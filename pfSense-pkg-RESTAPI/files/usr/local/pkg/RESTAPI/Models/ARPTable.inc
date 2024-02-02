@@ -20,7 +20,8 @@ class ARPTable extends Model
     public StringField $dnsresolve;
     public StringField $expires;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Define model attributes
         $this->many = true;
@@ -61,7 +62,8 @@ class ARPTable extends Model
         );
         $this->expires = new StringField(read_only: true, help_text: 'The expiration time for this ARP entry.');
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

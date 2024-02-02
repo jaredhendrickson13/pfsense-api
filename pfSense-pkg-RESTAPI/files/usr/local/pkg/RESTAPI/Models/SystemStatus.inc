@@ -158,7 +158,8 @@ class SystemStatus extends Model
             help_text: 'The current disk usage as a whole percentage.',
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

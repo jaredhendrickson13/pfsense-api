@@ -42,7 +42,8 @@ class IPsecPhase2 extends Model
     public StringField $pinghost;
     public BooleanField $keepalive;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Obtain global IPsec phase 2 variables
         global $p2_modes;
@@ -245,7 +246,8 @@ class IPsecPhase2 extends Model
                 'and tunnel mode P2s. For IKEv2 without split connections, this only needs to be enabled on one P2.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

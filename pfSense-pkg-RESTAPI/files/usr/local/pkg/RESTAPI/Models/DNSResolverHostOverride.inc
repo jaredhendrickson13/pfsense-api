@@ -19,7 +19,8 @@ class DNSResolverHostOverride extends Model
     public StringField $descr;
     public NestedModelField $aliases;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'unbound/hosts';
@@ -61,7 +62,8 @@ class DNSResolverHostOverride extends Model
             help_text: 'Additional alias hostnames that should resolve the same IP(s).',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

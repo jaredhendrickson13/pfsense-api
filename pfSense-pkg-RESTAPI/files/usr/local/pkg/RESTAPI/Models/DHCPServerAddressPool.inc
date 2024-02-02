@@ -37,7 +37,8 @@ class DHCPServerAddressPool extends Model
     public BooleanField $ignoreclientuids;
     public StringField $denyunknown;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Define Model attributes
         $this->parent_model_class = 'DHCPServer';
@@ -168,7 +169,8 @@ class DHCPServerAddressPool extends Model
                 'will get an IP address within this scope/range.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

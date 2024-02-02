@@ -22,7 +22,8 @@ class UserGroup extends Model
     public ForeignModelField $member;
     public StringField $priv;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'system/group';
@@ -74,7 +75,8 @@ class UserGroup extends Model
             allow_empty: true,
             help_text: 'The description to assign to this user group.',
         );
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

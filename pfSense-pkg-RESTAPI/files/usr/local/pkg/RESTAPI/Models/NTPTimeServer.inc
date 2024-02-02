@@ -54,7 +54,8 @@ class NTPTimeServer extends Model
             help_text: 'Prevent NTP from using this timeserver, but continue collecting stats.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

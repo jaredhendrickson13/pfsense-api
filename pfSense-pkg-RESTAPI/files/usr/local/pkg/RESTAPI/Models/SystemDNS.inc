@@ -15,7 +15,8 @@ class SystemDNS extends Model
     public StringField $dnslocalhost;
     public StringField $dnsserver;
 
-    public function __construct(mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'system';
@@ -44,7 +45,8 @@ class SystemDNS extends Model
             help_text: 'The remote DNS server IPv4 or IPv6 addresses.',
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

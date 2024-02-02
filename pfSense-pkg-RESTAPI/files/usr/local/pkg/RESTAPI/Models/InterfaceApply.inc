@@ -19,7 +19,8 @@ class InterfaceApply extends Model
     public BooleanField $applied;
     public InterfaceField $pending_interfaces;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->internal_callable = 'get_applied_status';
@@ -40,7 +41,8 @@ class InterfaceApply extends Model
             help_text: 'Displays a list of interfaces that have pending changes waiting to be applied.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

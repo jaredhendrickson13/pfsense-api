@@ -45,7 +45,8 @@ class DHCPServer extends Model
     public NestedModelField $pool;
     public NestedModelField $staticmap;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Define Model attributes
         $this->config_path = 'dhcpd';
@@ -226,7 +227,8 @@ class DHCPServer extends Model
             help_text: 'Static mappings applied to this DHCP server.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

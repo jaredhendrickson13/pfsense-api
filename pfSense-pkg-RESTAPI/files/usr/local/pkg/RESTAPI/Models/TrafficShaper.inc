@@ -25,7 +25,8 @@ class TrafficShaper extends Model
     public IntegerField $tbrconfig;
     public NestedModelField $queue;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'shaper/queue';
@@ -87,7 +88,8 @@ class TrafficShaper extends Model
             help_text: 'The child queues assigned to this traffic shaper.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

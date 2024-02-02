@@ -13,7 +13,8 @@ class CARP extends Model
     public BooleanField $maintenance_mode;
     public StringField $interfaces;
 
-    public function __construct(mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->internal_callable = 'get_carp_internal';
@@ -33,7 +34,8 @@ class CARP extends Model
             help_text: 'Enables or disables CARP maintenance mode on this system.',
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

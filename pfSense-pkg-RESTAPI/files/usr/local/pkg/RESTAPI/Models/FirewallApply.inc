@@ -21,7 +21,8 @@ class FirewallApply extends Model
     public BooleanField $applied;
     public StringField $pending_subsystems;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->internal_callable = 'get_applied_status';
@@ -43,7 +44,8 @@ class FirewallApply extends Model
             help_text: 'Displays the specific firewall subsystems that have pending changes.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

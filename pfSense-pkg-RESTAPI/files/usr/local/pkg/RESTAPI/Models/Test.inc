@@ -78,7 +78,8 @@ class Test extends Model
         );
 
         # Parent base 'Model' object must be constructed very last to ensure the Model has all configured attributes.
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

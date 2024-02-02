@@ -14,7 +14,8 @@ class InterfaceBridge extends Model
     public StringField $descr;
     public StringField $bridgeif;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'bridges/bridged';
@@ -41,7 +42,8 @@ class InterfaceBridge extends Model
             help_text: 'The real interface name for this bridge interface.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

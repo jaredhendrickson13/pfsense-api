@@ -42,7 +42,8 @@ class RESTAPISettings extends Model
     public StringField $ha_sync_username;
     public StringField $ha_sync_password;
 
-    public function __construct(mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Obtain the API config index and set the config path to the API configuration
         $this->id = $this->get_pkg_id();
@@ -185,7 +186,8 @@ class RESTAPISettings extends Model
             for the user defined in `ha_sync_username` and must be the same on all hosts defined in `ha_sync_hosts`.",
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

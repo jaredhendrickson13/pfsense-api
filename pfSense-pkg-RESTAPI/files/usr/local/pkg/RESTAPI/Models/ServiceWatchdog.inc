@@ -47,7 +47,8 @@ class ServiceWatchdog extends Model
             help_text: 'Indicates if this Service Watchdog is enabled or disabled. This value is unused.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

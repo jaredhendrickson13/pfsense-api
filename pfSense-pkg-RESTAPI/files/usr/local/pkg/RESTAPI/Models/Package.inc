@@ -20,7 +20,8 @@ class Package extends Model
     public StringField $latest_version;
     public BooleanField $update_available;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->internal_callable = 'get_installed_pkgs';
@@ -53,7 +54,8 @@ class Package extends Model
             help_text: 'Indicates whether the installed package has an update available.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

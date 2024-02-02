@@ -19,7 +19,8 @@ class InterfaceGroup extends Model
     /**
      * @inheritDoc
      */
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'ifgroups/ifgroupentry';
@@ -48,7 +49,8 @@ class InterfaceGroup extends Model
             help_text: 'The description for this interface group.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

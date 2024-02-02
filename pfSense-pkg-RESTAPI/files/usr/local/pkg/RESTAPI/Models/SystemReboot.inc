@@ -22,7 +22,8 @@ class SystemReboot extends Model
             help_text: "Run through the call but don't actually initiate a reboot.",
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

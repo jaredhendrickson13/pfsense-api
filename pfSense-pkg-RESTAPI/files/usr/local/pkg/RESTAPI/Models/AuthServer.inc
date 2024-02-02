@@ -252,6 +252,7 @@ class AuthServer extends Model
                 'Access-Requests. This choice will not change the interface used for contacting the RADIUS server.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 }

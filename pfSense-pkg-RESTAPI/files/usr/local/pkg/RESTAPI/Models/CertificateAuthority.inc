@@ -24,7 +24,8 @@ class CertificateAuthority extends Model
     public Base64Field $crt;
     public Base64Field $prv;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'ca';
@@ -69,7 +70,8 @@ class CertificateAuthority extends Model
             help_text: 'The X509 private key string.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

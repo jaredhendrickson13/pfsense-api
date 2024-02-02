@@ -41,7 +41,8 @@ class DefaultGateway extends Model
                 'automatically determine the default gateway, or set to `-` to assign no gateway.',
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

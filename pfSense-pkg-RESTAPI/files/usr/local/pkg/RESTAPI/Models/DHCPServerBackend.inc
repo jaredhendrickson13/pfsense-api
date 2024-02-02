@@ -26,7 +26,8 @@ class DHCPServerBackend extends Model
                 'version of pfSense.',
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

@@ -15,7 +15,8 @@ class RESTAPISettingsSync extends Model
 {
     public StringField $sync_data;
 
-    public function __construct(mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->internal_callable = 'void';
@@ -28,7 +29,8 @@ class RESTAPISettingsSync extends Model
             help_text: 'The serialized REST API settings data to be synced.',
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

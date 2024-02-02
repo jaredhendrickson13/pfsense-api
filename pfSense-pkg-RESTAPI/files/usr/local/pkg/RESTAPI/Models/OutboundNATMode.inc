@@ -11,7 +11,8 @@ class OutboundNATMode extends Model
 {
     public StringField $mode;
 
-    public function __construct(mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'nat/outbound';
@@ -27,7 +28,8 @@ class OutboundNATMode extends Model
                 'NAT on this system entirely.',
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

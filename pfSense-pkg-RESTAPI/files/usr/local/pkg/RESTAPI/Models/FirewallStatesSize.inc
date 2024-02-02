@@ -13,7 +13,8 @@ class FirewallStatesSize extends Model
     public IntegerField $defaultmaximumstates;
     public IntegerField $currentstates;
 
-    public function __construct(mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'system';
@@ -34,7 +35,8 @@ class FirewallStatesSize extends Model
             read_only: true,
             help_text: 'The number of firewall state entries currently registered in the states table.',
         );
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

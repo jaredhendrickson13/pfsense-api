@@ -140,7 +140,8 @@ class NTPSettings extends Model
             help_text: 'The digest algorithm for the server authentication key.',
         );
 
-        parent::__construct(null, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

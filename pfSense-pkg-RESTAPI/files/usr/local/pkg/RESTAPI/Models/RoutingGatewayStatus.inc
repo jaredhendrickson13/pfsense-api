@@ -19,7 +19,8 @@ class RoutingGatewayStatus extends Model
     public StringField $status;
     public StringField $substatus;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->internal_callable = 'get_gateway_statuses';
@@ -72,7 +73,8 @@ class RoutingGatewayStatus extends Model
                 'gateway is seeing such as latency or packet loss.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

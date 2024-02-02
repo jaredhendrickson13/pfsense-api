@@ -34,7 +34,8 @@ class PortForward extends Model
     public UnixTimeField $updated_time;
     public StringField $updated_by;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set model attributes
         $this->config_path = 'nat/rule';
@@ -163,7 +164,8 @@ class PortForward extends Model
             help_text: 'The username and IP of the user who last updated this port forward rule.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

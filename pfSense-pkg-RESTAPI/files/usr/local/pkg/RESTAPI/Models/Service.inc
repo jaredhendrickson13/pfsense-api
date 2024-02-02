@@ -16,7 +16,8 @@ class Service extends Model
     public BooleanField $enabled;
     public BooleanField $status;
 
-    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+
     {
         # Set Model attributes
         $this->internal_callable = 'get_services';
@@ -48,7 +49,8 @@ class Service extends Model
             help_text: 'Indicates if the service is actively running.',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**

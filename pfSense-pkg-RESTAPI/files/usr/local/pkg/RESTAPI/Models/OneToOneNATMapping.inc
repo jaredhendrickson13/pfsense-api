@@ -102,7 +102,8 @@ class OneToOneNATMapping extends Model
             help_text: 'A description for this 1:1 NAT mapping',
         );
 
-        parent::__construct($id, null, $data, ...$options);
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**
