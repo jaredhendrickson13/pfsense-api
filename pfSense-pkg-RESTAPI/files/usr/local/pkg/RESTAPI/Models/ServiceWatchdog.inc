@@ -14,7 +14,7 @@ class ServiceWatchdog extends Model
     public BooleanField $notify;
     public BooleanField $enabled;
 
-    public function __construct(mixed $id = null, mixed $data = [], ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
     {
         # Set model attributes
         $this->config_path = 'installedpackages/servicewatchdog/item';

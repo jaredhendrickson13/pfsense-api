@@ -25,7 +25,7 @@ class Test extends Model
     public Field $test_string_many;
     public Field $test_string_namespace;
 
-    public function __construct(mixed $id = null, array $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $parent_id = null, array $data = [], mixed ...$options)
     {
         # Mark this model as a `many` model indicating multiple Test model objects can be created. This is also
         # required for the `unique` field to work.
