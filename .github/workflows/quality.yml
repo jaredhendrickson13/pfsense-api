@@ -37,7 +37,7 @@ jobs:
         run: |
           curl -Ls https://github.com/overtrue/phplint/releases/download/9.0.3/phplint.phar -o /usr/local/bin/phplint
           chmod +x /usr/local/bin/phplint
-          /usr/local/bin/phplint -vvv --no-cache --extensions .inc,.php -- .
+          /usr/local/bin/phplint -vvv --no-cache --extensions .inc .php -- .
 
   python:
     runs-on: ubuntu-latest
