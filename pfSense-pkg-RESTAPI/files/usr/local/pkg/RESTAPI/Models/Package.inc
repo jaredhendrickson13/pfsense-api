@@ -21,7 +21,6 @@ class Package extends Model
     public BooleanField $update_available;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->internal_callable = 'get_installed_pkgs';
@@ -55,7 +54,6 @@ class Package extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

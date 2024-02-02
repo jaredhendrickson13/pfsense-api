@@ -23,7 +23,6 @@ class SystemReboot extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

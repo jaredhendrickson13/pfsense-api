@@ -19,7 +19,6 @@ class RESTAPIJWT extends Model
     public StringField $token;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set Model attributes
         $this->verbose_name = 'API JWT';
@@ -32,7 +31,6 @@ class RESTAPIJWT extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

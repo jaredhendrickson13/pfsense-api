@@ -18,7 +18,6 @@ class SystemVersion extends Model
     public StringField $buildtime;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->internal_callable = 'get_pfsense_version';
@@ -40,7 +39,6 @@ class SystemVersion extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

@@ -16,7 +16,6 @@ class RESTAPIVersion extends Model
     public StringField $install_version;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->internal_callable = 'get_api_version_details';
@@ -48,7 +47,6 @@ class RESTAPIVersion extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

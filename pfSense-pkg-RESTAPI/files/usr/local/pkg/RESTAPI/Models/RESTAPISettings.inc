@@ -43,7 +43,6 @@ class RESTAPISettings extends Model
     public StringField $ha_sync_password;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Obtain the API config index and set the config path to the API configuration
         $this->id = $this->get_pkg_id();
@@ -187,7 +186,6 @@ class RESTAPISettings extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

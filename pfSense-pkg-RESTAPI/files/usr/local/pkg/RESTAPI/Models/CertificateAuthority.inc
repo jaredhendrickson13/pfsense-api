@@ -25,7 +25,6 @@ class CertificateAuthority extends Model
     public Base64Field $prv;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->config_path = 'ca';
@@ -71,7 +70,6 @@ class CertificateAuthority extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

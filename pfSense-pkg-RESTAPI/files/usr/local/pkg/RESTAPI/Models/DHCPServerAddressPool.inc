@@ -38,7 +38,6 @@ class DHCPServerAddressPool extends Model
     public StringField $denyunknown;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Define Model attributes
         $this->parent_model_class = 'DHCPServer';
@@ -170,7 +169,6 @@ class DHCPServerAddressPool extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

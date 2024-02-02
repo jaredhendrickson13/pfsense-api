@@ -17,7 +17,6 @@ class Service extends Model
     public BooleanField $status;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set Model attributes
         $this->internal_callable = 'get_services';
@@ -50,7 +49,6 @@ class Service extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

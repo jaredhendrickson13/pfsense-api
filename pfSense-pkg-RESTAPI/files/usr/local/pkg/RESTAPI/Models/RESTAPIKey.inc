@@ -22,7 +22,6 @@ class RESTAPIKey extends Model
     public StringField $key;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Gather information about current API settings
         $api_pkg_id = RESTAPISettings::get_pkg_id();
@@ -73,7 +72,6 @@ class RESTAPIKey extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

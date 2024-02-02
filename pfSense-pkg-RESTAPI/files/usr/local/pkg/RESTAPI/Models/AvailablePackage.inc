@@ -20,7 +20,6 @@ class AvailablePackage extends Model
     public StringField $deps;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->internal_callable = 'get_all_pkgs';
@@ -52,7 +51,6 @@ class AvailablePackage extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

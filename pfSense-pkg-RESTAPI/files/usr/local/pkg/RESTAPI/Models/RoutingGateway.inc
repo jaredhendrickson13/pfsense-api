@@ -43,7 +43,6 @@ class RoutingGateway extends Model
     public IntegerField $alert_interval;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Define Model attributes
         $this->config_path = 'gateways/gateway_item';
@@ -172,7 +171,6 @@ class RoutingGateway extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

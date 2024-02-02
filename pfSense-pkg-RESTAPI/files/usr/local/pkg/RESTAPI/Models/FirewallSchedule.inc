@@ -22,7 +22,6 @@ class FirewallSchedule extends Model
     public NestedModelField $timerange;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->config_path = 'schedules/schedule';
@@ -59,7 +58,6 @@ class FirewallSchedule extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

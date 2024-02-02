@@ -16,7 +16,6 @@ class RESTAPISettingsSync extends Model
     public StringField $sync_data;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->internal_callable = 'void';
@@ -30,7 +29,6 @@ class RESTAPISettingsSync extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

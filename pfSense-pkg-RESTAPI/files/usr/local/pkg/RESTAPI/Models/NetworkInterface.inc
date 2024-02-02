@@ -69,7 +69,6 @@ class NetworkInterface extends Model
     public StringField $track6_prefix_id_hex;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set the configuration path for these objects and allow many to be stored.
         $this->config_path = 'interfaces';
@@ -368,7 +367,6 @@ class NetworkInterface extends Model
 
         # Needs to be constructed after Fields are defined
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

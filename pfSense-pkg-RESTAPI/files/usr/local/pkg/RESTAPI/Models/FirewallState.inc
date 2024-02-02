@@ -110,7 +110,6 @@ class FirewallState extends Model
             help_text: 'The total number of outbound traffic (in bytes) observed by the state.',
         );
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

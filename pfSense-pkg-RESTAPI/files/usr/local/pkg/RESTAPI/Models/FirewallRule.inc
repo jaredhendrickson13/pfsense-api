@@ -47,7 +47,6 @@ class FirewallRule extends Model
     public StringField $updated_by;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->config_path = 'filter/rule';
@@ -284,7 +283,6 @@ class FirewallRule extends Model
         # TODO: Add ForeignModelField for `ackqueue` when the traffic shaper Models are developed
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

@@ -16,7 +16,6 @@ class SystemDNS extends Model
     public StringField $dnsserver;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->config_path = 'system';
@@ -46,7 +45,6 @@ class SystemDNS extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

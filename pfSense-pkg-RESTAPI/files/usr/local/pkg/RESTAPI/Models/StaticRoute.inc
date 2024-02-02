@@ -25,7 +25,6 @@ class StaticRoute extends Model
      * Constructs the StaticRoute object.
      */
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Define model attributes
         $this->config_path = 'staticroutes/route';
@@ -51,7 +50,6 @@ class StaticRoute extends Model
         $this->disabled = new BooleanField(default: false, help_text: 'Disable this static route.');
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

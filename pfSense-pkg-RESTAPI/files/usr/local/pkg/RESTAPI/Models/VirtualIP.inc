@@ -34,7 +34,6 @@ class VirtualIP extends Model
     public StringField $carp_status;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Define model attributes
         $this->config_path = 'virtualip/vip';
@@ -127,7 +126,6 @@ class VirtualIP extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

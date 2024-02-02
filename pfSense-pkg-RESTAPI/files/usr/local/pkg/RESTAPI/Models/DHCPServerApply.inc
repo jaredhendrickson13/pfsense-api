@@ -11,7 +11,6 @@ class DHCPServerApply extends Model
     public BooleanField $applied;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->internal_callable = 'get_applied_status';
@@ -26,7 +25,6 @@ class DHCPServerApply extends Model
                 'Displays `false` when there are pending DHCP server changes that have not been applied.',
         );
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

@@ -17,7 +17,6 @@ class WakeOnLANSend extends Model
     public StringField $mac_addr;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->many = false;
@@ -34,7 +33,6 @@ class WakeOnLANSend extends Model
             help_text: 'The MAC address of the host to be awoken.',
         );
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

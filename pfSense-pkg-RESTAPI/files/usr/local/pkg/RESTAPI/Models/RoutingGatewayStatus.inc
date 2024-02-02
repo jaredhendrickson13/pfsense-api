@@ -20,7 +20,6 @@ class RoutingGatewayStatus extends Model
     public StringField $substatus;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->internal_callable = 'get_gateway_statuses';
@@ -74,7 +73,6 @@ class RoutingGatewayStatus extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

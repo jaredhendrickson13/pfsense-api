@@ -36,7 +36,6 @@ class OutboundNATMapping extends Model
     public StringField $descr;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->config_path = 'nat/outbound/rule';
@@ -174,7 +173,6 @@ class OutboundNATMapping extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

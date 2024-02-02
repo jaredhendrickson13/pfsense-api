@@ -55,7 +55,6 @@ class IPsecPhase1 extends Model
     public NestedModelField $encryption;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Define model attributes
         $this->config_path = 'ipsec/phase1';
@@ -229,7 +228,6 @@ class IPsecPhase1 extends Model
             help_text: 'The encryption algorithms supported by this P1 encryption.',
         );
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**

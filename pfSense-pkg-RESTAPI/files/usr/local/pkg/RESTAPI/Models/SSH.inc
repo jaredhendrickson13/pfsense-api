@@ -16,7 +16,6 @@ class SSH extends Model
     public BooleanField $sshdagentforwarding;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-
     {
         # Set model attributes
         $this->config_path = 'system/ssh';
@@ -49,7 +48,6 @@ class SSH extends Model
 
         # Construct the parent Model object
         parent::__construct($id, $parent_id, $data, ...$options);
-
     }
 
     /**
