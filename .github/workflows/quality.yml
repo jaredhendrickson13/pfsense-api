@@ -12,7 +12,7 @@ jobs:
       - name: Install npm packages
         run: npm install
       - name: Check Prettier
-        run: prettier --check ./pfSense-pkg-RESTAPI/files
+        run: ./node_modules/.bin/prettier --check ./pfSense-pkg-RESTAPI/files
 
   php:
     runs-on: ubuntu-latest
@@ -20,6 +20,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Check PHP syntax errors
         uses: overtrue/phplint@9.0.3
+        with:
+          path: ./pfSense-pkg-RESTAPI/files
 
   python:
     runs-on: ubuntu-latest
