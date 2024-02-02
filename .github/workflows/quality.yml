@@ -21,7 +21,7 @@ jobs:
       - name: Check PHP syntax errors
         uses: overtrue/phplint@9.0.3
         with:
-          path: "./pfSense-pkg-RESTAPI/files/**/*.inc"
+          path: "./pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/**/*.inc"
 
   python:
     runs-on: ubuntu-latest
