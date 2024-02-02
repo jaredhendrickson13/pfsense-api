@@ -33,7 +33,7 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
 class Auth
 {
     use BaseTraits;
-    
+
     /**
      * @var array $api_settings The current REST API settings config. This contains the settings internal values.
      */
@@ -157,7 +157,7 @@ class Auth
 
         # Log this authentication attempt and return the authentication result
         $this->log_authentication();
-        
+
         return $this->is_authenticated;
     }
 

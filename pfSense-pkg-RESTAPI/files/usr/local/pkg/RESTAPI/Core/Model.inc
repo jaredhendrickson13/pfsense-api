@@ -38,7 +38,7 @@ const DEFAULT_CLIENT_IP_ADDRESS = '127.0.0.1';
 class Model
 {
     use BaseTraits;
-    
+
     /**
      * @var string|null $config_path
      * The configuration path where this Model's object(s) are internally stored. This property is mandatory unless

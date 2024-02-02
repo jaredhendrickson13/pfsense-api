@@ -15,7 +15,7 @@ use RESTAPI\Responses\ServiceUnavailableError;
 class Dispatcher
 {
     use BaseTraits;
-    
+
     /**
      * @const DISPATCH_SCRIPT The absolute file path to the dispatch.sh helper script.
      */

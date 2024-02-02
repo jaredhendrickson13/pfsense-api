@@ -13,7 +13,7 @@ require_once 'RESTAPI/autoloader.inc';
 class Form
 {
     use BaseTraits;
-    
+
     public string $url;
     public bool $many = false;
     public bool $editable = true;

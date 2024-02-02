@@ -89,7 +89,7 @@ const HTTP_STATUS_MESSAGES = [
 class Response extends Error
 {
     use BaseTraits;
-    
+
     public $code = 500;
     public string $status;
     public string $help_text = '';

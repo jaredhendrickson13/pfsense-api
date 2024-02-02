@@ -13,7 +13,7 @@ namespace RESTAPI\Core;
 class Command
 {
     use BaseTraits;
-    
+
     public string $command;
     public string $redirect;
     public string $output = '';

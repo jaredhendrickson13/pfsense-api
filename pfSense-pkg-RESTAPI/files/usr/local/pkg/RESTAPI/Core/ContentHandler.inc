@@ -20,7 +20,7 @@ require_once 'RESTAPI/autoloader.inc';
 class ContentHandler
 {
     use BaseTraits;
-    
+
     const DEFAULT_ENCODE_MIME_TYPE = 'application/json';
 
     /**

@@ -17,7 +17,7 @@ require_once 'RESTAPI/autoloader.inc';
 class TestCase
 {
     use BaseTraits;
-    
+
     public string $method = 'unknown';
     public string $method_docstring = '';
 

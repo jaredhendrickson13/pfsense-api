@@ -14,7 +14,7 @@ require_once 'RESTAPI/autoloader.inc';
 class ModelSet
 {
     use BaseTraits;
-    
+
     const QUERY_FILTERS = ['startswith', 'endswith', 'contains', 'lt', 'lte', 'gt', 'gte', 'exact', 'except', 'has'];
 
     /**

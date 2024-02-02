@@ -14,7 +14,7 @@ require_once 'RESTAPI/autoloader.inc';
 class ResourceLink
 {
     use BaseTraits;
-    
+
     /**
      * @var $custom_attributes array
      * Defines custom attributes to include in the link object. Any custom attributes defined should be well documented.

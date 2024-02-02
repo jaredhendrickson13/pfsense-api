@@ -13,7 +13,7 @@ use const RESTAPI\Core\Globals\HAL_REL_NAMESPACE;
 class ResourceLinkSet
 {
     use BaseTraits;
-    
+
     /**
      * Constructs a new ResourceLinkSet object
      * @param array $resource_links An array of ResourceLink objects to include in this ResourceLinkSet

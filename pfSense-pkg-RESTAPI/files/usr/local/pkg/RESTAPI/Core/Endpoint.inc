@@ -37,7 +37,7 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
 class Endpoint
 {
     use BaseTraits;
-    
+
     /**
      * @var string $url
      * The URL of this endpoint, used to generate a PHP file in the web path pointing
