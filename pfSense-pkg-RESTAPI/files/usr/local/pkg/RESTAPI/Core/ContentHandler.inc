@@ -64,7 +64,6 @@ class ContentHandler extends BaseClass
     final public function encode(mixed $content): mixed {
         $encoded_content = $this->_encode($content);
         header("content-type: $this->mime_type");
-        header("content-length: ".strlen($encoded_content));
         return $encoded_content;
     }
 
