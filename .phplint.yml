@@ -1,2 +1,3 @@
-path:
-  - "pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/**/*.{php,inc}"
+extensions:
+  - ".inc"
+  - ".php"
