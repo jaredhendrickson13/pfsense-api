@@ -10,7 +10,7 @@ use const RESTAPI\Core\Globals\HAL_REL_NAMESPACE;
 /**
  * Defines a class that allows the storage and processing of many ResourceLink objects at once.
  */
-class ResourceLinkSet
+class ResourceLinkSet extends BaseClass
 {
     /**
      * Constructs a new ResourceLinkSet object

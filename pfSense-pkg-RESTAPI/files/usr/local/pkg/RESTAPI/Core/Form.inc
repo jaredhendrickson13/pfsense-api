@@ -10,7 +10,7 @@ require_once("RESTAPI/autoloader.inc");
  * Defines a Form object that can be used to dynamically generate custom pfSense webConfigurator pages for a specified
  * Model object.
  */
-class Form {
+class Form extends BaseClass {
     public string $url;
     public bool $many = false;
     public bool $editable = true;

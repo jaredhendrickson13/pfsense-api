@@ -12,7 +12,7 @@ use RESTAPI\Responses\ServiceUnavailableError;
  * objects allows us to dynamically create a private PHP script that can be called in the background, manages the
  * process spawn queue, and enforces background process timeouts.
  */
-class Dispatcher
+class Dispatcher extends BaseClass
 {
     /**
      * @const DISPATCH_SCRIPT The absolute file path to the dispatch.sh helper script.

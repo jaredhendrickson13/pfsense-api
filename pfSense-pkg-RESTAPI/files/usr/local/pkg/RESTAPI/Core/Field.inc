@@ -17,7 +17,7 @@ use const RESTAPI\Core\Globals\RESERVED_FIELD_NAMES;
  * assigned custom Validator objects to add custom validation to the Field. Field's must be assigned as a properties
  * Model objects.
  */
-class Field
+class Field extends BaseClass
 {
     /**
      * @const SENSITIVE_MASK The value that is used to mask the value of a $sensitive Field object. This only applies

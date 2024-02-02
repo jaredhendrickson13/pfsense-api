@@ -34,7 +34,7 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * Represents an API Endpoint, encapsulating attributes essential for generating the API endpoint
  * and facilitating API calls. description is not adequate.
  */
-class Endpoint {
+class Endpoint extends BaseClass {
     /**
      * @var string $url
      * The URL of this endpoint, used to generate a PHP file in the web path pointing

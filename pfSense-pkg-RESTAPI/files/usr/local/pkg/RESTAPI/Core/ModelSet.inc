@@ -11,7 +11,7 @@ require_once("RESTAPI/autoloader.inc");
  * Creates a ModelSet object that acts as a container for multiple Model objects. This can be used to represent a
  * set of Model objects at once. Additionally, ModelSets can be further filtered using queries.
  */
-class ModelSet {
+class ModelSet extends BaseClass {
     const QUERY_FILTERS = ["startswith", "endswith", "contains", "lt", "lte", "gt", "gte", "exact", "except", "has"];
     public array $model_objects;
 

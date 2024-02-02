@@ -9,7 +9,7 @@ require_once("RESTAPI/autoloader.inc");
 /**
  * Defines a Validator object which Field objects can use to quickly validate its value.
  */
-class Validator {
+class Validator extends BaseClass {
     public Model|null $model_context = null;
     public Field|null $field_context = null;
 

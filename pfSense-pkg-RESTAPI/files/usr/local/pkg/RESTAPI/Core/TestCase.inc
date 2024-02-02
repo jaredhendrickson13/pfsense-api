@@ -14,7 +14,7 @@ require_once("RESTAPI/autoloader.inc");
  * Defines a TestCase object that can be used to define child TestCase classes that test internal functionality of
  * the API. This is needed because pfSense does not have PHPUnit readily available.
  */
-class TestCase {
+class TestCase extends BaseClass {
     public string $method = "unknown";
     public string $method_docstring = "";
 
