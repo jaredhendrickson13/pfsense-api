@@ -32,6 +32,10 @@ class TrafficShaperLimiter extends Model
     public IntegerField $param_pie_beta;
     public IntegerField $param_pie_max_burst;
     public IntegerField $param_pie_max_ecnth;
+    public BooleanField $pie_onoff;
+    public BooleanField $pie_capdrop;
+    public BooleanField $pie_qdelay;
+    public BooleanField $pie_pderand;
     public IntegerField $param_red_w_q;
     public IntegerField $param_red_min_th;
     public IntegerField $param_red_max_th;
@@ -58,6 +62,7 @@ class TrafficShaperLimiter extends Model
     public FloatField $plr;
     public IntegerField $buckets;
     public NestedModelField $bandwidth;
+    public NestedModelField $queue;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
     {
@@ -182,6 +187,30 @@ class TrafficShaperLimiter extends Model
             default: 0,
             conditions: ['aqm' => 'pie'],
             help_text: 'The value for the PIE ecnth parameter.',
+        );
+        $this->pie_onoff = new BooleanField(
+            default: false,
+            indicates_true: 'on',
+            conditions: ['aqm' => 'pie'],
+            help_text: 'Enable or disable turning PIE on and off depending on queue load.',
+        );
+        $this->pie_capdrop = new BooleanField(
+            default: false,
+            indicates_true: 'on',
+            conditions: ['aqm' => 'pie'],
+            help_text: 'Enable or disable cap drop adjustment.',
+        );
+        $this->pie_qdelay = new BooleanField(
+            default: false,
+            indicates_true: 'on',
+            conditions: ['aqm' => 'pie'],
+            help_text: 'Set queue delay type to timestamps (true) or departure rate estimation (false).',
+        );
+        $this->pie_pderand = new BooleanField(
+            default: false,
+            indicates_true: 'on',
+            conditions: ['aqm' => 'pie'],
+            help_text: 'Enable or disable drop probability de-randomisation.',
         );
         $this->param_red_w_q = new IntegerField(
             default: 1,
@@ -325,6 +354,12 @@ class TrafficShaperLimiter extends Model
             default: [],
             allow_empty: true,
             help_text: 'The bandwidth profiles for this limiter.',
+        );
+        $this->queue = new NestedModelField(
+            model_class: 'TrafficShaperLimiterQueue',
+            default: [],
+            allow_empty: true,
+            help_text: 'The child queues for this limiter.',
         );
 
         parent::__construct($id, $parent_id, $data, $options);
