@@ -36,7 +36,7 @@ class TrafficShaperLimiterBandwidth extends Model
         $this->bwsched = new ForeignModelField(
             model_name: 'FirewallSchedule',
             model_field: 'name',
-            allowed_keywords: ["none"],
+            allowed_keywords: ['none'],
             default: 'none',
             help_text: 'The schedule to assign this bandwidth profile. When this firewall schedule is active, ' .
                 'this bandwidth profile will be used.',

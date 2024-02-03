@@ -65,7 +65,7 @@ class TrafficShaperLimiter extends Model
         $this->config_path = 'dnshaper/queue';
         $this->subsystem = 'shaper';
         $this->many = true;
-        
+
         # Set model fields
         $this->name = new StringField(
             required: true,
