@@ -6,6 +6,7 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Form;
 use RESTAPI\Core\Response;
+use RESTAPI\Models\RESTAPISettings;
 
 class SystemRESTAPIKey extends Form
 {
@@ -25,9 +26,25 @@ class SystemRESTAPIKey extends Form
     ];
 
     /**
+     * Prints a warning banner when the page loads if this Form is accessed when KeyAuth is not enabled.
+     */
+    public function on_load(): void
+    {
+        # Print a warning at the top of the page if the user is accessing the page when KeyAuth is not enabled
+        $api_settings = new RESTAPISettings();
+        if (!in_array("KeyAuth", $api_settings->auth_methods->value)) {
+            $this->print_info_banner(
+                message: "Key authentication is not currently enabled. You may create keys, but they cannot be used ".
+                "until Key authentication is enabled on the <a href='/system_restapi_settings.php'>REST API > ".
+                "Settings</a> tab."
+            );
+        }
+    }
+
+    /**
      * Overwrite the on_save() method to include the generated API key.
      */
-    public function on_save()
+    public function on_save(): void
     {
         # Update settings with the newly provided values
         $representation_data = $this->id ? ['id' => $this->id] : [];
