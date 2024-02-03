@@ -14,22 +14,116 @@ class Form
 {
     use BaseTraits;
 
+    /**
+     * @var string $url The URL this Form can be accessed at.
+     */
     public string $url;
+
+    /**
+     * @var bool $many Indicate whether this Form should interact with many Model object at once. When `true`, the
+     * Form display models as a table and can be configured using the $title_path, $editable, and $deletable properties.
+     * When `false`, the Form will only display one model at a time. This field is only appliacble if the $model_class
+     * is a many enabled Model.
+     */
     public bool $many = false;
+
+    /**
+     * @var bool $editable When `true`, the edit button will be displayed on the table for each Model object. This is
+     * only applicable when $many is `true`. If false, Model objects cannot be edited via this form.
+     */
     public bool $editable = true;
+
+    /**
+     * @var bool $editable When `true`, the delete button will be displayed on the table for each Model object. This is
+     * only applicable when $many is `true`. If false, Model objects cannot be deleted via this form.
+     */
     public bool $deletable = true;
+
+    /**
+     * @var string $many_sub_url The URL that the edit button should link to when clicked. This URL should not contain
+     * Model specific values like IDs. In most cases, this will link the $url of another non-many Form object. This
+     * property is only applicable when $many is enabled for this Form.
+     */
     public string $many_sub_url = '';
+
+    /**
+     * @var mixed $id The ID of the Model object this Form is currently interacting with. This is generally only
+     * applicable when $many is set to false.
+     */
     public mixed $id = null;
+
+    /**
+     * @var array $title_path The path to display at the top of the webConfigurator page. This path typically indicates
+     * which pages were navigated to in order to reach this Form page with the last item representing the page we
+     * are currently on. (i.e. ["System", "REST API", "Settings"])
+     */
     public array $title_path = [];
+
+    /**
+     * @var array $tabs An array of additional tabs that should be display for this form. These tabs are quick links
+     * to other pages or Form objects that are directly related to this Form's Model. These value must be an array
+     * of arrays, each listed array must have three items in this order: 1. The name to show on the tab. 2. A boolean
+     * indicating whether we are currently on this tab. 3. The URL of the page to link to when the tab is selected.
+     */
     public array $tabs;
-    public string $model_name = '';
+
+    /**
+     * @var string $model_class The shortname of the Model class this Form interacts with.
+     */
+    public string $model_class = '';
+
+    /**
+     * @var string $custom_css The URL to a custom CSS file for this Form page to use.
+     */
     public string $custom_css = '';
+
+    /**
+     * @var string $custom_js The URL to a custom JS file for this Form page to use.
+     */
     public string $custom_js = '';
-    public array $sections = ['General' => ['Fields' => [], 'classes' => []]];
+
+    /**
+     * @var array|array[] Defines subsections for this Form and assigns specific Model fields to display in each section.
+     * This value must be an array where the array keys are the name of the Form section, and the value is an array of
+     * attributes. Valid section attributes are:
+     *     'fields' an array of Model field names to include in the section.
+     *     'classes' an array of CSS class names to assign the section.
+     */
+    public array $sections = ['General' => ['fields' => [], 'classes' => []]];
+
+    /**
+     * @var array $table_fields Sets the fields that will generate columns for the Form table. This is only applicable
+     * when $many is `true`.
+     */
     public array $table_fields = [];
+
+    /**
+     * @var array $buttons Defines additional buttons to add to the form page. This must be an array of arrays where the
+     * key is the ID name to give the button, and the value is an array of button attributes. Valid button attributes
+     * are:
+     *     'title' the verbose name to display on the button itself.
+     *     'icon' the pfSense CSS icon class for this button (i.e. fa-repeat, fa-question-circle, etc.)
+     *     'classes' an array of additional CSS classes to assign the button.
+     *     'on_click' the JS to trigger when the button is clicked.
+     *     'callable' the Form method to call when the button is click. This must be the method name as a string.
+     *     'link' the URL to link to when the button is clicked.
+     */
     public array $buttons = [];
+
+    /**
+     * @var array $form_data The POSTed data from the client using the Form.
+     */
     public array $form_data = [];
+
+    /**
+     * @var string $verbose_name Defines a verbose name for this Form page. If none is specified, a default verbose name
+     * will be generated using this Form class's shortname.
+     */
     public string $verbose_name = '';
+
+    /**
+     * @var Model|mixed $model The Model object this Form is interacting with.
+     */
     protected Model $model;
 
     /**
@@ -47,13 +141,16 @@ class Form
         # Obtain the `id` from URL parameters
         $this->id = is_numeric($_GET['id']) ? intval($_GET['id']) : null;
 
+        # Obtain the class FQN
+        $this->model_class = "\\RESTAPI\\Models\\$this->model_class";
+
         # For `many` Forms, specify an ID
         if ($this->many) {
-            $this->model = new $this->model_name(id: $this->id, client: $client);
+            $this->model = new $this->model_class(id: $this->id, client: $client);
         }
         # For non `many` Forms, don't specify an ID when creating
         else {
-            $this->model = new $this->model_name(client: $client);
+            $this->model = new $this->model_class(client: $client);
         }
 
         foreach ($this->title_path as &$path) {
@@ -93,7 +190,7 @@ class Form
             $section->addClass(implode(' ', $section_params['classes'] ?? []));
 
             # Add any defined Fields to this section
-            foreach ($section_params['Fields'] as $section_field) {
+            foreach ($section_params['fields'] as $section_field) {
                 # Make this a password field if it is a sensitive field
                 if ($this->model->$section_field->sensitive) {
                     $section->addPassword($this->model->$section_field->to_form_input());

@@ -9,7 +9,7 @@ use RESTAPI\Core\Form;
 class SystemRESTAPIUpdatesForm extends Form
 {
     public string $url = '/system_restapi_updates.php';
-    public string $model_name = '\RESTAPI\Models\RESTAPIVersion';
+    public string $model_class = 'RESTAPIVersion';
     public array $title_path = ['System', 'REST API', 'Updates'];
     public array $tabs = [
         ['Settings', false, '/system_restapi_settings.php'],
@@ -19,10 +19,10 @@ class SystemRESTAPIUpdatesForm extends Form
     ];
     public array $sections = [
         'Version' => [
-            'Fields' => ['current_version', 'latest_version', 'latest_version_release_date'],
+            'fields' => ['current_version', 'latest_version', 'latest_version_release_date'],
         ],
         'Install a different version' => [
-            'Fields' => ['install_version'],
+            'fields' => ['install_version'],
         ],
     ];
 }

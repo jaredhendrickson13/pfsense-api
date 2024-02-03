@@ -10,7 +10,7 @@ use RESTAPI\Models\RESTAPIJWT;
 class SystemRESTAPISettingsForm extends Form
 {
     public string $url = '/system_restapi_settings.php';
-    public string $model_name = '\RESTAPI\Models\RESTAPISettings';
+    public string $model_class = 'RESTAPISettings';
     public array $title_path = ['System', 'REST API', 'Settings'];
     public array $tabs = [
         ['Settings', true, '/system_restapi_settings.php'],
@@ -20,10 +20,10 @@ class SystemRESTAPISettingsForm extends Form
     ];
     public array $sections = [
         'General' => [
-            'Fields' => ['enabled', 'keep_backup', 'represent_interfaces_as'],
+            'fields' => ['enabled', 'keep_backup', 'represent_interfaces_as'],
         ],
         'Security' => [
-            'Fields' => [
+            'fields' => [
                 'allowed_interfaces',
                 'read_only',
                 'auth_methods',
@@ -33,7 +33,7 @@ class SystemRESTAPISettingsForm extends Form
             ],
         ],
         'Advanced Settings' => [
-            'Fields' => [
+            'fields' => [
                 'hateoas',
                 'allow_pre_releases',
                 'ha_sync',

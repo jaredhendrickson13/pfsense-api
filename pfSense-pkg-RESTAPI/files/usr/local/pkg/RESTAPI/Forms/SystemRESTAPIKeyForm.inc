@@ -11,7 +11,7 @@ use RESTAPI\Models\RESTAPISettings;
 class SystemRESTAPIKeyForm extends Form
 {
     public string $url = '/system_restapi_key_edit.php';
-    public string $model_name = '\RESTAPI\Models\RESTAPIKey';
+    public string $model_class = 'RESTAPIKey';
     public array $title_path = ['System', 'REST API', 'Keys'];
     public array $tabs = [
         ['Settings', false, '/system_restapi_settings.php'],
@@ -21,7 +21,7 @@ class SystemRESTAPIKeyForm extends Form
     ];
     public array $sections = [
         'Key Settings' => [
-            'Fields' => ['hash_algo', 'length_bytes', 'descr'],
+            'fields' => ['hash_algo', 'length_bytes', 'descr'],
         ],
     ];
 

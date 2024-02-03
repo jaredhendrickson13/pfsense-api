@@ -1124,7 +1124,6 @@ class Field
 
         # Enhance help text to include instructions on formatting
         $help_text = $this->help_text;
-        $help_text .= $this->many ? " Many values may be specified seperated by <code>$this->delimiter</code>" : '';
         $help_text .= $this->unique ? ' Value must be unique from all other objects of its kind.' : '';
 
         $input->setHelp($help_text);

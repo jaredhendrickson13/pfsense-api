@@ -13,7 +13,7 @@ class SystemRESTAPIKeysForm extends Form
     public string $many_sub_url = '/system_restapi_key_edit.php';
     public bool $many = true;
     public bool $editable = false;
-    public string $model_name = '\RESTAPI\Models\RESTAPIKey';
+    public string $model_class = 'RESTAPIKey';
     public array $title_path = ['System', 'REST API', 'Keys'];
     public array $table_fields = ['username', 'hash_algo', 'length_bytes', 'descr'];
     public array $tabs = [
