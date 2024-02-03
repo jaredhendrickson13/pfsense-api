@@ -8,7 +8,7 @@ use RESTAPI\Core\Form;
 use RESTAPI\Core\Response;
 use RESTAPI\Models\RESTAPISettings;
 
-class SystemRESTAPIKey extends Form
+class SystemRESTAPIKeyForm extends Form
 {
     public string $url = '/system_restapi_key_edit.php';
     public string $model_name = '\RESTAPI\Models\RESTAPIKey';

@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Form;
 use RESTAPI\Models\RESTAPIJWT;
 
-class SystemRESTAPISettings extends Form
+class SystemRESTAPISettingsForm extends Form
 {
     public string $url = '/system_restapi_settings.php';
     public string $model_name = '\RESTAPI\Models\RESTAPISettings';

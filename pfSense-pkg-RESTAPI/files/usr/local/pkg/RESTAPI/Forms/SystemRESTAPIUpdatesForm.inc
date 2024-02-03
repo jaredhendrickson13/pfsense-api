@@ -6,7 +6,7 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Form;
 
-class SystemRESTAPIUpdates extends Form
+class SystemRESTAPIUpdatesForm extends Form
 {
     public string $url = '/system_restapi_updates.php';
     public string $model_name = '\RESTAPI\Models\RESTAPIVersion';
