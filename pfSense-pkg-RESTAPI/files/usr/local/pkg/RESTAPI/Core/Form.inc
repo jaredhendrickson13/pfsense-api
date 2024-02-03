@@ -219,7 +219,7 @@ class Form
      * Prints this form as a web page. This method is intended to be called by a PHP endpoint somewhere in the pfSense
      * web root.
      */
-    final public function print_form()
+    final public function print_form(): void
     {
         # Print the static pfSense UI and include any custom CSS or JS files
         global $config;
@@ -228,6 +228,9 @@ class Form
         echo "<link rel='stylesheet' href='$this->custom_css'/>";
         echo "<script type='application/javascript' src='$this->custom_js'></script>";
         \display_top_tabs($this->tabs, true);
+
+        # Call on_load to load any custom components requested by the child class
+        $this->on_load();
 
         # Perform the save action if the save button was submitted
         if ($this->form_data['save']) {
@@ -258,9 +261,15 @@ class Form
     }
 
     /**
+     * Performs tasks when the Form page is initially loaded. This method is intended to be overridden by the child
+     * class.
+     */
+    public function on_load(): void {}
+
+    /**
      * Performs validation and saves the Model assigned to this ModelForm.
      */
-    public function on_save()
+    public function on_save(): void
     {
         # Update settings with the newly provided values
         $representation_data = $this->id ? ['id' => $this->id] : [];
@@ -289,7 +298,7 @@ class Form
      * Tries to delete the Model object when requested.
      * @param int|string $id The ID of the Model object to delete.
      */
-    public function on_delete(int|string $id)
+    public function on_delete(int|string $id): void
     {
         # Convert the ID to an integer if it is numeric
         if (is_numeric($id)) {
@@ -354,7 +363,7 @@ class Form
      * Prints the green success banner at the top of the form page.
      * @param string $message Adds an extra message to the banner.
      */
-    public function print_success_banner(string $message = '')
+    public function print_success_banner(string $message = ''): void
     {
         print_apply_result_box(retval: 0, extra_text: $message);
     }
@@ -363,9 +372,18 @@ class Form
      * Prints the input error banner at the top of the form page.
      * @param string $message Adds an extra message to the banner.
      */
-    public function print_input_error_banner(string $message = '')
+    public function print_input_error_banner(string $message = ''): void
     {
         print_input_errors([$message]);
+    }
+
+    /**
+     * Prints an info/warning banner at the top of the form page.
+     * @param string $message The message to display on the banner.
+     * @param string $class The CSS class to use for the banner.
+     */
+    public function print_info_banner(string $message = '', string $class = 'alert-warning'): void {
+        print_info_box(msg: $message, class: $class);
     }
 
     /**
