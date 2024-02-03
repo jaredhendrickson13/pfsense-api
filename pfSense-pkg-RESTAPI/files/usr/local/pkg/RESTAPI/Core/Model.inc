@@ -42,7 +42,8 @@ class Model
     /**
      * @var string|null $config_path
      * The configuration path where this Model's object(s) are internally stored. This property is mandatory unless
-     * an $internal_callable is explicitly defined.
+     * an $internal_callable is explicitly defined. If a $parent_model_class is assigned, this path will be relative
+     * to the parent Model's $config_path. Otherwise, this is an absolute config path.
      */
     public string|null $config_path = null;
 
