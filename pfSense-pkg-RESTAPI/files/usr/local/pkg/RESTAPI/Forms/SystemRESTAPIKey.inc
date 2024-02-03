@@ -32,11 +32,11 @@ class SystemRESTAPIKey extends Form
     {
         # Print a warning at the top of the page if the user is accessing the page when KeyAuth is not enabled
         $api_settings = new RESTAPISettings();
-        if (!in_array("KeyAuth", $api_settings->auth_methods->value)) {
+        if (!in_array('KeyAuth', $api_settings->auth_methods->value)) {
             $this->print_info_banner(
-                message: "Key authentication is not currently enabled. You may create keys, but they cannot be used ".
-                "until Key authentication is enabled on the <a href='/system_restapi_settings.php'>REST API > ".
-                "Settings</a> tab."
+                message: 'Key authentication is not currently enabled. You may create keys, but they cannot be used ' .
+                    "until Key authentication is enabled on the <a href='/system_restapi_settings.php'>REST API > " .
+                    'Settings</a> tab.',
             );
         }
     }

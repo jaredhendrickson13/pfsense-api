@@ -264,7 +264,9 @@ class Form
      * Performs tasks when the Form page is initially loaded. This method is intended to be overridden by the child
      * class.
      */
-    public function on_load(): void {}
+    public function on_load(): void
+    {
+    }
 
     /**
      * Performs validation and saves the Model assigned to this ModelForm.
@@ -382,7 +384,8 @@ class Form
      * @param string $message The message to display on the banner.
      * @param string $class The CSS class to use for the banner.
      */
-    public function print_info_banner(string $message = '', string $class = 'alert-warning'): void {
+    public function print_info_banner(string $message = '', string $class = 'alert-warning'): void
+    {
         print_info_box(msg: $message, class: $class);
     }
 
