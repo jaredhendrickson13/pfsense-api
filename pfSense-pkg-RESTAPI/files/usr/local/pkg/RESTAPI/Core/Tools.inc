@@ -170,6 +170,7 @@ function generate_documentation(): bool
     $endpoint_classes = get_classes_from_namespace('\\RESTAPI\\Endpoints\\');
     $response_classes = get_classes_from_namespace('\\RESTAPI\\Responses\\');
     $auth_classes = get_classes_from_namespace('\\RESTAPI\\Auth\\');
+    $auth_classes_short = get_classes_from_namespace('\\RESTAPI\\Auth\\', shortnames: true);
     $content_handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
     $assigned_tags = [];
 
@@ -258,7 +259,7 @@ function generate_documentation(): bool
             $priv_options_str = implode(', ', $endpoint->$privilege_property);
             $required_packages_str = $model->packages ? implode(', ', $model->packages) : 'None';
             $requires_auth_str = $endpoint->requires_auth ? 'Yes' : 'No';
-            $auth_method_str = implode(', ', $endpoint->auth_methods);
+            $auth_method_str = implode(', ', $endpoint->auth_methods ?: $auth_classes_short);
 
             # Add openapi for all requests at this path
             $openapi_config['paths'][$endpoint->url][$request_method] = [

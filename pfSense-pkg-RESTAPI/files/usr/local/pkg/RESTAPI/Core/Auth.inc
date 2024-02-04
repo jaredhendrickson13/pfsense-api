@@ -182,6 +182,16 @@ class Auth
     }
 
     /**
+     * Checks if the remote client has requested this Auth class for authentication. By default, this method will
+     * simply try to authenticate the remote client using the called Auth class. This can also be overridden by
+     * child Auth classes to define custom logic to determine if the client is trying to use the called Auth
+     * class.
+     */
+    public function is_requested(): bool {
+        return $this->_authenticate();
+    }
+
+    /**
      * Checks if a given username is an existing user that is not disabled
      * @param string $username The username to check.
      * @return bool `true` if the user is disabled, `false` if it is not.
@@ -275,7 +285,7 @@ class Auth
     {
         # Variables
         $auth_namespace = '\\RESTAPI\\Auth\\';
-        $matched_auth = new BasicAuth(); // Default to basic auth
+        $matched_auth = null;
         $api_settings = new RESTAPISettings();
         $auth_classes = $auth_classes ?: $api_settings->auth_methods->value;
 
@@ -288,15 +298,21 @@ class Auth
             $auth_class = $auth_namespace . $auth_class;
             $auth = new $auth_class(required_privileges: $required_privileges);
 
-            # If preliminary authentication is successful, break the loop and authenticate using this class
-            if ($auth->_authenticate()) {
+            # If this Auth class is being requested by the remote client, set the matched auth and break the loop
+            if ($auth->is_requested()) {
                 $matched_auth = $auth;
                 break;
             }
         }
 
+        # Log an authentication error if no Auth class could be determined
+        if (!$matched_auth) {
+            $auth = new Auth();
+            $auth->log_authentication();
+        }
+
         # Throw an authentication error if no preliminary auth passed or authentication for the identified class fails
-        if (!$matched_auth->authenticate()) {
+        if (!$matched_auth or !$matched_auth->authenticate()) {
             throw new AuthenticationError(message: 'Authentication failed.', response_id: 'AUTH_AUTHENTICATION_FAILED');
         }
         # Throw an authorization error if authorization for the identified class fails

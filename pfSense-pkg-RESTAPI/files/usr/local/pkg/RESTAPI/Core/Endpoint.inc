@@ -126,9 +126,11 @@ class Endpoint
 
     /**
      * @var array $auth_methods
-     * Explicitly specify the API authentication methods clients can use when making
-     * requests to this Endpoint. Leave blank to use the authentication mode specified
-     * in the API settings.
+     * Explicitly specify authentication methods this Endpoint uses. Leave blank to
+     * use the authentication methods allowed by the REST API settings. If any
+     * authentication methods are specified here, this Endpoint will always allow
+     * authentication using this method, even if the method is not enabled in the
+     * REST API settings.
      */
     public array $auth_methods = [];
 
@@ -264,11 +266,6 @@ class Endpoint
 
         # Set default endpoint privileges
         $this->get_default_privs();
-
-        # Assume this endpoint supports all available authentication methods if not specified
-        if (!$this->auth_methods) {
-            $this->auth_methods = get_classes_from_namespace(namespace: '\\RESTAPI\\Auth\\', shortnames: true);
-        }
     }
 
     /**

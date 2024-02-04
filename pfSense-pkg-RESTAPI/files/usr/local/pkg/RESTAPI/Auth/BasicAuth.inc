@@ -35,6 +35,14 @@ class BasicAuth extends Auth
     }
 
     /**
+     * Checks if the remote client is requesting BasicAuth by checking for the necessary headers.
+     */
+    public function is_requested(): bool
+    {
+        return ($_SERVER['PHP_AUTH_USER'] or $_SERVER['PHP_AUTH_PW']);
+    }
+
+    /**
      * When basic authentication fails, set the WWW-Authenticate to request basic authentication.
      */
     protected function on_failed_auth(): void
