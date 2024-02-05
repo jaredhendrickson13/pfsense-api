@@ -111,14 +111,14 @@ example:
 
 
 <details>
-    <summary>API Key</summary>
+    <summary>Key</summary>
 
 Uses standalone keys generated via API or webConfigurator. These are better suited to distribute to systems as they are
 revocable and will only allow API authentication; not webConfigurator or SSH authentication (like the local database
 credentials).
 
 ```bash
-curl -H "Authorization: API_KEY_HERE" -X GET https://pfsense.example.com/api/v2/diagnostics/arp_table
+curl -H "Authorization: KeyAuth API_KEY_HERE" -X GET https://pfsense.example.com/api/v2/diagnostics/arp_table
 ```
 
 - To generate API keys, navigate to 'System > REST API' and select the 'Keys' tab. Alternatively, you can generate new
