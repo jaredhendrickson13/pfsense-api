@@ -1,9 +1,7 @@
 # pfSense REST API Package
 
-[![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
-[![OpenAPI](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml)
-[![PHPlint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml)
-[![Pylint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml)
+[![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg?branch=next_major)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
+[![Quality](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml/badge.svg?branch=next_major)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml)
 
 Welcome to the pfSense-pkg-RESTAPI repository! This package offers a robust and secure REST API for pfSense firewalls.
 It is designed to streamline automation by transforming the PHP functions and processes used by pfSense's
