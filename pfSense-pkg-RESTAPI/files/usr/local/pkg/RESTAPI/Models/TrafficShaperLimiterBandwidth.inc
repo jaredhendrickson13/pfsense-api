@@ -42,7 +42,7 @@ class TrafficShaperLimiterBandwidth extends Model
                 'this bandwidth profile will be used.',
         );
 
-        parent::__construct($id, $parent_id, $data, $options);
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
