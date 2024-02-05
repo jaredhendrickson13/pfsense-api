@@ -39,7 +39,7 @@ class BasicAuth extends Auth
      */
     public function is_requested(): bool
     {
-        return ($_SERVER['PHP_AUTH_USER'] or $_SERVER['PHP_AUTH_PW']);
+        return $_SERVER['PHP_AUTH_USER'] or $_SERVER['PHP_AUTH_PW'];
     }
 
     /**

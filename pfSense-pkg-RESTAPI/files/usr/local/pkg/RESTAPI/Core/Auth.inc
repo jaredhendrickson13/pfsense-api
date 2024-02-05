@@ -187,7 +187,8 @@ class Auth
      * child Auth classes to define custom logic to determine if the client is trying to use the called Auth
      * class.
      */
-    public function is_requested(): bool {
+    public function is_requested(): bool
+    {
         return $this->_authenticate();
     }
 

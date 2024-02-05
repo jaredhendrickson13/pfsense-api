@@ -381,6 +381,6 @@ class TrafficShaperLimiter extends Model
     {
         # Delete the limiter from config and remove the limiter from ipfw
         parent::_delete();
-        new Command("ipfw pipe delete ".$this->number->value);
+        new Command('ipfw pipe delete ' . $this->number->value);
     }
 }
