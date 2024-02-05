@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Models;
 
+use RESTAPI\Core\Command;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\TrafficShaperApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
@@ -362,7 +363,7 @@ class TrafficShaperLimiter extends Model
             help_text: 'The child queues for this limiter.',
         );
 
-        parent::__construct($id, $parent_id, $data, $options);
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
@@ -371,5 +372,15 @@ class TrafficShaperLimiter extends Model
     public function apply(): void
     {
         (new TrafficShaperApplyDispatcher(async: $this->async))->spawn_process();
+    }
+
+    /**
+     * Extends the default _delete() method to ensure the limit is removed from ipfw afterward.
+     */
+    public function _delete(): void
+    {
+        # Delete the limiter from config and remove the limiter from ipfw
+        parent::_delete();
+        new Command("ipfw pipe delete ".$this->number->value);
     }
 }
