@@ -2,6 +2,8 @@
 
 namespace RESTAPI\Models;
 
+require_once("RESTAPI/autoloader.inc");
+
 use RESTAPI;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
