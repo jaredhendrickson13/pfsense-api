@@ -34,6 +34,8 @@ class FirewallRule extends Model {
     public StringField $tcp_flags_set;
     public ForeignModelField $gateway;
     public ForeignModelField $sched;
+    public ForeignModelField $dnpipe;
+    public ForeignModelField $pdnpipe;
     public ForeignModelField $defaultqueue;
     public ForeignModelField $ackqueue;
     public BooleanField $floating;
@@ -202,6 +204,20 @@ class FirewallRule extends Model {
             allow_null: true,
             help_text: 'The name of an existing firewall schedule to assign to this firewall rule.',
         );
+        $this->dnpipe = new ForeignModelField(
+            model_name: 'TrafficShaperLimiterQueue',
+            model_field: 'name',
+            default: null,
+            allow_null: true,
+            help_text: "The name of the traffic shaper limiter queue to use for incoming traffic."
+        );
+        $this->pdnpipe = new ForeignModelField(
+            model_name: 'TrafficShaperLimiterQueue',
+            model_field: 'name',
+            default: null,
+            allow_null: true,
+            help_text: "The name of the traffic shaper limiter queue to use for outgoing traffic."
+        );
         $this->defaultqueue = new ForeignModelField(
             model_name: 'TrafficShaperQueue',
             model_field: 'name',
@@ -275,10 +291,6 @@ class FirewallRule extends Model {
             internal_namespace: 'updated',
             help_text: 'The username and IP of the user who last updated this firewall rule.',
         );
-        # TODO: Add ForeignModelField for `dnpipe` when the traffic shaper Models are developed
-        # TODO: Add ForeignModelField for `pdnpipe` when the traffic shaper Models are developed
-        # TODO: Add ForeignModelField for `defaultqueue` when the traffic shaper Models are developed
-        # TODO: Add ForeignModelField for `ackqueue` when the traffic shaper Models are developed
 
         parent::__construct($id, $parent_id, $data, ...$options);
     }
