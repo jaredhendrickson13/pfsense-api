@@ -222,7 +222,7 @@ class FirewallRule extends Model {
             default: false,
             editable: false,
             indicates_true: 'yes',
-            help_text: 'Mark this rule is a floating firewall rule.',
+            help_text: 'Mark this rule as a floating firewall rule.',
         );
         $this->quick = new BooleanField(
             default: false,
