@@ -15,6 +15,8 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
+use RESTAPI\Responses\ConflictError;
+use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ValidationError;
 
 class FirewallRule extends Model {
@@ -36,8 +38,8 @@ class FirewallRule extends Model {
     public StringField $tcp_flags_set;
     public ForeignModelField $gateway;
     public ForeignModelField $sched;
-    public ForeignModelField $dnpipe;
-    public ForeignModelField $pdnpipe;
+    public StringField $dnpipe;
+    public StringField $pdnpipe;
     public ForeignModelField $defaultqueue;
     public ForeignModelField $ackqueue;
     public BooleanField $floating;
@@ -206,19 +208,15 @@ class FirewallRule extends Model {
             allow_null: true,
             help_text: 'The name of an existing firewall schedule to assign to this firewall rule.',
         );
-        $this->dnpipe = new ForeignModelField(
-            model_name: 'TrafficShaperLimiterQueue',
-            model_field: 'name',
+        $this->dnpipe = new StringField(
             default: null,
             allow_null: true,
-            help_text: "The name of the traffic shaper limiter queue to use for incoming traffic."
+            help_text: "The name of the traffic shaper limiter pipe or queue to use for incoming traffic."
         );
-        $this->pdnpipe = new ForeignModelField(
-            model_name: 'TrafficShaperLimiterQueue',
-            model_field: 'name',
+        $this->pdnpipe = new StringField(
             default: null,
             allow_null: true,
-            help_text: "The name of the traffic shaper limiter queue to use for outgoing traffic."
+            help_text: "The name of the traffic shaper limiter pipe or queue to use for outgoing traffic."
         );
         $this->defaultqueue = new ForeignModelField(
             model_name: 'TrafficShaperQueue',
@@ -358,6 +356,65 @@ class FirewallRule extends Model {
     }
 
     /**
+     * Adds extra validation to the `dnpipe` field.
+     * @param string $dnpipe The incoming value to be validated.
+     * @return string The validated value to be assigned.
+     * @throws NotFoundError When $dnpipe is not an existing TrafficShaperLimiter or TrafficShaperLimiterQueue name
+     */
+    public function validate_dnpipe(string $dnpipe): string {
+        # Throw an error if $dnpipe is not an existing TrafficShaperLimiter or TrafficShaperLimiterQueue
+        if (!$this->get_dnpipe_by_name($dnpipe)) {
+            throw new NotFoundError(
+                message: "Field `dnpipe` must be an existing Traffic Shaper Limiter or Limiter Queue. Could not ".
+                    "locate object with `name` value `$dnpipe`",
+                response_id: "FIREWALL_RULE_DNPIPE_NOT_FOUND"
+            );
+        }
+
+        return $dnpipe;
+    }
+
+    /**
+     * Adds extra validation to the `pdnpipe` field.
+     * @param string $pdnpipe The incoming value to be validated.
+     * @return string The validated value to be assigned.
+     * @throws ValidationError When $pdnpipe is defined but the `dnpipe` field was not.
+     * @throws NotFoundError When $pdnpipe is not an existing TrafficShaperLimiter or TrafficShaperLimiterQueue name
+     * @throws ConflictError When $pdnpipe and `dnpipe` are not of the same type (pipe or queue).
+     */
+    public function validate_pdnpipe(string $pdnpipe): string {
+        # Throw an error if $pdnpipe has a value but `dnpipe` does not
+        if ($pdnpipe and !$this->dnpipe->value) {
+            throw new ValidationError(
+                message: "Field `pdnpipe` cannot be set unless `dnpipe` is also set.",
+                response_id: "FIREWALL_RULE_PDNPIPE_SET_WITHOUT_DNPIPE"
+            );
+        }
+
+        # Throw an error if $pdnpipe is not an existing TrafficShaperLimiter or TrafficShaperLimiterQueue
+        $pdnpipe_obj = $this->get_dnpipe_by_name($pdnpipe);
+        if (!$pdnpipe_obj) {
+            throw new NotFoundError(
+                message: "Field `pdnpipe` must be an existing Traffic Shaper Limiter or Limiter Queue. Could not ".
+                    "locate object with `name` value `$pdnpipe`",
+                response_id: "FIREWALL_RULE_DNPIPE_NOT_FOUND"
+            );
+        }
+
+        # Throw an error if dnpipe and pdnpipe are not of the same class
+        $dnpipe_obj = $this->get_dnpipe_by_name($this->dnpipe->value);
+        if (get_class($dnpipe_obj) !== get_class($pdnpipe_obj)) {
+            throw new ConflictError(
+                message: "Field `pdnpipe` must be of the same limiter type as `dnpipe`. A pipe and a queue cannot be " .
+                    "used concurrently.",
+                response_id: "FIREWALL_RULE_PDNPIPE_DOES_NOT_MATCH_DNPIPE_LIMITER_TYPE"
+            );
+        }
+
+        return $pdnpipe;
+    }
+
+    /**
      * Adds extra validation to the `ackqueue` field.
      * @param string $ackqueue The incoming value to be validated.
      * @return string The value to be assigned.
@@ -397,7 +454,34 @@ class FirewallRule extends Model {
     /**
      * Applies firewall rule changes.
      */
-    public function apply() {
+    public function apply(): void {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
+    }
+
+    /**
+     * Checks if a given name value is an existing TrafficShaperLimiter or TrafficShaperLimiterQueue name.
+     * @param string $name The name of the pipe or queue to look for.
+     * @returns Model|null Returns the object which matched the provided $name
+     * or null if no object could be found.
+     */
+    private function get_dnpipe_by_name(string $name): ?Model {
+        # Query for TrafficShaperLimiter objects with the provided name.
+        $limiters = TrafficShaperLimiter::read_all();
+        $limiter_q = $limiters->query(name: $name);
+
+        # Allow this value if $dnpipe matches an existing TrafficShaperLimiter's name
+        if ($limiter_q->exists()) {
+            return $limiter_q->first();
+        }
+
+        # Check if any existing TrafficShaper limiters have child queues with a name that matches $dnpipe;
+        foreach ($limiters as $limiter) {
+            $queue_q = TrafficShaperLimiterQueue::query(parent_id: $limiter->id, name: $name);
+            if ($queue_q->exists()) {
+                return $queue_q->first();
+            }
+        }
+
+        return null;
     }
 }
