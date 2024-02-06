@@ -11,12 +11,10 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\cprint;
 
-class RESTAPISettingsSync extends Model
-{
+class RESTAPISettingsSync extends Model {
     public StringField $sync_data;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'void';
         $this->many = false;
@@ -35,8 +33,7 @@ class RESTAPISettingsSync extends Model
      * Returns an empty array as the internall callable
      * @returns array An array containing nothing
      */
-    protected function void(): array
-    {
+    protected function void(): array {
         return [];
     }
 
@@ -46,8 +43,7 @@ class RESTAPISettingsSync extends Model
      * @returns string The validated value to be assigned
      * @throws ValidationError When `sync_data` cannot be unserialized into an array of REST API settings
      */
-    public function validate_sync_data(string $sync_data): string
-    {
+    public function validate_sync_data(string $sync_data): string {
         # Attempt to unserialize the sync data
         $unserialized_sync_data = unserialize($this->sync_data->value);
 
@@ -65,8 +61,7 @@ class RESTAPISettingsSync extends Model
     /**
      * Writes the synced changes to configuration.
      */
-    public function _create(): void
-    {
+    public function _create(): void {
         # Unserialize the sync data
         $unserialized_sync_data = unserialize($this->sync_data->value);
 
@@ -87,8 +82,7 @@ class RESTAPISettingsSync extends Model
      * @param bool $print_status Set to true to print the progress of the sync to the console. Set to false run the
      * sync quietly.
      */
-    public static function sync(bool $print_status = false): void
-    {
+    public static function sync(bool $print_status = false): void {
         # Variables
         $settings = new RESTAPISettings();
         $endpoint_url = (new SystemRESTAPISettingsSyncEndpoint())->url;

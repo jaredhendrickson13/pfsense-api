@@ -7,8 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Form;
 use RESTAPI\Models\RESTAPISettings;
 
-class SystemRESTAPIKeysForm extends Form
-{
+class SystemRESTAPIKeysForm extends Form {
     public string $url = '/system_restapi_key.php';
     public string $many_sub_url = '/system_restapi_key_edit.php';
     public bool $many = true;
@@ -26,8 +25,7 @@ class SystemRESTAPIKeysForm extends Form
     /**
      * Prints a warning banner when the page loads if this Form is accessed when KeyAuth is not enabled.
      */
-    public function on_load(): void
-    {
+    public function on_load(): void {
         # Print a warning at the top of the page if the user is accessing the page when KeyAuth is not enabled
         $api_settings = new RESTAPISettings();
         if (!in_array('KeyAuth', $api_settings->auth_methods->value)) {

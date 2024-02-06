@@ -10,13 +10,11 @@ use RESTAPI\Models\DHCPServerStaticMapping;
 use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\VirtualIP;
 
-class APIModelsDHCPServerAddressPoolTestCase extends TestCase
-{
+class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
     /**
      * Checks that the DHCPServerAddressPool cannot overlap with the DHCPServer's primary address pool.
      */
-    public function test_address_pool_cannot_overlap_primary_address_pool(): void
-    {
+    public function test_address_pool_cannot_overlap_primary_address_pool(): void {
         # Define the parent DHCPServer's address pool
         $dhcp_server = new DHCPServer(id: 'lan', range_from: '192.168.1.15', range_to: '192.168.1.30', async: false);
         $dhcp_server->update();
@@ -39,8 +37,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the DHCPServerAddressPool cannot overlap with another DHCPServerAddressPool.
      */
-    public function test_address_pool_cannot_overlap_other_address_pool(): void
-    {
+    public function test_address_pool_cannot_overlap_other_address_pool(): void {
         # Create a new DHCPServerAddress pool
         $pool = new DHCPServerAddressPool(
             parent_id: 'lan',
@@ -71,8 +68,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the DHCPServerAddressPool cannot overlap with a DHCPServerStaticMapping's IP address.
      */
-    public function test_address_pool_cannot_overlap_static_mapping(): void
-    {
+    public function test_address_pool_cannot_overlap_static_mapping(): void {
         # Create a new static mapping to test with
         $static_mapping = new DHCPServerStaticMapping(
             parent_id: 'lan',
@@ -103,8 +99,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the DHCPServerAddressPool cannot overlap with a VirtualIP.
      */
-    public function test_address_pool_cannot_overlap_vip(): void
-    {
+    public function test_address_pool_cannot_overlap_vip(): void {
         # Create a new virtual ip to test with
         $vip = new VirtualIP(interface: 'lan', mode: 'ipalias', subnet: '192.168.1.205', subnet_bits: 24, async: false);
         $vip->create();
@@ -130,8 +125,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the `range_from` field cannot be the interface's network IP
      */
-    public function test_range_from_cannot_be_interface_network_address(): void
-    {
+    public function test_range_from_cannot_be_interface_network_address(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_ADDRESS_POOL_RANGE_FROM_CANNOT_BE_NETWORK_ADDRESS',
             code: 400,
@@ -150,8 +144,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the `range_from` field cannot be an IP greater than `range_to`
      */
-    public function test_range_from_cannot_be_greater_than_range_to(): void
-    {
+    public function test_range_from_cannot_be_greater_than_range_to(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_ADDRESS_POOL_RANGE_FROM_CANNOT_BE_GREATER_THAN_RANGE_TO',
             code: 400,
@@ -169,8 +162,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the `range_from` must be an IP address within the parent interface's subnet
      */
-    public function test_range_from_must_be_ip_within_interfaces_subnet(): void
-    {
+    public function test_range_from_must_be_ip_within_interfaces_subnet(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_ADDRESS_POOL_RANGE_FROM_OUTSIDE_OF_SUBNET',
             code: 400,
@@ -184,8 +176,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the `range_to` field cannot be the parent interface's broadcast address
      */
-    public function test_range_to_cannot_be_interface_broadcast_address(): void
-    {
+    public function test_range_to_cannot_be_interface_broadcast_address(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_ADDRESS_POOL_RANGE_TO_CANNOT_BE_BROADCAST_ADDRESS',
             code: 400,
@@ -204,8 +195,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the `range_to` must be an IP address within the parent interface's subnet
      */
-    public function test_range_to_must_be_ip_within_interfaces_subnet(): void
-    {
+    public function test_range_to_must_be_ip_within_interfaces_subnet(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_ADDRESS_POOL_RANGE_TO_OUTSIDE_OF_SUBNET',
             code: 400,
@@ -223,8 +213,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the `maxleasetime` field cannot be less than the `defaultleastime` field
      */
-    public function test_maxleasetime_cannot_be_less_than_defaultleasetime(): void
-    {
+    public function test_maxleasetime_cannot_be_less_than_defaultleasetime(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_ADDRESS_POOL_MAX_LEASE_TIME_LESS_THAN_DEFAULT',
             code: 400,
@@ -244,8 +233,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that the `gateway` field must be an IP within the parent interface's subnet.
      */
-    public function test_gateway_must_be_ip_within_parent_interface(): void
-    {
+    public function test_gateway_must_be_ip_within_parent_interface(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_ADDRESS_POOL_GATEWAY_NOT_WITHIN_SUBNET',
             code: 400,
@@ -264,8 +252,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that address pools are correctly represented in dhcpd.conf after creation, modification and deletion.
      */
-    public function test_crud_dhcpd(): void
-    {
+    public function test_crud_dhcpd(): void {
         # Switch the DHCP server backend to ISC DHCP (dhcpd)
         $backend = new DHCPServerBackend(dhcpbackend: 'isc', async: false);
         $backend->update();
@@ -357,8 +344,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
     /**
      * Checks that address pools are correctly represented in kea-dhcp4.conf after creation, modification and deletion.
      */
-    public function test_crud_kea(): void
-    {
+    public function test_crud_kea(): void {
         # Switch the DHCP server backend to Kea DHCP (kea-dhcp4)
         $backend = new DHCPServerBackend(dhcpbackend: 'kea', async: false);
         $backend->update();
@@ -462,8 +448,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
      * @param array $option_data The entire reservation's `option-data` array.
      * @return string The 'data' value of the $options_data item with the given $name
      */
-    public function get_kea_option_by_name(string $name, array $option_data): string
-    {
+    public function get_kea_option_by_name(string $name, array $option_data): string {
         foreach ($option_data as $option) {
             if ($option['name'] === $name) {
                 return $option['data'];

@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\AuthServer;
 
-class APIModelsAuthServerTestCase extends TestCase
-{
+class APIModelsAuthServerTestCase extends TestCase {
     /**
      * Checks that RADIUS authentication servers can be created, updated and deleted.
      */
-    public function test_radius_crud(): void
-    {
+    public function test_radius_crud(): void {
         # Create a new RADIUS server
         $radius = new AuthServer(
             type: 'radius',
@@ -58,8 +56,7 @@ class APIModelsAuthServerTestCase extends TestCase
     /**
      * Checks that LDAP authentication servers can be created, updated and deleted.
      */
-    public function test_ldap_crud(): void
-    {
+    public function test_ldap_crud(): void {
         # Create a new LDAP server
         $ldap = new AuthServer(
             type: 'ldap',

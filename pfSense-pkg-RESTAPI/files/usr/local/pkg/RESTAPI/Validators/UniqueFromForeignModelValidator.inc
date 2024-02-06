@@ -9,8 +9,7 @@ use RESTAPI\Responses\ValidationError;
  * Defines a Validator object that ensures a Field's value is unique from another specified Model's field. This
  * allows you to prevent a Field from being set to the same value as a different Model's Field.
  */
-class UniqueFromForeignModelValidator extends Validator
-{
+class UniqueFromForeignModelValidator extends Validator {
     public string $foreign_model_name;
     public string $foreign_model_fqn;
     public string $foreign_model_field_name;
@@ -19,8 +18,7 @@ class UniqueFromForeignModelValidator extends Validator
      * Define this validator object by specifying the name of the foreign Model and the specific Field on the foreign
      * Model to check for uniqueness.
      */
-    public function __construct(string $model, string $field)
-    {
+    public function __construct(string $model, string $field) {
         # Assign parameters to class properties
         $this->foreign_model_name = $model;
         $this->foreign_model_fqn = "\\RESTAPI\\Models\\$model";
@@ -31,8 +29,7 @@ class UniqueFromForeignModelValidator extends Validator
      * Checks if the value passed into this Validator matches the '$foreign_model_field_name' of any existing object
      * of the $foreign_model_name class
      */
-    public function validate(mixed $value, string $field_name = '')
-    {
+    public function validate(mixed $value, string $field_name = '') {
         # Create the foreign model object
         $foreign_model_fqn = $this->foreign_model_fqn;
         $foreign_model_field_name = $this->foreign_model_field_name;

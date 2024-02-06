@@ -8,8 +8,7 @@ use RESTAPI;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
-class NumericRangeValidator extends RESTAPI\Core\Validator
-{
+class NumericRangeValidator extends RESTAPI\Core\Validator {
     public int|float $minimum;
     public int|float $maximum;
 
@@ -18,8 +17,7 @@ class NumericRangeValidator extends RESTAPI\Core\Validator
      * @param int $minimum The minimum value this value can be.
      * @param int $maximum The maximum value this value can be..
      */
-    public function __construct(int $minimum = 0, int $maximum = 99999999999)
-    {
+    public function __construct(int $minimum = 0, int $maximum = 99999999999) {
         $this->minimum = $minimum;
         $this->maximum = $maximum;
     }
@@ -30,8 +28,7 @@ class NumericRangeValidator extends RESTAPI\Core\Validator
      * @throws ValidationError When the value exceeds the maximum length specified.
      * @throws ServerError When the value was not a string or an array.
      */
-    public function validate(mixed $value, string $field_name = '')
-    {
+    public function validate(mixed $value, string $field_name = '') {
         # Ensure the value being validated is either an integer or a float (double)
         if (!is_integer($value) and !is_float($value)) {
             throw new ServerError(

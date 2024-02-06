@@ -7,14 +7,12 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPISettings;
 
-class APIModelsAPIJWTTestCase extends TestCase
-{
+class APIModelsAPIJWTTestCase extends TestCase {
     /**
      * Checks that the init_server_key() method correctly generates a server key that can be used to
      * generate an actual JWT.
      */
-    public function test_init_server_key()
-    {
+    public function test_init_server_key() {
         # First ensure there is not already a JWT server key
         $api_pkg_id = RESTAPISettings::get_pkg_id();
         Model::del_config("installedpackages/package/{$api_pkg_id}/conf/server_key");
@@ -42,8 +40,7 @@ class APIModelsAPIJWTTestCase extends TestCase
     /**
      * Checks that we are able to generate and decode JWTs.
      */
-    public function test_create_and_decode_jwt()
-    {
+    public function test_create_and_decode_jwt() {
         # Get our API pkg config
         $api_pkg_id = RESTAPISettings::get_pkg_id();
         $api_settings = new RESTAPISettings();

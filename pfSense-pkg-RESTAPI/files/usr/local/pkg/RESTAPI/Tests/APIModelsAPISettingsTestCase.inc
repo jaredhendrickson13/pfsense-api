@@ -11,16 +11,14 @@ use const RESTAPI\Models\API_SETTINGS_RESTORE_NO_BACKUP;
 use const RESTAPI\Models\API_SETTINGS_RESTORE_NO_CHANGE;
 use const RESTAPI\Models\API_SETTINGS_RESTORE_SUCCESS;
 
-class APIModelsAPISettingsTestCase extends TestCase
-{
+class APIModelsAPISettingsTestCase extends TestCase {
     # TODO: Needs Tests for API HA sync feature
 
     /**
      * Checks that the static `get_pkg_config()` method returns the API package's internal configuration and
      * the static `get_pkg_id()` method returns the API package's ID
      */
-    public function test_get_api_config_and_id(): void
-    {
+    public function test_get_api_config_and_id(): void {
         $test_api_settings = new RESTAPISettings();
 
         # Ensure the API config's ID was returned and ensure it is an integer
@@ -35,8 +33,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that the static `backup_to_file()` method correctly backs up the API configuration when configured.
      */
-    public function test_backup_to_file()
-    {
+    public function test_backup_to_file() {
         # Create an RESTAPISettings object to test with
         $api_settings = new RESTAPISettings();
 
@@ -64,8 +61,7 @@ class APIModelsAPISettingsTestCase extends TestCase
      * present. Also ensures the correct return codes are provided when there is no change between the running
      * configuration and the backup, or there is backup file found.
      */
-    public function test_restore_from_backup()
-    {
+    public function test_restore_from_backup() {
         # Create an RESTAPISettings object to test with
         $api_settings = new RESTAPISettings();
 
@@ -102,8 +98,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `enabled` field works as intended.
      */
-    public function test_enabled()
-    {
+    public function test_enabled() {
         # Ensure value must be boolean
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -118,8 +113,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `read_only` field works as intended.
      */
-    public function test_read_only()
-    {
+    public function test_read_only() {
         # Ensure value must be boolean
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -134,8 +128,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `keep_backup` field works as intended.
      */
-    public function test_keep_backup()
-    {
+    public function test_keep_backup() {
         # Ensure value must be boolean
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -150,8 +143,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `login_protection` field works as intended.
      */
-    public function test_login_protection()
-    {
+    public function test_login_protection() {
         # Ensure value must be boolean
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -166,8 +158,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `log_successful_auth` field works as intended.
      */
-    public function test_log_successful_auth()
-    {
+    public function test_log_successful_auth() {
         # Ensure value must be boolean
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -182,8 +173,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `allow_pre_releases` field works as intended.
      */
-    public function test_allow_pre_releases()
-    {
+    public function test_allow_pre_releases() {
         # Ensure value must be boolean
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -198,8 +188,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `allowed_interfaces` field works as intended.
      */
-    public function test_allowed_interfaces()
-    {
+    public function test_allowed_interfaces() {
         # Ensure interfaces are represented as their internal values
         $api_settings = new RESTAPISettings(data: ['represent_interfaces_as' => 'id']);
         $api_settings->update();
@@ -254,8 +243,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `represent_interfaces_as` field works as intended.
      */
-    public function test_represent_interfaces_as()
-    {
+    public function test_represent_interfaces_as() {
         # Ensure value must be a string
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -292,8 +280,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `auth_methods` field works as intended.
      */
-    public function test_auth_methods(): void
-    {
+    public function test_auth_methods(): void {
         # Ensure value must be a string
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -326,8 +313,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `jwt_exp` field works as intended.
      */
-    public function test_jwt_exp()
-    {
+    public function test_jwt_exp() {
         # Ensure value must be an integer
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -374,8 +360,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `ha_sync` field works as intended.
      */
-    public function test_ha_sync()
-    {
+    public function test_ha_sync() {
         # Ensure value must be boolean
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -390,8 +375,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `ha_sync_validate_certs` field works as intended.
      */
-    public function test_ha_sync_validate_certs()
-    {
+    public function test_ha_sync_validate_certs() {
         # Ensure value must be boolean
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -406,8 +390,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `ha_sync_hosts` works as intended.
      */
-    public function test_ha_sync_hosts()
-    {
+    public function test_ha_sync_hosts() {
         # Ensure value must be array
         $this->assert_throws_response(
             'FIELD_INVALID_MANY_VALUE',
@@ -484,8 +467,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `ha_sync_username` works as intended.
      */
-    public function test_ha_sync_username()
-    {
+    public function test_ha_sync_username() {
         # Ensure value must be string
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -512,8 +494,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that validation on the `ha_sync_password` works as intended.
      */
-    public function test_ha_sync_password()
-    {
+    public function test_ha_sync_password() {
         # Ensure value must be string
         $this->assert_throws_response(
             'FIELD_INVALID_TYPE',
@@ -544,8 +525,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     /**
      * Checks that the `hateoas` field successfully enables or disables HATEOAS links in representations
      */
-    public function test_hateoas(): void
-    {
+    public function test_hateoas(): void {
         # Enable hateoas
         $api_settings = new RESTAPISettings();
         $api_settings->hateoas->value = true;

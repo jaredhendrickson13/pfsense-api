@@ -8,8 +8,7 @@
  * @param mixed $pluginparams Plugin parameters passed in by the pfSense package system.
  * @return string The custom nginx block to be added to the webConfigurator's nginx.conf file
  */
-function restapi_plugin_nginx(mixed $pluginparams): string
-{
+function restapi_plugin_nginx(mixed $pluginparams): string {
     global $g;
 
     # Caller did not properly define data, exit early

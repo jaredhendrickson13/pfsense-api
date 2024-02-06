@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\InterfaceVLAN;
 
-class APIModelsInterfaceVLANTestCase extends TestCase
-{
+class APIModelsInterfaceVLANTestCase extends TestCase {
     /**
      * Checks that created VLANs are correctly configuring by checking ifconfig.
      */
-    public function test_vlan_configured_in_ifconfig()
-    {
+    public function test_vlan_configured_in_ifconfig() {
         # Create a new VLAN interface
         $test_vlan = new InterfaceVLAN(
             data: [
@@ -52,8 +50,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase
     /**
      * Checks to ensure a VLAN's `if` and `tag` must be unique together
      */
-    public function test_vlan_if_and_tag_unique_requirement()
-    {
+    public function test_vlan_if_and_tag_unique_requirement() {
         # Create a new VLAN interface
         $test_vlan = new InterfaceVLAN(
             data: [
@@ -86,8 +83,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase
     /**
      * Checks that the VLANs requested parent interface must be known to the system
      */
-    public function test_vlan_parent_exists_requirement()
-    {
+    public function test_vlan_parent_exists_requirement() {
         # Ensure attempts to create a VLAN for a parent interface that doesn't exist fail
         $this->assert_throws_response(
             response_id: 'VLAN_INTERFACE_PARENT_NOT_FOUND',

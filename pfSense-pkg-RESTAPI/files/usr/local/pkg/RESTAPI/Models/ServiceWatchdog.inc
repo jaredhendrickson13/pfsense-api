@@ -7,15 +7,13 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 
-class ServiceWatchdog extends Model
-{
+class ServiceWatchdog extends Model {
     public ForeignModelField $name;
     public StringField $description;
     public BooleanField $notify;
     public BooleanField $enabled;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'installedpackages/servicewatchdog/item';
         $this->packages = ['pfSense-pkg-Service_Watchdog'];
@@ -56,8 +54,7 @@ class ServiceWatchdog extends Model
      * @param string $description The incoming value to be validated.
      * @return string The validated value to be assigned.
      */
-    public function validate_description(string $description): string
-    {
+    public function validate_description(string $description): string {
         # Force this value to always be set to the description of the Service object referenced in the `name` field.
         return $this->name->get_related_model()->description->value;
     }
@@ -65,8 +62,7 @@ class ServiceWatchdog extends Model
     /**
      * Applies changes to the Service Watchdog configuration.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         # Refresh the Service Watchdog cron job
         servicewatchdog_cron_job();
     }

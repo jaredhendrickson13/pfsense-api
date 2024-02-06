@@ -16,8 +16,7 @@ use RESTAPI\Responses\ServerError;
  * Fields that relate to a different Model object field. For example, a ForeignModelField can be used to relate a static
  * route to its parent Gateway model object.
  */
-class ForeignModelField extends Field
-{
+class ForeignModelField extends Field {
     /**
      * @var Model $model Contains the Model object of the foreign Model this Field's value relates to.
      */
@@ -165,8 +164,7 @@ class ForeignModelField extends Field
      * Checks that the object to be constructed has no conflicts.
      * @param string $model_name The foreign Model class's FQN.
      */
-    private function check_construct(string $model_name): void
-    {
+    private function check_construct(string $model_name): void {
         # Ensure the assigned $model_name is an existing Model class
         if (!class_exists($model_name)) {
             throw new ServerError(
@@ -212,8 +210,7 @@ class ForeignModelField extends Field
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return mixed The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): mixed
-    {
+    protected function _from_internal(mixed $internal_value): mixed {
         # Ensure the internal field value is converted to its representation value before querying
         if ($this->model_field_internal !== 'id') {
             $internal_value = $this->model->{$this->model_field_internal}->_from_internal($internal_value);
@@ -236,8 +233,7 @@ class ForeignModelField extends Field
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value): array|string|null
-    {
+    protected function _to_internal(mixed $representation_value): array|string|null {
         # Obtain Model objects that matches this field's criteria
         $query_modelset = $this->__get_matches($this->model_field, $representation_value);
 
@@ -255,8 +251,7 @@ class ForeignModelField extends Field
      * @param mixed $value The value being validated. In the event that this is a `many` field, this method will
      * receive each value of the array individually, not the array value itself.
      */
-    public function validate_extra(mixed $value): void
-    {
+    public function validate_extra(mixed $value): void {
         # Accept this value matches an allowed keyword exactly
         if (in_array($value, $this->allowed_keywords)) {
             return;
@@ -280,8 +275,7 @@ class ForeignModelField extends Field
      * $parent_model_query properties.
      * @return ModelSet A ModelSet of Model objects that are in-scope for this field
      */
-    public function get_in_scope_models(): ModelSet
-    {
+    public function get_in_scope_models(): ModelSet {
         # Variables
         $models = new ModelSet();
 
@@ -313,8 +307,7 @@ class ForeignModelField extends Field
      * @param mixed $field_value The value of the $field_name that indicates there is a match. This is typically set
      * to the same value as $this->value.
      */
-    private function __get_matches(string $field_name, mixed $field_value): ModelSet
-    {
+    private function __get_matches(string $field_name, mixed $field_value): ModelSet {
         return $this->get_in_scope_models()->query(query_params: [$field_name => $field_value]);
     }
 
@@ -323,8 +316,7 @@ class ForeignModelField extends Field
      * a $many enabled field.
      * @returns Model|null Returns the Model object associated with this Field's current value.
      */
-    public function get_related_model(): Model|null
-    {
+    public function get_related_model(): Model|null {
         # Get the Model objects that match this field's criteria
         $query_modelset = $this->__get_matches($this->model_field, $this->value);
 
@@ -342,8 +334,7 @@ class ForeignModelField extends Field
      * a $many enabled field.
      * @returns ModelSet Returns a ModelSet containing all Models associated with this Field's current values.
      */
-    public function get_related_models(): ModelSet
-    {
+    public function get_related_models(): ModelSet {
         # Create a ModelSet we can use to store matching objects
         $modelset = new ModelSet();
 

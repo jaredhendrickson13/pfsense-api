@@ -14,8 +14,7 @@ use RESTAPI\Responses\ValidationError;
  * Defines a DateTimeField class that extends the Core Field method. This Field adds validation and representation for
  * datetime Model Fields.
  */
-class DateTimeField extends Field
-{
+class DateTimeField extends Field {
     public string $datetime_format;
     public bool $auto_add_now;
     public bool $auto_update_now;
@@ -159,8 +158,7 @@ class DateTimeField extends Field
      * @param string $format The DateTime format of the $datetime string. (i.e. m/d/Y)
      * @return bool `true` when the datetime string is valid, `false` when it is not.
      */
-    public static function is_valid_datetime(string $datetime, string $format): bool
-    {
+    public static function is_valid_datetime(string $datetime, string $format): bool {
         # Try to create a DateTime object with this datetime string and format, then check for errors
         $datetime_obj = DateTime::createFromFormat($format, $datetime);
         $errors = DateTime::getLastErrors();
@@ -179,8 +177,7 @@ class DateTimeField extends Field
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value): array|string|null
-    {
+    protected function _to_internal(mixed $representation_value): array|string|null {
         # When `auto_update_now` is set, set the value to the current datetime.
         if ($this->auto_update_now) {
             $this->value = (new DateTime())->format($this->datetime_format);
@@ -196,8 +193,7 @@ class DateTimeField extends Field
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): string
-    {
+    protected function _from_internal(mixed $internal_value): string {
         return strval($internal_value);
     }
 
@@ -205,8 +201,7 @@ class DateTimeField extends Field
      * Add extra validation to DateTimeFields to ensure the value matches the DateTime format.
      * @param mixed $value The incoming
      */
-    public function validate_extra(mixed $value)
-    {
+    public function validate_extra(mixed $value) {
         # Check to ensure that the datetime value matches this Field's DateTime format.
         if (!$this->is_valid_datetime($value, $this->datetime_format)) {
             throw new ValidationError(

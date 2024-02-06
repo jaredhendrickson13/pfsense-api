@@ -9,8 +9,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 
-class ARPTable extends Model
-{
+class ARPTable extends Model {
     public StringField $hostname;
     public StringField $ip_address;
     public StringField $mac_address;
@@ -20,8 +19,7 @@ class ARPTable extends Model
     public StringField $dnsresolve;
     public StringField $expires;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define model attributes
         $this->many = true;
         $this->internal_callable = 'get_arp_table';
@@ -67,16 +65,14 @@ class ARPTable extends Model
     /**
      * Fetches the ARP table contents. This method is the internal callable used to read the internal ARP table entries.
      */
-    function get_arp_table(): array
-    {
+    function get_arp_table(): array {
         return prepare_ARP_table();
     }
 
     /**
      * Deletes this Model object from the ARP table.
      */
-    public function _delete()
-    {
+    public function _delete() {
         $arp_cmd = new Command('/usr/sbin/arp -d ' . escapeshellarg($this->ip_address->value));
     }
 }

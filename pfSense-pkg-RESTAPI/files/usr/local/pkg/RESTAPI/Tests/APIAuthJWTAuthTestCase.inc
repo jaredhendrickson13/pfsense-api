@@ -7,13 +7,11 @@ use RESTAPI\Auth\JWTAuth;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RESTAPIJWT;
 
-class APIAuthJWTAuthTestCase extends TestCase
-{
+class APIAuthJWTAuthTestCase extends TestCase {
     /**
      * Checks that the _authenticate_method() correctly determines whether a client successfully authenticates or not.
      */
-    public function test_authenticate(): void
-    {
+    public function test_authenticate(): void {
         # Simulate success jwt auth
         $jwt = new RESTAPIJWT();
         $jwt->client->username = 'admin';

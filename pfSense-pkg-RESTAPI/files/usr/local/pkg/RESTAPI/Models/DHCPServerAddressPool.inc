@@ -19,8 +19,7 @@ use RESTAPI\Validators\MACAddressValidator;
 /*
  * Defines a Model that configures additional address pools for a parent DHCPServer.
  */
-class DHCPServerAddressPool extends Model
-{
+class DHCPServerAddressPool extends Model {
     public StringField $range_from;
     public StringField $range_to;
     public StringField $domain;
@@ -37,8 +36,7 @@ class DHCPServerAddressPool extends Model
     public BooleanField $ignoreclientuids;
     public StringField $denyunknown;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define Model attributes
         $this->parent_model_class = 'DHCPServer';
         $this->config_path = 'pool';
@@ -174,8 +172,7 @@ class DHCPServerAddressPool extends Model
     /**
      * Provides extra validation to this entire Model object.
      */
-    public function validate_extra(): void
-    {
+    public function validate_extra(): void {
         # Check if this pool's range overlaps with another model object.
         $overlapped_model = $this->get_range_overlap();
 
@@ -197,8 +194,7 @@ class DHCPServerAddressPool extends Model
      * @throws ValidationError When `range_from` is not in the interface's subnet.
      * @throws ValidationError When `range_from` is greater than the `range_to` IP.
      */
-    public function validate_range_from(string $range_from): string
-    {
+    public function validate_range_from(string $range_from): string {
         # Get the parent interface for this DHCP server
         $interface = NetworkInterface::query(['id' => $this->parent_id])->first();
 
@@ -237,8 +233,7 @@ class DHCPServerAddressPool extends Model
      * @throws ValidationError When `range_from` is not in the interface's subnet.
      * @throws ValidationError When `range_from` is greater than the `range_to` IP.
      */
-    public function validate_range_to(string $range_to): string
-    {
+    public function validate_range_to(string $range_to): string {
         # Get the parent interface for this DHCP server
         $interface = NetworkInterface::query(['id' => $this->parent_id])->first();
 
@@ -267,8 +262,7 @@ class DHCPServerAddressPool extends Model
      * @return int The validated `maxleasetime` field value to be assigned.
      * @throws ValidationError When `maxleasetime` is less than the `defaultleasetime`
      */
-    public function validate_maxleasetime(int $maxleasetime): int
-    {
+    public function validate_maxleasetime(int $maxleasetime): int {
         if ($maxleasetime < $this->defaultleasetime->value) {
             throw new ValidationError(
                 message: 'DHCP server `maxleasetime` cannot be less than the `defaultleasetime`',
@@ -285,8 +279,7 @@ class DHCPServerAddressPool extends Model
      * @return string The validated `gateway` field value to be assigned.
      * @throws ValidationError When `gateway` is not an IP within the interface's subnet
      */
-    public function validate_gateway(string $gateway): string
-    {
+    public function validate_gateway(string $gateway): string {
         # Get the parent interface for this DHCP server
         $interface = NetworkInterface::query(['id' => $this->parent_id])->first();
 
@@ -306,8 +299,7 @@ class DHCPServerAddressPool extends Model
      * @return Model|null Returns the Model object that this range overlaps with, returns
      * null if the range did not overlap with an existing Model object.
      */
-    private function get_range_overlap(): ?Model
-    {
+    private function get_range_overlap(): ?Model {
         # Variables
         $range_from = $this->range_from->value;
         $range_to = $this->range_to->value;
@@ -355,8 +347,7 @@ class DHCPServerAddressPool extends Model
     /**
      * Applies the pending DHCP server changes.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new DHCPServerApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

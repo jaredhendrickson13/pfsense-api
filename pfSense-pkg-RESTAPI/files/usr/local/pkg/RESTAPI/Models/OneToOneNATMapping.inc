@@ -11,8 +11,7 @@ use RESTAPI\Fields\SpecialNetworkField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
-class OneToOneNATMapping extends Model
-{
+class OneToOneNATMapping extends Model {
     public InterfaceField $interface;
     public BooleanField $disabled;
     public BooleanField $nobinat;
@@ -23,8 +22,7 @@ class OneToOneNATMapping extends Model
     public FilterAddressField $destination;
     public StringField $descr;
 
-    public function __construct(mixed $id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'nat/onetoone';
         $this->subsystem = 'natconf';
@@ -111,8 +109,7 @@ class OneToOneNATMapping extends Model
      * @return string The validated value to be assigned.
      * @throws ValidationError When $external is an IP that does not match the current `ipprotocol` field value.
      */
-    public function validate_external(string $external): string
-    {
+    public function validate_external(string $external): string {
         # Variables
         $ipproto = $this->ipprotocol->value;
         $is_ipv4 = $this->external->has_label('is_ipaddrv4');
@@ -136,8 +133,7 @@ class OneToOneNATMapping extends Model
      * @throws ValidationError When $source is an IP that does not match the current `ipprotocol` field value.
      * @throws ValidationError When $source is a subnet that does not match the current `ipprotocol` field value.
      */
-    public function validate_source(string $source): string
-    {
+    public function validate_source(string $source): string {
         # Variables
         $ipproto = $this->ipprotocol->value;
         $is_ipv4 = $this->source->has_label('is_ipaddrv4');
@@ -171,8 +167,7 @@ class OneToOneNATMapping extends Model
      * @throws ValidationError When $destination is an IP that does not match the current `ipprotocol` field value.
      * @throws ValidationError When $destination is a subnet that does not match the current `ipprotocol` field value.
      */
-    public function validate_destination(string $destination): string
-    {
+    public function validate_destination(string $destination): string {
         # Variables
         $ipproto = $this->ipprotocol->value;
         $is_ipv4 = $this->destination->has_label('is_ipaddrv4');
@@ -202,8 +197,7 @@ class OneToOneNATMapping extends Model
     /**
      * Applies changes to 1:1 NAT mappings.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

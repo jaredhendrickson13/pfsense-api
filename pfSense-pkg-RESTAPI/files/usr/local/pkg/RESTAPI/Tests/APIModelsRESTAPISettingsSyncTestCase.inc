@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\RESTAPISettingsSync;
 
-class APIModelsRESTAPISettingsSyncTestCase extends TestCase
-{
+class APIModelsRESTAPISettingsSyncTestCase extends TestCase {
     /**
      * Checks that the 'serialize_settings()` method correctly populates the 'sync_data' field.
      */
-    public function test_validate_sync_data(): void
-    {
+    public function test_validate_sync_data(): void {
         # Ensure a validation error is thrown if 'sync_data' cannot be unserialized
         $this->assert_throws_response(
             response_id: 'RESTAPI_SETTINGS_SYNC_SYNC_DATA_COULD_NOT_BE_UNSERIALIZED',
@@ -39,8 +37,7 @@ class APIModelsRESTAPISettingsSyncTestCase extends TestCase
     /**
      * Checks that the 'create()' method correctly syncs the API configuration with the serialized sync data
      */
-    public function test_create(): void
-    {
+    public function test_create(): void {
         # Get the current API configuration
         $original_api_config = RESTAPISettings::get_pkg_config();
         $sync_api_config = $original_api_config;
@@ -72,8 +69,7 @@ class APIModelsRESTAPISettingsSyncTestCase extends TestCase
     /**
      * Checks that the 'sync()' method correctly syncs the API config to HA peers.
      */
-    public function test_sync(): void
-    {
+    public function test_sync(): void {
         # Use a non-pfSense host as an HA peer
         $api_settings = new RESTAPISettings();
         $api_settings->ha_sync->value = true;

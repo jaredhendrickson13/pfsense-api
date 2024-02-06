@@ -6,13 +6,11 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\SystemStatus;
 
-class APIModelsSystemStatusTestCase extends TestCase
-{
+class APIModelsSystemStatusTestCase extends TestCase {
     /**
      * Checks that we can read the current system status and that fields are properly assigned the correct values.
      */
-    public function test_read(): void
-    {
+    public function test_read(): void {
         # Read the current system status and ensure fields are assigned valid values
         $system_status = new SystemStatus();
         $this->assert_equals($system_status->platform->value, system_identify_specific_platform()['descr']);

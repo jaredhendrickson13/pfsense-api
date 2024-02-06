@@ -30,8 +30,7 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * Creates object that performs authentication and authorization for REST API Endpoints and obtains details about the
  * authenticating client.
  */
-class Auth
-{
+class Auth {
     use BaseTraits;
 
     /**
@@ -86,8 +85,7 @@ class Auth
      * Creates an Auth object which can be used to authenticate an external client requesting API access.
      * @param array $required_privileges An array of required pfSense privileges to check during authorization.
      */
-    public function __construct(array $required_privileges = [])
-    {
+    public function __construct(array $required_privileges = []) {
         # Obtain the internal API package configuration
         $this->api_settings = RESTAPISettings::get_pkg_config();
 
@@ -103,16 +101,14 @@ class Auth
      * Provides additional logic whenever authentication is successful. This is intended to be overridden by a
      * child Auth class when it needs something specific to happen after a client successfully authenticates.
      */
-    protected function on_successful_auth(): void
-    {
+    protected function on_successful_auth(): void {
     }
 
     /**
      * Provides additional logic whenever authentication has failed. This is intended to be overridden by a
      * child Auth class when it needs something specific to happen after a client fails to authenticate.
      */
-    protected function on_failed_auth(): void
-    {
+    protected function on_failed_auth(): void {
     }
 
     /**
@@ -122,8 +118,7 @@ class Auth
      * @return bool Returns true if authentication was successful, returns false otherwise.
      * @throws ServerError When this method is not overridden by a child class.
      */
-    public function _authenticate(): bool
-    {
+    public function _authenticate(): bool {
         $class = get_called_class();
         throw new ServerError(
             message: "Auth class `$class` must override `_authenticate()` method.",
@@ -135,8 +130,7 @@ class Auth
      * Perform authentication using the current authentication method.
      * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
      */
-    final public function authenticate(): bool
-    {
+    final public function authenticate(): bool {
         # Assume user is no longer authenticated or authorized.
         $this->is_authenticated = false;
         $this->is_authorized = false;
@@ -165,8 +159,7 @@ class Auth
      * Checks if the client is authorized to make this request.
      * @return bool `true` if authorization was successful, `false` if authorization was unsuccessful.
      */
-    public function authorize(): bool
-    {
+    public function authorize(): bool {
         # Variables
         $is_not_authorized = false;
         $this->client_privileges = get_user_privileges(getUserEntry($this->username));
@@ -187,8 +180,7 @@ class Auth
      * child Auth classes to define custom logic to determine if the client is trying to use the called Auth
      * class.
      */
-    public function is_requested(): bool
-    {
+    public function is_requested(): bool {
         return $this->_authenticate();
     }
 
@@ -197,16 +189,14 @@ class Auth
      * @param string $username The username to check.
      * @return bool `true` if the user is disabled, `false` if it is not.
      */
-    public static function is_user_enabled(string $username): bool
-    {
+    public static function is_user_enabled(string $username): bool {
         return User::query(name: $username, disabled: false)->exists();
     }
 
     /**
      * Logs API authentication according to the current API configuration.
      */
-    private function log_authentication(): void
-    {
+    private function log_authentication(): void {
         # Variables
         $username = $this->username ?: 'unknown';
         $ip_address = $this->ip_address;
@@ -232,8 +222,7 @@ class Auth
      * @returns String A string containing the submitted bearer token from the client. If a key with the matching
      * $identifier is not found, an empty string will be returned.
      */
-    public static function get_auth_key(string $identifier): string
-    {
+    public static function get_auth_key(string $identifier): string {
         # Obtain the key from the authorization header.
         $auth_header = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
         $token_type = $auth_header[0];
@@ -253,8 +242,7 @@ class Auth
      * @param string $class_name The name of the Auth class to check for.
      * @throws ServerError When $class_name is not an existing Auth child class in the \RESTAPI\Auth\ namespace
      */
-    public static function ensure_class_exists(string $class_name): void
-    {
+    public static function ensure_class_exists(string $class_name): void {
         # Variables
         $namespace = '\\RESTAPI\\Auth\\';
 
@@ -282,8 +270,7 @@ class Auth
      * @throws ForbiddenError When authentication was successful for an Auth class, but the client failed to be
      * authorized due to missing privileges.
      */
-    final public static function attempt_multi_auth(array $auth_classes = [], array $required_privileges = []): Auth
-    {
+    final public static function attempt_multi_auth(array $auth_classes = [], array $required_privileges = []): Auth {
         # Variables
         $auth_namespace = '\\RESTAPI\\Auth\\';
         $matched_auth = null;

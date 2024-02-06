@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\DHCPServerBackend;
 use RESTAPI\Models\Service;
 
-class APIModelsDHCPServerBackendTestCase extends TestCase
-{
+class APIModelsDHCPServerBackendTestCase extends TestCase {
     /**
      * Checks that the backend DHCP server is successful changed after being updated.
      */
-    public function test_switch_backend(): void
-    {
+    public function test_switch_backend(): void {
         # Switch the backend to Kea DHCP
         $dhcp_backend = new DHCPServerBackend(dhcpbackend: 'kea', async: false);
         $dhcp_backend->update();

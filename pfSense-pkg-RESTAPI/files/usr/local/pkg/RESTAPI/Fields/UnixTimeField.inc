@@ -10,8 +10,7 @@ use RESTAPI\Responses\ServerError;
 /**
  * Defines a UnixTimeField class that extends the Core Field method.
  */
-class UnixTimeField extends IntegerField
-{
+class UnixTimeField extends IntegerField {
     public bool $auto_add_now;
     public bool $auto_update_now;
 
@@ -152,8 +151,7 @@ class UnixTimeField extends IntegerField
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value): array|string|null
-    {
+    protected function _to_internal(mixed $representation_value): array|string|null {
         # When `auto_update_now` is set, set the value to the current time.
         if ($this->auto_update_now) {
             $this->value = time();
@@ -169,8 +167,7 @@ class UnixTimeField extends IntegerField
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return int The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): int
-    {
+    protected function _from_internal(mixed $internal_value): int {
         return $internal_value;
     }
 }

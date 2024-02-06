@@ -9,13 +9,11 @@ use RESTAPI\Models\FirewallSchedule;
 use RESTAPI\Models\RoutingGateway;
 use RESTAPI\Models\TrafficShaper;
 
-class APIModelsFirewallRuleTestCase extends TestCase
-{
+class APIModelsFirewallRuleTestCase extends TestCase {
     /**
      * Checks that multiple interfaces cannot be assigned to a FirewallRule unless `floating` is enabled.
      */
-    public function test_no_multiple_interface_without_floating()
-    {
+    public function test_no_multiple_interface_without_floating() {
         # Ensure multiple interface values are not allowed for non floating FirewallRules
         $this->assert_throws_response(
             response_id: 'FIREWALL_RULE_MULTIPLE_INTERFACE_WITHOUT_FLOATING',
@@ -41,8 +39,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that the `statetype` can only be `synproxy state` if the `protocol` is `tcp`
      */
-    public function test_no_synproxy_statetype_with_non_tcp_rule()
-    {
+    public function test_no_synproxy_statetype_with_non_tcp_rule() {
         $this->assert_throws_response(
             response_id: 'FIREWALL_RULE_SYNPROXY_STATE_TYPE_WITH_NON_TCP_PROTOCOL',
             code: 400,
@@ -57,8 +54,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that the `statetype` can only be `synproxy state` if a `gateway` is not set.
      */
-    public function test_no_synproxy_statetype_with_gateway_assigned()
-    {
+    public function test_no_synproxy_statetype_with_gateway_assigned() {
         $this->assert_throws_response(
             response_id: 'FIREWALL_RULE_SYNPROXY_STATE_TYPE_WITH_GATEWAY',
             code: 400,
@@ -74,8 +70,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that any values specific in `tcp_flags_set` must also be present in `tcp_flags_out_of`
      */
-    public function test_tcp_flag_set_must_be_in_tcp_flags_out_of()
-    {
+    public function test_tcp_flag_set_must_be_in_tcp_flags_out_of() {
         $this->assert_throws_response(
             response_id: 'FIREWALL_RULE_TCP_FLAGS_SET_NOT_IN_TCP_FLAGS_OUT_OF',
             code: 400,
@@ -91,8 +86,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
      * Checks that the `update_by` value is automatically updated with the current user regardless of what value
      * is currently is assigned.
      */
-    public function test_updated_by_is_automatically_overwritten()
-    {
+    public function test_updated_by_is_automatically_overwritten() {
         # Define a FirewallRule object and set it's client username and IP
         $rule = new FirewallRule();
         $rule->client->username = 'testuser1';
@@ -116,8 +110,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that basic firewall rules are actually configured by pfctl after creation, modification and deletion.
      */
-    public function test_basic_crud()
-    {
+    public function test_basic_crud() {
         # Create a firewall rule to test with
         $rule = new FirewallRule(
             data: [
@@ -195,8 +188,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that firewall rules created with a specific gateway assigned are properly set in pfctl
      */
-    public function test_rule_with_gateway()
-    {
+    public function test_rule_with_gateway() {
         # Create a routing gatewy to test with
         $gateway = new RoutingGateway(
             data: [
@@ -242,8 +234,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that disabled firewall rules are not present in pfctl
      */
-    public function test_disabled()
-    {
+    public function test_disabled() {
         # Create a firewall rule to test with
         $rule = new FirewallRule(
             data: [
@@ -269,8 +260,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that the `statetype` is properly set in the pfctl rule
      */
-    public function test_statetype()
-    {
+    public function test_statetype() {
         # Create a firewall rule to test with
         $rule = new FirewallRule(
             data: [
@@ -297,8 +287,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that firewall rules with `log` enabled have the log flag set in pfctl
      */
-    public function test_log()
-    {
+    public function test_log() {
         # Create a firewall rule to test with
         $rule = new FirewallRule(
             data: [
@@ -333,8 +322,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that firewall rules with `tcp_flags_any` enabled have the `any` flag set in pfctl
      */
-    public function test_tcp_flags_any()
-    {
+    public function test_tcp_flags_any() {
         # Create a firewall rule to test with
         $rule = new FirewallRule(
             data: [
@@ -361,8 +349,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that firewall rules with explicit TCP flags set are correctly added in pfctl
      */
-    public function test_tcp_flags()
-    {
+    public function test_tcp_flags() {
         # Create a firewall rule to test with
         $rule = new FirewallRule(
             data: [
@@ -390,8 +377,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that firewall rules with `floating` enabled are correctly added in pfctl
      */
-    public function test_floating()
-    {
+    public function test_floating() {
         # Create a firewall rule to test with
         $rule = new FirewallRule(
             data: [
@@ -422,8 +408,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that firewall rules with a `sched` are correctly added in pfctl
      */
-    public function test_sched_found_in_pfctl(): void
-    {
+    public function test_sched_found_in_pfctl(): void {
         # Get the current month and day so we can test the schedule
         $current_month = (int) date('m');
         $current_day = (int) date('d');
@@ -479,8 +464,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that the `defaultqueue` field is correctly shown in pfctl after creation, modification and deletion
      */
-    public function test_defaultqueue_found_in_pfctl(): void
-    {
+    public function test_defaultqueue_found_in_pfctl(): void {
         # Create TrafficShapers to test with
         $shaper1 = new TrafficShaper(
             interface: 'lan',
@@ -548,8 +532,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     /**
      * Checks that the `ackqueue` field is correctly shown in pfctl after creation, modification and deletion
      */
-    public function test_ackqueue_found_in_pfctl(): void
-    {
+    public function test_ackqueue_found_in_pfctl(): void {
         # Create TrafficShapers to test with
         $shaper1 = new TrafficShaper(
             interface: 'lan',

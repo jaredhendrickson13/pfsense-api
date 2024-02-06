@@ -6,14 +6,12 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\OneToOneNATMapping;
 
-class APIModelsOneToOneNATMappingTestCase extends TestCase
-{
+class APIModelsOneToOneNATMappingTestCase extends TestCase {
     /**
      * Checks that a ValidationError is thrown when the `external` field is assigned an IP address that is not of the
      * IP family specified by the `ipprotocol` field.
      */
-    public function test_validate_external(): void
-    {
+    public function test_validate_external(): void {
         $this->assert_throws_response(
             response_id: 'ONE_TO_ONE_NAT_MAPPING_EXTERNAL_IP_DOES_NOT_MATCH_IPPROTOCOL',
             code: 400,
@@ -49,8 +47,7 @@ class APIModelsOneToOneNATMappingTestCase extends TestCase
      * Checks that a ValidationError is thrown when the `source` field is assigned an IP or subnet that is not of the
      * IP family specified by the `ipprotocol` field.
      */
-    public function test_validate_source(): void
-    {
+    public function test_validate_source(): void {
         $this->assert_throws_response(
             response_id: 'ONE_TO_ONE_NAT_MAPPING_SOURCE_IP_DOES_NOT_MATCH_IPPROTOCOL',
             code: 400,
@@ -116,8 +113,7 @@ class APIModelsOneToOneNATMappingTestCase extends TestCase
      * Checks that a ValidationError is thrown when the `destination` field is assigned an IP or subnet that is not of the
      * IP family specified by the `ipprotocol` field.
      */
-    public function test_validate_destination(): void
-    {
+    public function test_validate_destination(): void {
         $this->assert_throws_response(
             response_id: 'ONE_TO_ONE_NAT_MAPPING_DESTINATION_IP_DOES_NOT_MATCH_IPPROTOCOL',
             code: 400,
@@ -182,8 +178,7 @@ class APIModelsOneToOneNATMappingTestCase extends TestCase
     /**
      * Checks that the NAT 1:1 mapping is correctly found in pfctl after creation, modification and deletion.
      */
-    public function test_one_to_one_found_in_pfctl(): void
-    {
+    public function test_one_to_one_found_in_pfctl(): void {
         # Create a new 1:1 mapping to test with
         $one_to_one = new OneToOneNATMapping(
             interface: 'lan',

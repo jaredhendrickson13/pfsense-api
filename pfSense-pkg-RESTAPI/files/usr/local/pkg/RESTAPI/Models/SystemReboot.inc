@@ -6,12 +6,10 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\SystemRebootDispatcher;
 use RESTAPI\Fields\BooleanField;
 
-class SystemReboot extends Model
-{
+class SystemReboot extends Model {
     public BooleanField $dry_run;
 
-    public function __construct(mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $data = [], ...$options) {
         # Set model attributes
         $this->many = false;
 
@@ -28,16 +26,14 @@ class SystemReboot extends Model
     /**
      * Returns an empty array. This method is the internal callable for this Model
      */
-    protected function void(): array
-    {
+    protected function void(): array {
         return [];
     }
 
     /**
      * Defines the steps necessary to initiate a reboot.
      */
-    public function _create(): void
-    {
+    public function _create(): void {
         # Only initiate the reboot if this is not a dry run
         if (!$this->dry_run->value) {
             (new SystemRebootDispatcher($this->async))->spawn_process();

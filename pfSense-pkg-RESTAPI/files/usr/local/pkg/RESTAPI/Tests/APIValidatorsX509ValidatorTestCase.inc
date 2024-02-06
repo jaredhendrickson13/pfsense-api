@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Validators\X509Validator;
 
-class APIValidatorsX509ValidatorTestCase extends TestCase
-{
+class APIValidatorsX509ValidatorTestCase extends TestCase {
     const EXAMPLE_CRT = "-----BEGIN CERTIFICATE-----
 MIIDnzCCAoegAwIBAgIUd9R9uoNKE2GoxgJPwzRn67WV4bgwDQYJKoZIhvcNAQEL
 BQAwXzELMAkGA1UEBhMCVVMxDTALBgNVBAgMBFV0YWgxFzAVBgNVBAcMDlNhbHQg
@@ -83,8 +82,7 @@ H0t+b8M07WqCw6FuSkg/UcMgMMshSooVSIemL+YhK7tYQ9oQKcVdy34Xt69NDh2T
     /**
      * Checks that the `allow_crt` parameter allows X509 encoded certificate strings.
      */
-    public function test_allow_crt()
-    {
+    public function test_allow_crt() {
         # Ensure valid X509 certificate strings are accepted
         $this->assert_does_not_throw(
             callable: function () {
@@ -107,8 +105,7 @@ H0t+b8M07WqCw6FuSkg/UcMgMMshSooVSIemL+YhK7tYQ9oQKcVdy34Xt69NDh2T
     /**
      * Checks that the `allow_prv` parameter allows X509 encoded private key strings.
      */
-    public function test_allow_prv()
-    {
+    public function test_allow_prv() {
         # Ensure valid X509 private key strings are accepted
         $this->assert_does_not_throw(
             callable: function () {
@@ -131,8 +128,7 @@ H0t+b8M07WqCw6FuSkg/UcMgMMshSooVSIemL+YhK7tYQ9oQKcVdy34Xt69NDh2T
     /**
      * Checks that the `allow_ecprv` parameter allows X509 encoded EC private key strings.
      */
-    public function test_allow_ecprv()
-    {
+    public function test_allow_ecprv() {
         # Ensure valid X509 EC private key strings are accepted
         $this->assert_does_not_throw(
             callable: function () {
@@ -155,8 +151,7 @@ H0t+b8M07WqCw6FuSkg/UcMgMMshSooVSIemL+YhK7tYQ9oQKcVdy34Xt69NDh2T
     /**
      * Checks that the `allow_csr` parameter allows X509 encoded CSR strings.
      */
-    public function test_allow_csr()
-    {
+    public function test_allow_csr() {
         # Ensure valid X509 CSRs are accepted
         $this->assert_does_not_throw(
             callable: function () {
@@ -179,8 +174,7 @@ H0t+b8M07WqCw6FuSkg/UcMgMMshSooVSIemL+YhK7tYQ9oQKcVdy34Xt69NDh2T
     /**
      * Checks that the `is_matching_keypair()` correctly identifies matching keypairs.
      */
-    public function test_is_matching_key_pair()
-    {
+    public function test_is_matching_key_pair() {
         # Ensure matching key pairs return `true`
         $this->assert_is_true(
             X509Validator::is_matching_keypair(public_key: self::EXAMPLE_CRT, private_key: self::EXAMPLE_PRV),

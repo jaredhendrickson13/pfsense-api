@@ -10,13 +10,11 @@ use RESTAPI\Models\StaticRoute;
 /**
  * Defines Tests for the RoutingGateway Model class.
  */
-class APIModelsRoutingGatewayTestCase extends TestCase
-{
+class APIModelsRoutingGatewayTestCase extends TestCase {
     /**
      * Checks that RoutingGateways cannot be disabled while its in use.
      */
-    public function test_cannot_disable_gateway_while_in_use()
-    {
+    public function test_cannot_disable_gateway_while_in_use() {
         # TODO: Need Tests to ensure gateway cannot be disabled while in use by gw groups and dns servers
         # Create a routing gateway to test with
         $test_gateway = new RoutingGateway(
@@ -68,8 +66,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     /**
      * Ensure a gateway's interface has an IP of the assigned `ipprotocol`
      */
-    public function test_gateway_interface_must_match_gateway_ip_protocol()
-    {
+    public function test_gateway_interface_must_match_gateway_ip_protocol() {
         # Create a parent interface to test with
         $test_if = new NetworkInterface(
             data: [
@@ -170,8 +167,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     /**
      * Checks to ensure the `gateway` field is set to a value that matches the `ipprotocol`.
      */
-    public function test_gateway_matches_ipprotocol_type()
-    {
+    public function test_gateway_matches_ipprotocol_type() {
         # Ensure an IPv4 IP cannot be used for IPv6 gateway
         $this->assert_throws_response(
             response_id: 'ROUTING_GATEWAY_NO_IPV4_WITH_INET6',
@@ -244,8 +240,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     /**
      * Ensures the `latencyhigh` field cannot be set to a value lower than `latencylow`
      */
-    public function test_latencyhigh_must_be_greater_than_latencylow()
-    {
+    public function test_latencyhigh_must_be_greater_than_latencylow() {
         $this->assert_throws_response(
             response_id: 'ROUTING_GATEWAY_WITH_LATENCY_LOW_GREATER_THAN_HIGH',
             code: 400,
@@ -269,8 +264,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     /**
      * Ensures the `losshigh` field cannot be set to a value lower than `losslow`
      */
-    public function test_losshigh_must_be_greater_than_losslow()
-    {
+    public function test_losshigh_must_be_greater_than_losslow() {
         $this->assert_throws_response(
             response_id: 'ROUTING_GATEWAY_WITH_LOSS_LOW_GREATER_THAN_HIGH',
             code: 400,
@@ -294,8 +288,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     /**
      * Ensures the `loss_interval` field cannot be set to a value lower than `latencyhigh`
      */
-    public function test_loss_interval_must_be_greater_than_latencyhigh()
-    {
+    public function test_loss_interval_must_be_greater_than_latencyhigh() {
         $this->assert_throws_response(
             response_id: 'ROUTING_GATEWAY_WITH_LOSS_INTERVAL_GREATER_THAN_LATENCY_HIGH',
             code: 400,
@@ -319,8 +312,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     /**
      * Checks that the `time_period` must be greater than twice the `interval` plus the `loss_interval`
      */
-    public function test_time_period_minimum_constraint()
-    {
+    public function test_time_period_minimum_constraint() {
         # Calculate the minimum value
         $interval = 500;
         $loss_interval = 2000;
@@ -370,8 +362,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     /**
      * Ensures the `alert_interval` must be greater than or equal to `interval`
      */
-    public function test_loss_interval_must_be_greater_than_interval()
-    {
+    public function test_loss_interval_must_be_greater_than_interval() {
         $this->assert_throws_response(
             response_id: 'ROUTING_GATEWAY_ALERT_INTERVAL_UNDER_MINIMUM',
             code: 400,
@@ -395,8 +386,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     /**
      * Checks that the gateway is configured on the backend when the RoutingGateway is created, updated and deleted.
      */
-    public function test_gateway_route_found_in_netstat()
-    {
+    public function test_gateway_route_found_in_netstat() {
         # Create a new RoutingGateway
         $test_gw = new RoutingGateway(
             data: [

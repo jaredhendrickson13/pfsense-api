@@ -10,8 +10,7 @@ use RESTAPI;
  * Defines a BooleanField class that extends the Core Field method. This Field adds validation and representation for
  * boolean Model Fields.
  */
-class BooleanField extends RESTAPI\Core\Field
-{
+class BooleanField extends RESTAPI\Core\Field {
     public mixed $indicates_true;
     public mixed $indicates_false;
 
@@ -107,8 +106,7 @@ class BooleanField extends RESTAPI\Core\Field
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return bool The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): bool
-    {
+    protected function _from_internal(mixed $internal_value): bool {
         # Check if the string matches our `indicates_true` value, if so, set this value as true.
         if ($internal_value === $this->indicates_true) {
             return true;
@@ -123,8 +121,7 @@ class BooleanField extends RESTAPI\Core\Field
      * @param mixed $representation_value The representation form of this field to convert to internal.
      * @return string|null The internal string used to indicate if the value is `true` or `false`.
      */
-    protected function _to_internal(mixed $representation_value): string|null
-    {
+    protected function _to_internal(mixed $representation_value): string|null {
         # If the representation value is `true`, set it's internal value as the current `indicates_true` value.
         if ($representation_value === true) {
             return $this->indicates_true;
@@ -142,8 +139,7 @@ class BooleanField extends RESTAPI\Core\Field
      * @return object The pfSense webConfigurator form input object.
      * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
      */
-    public function to_form_input(string $type = 'text', array $attributes = []): object
-    {
+    public function to_form_input(string $type = 'text', array $attributes = []): object {
         # Populate the GENERAL section of the UI form
         $input = new \Form_Checkbox(
             $this->name,

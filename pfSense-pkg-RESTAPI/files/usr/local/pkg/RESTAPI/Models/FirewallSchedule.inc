@@ -13,16 +13,14 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
 use RESTAPI\Validators\FilterNameValidator;
 
-class FirewallSchedule extends Model
-{
+class FirewallSchedule extends Model {
     public UIDField $schedlabel;
     public StringField $name;
     public StringField $descr;
     public BooleanField $active;
     public NestedModelField $timerange;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'schedules/schedule';
         $this->many = true;
@@ -63,8 +61,7 @@ class FirewallSchedule extends Model
     /**
      * Obtains the `active` status for this FirewallSchedule
      */
-    protected function from_internal_active(): bool
-    {
+    protected function from_internal_active(): bool {
         # Only attempt to obtain this value if this FirewallSchedule already exists
         if (isset($this->id)) {
             return filter_get_time_based_rule_status($this->to_internal());
@@ -77,8 +74,7 @@ class FirewallSchedule extends Model
     /**
      * Applies the schedule by reloading the filter.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         # Reload the filter
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
 

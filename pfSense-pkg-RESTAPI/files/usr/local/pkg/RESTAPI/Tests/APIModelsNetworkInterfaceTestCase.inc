@@ -9,14 +9,12 @@ use RESTAPI\Models\InterfaceVLAN;
 use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\VirtualIP;
 
-class APIModelsNetworkInterfaceTestCase extends TestCase
-{
+class APIModelsNetworkInterfaceTestCase extends TestCase {
     /**
      * Checks to ensure the `from_internal_descr()` correctly populates empty interface
      * `descr` field values.
      */
-    public function test_from_internal_descr()
-    {
+    public function test_from_internal_descr() {
         # Create a NetworkInterface model to test with
         $test_model = new NetworkInterface();
         $test_model->get_next_id();
@@ -32,8 +30,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `descr' field value must be 22 characters or less when the `if` field is set
      * to an OpenVPN interface
      */
-    public function test_descr_max_length_with_openvpn_if()
-    {
+    public function test_descr_max_length_with_openvpn_if() {
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_DESCR_OPENVPN_MAX_LENGTH_EXCEEDED',
             code: 400,
@@ -63,8 +60,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `descr' field value must be 22 characters or less when the `if` field is set
      * to an IPsec interface
      */
-    public function test_descr_max_length_with_ipsec_if()
-    {
+    public function test_descr_max_length_with_ipsec_if() {
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_DESCR_IPSEC_MAX_LENGTH_EXCEEDED',
             code: 400,
@@ -94,8 +90,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `descr' field value must be 22 characters or less when the `if` field is set
      * to a GIF interface
      */
-    public function test_descr_max_length_with_gif_if()
-    {
+    public function test_descr_max_length_with_gif_if() {
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_DESCR_GIF_MAX_LENGTH_EXCEEDED',
             code: 400,
@@ -125,8 +120,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `descr' field value must be 22 characters or less when the `if` field is set
      * to a GRE interface
      */
-    public function test_descr_max_length_with_gre_if()
-    {
+    public function test_descr_max_length_with_gre_if() {
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_DESCR_GRE_MAX_LENGTH_EXCEEDED',
             code: 400,
@@ -155,8 +149,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that a VLAN interface cannot set its MTU higher than its parent interface's MTU.
      */
-    public function test_vlan_interface_cannot_have_higher_mtu_than_parent()
-    {
+    public function test_vlan_interface_cannot_have_higher_mtu_than_parent() {
         # Create a new interface VLAN
         $vlan = new InterfaceVLAN(
             data: [
@@ -208,8 +201,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the `validate_media()` method properly validates available interface media types.
      */
-    public function test_validate_media()
-    {
+    public function test_validate_media() {
         # Ensure an error is thrown if media is not a supported value
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_WITH_UNSUPPORTED_MEDIA_TYPE',
@@ -230,8 +222,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the `validate_mediaopt()` method properly validates available interface media options.
      */
-    public function test_validate_mediaopt()
-    {
+    public function test_validate_mediaopt() {
         # Ensure an error is thrown if mediaopt is not a supported value
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_WITH_UNSUPPORTED_MEDIA_OPTION',
@@ -256,8 +247,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the `validate_blockbogons()` correctly determines if bogons can be blocked on the current system.
      */
-    public function test_validate_blockbogons()
-    {
+    public function test_validate_blockbogons() {
         # Ensure no error is thrown when trying to block bogons with a sufficient table entries size limit
         $this->assert_does_not_throw(
             callable: function () {
@@ -293,8 +283,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `from_internal_typev4()` method correctly determines the IPv4 type of the configured interface.
      * `typev4` is not a stored field so this method is responsible for populating the field dynamically.
      */
-    public function test_from_internal_typev4()
-    {
+    public function test_from_internal_typev4() {
         # Create a model to test with
         $test_model = new NetworkInterface();
 
@@ -316,8 +305,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the interface `typev4` cannot be changed from `static` if the DHCP server is enabled on the
      * interface.
      */
-    public function test_no_non_static_typev4_when_dhcpd_enabled()
-    {
+    public function test_no_non_static_typev4_when_dhcpd_enabled() {
         $this->assert_throws_response(
             'NETWORK_INTERFACE_CANNOT_CHANGE_TYPEV4_WHILE_DHCP_SERVER_ENABLED',
             code: 400,
@@ -336,8 +324,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the interface `typev4` cannot be changed to `none` if it has virtual IPs.
      */
-    public function test_no_none_typev4_when_vips_exist()
-    {
+    public function test_no_none_typev4_when_vips_exist() {
         $this->assert_throws_response(
             'NETWORK_INTERFACE_NO_TYPEV4_NONE_WITH_EXISTING_VIRTUAL_IPS',
             code: 400,
@@ -378,8 +365,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `validate_ipaddr()` method forces the `ipaddr` to match the `typev4` value when `typev4` is not
      * `static`
      */
-    public function test_ipaddr_forced_value_for_non_static_typev4()
-    {
+    public function test_ipaddr_forced_value_for_non_static_typev4() {
         # Create a NetworkInterface to use for testing
         $test_model = new NetworkInterface();
 
@@ -397,8 +383,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the `validate_ipaddr()` method forces the `ipaddr` to be an IPv4 address if `typev4` is `static`.
      */
-    public function test_ipaddr_must_be_ipv4_when_static()
-    {
+    public function test_ipaddr_must_be_ipv4_when_static() {
         $this->assert_throws_response(
             response_id: 'INTERFACE_IPADDR_NOT_IPV4_WHEN_STATIC',
             code: 400,
@@ -428,8 +413,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that `validate_ipaddr()` ensures an interface's `ipaddr` and `subnet` cannot overlap with another
      * interface, virtual IP, etc.
      */
-    public function test_ipaddr_and_subnet_cannot_overlap_other_objects()
-    {
+    public function test_ipaddr_and_subnet_cannot_overlap_other_objects() {
         $this->assert_throws_response(
             response_id: 'INTERFACE_IPADDR_ALREADY_IN_USE',
             code: 400,
@@ -460,8 +444,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that `validate_ipaddr()` prevents the `ipaddr` from being set as the network address.
      */
-    public function test_ipaddr_cannot_be_network_address()
-    {
+    public function test_ipaddr_cannot_be_network_address() {
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_IPADDR_CANNOT_USE_NETWORK_ADDRESS',
             code: 400,
@@ -480,8 +463,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that `validate_ipaddr()` prevents the `ipaddr` from being set as the broadcast address.
      */
-    public function test_ipaddr_cannot_be_broadcast_address()
-    {
+    public function test_ipaddr_cannot_be_broadcast_address() {
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_IPADDR_CANNOT_USE_BROADCAST_ADDRESS',
             code: 400,
@@ -501,8 +483,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `validate_ipaddr()` method correctly prevents the `ipaddr` and `subnet` from being set to values
      * that conflict with an existing static route.
      */
-    public function test_ipaddr_cannot_conflict_with_static_route()
-    {
+    public function test_ipaddr_cannot_conflict_with_static_route() {
         # Add a static route we can use to create a conflict
         # TODO: replace this with a StaticRoute model call when developed
         $static_route = [
@@ -532,8 +513,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `validate_subnet()` method prevents an interface's subnet from being reduced to a /31 or /32
      * while the DHCP server is enabled on the interface.
      */
-    public function test_subnet_is_less_than_31_while_dhcp_server_enabled()
-    {
+    public function test_subnet_is_less_than_31_while_dhcp_server_enabled() {
         # Ensure the DHCP server is enabled on the `lan` interface
         Model::set_config(path: 'dhcpd/lan/enable', value: '');
 
@@ -576,8 +556,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `from_internal_typev6()` method correctly determines the IPv6 type of the configured interface.
      * `typev6` is not a stored field so this method is responsible for populating the field dynamically.
      */
-    public function test_from_internal_typev6()
-    {
+    public function test_from_internal_typev6() {
         # Create a model to test with
         $test_model = new NetworkInterface();
 
@@ -610,8 +589,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the `validate_typev6()` method prevents more than one interface from using the `6to4` typev6
      */
-    public function test_only_one_interface_with_6to4_typev6()
-    {
+    public function test_only_one_interface_with_6to4_typev6() {
         # Create a new 6to4 typev6 interface
         $if_6to4 = new NetworkInterface(
             data: [
@@ -641,8 +619,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the interface `typev6` cannot be changed to `none` if it has virtual IPs.
      */
-    public function test_no_none_typev6_when_vips_exist()
-    {
+    public function test_no_none_typev6_when_vips_exist() {
         # Create a static IPv6 interface to test with
         $test_model = new NetworkInterface(
             data: [
@@ -686,8 +663,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the `get_next_id()` method correctly obtains the next available pfSense interface ID.
      */
-    public function test_get_next_id()
-    {
+    public function test_get_next_id() {
         $test_model = new NetworkInterface();
         $this->assert_equals($test_model->get_next_id(), 'opt1');
     }
@@ -696,8 +672,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `get_supported_media()` method correctly identifies an interface's supported speed and duplex
      * types and options.
      */
-    public function test_get_supported_media()
-    {
+    public function test_get_supported_media() {
         # Create a model object to test with
         $test_model = new NetworkInterface();
         $test_model->if->value = 'em0';
@@ -725,8 +700,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `serialize_changes()` method correctly serializes pending interface changes and writes the
      * pending changes to /tmp/.interfaces.apply to be applied later
      */
-    public function test_serialize_changes()
-    {
+    public function test_serialize_changes() {
         # Create a NetworkInterface object to test with
         $test_model = new NetworkInterface(
             data: [
@@ -769,8 +743,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that NetworkInterface objects cannot be deleted if the ID is `wan`
      */
-    public function test_cannot_delete_wan_interface()
-    {
+    public function test_cannot_delete_wan_interface() {
         $this->assert_throws_response(
             response_id: 'NETWORK_INTERFACE_WAN_CANNOT_BE_DELETED',
             code: 400,
@@ -794,8 +767,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     /**
      * Checks that the `get_all_avail_interfaces()` method correctly gathers available interfaces.
      */
-    public function test_get_all_avail_interfaces()
-    {
+    public function test_get_all_avail_interfaces() {
         # Create a model to test with
         $test_model = new NetworkInterface();
 
@@ -810,8 +782,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that static NetworkInterfaces are accurately configured on the backend whenever they are created, updated,
      * and/or deleted.
      */
-    public function test_static_interfaces_match_ifconfig()
-    {
+    public function test_static_interfaces_match_ifconfig() {
         # Create a new static NetworkInterface
         $static_if = new NetworkInterface(
             data: [
@@ -895,8 +866,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
      * Checks that the `is_ipv4_in_cidr()` method correctly determines if a given IP address is within an interface's
      * configured IPv4 CIDR
      */
-    public function test_is_ipv4_in_cidr(): void
-    {
+    public function test_is_ipv4_in_cidr(): void {
         $if = new NetworkInterface(id: 'lan');
         $this->assert_is_true($if->is_ipv4_in_cidr('192.168.1.5'));
         $this->assert_is_false($if->is_ipv4_in_cidr('192.168.2.5'));

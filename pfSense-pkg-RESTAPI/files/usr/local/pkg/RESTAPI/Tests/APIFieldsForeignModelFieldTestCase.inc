@@ -8,13 +8,11 @@ use RESTAPI\Models\DNSResolverHostOverride;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\TrafficShaper;
 
-class APIFieldsForeignModelFieldTestCase extends TestCase
-{
+class APIFieldsForeignModelFieldTestCase extends TestCase {
     /**
      * Ensure assigned `model_name` must be an existing Model class name.
      */
-    public function test_model_name_must_be_name_of_model_class(): void
-    {
+    public function test_model_name_must_be_name_of_model_class(): void {
         $this->assert_throws_response(
             response_id: 'FOREIGN_MODEL_FIELD_WITH_UNKNOWN_MODEL_NAME',
             code: 500,
@@ -27,8 +25,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Ensure assigned `model_name` must be an existing Model class name.
      */
-    public function test_model_must_be_many(): void
-    {
+    public function test_model_must_be_many(): void {
         $this->assert_throws_response(
             response_id: 'FOREIGN_MODEL_FIELD_ASSIGNED_NON_MANY_MODEL',
             code: 500,
@@ -41,8 +38,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Ensure assigned `model_field` must be an existing Field name from the assigned Model class.
      */
-    public function test_model_field_must_be_existing_field_name(): void
-    {
+    public function test_model_field_must_be_existing_field_name(): void {
         $this->assert_throws_response(
             response_id: 'FOREIGN_MODEL_FIELD_WITH_UNKNOWN_MODEL_FIELD',
             code: 500,
@@ -65,8 +61,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Ensure assigned `model_field_internal` must be an existing Field name from the assigned Model class.
      */
-    public function test_model_field_internal_must_be_existing_field_name(): void
-    {
+    public function test_model_field_internal_must_be_existing_field_name(): void {
         $this->assert_throws_response(
             response_id: 'FOREIGN_MODEL_FIELD_WITH_UNKNOWN_MODEL_FIELD_INTERNAL',
             code: 500,
@@ -93,8 +88,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Ensure the `from_internal()` method correctly locates the correct object by its internal value.
      */
-    public function test_from_internal(): void
-    {
+    public function test_from_internal(): void {
         # Create FirewallAlias objects to use for testing purposes
         $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []]);
         $host_alias->create();
@@ -117,8 +111,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Ensure the `to_internal()` method correctly sets the internal value of the assigned object.
      */
-    public function test_to_internal(): void
-    {
+    public function test_to_internal(): void {
         # Create FirewallAlias objects to use for testing purposes
         $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []]);
         $host_alias->create();
@@ -141,8 +134,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Ensure the value assigned to the field must relate to existing object
      */
-    public function test_value_must_relate_to_foreign_model(): void
-    {
+    public function test_value_must_relate_to_foreign_model(): void {
         $this->assert_throws_response(
             response_id: 'FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND',
             code: 404,
@@ -158,8 +150,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Ensure the `model_query` correctly limits the Model objects this Field can relate to.
      */
-    public function test_model_query_limits_objects(): void
-    {
+    public function test_model_query_limits_objects(): void {
         # Create FirewallAlias objects to use for testing purposes
         $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []]);
         $host_alias->create();
@@ -204,8 +195,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Ensure the `get_related_model` correctly returns the model object(s) associated with this field's current value(s).
      */
-    public function test_get_related_model(): void
-    {
+    public function test_get_related_model(): void {
         # Create FirewallAlias objects to use for testing purposes
         $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []]);
         $host_alias->create();
@@ -242,8 +232,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Checks that we can use Model classes that have parent classes assigned.
      */
-    public function test_foreign_models_with_parents(): void
-    {
+    public function test_foreign_models_with_parents(): void {
         # Use TrafficShapers to test this
         $shaper1 = new TrafficShaper(
             interface: 'lan',
@@ -284,8 +273,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     /**
      * Checks that values specified in `allowed_keywords` are always accepted.
      */
-    public function test_allowed_keywords(): void
-    {
+    public function test_allowed_keywords(): void {
         # Ensure no error is thrown if we validate a ForeignModelField assigned an allowed keyword.
         $this->assert_does_not_throw(
             callable: function () {

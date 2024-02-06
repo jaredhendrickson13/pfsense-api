@@ -8,13 +8,11 @@ use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\RoutingGateway;
 use RESTAPI\Models\StaticRoute;
 
-class APIModelsStaticRouteTestCase extends TestCase
-{
+class APIModelsStaticRouteTestCase extends TestCase {
     /**
      * Checks that the static route cannot conflict with an existing interface's subnet.
      */
-    public function test_static_route_cannot_conflict_with_interface_subnet()
-    {
+    public function test_static_route_cannot_conflict_with_interface_subnet() {
         # Create an interface to use for testing
         $test_if = new NetworkInterface(
             data: [
@@ -120,8 +118,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     /**
      * Checks that the static route's network matches the IP type of the gateway.
      */
-    public function test_static_route_network_must_match_gateway_ip_type()
-    {
+    public function test_static_route_network_must_match_gateway_ip_type() {
         # Create an interface to use for testing
         $test_if = new NetworkInterface(
             data: [
@@ -201,8 +198,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     /**
      * Checks that static routes must be disabled if the parent gateway is disabled.
      */
-    public function test_static_route_must_be_disabled_when_gateway_is_disabled()
-    {
+    public function test_static_route_must_be_disabled_when_gateway_is_disabled() {
         # Create gateways to use for testing
         $test_gw4 = new RoutingGateway(
             data: [
@@ -239,8 +235,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     /**
      * Checks that the `get_networks()` method correctly gathers all applicable networks for the given `network` value.
      */
-    public function test_get_networks()
-    {
+    public function test_get_networks() {
         # Create an alias to use for testing
         $test_alias = new FirewallAlias(
             data: [
@@ -295,8 +290,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     /**
      * Checks that static routes are found in the routing table after creation, updates and not found after deletion.
      */
-    public function test_static_route_configured_in_routing_table()
-    {
+    public function test_static_route_configured_in_routing_table() {
         # Create a gateway to use for testing
         $test_gw = new RoutingGateway(
             data: [

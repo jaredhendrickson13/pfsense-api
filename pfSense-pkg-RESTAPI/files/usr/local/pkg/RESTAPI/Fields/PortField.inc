@@ -14,8 +14,7 @@ use RESTAPI\Responses\ValidationError;
  * Defines a PortField class that extends the Core Field method. This Field adds validation and representation for
  * TCP/UDP port values and ranges.
  */
-class PortField extends Field
-{
+class PortField extends Field {
     const REPR_RANGE_CHAR = ':';
     public bool $allow_alias;
     public bool $allow_range;
@@ -146,8 +145,7 @@ class PortField extends Field
     /**
      * Adds extra validation to determine if this value should be accepted given the current Field settings.
      */
-    public function validate_extra(mixed $value)
-    {
+    public function validate_extra(mixed $value) {
         # Allow this value if it is an existing port alias name and alias values are allowed
         if ($this->allow_alias and FirewallAlias::query(['type' => 'port', 'name' => $value])->exists()) {
             $this->labels[] = 'is_alias';
@@ -178,8 +176,7 @@ class PortField extends Field
      * help messages depending on this Field's current settings.
      * @return string A string representation of values that are considered valid for this Field.
      */
-    private function get_valid_opts_str(): string
-    {
+    private function get_valid_opts_str(): string {
         $opts_str = 'Valid options are: a TCP/UDP port number, ';
         $opts_str .= $this->allow_range ? 'a TCP/UDP port range separated by `' . self::REPR_RANGE_CHAR . '`, ' : '';
         $opts_str .= $this->allow_alias ? 'an existing port type firewall alias, ' : '';
@@ -193,8 +190,7 @@ class PortField extends Field
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value): array|string|null
-    {
+    protected function _to_internal(mixed $representation_value): array|string|null {
         # Return null values if they are already null
         if ($representation_value === null) {
             return null;
@@ -211,8 +207,7 @@ class PortField extends Field
      * @param string $internal_value The internal config value to convert to a representation value.
      * @throws ServerError When the child Field class does not override this method.
      */
-    protected function _from_internal(string $internal_value)
-    {
+    protected function _from_internal(string $internal_value) {
         # Replace the internal range character to the representation range character
         return str_replace($this->internal_range_char, self::REPR_RANGE_CHAR, $internal_value);
     }

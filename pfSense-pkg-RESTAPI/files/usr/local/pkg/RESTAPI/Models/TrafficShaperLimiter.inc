@@ -12,8 +12,7 @@ use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\FilterNameValidator;
 
-class TrafficShaperLimiter extends Model
-{
+class TrafficShaperLimiter extends Model {
     public StringField $name;
     public IntegerField $number;
     public BooleanField $enabled;
@@ -65,8 +64,7 @@ class TrafficShaperLimiter extends Model
     public NestedModelField $bandwidth;
     public NestedModelField $queue;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'dnshaper/queue';
         $this->subsystem = 'shaper';
@@ -369,16 +367,14 @@ class TrafficShaperLimiter extends Model
     /**
      * Reloads the filter, and resets applicable RRD graphs
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new TrafficShaperApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**
      * Extends the default _delete() method to ensure the limit is removed from dnctl afterward.
      */
-    public function _delete(): void
-    {
+    public function _delete(): void {
         # Delete the limiter from config and remove the limiter from dnctl
         parent::_delete();
         new Command('dnctl pipe delete ' . $this->number->value);

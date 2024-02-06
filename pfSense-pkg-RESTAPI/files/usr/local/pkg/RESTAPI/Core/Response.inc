@@ -86,8 +86,7 @@ const HTTP_STATUS_MESSAGES = [
  * HTTP status code, HTTP status message, API return code, error messages, and API response data. All API Error classes
  * will originate as Response objects.
  */
-class Response extends Error
-{
+class Response extends Error {
     use BaseTraits;
 
     public $code = 500;
@@ -122,8 +121,7 @@ class Response extends Error
      * Converts this Response object to an array representation of its contents.
      * @return array An array containing the response details.
      */
-    final public function to_representation(): array
-    {
+    final public function to_representation(): array {
         # Set the standard representation for the Response
         $representation = [
             'code' => $this->code,
@@ -146,8 +144,7 @@ class Response extends Error
      * @param int $http_status The HTTP status code to fetch the descriptive message for.
      * @return string The HTTP status message associated with the give HTTP response code OR `unknown` if not found.
      */
-    final public static function get_http_status_message(int $http_status): string
-    {
+    final public static function get_http_status_message(int $http_status): string {
         # Return the message associated with this HTTP status code if it exists
         if (array_key_exists($http_status, HTTP_STATUS_MESSAGES)) {
             return HTTP_STATUS_MESSAGES[$http_status];
@@ -163,8 +160,7 @@ class Response extends Error
      * are allowed by the Accept header.
      * @return array This Response object as an OpenAPI response component
      */
-    final public function to_openapi_component(): array
-    {
+    final public function to_openapi_component(): array {
         # Variables
         $component = ['description' => $this->help_text, 'content' => []];
         $content_handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
@@ -192,8 +188,7 @@ class Response extends Error
      * Represents the Response object as an OpenAPI schema.
      * @return array This Response object as an OpenAPI schema.
      */
-    final public static function to_openapi_schema(): array
-    {
+    final public static function to_openapi_schema(): array {
         return [
             'type' => 'object',
             'properties' => [

@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class FirewallNATPortForwardEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class FirewallNATPortForwardEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/firewall/nat/port_forward';
         $this->model_name = 'PortForward';

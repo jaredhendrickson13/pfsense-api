@@ -15,8 +15,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\HexValidator;
 
-class OutboundNATMapping extends Model
-{
+class OutboundNATMapping extends Model {
     const SOURCE_HASH_KEY_BYTES = 16;
     public InterfaceField $interface;
     public StringField $protocol;
@@ -35,8 +34,7 @@ class OutboundNATMapping extends Model
     public StringField $source_hash_key;
     public StringField $descr;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'nat/outbound/rule';
         $this->many = true;
@@ -181,8 +179,7 @@ class OutboundNATMapping extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When `poolopts` is set but `target` is not an IP address or alias.
      */
-    public function validate_poolopts(string $poolopts): string
-    {
+    public function validate_poolopts(string $poolopts): string {
         # Do not allow poolopts to be set if `target` is not an alias or IP address
         if (!$this->target->has_label('is_ipaddr') and !$this->target->has_label('is_alias')) {
             throw new ValidationError(
@@ -200,8 +197,7 @@ class OutboundNATMapping extends Model
      * @returns int|null The validated value to be set. Returns null if `target` is not an IP address or alias.
      * @throws ValidationError When `target` is an IPv4 address but $target_subnet is greater than 32
      */
-    public function validate_target_subnet(int $target_subnet): int|null
-    {
+    public function validate_target_subnet(int $target_subnet): int|null {
         # Throw an error if `target` is an IPv4 address, but `target_subnet` is greater than 32.
         if ($this->target->has_label('is_ipaddrv4') and $target_subnet > 32) {
             throw new ValidationError(
@@ -221,8 +217,7 @@ class OutboundNATMapping extends Model
     /**
      * Applies any changes to outbound NAT mappings.
      */
-    public function apply()
-    {
+    public function apply() {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

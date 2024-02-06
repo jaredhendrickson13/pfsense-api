@@ -4,8 +4,7 @@ namespace RESTAPI\Auth;
 
 use RESTAPI\Core\Auth;
 
-class BasicAuth extends Auth
-{
+class BasicAuth extends Auth {
     const WWW_AUTHENTICATE_HEADER = 'WWW-Authenticate: Basic realm="Login for pfSense REST API"';
 
     /**
@@ -24,8 +23,7 @@ class BasicAuth extends Auth
      * @link Basic https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication
      * @return bool Returns true if basic auth is successful, return false otherwise
      */
-    public function _authenticate(): bool
-    {
+    public function _authenticate(): bool {
         # Obtain the username and password from the client via Basic authentication
         $this->username = $_SERVER['PHP_AUTH_USER'] ?: '';
         $password = $_SERVER['PHP_AUTH_PW'] ?: '';
@@ -37,16 +35,14 @@ class BasicAuth extends Auth
     /**
      * Checks if the remote client is requesting BasicAuth by checking for the necessary headers.
      */
-    public function is_requested(): bool
-    {
+    public function is_requested(): bool {
         return $_SERVER['PHP_AUTH_USER'] or $_SERVER['PHP_AUTH_PW'];
     }
 
     /**
      * When basic authentication fails, set the WWW-Authenticate to request basic authentication.
      */
-    protected function on_failed_auth(): void
-    {
+    protected function on_failed_auth(): void {
         header(self::WWW_AUTHENTICATE_HEADER);
     }
 }

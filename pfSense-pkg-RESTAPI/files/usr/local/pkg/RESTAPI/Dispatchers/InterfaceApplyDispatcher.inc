@@ -4,16 +4,14 @@ namespace RESTAPI\Dispatchers;
 
 use RESTAPI\Core\Dispatcher;
 
-class InterfaceApplyDispatcher extends Dispatcher
-{
+class InterfaceApplyDispatcher extends Dispatcher {
     # Do not limit the number concurrent filter reloads that can run
     public int $max_concurrency = 1;
 
     /**
      * Applies pending interface changes.
      */
-    public function process(mixed ...$arguments): void
-    {
+    public function process(mixed ...$arguments): void {
         # Local variables
         global $g;
         unlink_if_exists("{$g['tmp_path']}/config.cache");

@@ -23,8 +23,7 @@ const API_SETTINGS_RESTORE_SUCCESS = 0;
 const API_SETTINGS_RESTORE_NO_CHANGE = 1;
 const API_SETTINGS_RESTORE_NO_BACKUP = 2;
 
-class RESTAPISettings extends Model
-{
+class RESTAPISettings extends Model {
     public BooleanField $enabled;
     public BooleanField $read_only;
     public BooleanField $keep_backup;
@@ -42,8 +41,7 @@ class RESTAPISettings extends Model
     public StringField $ha_sync_username;
     public StringField $ha_sync_password;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Obtain the API config index and set the config path to the API configuration
         $this->id = $this->get_pkg_id();
         $this->config_path = "installedpackages/package/$this->id/conf";
@@ -192,8 +190,7 @@ class RESTAPISettings extends Model
      * Obtains the choices for the `auth_methods` field. This will dynamically populate a choice for each Auth class
      * in the \RESTAPI\Auth\ namespace.
      */
-    public function get_auth_methods_choices(): array
-    {
+    public function get_auth_methods_choices(): array {
         # Variables
         $choices = [];
 
@@ -210,8 +207,7 @@ class RESTAPISettings extends Model
      * Creates a backup of the current API configuration at /usr/local/share/pfSense-pkg-RESTAPI/backup.json.
      * @returns integer Returns 0 when backup was successful, or -1 when the API's `keep_backup` field is disabled.
      */
-    public static function backup_to_file(): int
-    {
+    public static function backup_to_file(): int {
         # Read current API settings
         $api_config = RESTAPISettings::get_pkg_config();
 
@@ -230,8 +226,7 @@ class RESTAPISettings extends Model
      * API configuration and the backup file, 2 when no backup file exists current, or -1 when the API's `keep_backup`
      * field is disabled.
      */
-    public static function restore_from_backup(): int
-    {
+    public static function restore_from_backup(): int {
         # Variables
         $backup_api_conf_json = is_file(API_SETTINGS_BACKUP_FILE_PATH)
             ? file_get_contents(API_SETTINGS_BACKUP_FILE_PATH)
@@ -264,8 +259,7 @@ class RESTAPISettings extends Model
      * Obtains the internal pfSense-pkg-RESTAPI configuration.
      * @return array An associative array containing the pfSense-pkg-RESTAPI configuration
      */
-    public static function get_pkg_config(): array
-    {
+    public static function get_pkg_config(): array {
         foreach (self::get_config('installedpackages/package') as $installed_package) {
             if ($installed_package['name'] === 'RESTAPI') {
                 return $installed_package['conf'];
@@ -279,16 +273,14 @@ class RESTAPISettings extends Model
      * @return int The pfSense-pkg-RESTAPI package's `installedpackage` configuration ID in integer format. If the
      * package cannot be found, this will return `-1`
      */
-    public static function get_pkg_id(): int
-    {
+    public static function get_pkg_id(): int {
         return get_package_id('RESTAPI');
     }
 
     /**
      * Refresh the API backup file and sync changes to API clients if configured.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         $this->backup_to_file();
         (new RESTAPISettingsSyncDispatcher(async: $this->async))->spawn_process();
     }

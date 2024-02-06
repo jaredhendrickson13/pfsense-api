@@ -7,16 +7,14 @@ use RESTAPI\Core\Dispatcher;
 /**
  * Defines a Dispatcher that applies pending Traffic Shaper changes.
  */
-class TrafficShaperApplyDispatcher extends Dispatcher
-{
+class TrafficShaperApplyDispatcher extends Dispatcher {
     # Do not limit the number concurrent traffic shaper reloads that can run
     public int $max_concurrency = 0;
 
     /**
      * Reloads the traffic shaper services.
      */
-    public function process(mixed ...$arguments): void
-    {
+    public function process(mixed ...$arguments): void {
         # Reload filter services
         filter_configure_sync();
 

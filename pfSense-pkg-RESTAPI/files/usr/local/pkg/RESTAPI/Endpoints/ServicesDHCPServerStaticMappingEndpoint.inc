@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class ServicesDHCPServerStaticMappingEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class ServicesDHCPServerStaticMappingEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/services/dhcp_server/static_mapping';
         $this->model_name = 'DHCPServerStaticMapping';

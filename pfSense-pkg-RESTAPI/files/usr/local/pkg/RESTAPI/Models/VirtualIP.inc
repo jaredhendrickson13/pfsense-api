@@ -17,8 +17,7 @@ use RESTAPI\Validators\UniqueFromForeignModelValidator;
 /**
  * Defines a Model for creating, reading, updating and deleting virtual IPs
  */
-class VirtualIP extends Model
-{
+class VirtualIP extends Model {
     public UIDField $uniqid;
     public StringField $mode;
     public InterfaceField $interface;
@@ -33,8 +32,7 @@ class VirtualIP extends Model
     public StringField $password;
     public StringField $carp_status;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define model attributes
         $this->config_path = 'virtualip/vip';
         $this->subsystem = 'vip';
@@ -134,8 +132,7 @@ class VirtualIP extends Model
      * @return string The validated `type` value to be set.
      * @throws ValidationError When the `type` value is not valid.
      */
-    public function validate_type(string $type): string
-    {
+    public function validate_type(string $type): string {
         # Do not allow `ipalias` and `carp` mode vips to use the `network` type.
         if (in_array($this->mode->value, ['ipalias', 'carp']) and $type === 'network') {
             throw new ValidationError(
@@ -153,8 +150,7 @@ class VirtualIP extends Model
      * @return int The validated `subnet_bits` value to be set.
      * @throws ValidationError When the `subnet_bits` value is not valid.
      */
-    public function validate_subnet_bits(int $subnet_bits): int
-    {
+    public function validate_subnet_bits(int $subnet_bits): int {
         # Ensure the `subnet_bits` does not exceed `32` if the current `subnet` is IPv4
         if ($this->subnet->has_label('is_ipaddrv4') and $subnet_bits > 32) {
             throw new ValidationError(
@@ -171,8 +167,7 @@ class VirtualIP extends Model
      * @return string|null Returns a string that indicates the current CARP status of this virtual IP, or null
      * if this is not a virtual IP.
      */
-    public function from_internal_carp_status(): string|null
-    {
+    public function from_internal_carp_status(): string|null {
         # Do not try to obtain this internal value if this is not a CARP virtual IP
         if ($this->mode->value !== 'carp' or !$this->uniqid->value) {
             return null;
@@ -191,8 +186,7 @@ class VirtualIP extends Model
     /**
      * Serializes changes to virtual IPs before applying them.
      */
-    private function serialize_changes()
-    {
+    private function serialize_changes() {
         global $g;
 
         # Retain existing serialized virtual IPs if present
@@ -210,15 +204,13 @@ class VirtualIP extends Model
     /**
      * Applies pending virtual IP changes.
      */
-    public function apply()
-    {
+    public function apply() {
         applyVIP();
     }
 
     /**
      * Serializes new virtual IPs as pending changes and saves them to configuration.     */
-    public function _create()
-    {
+    public function _create() {
         $this->serialize_changes();
         parent::_create();
     }
@@ -226,8 +218,7 @@ class VirtualIP extends Model
     /**
      * Serializes updated virtual IPs as pending changes and saves them to configuration.
      */
-    public function _update()
-    {
+    public function _update() {
         $this->serialize_changes();
         parent::_update();
     }
@@ -235,8 +226,7 @@ class VirtualIP extends Model
     /**
      * Brings down and removes this virtual IP from the configuration.
      */
-    public function _delete()
-    {
+    public function _delete() {
         # Call the parent _delete() method to remove the entry from config
         parent::_delete();
 

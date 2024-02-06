@@ -5,8 +5,7 @@ namespace RESTAPI\Validators;
 use RESTAPI\Core\Validator;
 use RESTAPI\Responses\ValidationError;
 
-class RegexValidator extends Validator
-{
+class RegexValidator extends Validator {
     /**
      * Constructs the Validator object.
      * @param string $pattern The regex pattern to validate the value against.
@@ -32,8 +31,7 @@ class RegexValidator extends Validator
      * @param mixed $value The incoming value to be validated.
      * @param string $field_name The name of the field being validated.
      */
-    public function validate(mixed $value, string $field_name = ''): void
-    {
+    public function validate(mixed $value, string $field_name = ''): void {
         # If this value is an allowed keyword, allow it
         if (in_array($value, $this->allowed_keywords)) {
             return;

@@ -7,14 +7,12 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\Package;
 
-class APIModelsPackageTestCase extends TestCase
-{
+class APIModelsPackageTestCase extends TestCase {
     /**
      * Checks that packages are installed correctly when the Package model's `create()` method runs and is correctly
      * deleted when the Package model's `delete()` method is run.
      */
-    public function test_package_install_and_delete(): void
-    {
+    public function test_package_install_and_delete(): void {
         # Try to install the pfSense-pkg-sudo package using the Package model
         $pkg = new Package(data: ['name' => 'pfSense-pkg-sudo']);
         $pkg->create();
@@ -48,8 +46,7 @@ class APIModelsPackageTestCase extends TestCase
      * Checks that the `latest_version` field's value is correctly derived from the available packages cache and the
      * `update_available` field correctly displays when an update is actually available.
      */
-    public function test_version_discovery(): void
-    {
+    public function test_version_discovery(): void {
         # Install a package and ensure the no update is advertised
         $pkg = new Package(data: ['name' => 'pfSense-pkg-sudo']);
         $pkg->create();

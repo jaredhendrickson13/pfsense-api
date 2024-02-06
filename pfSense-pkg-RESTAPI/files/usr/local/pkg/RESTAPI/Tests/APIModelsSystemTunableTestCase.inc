@@ -6,13 +6,11 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\SystemTunable;
 
-class APIModelsSystemTunableTestCase extends TestCase
-{
+class APIModelsSystemTunableTestCase extends TestCase {
     /**
      * Ensures that the tunable is correctly set in sysctl after creating, updating and delete SystemTunable objects.
      */
-    public function test_crud()
-    {
+    public function test_crud() {
         # Sets the sysctl OID value to use for testing
         $test_oid = 'net.link.bridge.pfil_bridge';
 

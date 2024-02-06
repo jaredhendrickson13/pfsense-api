@@ -14,8 +14,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
 use RESTAPI\Validators\IPAddressValidator;
 
-class AuthServer extends Model
-{
+class AuthServer extends Model {
     public UIDField $refid;
     public StringField $type;
     public StringField $name;
@@ -51,8 +50,7 @@ class AuthServer extends Model
     public IntegerField $radius_timeout;
     public InterfaceField $radius_nasip_attribute;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'system/authserver';
         $this->verbose_name = 'authentication server';

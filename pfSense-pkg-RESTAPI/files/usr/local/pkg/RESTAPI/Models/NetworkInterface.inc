@@ -22,8 +22,7 @@ use RESTAPI\Validators\UniqueFromForeignModelValidator;
  * A Model that allows us to read, create, update and delete network interfaces. Note: PHP does not allow us to name a
  * class `Interface` so we must use `NetworkInterface` even though this isn't inconsistent.
  */
-class NetworkInterface extends Model
-{
+class NetworkInterface extends Model {
     public StringField $if;
     public BooleanField $enable;
     public StringField $descr;
@@ -68,8 +67,7 @@ class NetworkInterface extends Model
     public InterfaceField $track6_interface;
     public StringField $track6_prefix_id_hex;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set the configuration path for these objects and allow many to be stored.
         $this->config_path = 'interfaces';
         $this->many = true;
@@ -373,8 +371,7 @@ class NetworkInterface extends Model
      * Populates the `descr` field as the interface's ID in uppercase if no value exists. This is necessary because
      * some default pfSense interfaces are created without a description assigned.
      */
-    public function from_internal_descr(mixed $descr): string
-    {
+    public function from_internal_descr(mixed $descr): string {
         # Check if descr has no value, if so, assign it this object's ID in uppercase
         if (empty($descr)) {
             return strtoupper($this->id);
@@ -390,8 +387,7 @@ class NetworkInterface extends Model
      * @returns array An array of the (real) interfaces available to this system where the array key is the real
      * interface ID/name and the value is verbose description of the interface including its MAC.
      */
-    public function get_interface_ports(): array
-    {
+    public function get_interface_ports(): array {
         return get_interface_ports();
     }
 
@@ -400,8 +396,7 @@ class NetworkInterface extends Model
      * @param string $descr The descr value to validate.
      * @returns string The validated $descr to set.
      * @throws ValidationError When the `$descr` value is invalid.     */
-    public function validate_descr(string $descr): string
-    {
+    public function validate_descr(string $descr): string {
         # Ensure OpenVPN interfaces are 22 characters or less
         if (str_starts_with($this->if->value, 'ovpn') and strlen($descr) > 22) {
             throw new ValidationError(
@@ -443,8 +438,7 @@ class NetworkInterface extends Model
      * @returns string The validated $mtu to set.
      * @throws ValidationError When the `if` value is invalid.
      */
-    public function validate_mtu(int $mtu): int
-    {
+    public function validate_mtu(int $mtu): int {
         # Check if this interface is a VLAN interface
         $vlan_query = InterfaceVLAN::query(['vlanif' => $this->if->value]);
 
@@ -470,8 +464,7 @@ class NetworkInterface extends Model
      * @returns string The validated $media to set.
      * @throws ValidationError When the `$media` value is invalid.
      */
-    public function validate_media(string $media): string
-    {
+    public function validate_media(string $media): string {
         # Variables
         $media_types = array_keys($this->get_supported_media());
         $media_types_str = implode(',', $media_types);
@@ -493,8 +486,7 @@ class NetworkInterface extends Model
      * @returns string The validated $mediaopt to set.
      * @throws ValidationError When the `mediaopt` value is invalid.
      */
-    public function validate_mediaopt(string $mediaopt): string
-    {
+    public function validate_mediaopt(string $mediaopt): string {
         # Variables
         $media_options = $this->get_supported_media()[$this->media->value];
         $media_options_str = implode(',', $media_options);
@@ -516,8 +508,7 @@ class NetworkInterface extends Model
      * @returns bool The validated $blockbogons to set.
      * @throws ValidationError When the `blockbogons` value is invalid.
      */
-    public function validate_blockbogons(bool $blockbogons): bool
-    {
+    public function validate_blockbogons(bool $blockbogons): bool {
         # Gather applicable configuration values
         $ipv6_allowed = $this->is_config_enabled(path: 'system', enable_key: 'ipv6allow');
         $max_table_entries = $this->get_config(path: 'system/maximumtableentries', default: 0);
@@ -541,8 +532,7 @@ class NetworkInterface extends Model
      * @returns string The overridden $typev4 value to set.
      * @throws ValidationError When the `$typev4` value is invalid.
      */
-    public function from_internal_typev4(mixed $typev4): string
-    {
+    public function from_internal_typev4(mixed $typev4): string {
         # Only populate this value if a value was not already set
         if (is_null($typev4)) {
             # Set the type to static if an IP address is set
@@ -564,8 +554,7 @@ class NetworkInterface extends Model
      * @returns string The validated $typev4 to set.
      * @throws ValidationError When the `typev4` value is invalid.
      */
-    public function validate_typev4(string $typev4): string
-    {
+    public function validate_typev4(string $typev4): string {
         # Do not allow the type to change from 'static' if the DHCP server is enabled on this interface
         if ($typev4 !== 'static' and $this->is_config_enabled(path: "dhcpd/$this->id")) {
             throw new ValidationError(
@@ -598,8 +587,7 @@ class NetworkInterface extends Model
      * @returns string The validated $ipaddr to set.
      * @throws ValidationError When the `ipaddr` value is invalid.
      */
-    public function validate_ipaddr(string $ipaddr): string
-    {
+    public function validate_ipaddr(string $ipaddr): string {
         # For non static values, force `ipaddr` to match `typev4`
         if ($this->typev4->value !== 'static') {
             $ipaddr = $this->typev4->value;
@@ -659,8 +647,7 @@ class NetworkInterface extends Model
      * @returns string The validated $subnet to set.
      * @throws ValidationError When the `subnet` value is invalid.
      */
-    public function validate_subnet(int $subnet): int
-    {
+    public function validate_subnet(int $subnet): int {
         # Require the subnet to be 30 or less when a DHCP server is enabled on this interface
         if ($subnet > 30 and $this->is_config_enabled(path: "dhcpd/$this->id")) {
             throw new ValidationError(
@@ -679,8 +666,7 @@ class NetworkInterface extends Model
      * @returns string The overridden $typev6 value to set.
      * @throws ValidationError When the `$typev6` value is invalid.
      */
-    public function from_internal_typev6(mixed $typev6): string
-    {
+    public function from_internal_typev6(mixed $typev6): string {
         # Only populate this value if a value was not already set
         if (is_null($typev6)) {
             # Set the type to static if an IP address is set
@@ -710,8 +696,7 @@ class NetworkInterface extends Model
      * @returns string The validated $typev6 to set.
      * @throws ValidationError When the `typev6` value is invalid.
      */
-    public function validate_typev6(string $typev6): string
-    {
+    public function validate_typev6(string $typev6): string {
         # Do not allow the type to change from 'staticv6' or 'track6' if the DHCPv6 server is enabled on this interface
         if (!in_array($typev6, ['staticv6', 'track6'])) {
             # TODO: Change this to use a query when the DHCPServer6 model is developed
@@ -767,8 +752,7 @@ class NetworkInterface extends Model
      * @returns string The validated $ipaddrv6 to set.
      * @throws ValidationError When the `ipaddrv6` value is invalid.
      */
-    public function validate_ipaddrv6(string $ipaddrv6): string
-    {
+    public function validate_ipaddrv6(string $ipaddrv6): string {
         # Only allow `dhcp6` as a value if the type is also `dhcp6`
         if ($ipaddrv6 === 'dhcp6' and $this->typev6->value !== 'dhcp6') {
             throw new ValidationError(
@@ -833,8 +817,7 @@ class NetworkInterface extends Model
      * Overwrites the default get_next_id() method to return the next pfSense interface ID (e.g. 'wan', 'lan', 'opt1').
      * @return string The next available pfSense interface ID
      */
-    public function get_next_id(): string
-    {
+    public function get_next_id(): string {
         # Use `lan` if it doesn't already exist
         if (!$this->query(['id' => 'lan'])->exists()) {
             return 'lan';
@@ -858,8 +841,7 @@ class NetworkInterface extends Model
      * Determines all supported media options for this interface.
      * @return array An array where the key is the speed (e.g. 1000baseT) and the value is an array of duplex options
      */
-    public function get_supported_media(): array
-    {
+    public function get_supported_media(): array {
         # Variables
         $media_options = [];
         $if = $this->if->value;
@@ -892,8 +874,7 @@ class NetworkInterface extends Model
      * Serializes this interface configuration and places it in the pending interface
      * changes file at /tmp/.interfaces.apply
      */
-    public function serialize_changes()
-    {
+    public function serialize_changes() {
         # Local variables
         global $g;
         $pending_ifs = [];
@@ -925,8 +906,7 @@ class NetworkInterface extends Model
      * Ensures pending interfaces are serialized and stored in the pending interfaces file before they are applied.
      * This method is automatically called after interface creations but before they are applied.
      */
-    public function pre_apply_create(): void
-    {
+    public function pre_apply_create(): void {
         $this->serialize_changes();
     }
 
@@ -934,8 +914,7 @@ class NetworkInterface extends Model
      * Defines how interfaces should be applied after they are create. This method is automatically called after
      * interfaces are created if immediate application is requested.
      */
-    public function apply_create(): void
-    {
+    public function apply_create(): void {
         (new InterfaceApplyDispatcher(async: $this->async))->spawn_process();
     }
 
@@ -943,8 +922,7 @@ class NetworkInterface extends Model
      * Ensures pending interfaces are serialized and stored in the pending interfaces file before they are applied.
      * This method is automatically called after interface updates but before they are applied.
      */
-    public function pre_apply_update(): void
-    {
+    public function pre_apply_update(): void {
         $this->serialize_changes();
     }
 
@@ -952,8 +930,7 @@ class NetworkInterface extends Model
      * Defines how interfaces should be applied after they are updated. This method is automatically called after
      * interfaces are updated if immediate application is requested.
      */
-    public function apply_update(): void
-    {
+    public function apply_update(): void {
         (new InterfaceApplyDispatcher(async: $this->async))->spawn_process();
     }
 
@@ -961,8 +938,7 @@ class NetworkInterface extends Model
      * Defines how interfaces should be deleted. This method should not be called directly, instead it should be
      * called using the delete() method.
      */
-    public function _delete(): void
-    {
+    public function _delete(): void {
         # Do not allow deletion of WAN interface
         if ($this->id === 'wan') {
             throw new ValidationError(
@@ -1057,8 +1033,7 @@ class NetworkInterface extends Model
      * Gathers information about all real interfaces and returns them in an array.
      * @return array a list of all interfaces along with their attributes
      */
-    public static function get_all_avail_interfaces(): array
-    {
+    public static function get_all_avail_interfaces(): array {
         global $ipsec_descrs;
         $base_ifs = get_interface_list();
 
@@ -1212,40 +1187,35 @@ class NetworkInterface extends Model
     /**
      * Checks the current IPv4 address of this interface. This works for both static and dynimcally assigned IPs.
      */
-    public function get_current_ipv4(): string|null
-    {
+    public function get_current_ipv4(): string|null {
         return get_interface_ip($this->id);
     }
 
     /**
      * Checks the current subnet (v4) of this interface. This works for both static and dynimcally assigned IPs.
      */
-    public function get_current_subnetv4(): int|null
-    {
+    public function get_current_subnetv4(): int|null {
         return get_interface_subnet($this->id);
     }
 
     /**
      * Checks the current IPv6 address of this interface. This works for both static and dynimcally assigned IPs.
      */
-    public function get_current_ipv6(): string|null
-    {
+    public function get_current_ipv6(): string|null {
         return get_interface_ipv6($this->id);
     }
 
     /**
      * Checks the current subnet (v6) of this interface. This works for both static and dynamically assigned IPs.
      */
-    public function get_current_subnetv6(): int|null
-    {
+    public function get_current_subnetv6(): int|null {
         return get_interface_subnetv6($this->id);
     }
 
     /**
      * Obtains the current network address of the subnet assigned to this interface.
      */
-    public function get_network_ipv4(): string|null
-    {
+    public function get_network_ipv4(): string|null {
         $ip = $this->get_current_ipv4();
         $subnet = $this->get_current_subnetv4();
         return gen_subnetv4($ip, $subnet);
@@ -1254,8 +1224,7 @@ class NetworkInterface extends Model
     /**
      * Obtains the current broadcast address of the subnet assigned to this interface.
      */
-    public function get_broadcast_ipv4(): string|null
-    {
+    public function get_broadcast_ipv4(): string|null {
         $ip = $this->get_current_ipv4();
         $subnet = $this->get_current_subnetv4();
         return gen_subnetv4_max($ip, $subnet);
@@ -1267,8 +1236,7 @@ class NetworkInterface extends Model
      * @return bool Returns true if the $ipaddr is an address within this interface's configured IPv4 CIDR, returns
      * false otherwise.
      */
-    public function is_ipv4_in_cidr(string $ipaddr): bool
-    {
+    public function is_ipv4_in_cidr(string $ipaddr): bool {
         return (bool) ip_in_subnet($ipaddr, $this->get_current_ipv4() . '/' . $this->get_current_subnetv4());
     }
 }

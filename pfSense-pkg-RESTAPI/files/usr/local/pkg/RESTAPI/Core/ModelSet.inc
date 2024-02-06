@@ -11,8 +11,7 @@ require_once 'RESTAPI/autoloader.inc';
  * Creates a ModelSet object that acts as a container for multiple Model objects. This can be used to represent a
  * set of Model objects at once. Additionally, ModelSets can be further filtered using queries.
  */
-class ModelSet
-{
+class ModelSet {
     use BaseTraits;
 
     const QUERY_FILTERS = ['startswith', 'endswith', 'contains', 'lt', 'lte', 'gt', 'gte', 'exact', 'except', 'has'];
@@ -26,8 +25,7 @@ class ModelSet
      * Creates a ModelSet object that contains multiple Model objects.
      * @param array $model_objects An array of model objects to include in this model set
      */
-    public function __construct(array $model_objects = [])
-    {
+    public function __construct(array $model_objects = []) {
         # Throw an error if any Models are not a Model object
         foreach ($model_objects as $model_object) {
             if (!is_object($model_object) or !in_array('RESTAPI\Core\Model', class_parents($model_object))) {
@@ -46,8 +44,7 @@ class ModelSet
      * Checks if Model objects exist in this ModelSet. This helpful when determining if an API query found matches.
      * @return bool true if Model objects exist in this ModelSet, false if they do not.
      */
-    public function exists(): bool
-    {
+    public function exists(): bool {
         return count($this->model_objects) > 0;
     }
 
@@ -55,8 +52,7 @@ class ModelSet
      * Returns the first Model object in the ModelSet. This is helpful when locating the first Model object that matched
      * a query.
      */
-    public function first(): Model
-    {
+    public function first(): Model {
         # Ensure there is at least 1 Model object in this ModelSet
         if ($this->exists()) {
             # Return the first Model object in the ModelSet
@@ -74,8 +70,7 @@ class ModelSet
      * Runs the to_representation() method for each model object within the model set and returns them all in an array.
      * @return array A serializable representation of all model objects within this model set.
      */
-    public function to_representation(): array
-    {
+    public function to_representation(): array {
         return $this->run_model_method(method_name: 'to_representation');
     }
 
@@ -83,8 +78,7 @@ class ModelSet
      * Runs the to_internal() method for each model object within the model set and returns them all in an array.
      * @return array The internal configu values of all model objects within this model set.
      */
-    public function to_internal(): array
-    {
+    public function to_internal(): array {
         return $this->run_model_method(method_name: 'to_internal', use_id_as_key: true);
     }
 
@@ -95,8 +89,7 @@ class ModelSet
      * @return array The return value of method call for each model object. Results are stored in the same order as
      * the model objects were passed in during construction.
      */
-    private function run_model_method(string $method_name, bool $use_id_as_key = false): array
-    {
+    private function run_model_method(string $method_name, bool $use_id_as_key = false): array {
         # Variables
         $results = [];
 
@@ -119,8 +112,7 @@ class ModelSet
      * https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
      * @return ModelSet The filtered ModelSet object containing only Model objects that matched the query.
      */
-    public function query(array $query_params = [], array $excluded = [], ...$vl_query_params): ModelSet
-    {
+    public function query(array $query_params = [], array $excluded = [], ...$vl_query_params): ModelSet {
         # Variables
         $queried_model_set = [];
 
@@ -173,8 +165,7 @@ class ModelSet
      * @param string $query_target The query target string (e.g. `field_name`, `field_name__contains`)
      * @return array An array of query target options found in the $query_target string.
      */
-    private function get_query_options(string $query_target): array
-    {
+    private function get_query_options(string $query_target): array {
         # Variables
         $query_options = ['field' => $query_target, 'filter' => 'exact'];
 
@@ -202,8 +193,7 @@ class ModelSet
      * @param mixed $substr The substring to check for.
      * @return bool `true` if $value startswith $substr. `false` if it does not.
      */
-    private static function startswith(mixed $value, mixed $substr): bool
-    {
+    private static function startswith(mixed $value, mixed $substr): bool {
         if (str_starts_with(strval($value), strval($substr))) {
             return true;
         }
@@ -216,8 +206,7 @@ class ModelSet
      * @param mixed $substr The substring to check for.
      * @return bool `true` if $value endswith $substr. `false` if it does not.
      */
-    private static function endswith(mixed $value, mixed $substr): bool
-    {
+    private static function endswith(mixed $value, mixed $substr): bool {
         if (str_ends_with(strval($value), strval($substr))) {
             return true;
         }
@@ -230,8 +219,7 @@ class ModelSet
      * @param mixed $substr The substring to check for.
      * @return bool `true` if $value contains $substr. `false` if it does not.
      */
-    private static function contains(mixed $value, mixed $substr): bool
-    {
+    private static function contains(mixed $value, mixed $substr): bool {
         if (str_contains(strval($value), strval($substr))) {
             return true;
         }
@@ -245,8 +233,7 @@ class ModelSet
      * @return bool true if the $needle is in the $haystack, false otherwise.
      * @throws ValidationError When $haystack is not an array
      */
-    public function has(mixed $haystack, mixed $needle): bool
-    {
+    public function has(mixed $haystack, mixed $needle): bool {
         # Throw a validation error if the $haystack is not an array
         if (!is_array($haystack)) {
             throw new ValidationError(
@@ -264,8 +251,7 @@ class ModelSet
      * @param mixed $value2 The second value to evaluate.
      * @return bool `true` if the $value1 and $value2 match exactly. `false` if they do not.
      */
-    private static function exact(mixed $value1, mixed $value2): bool
-    {
+    private static function exact(mixed $value1, mixed $value2): bool {
         return $value1 == $value2;
     }
 
@@ -275,8 +261,7 @@ class ModelSet
      * @param mixed $value2 The second value to evaluate.
      * @return bool `true` if the $value1 and $value2 do not match. `false` if they do not.
      */
-    private static function except(mixed $value1, mixed $value2): bool
-    {
+    private static function except(mixed $value1, mixed $value2): bool {
         return $value1 !== $value2;
     }
 
@@ -286,8 +271,7 @@ class ModelSet
      * @param mixed $limit The value to check if $value is less than.
      * @return bool `true` if $value is less than $limit. `false` if it is not.
      */
-    private function lt(mixed $value, mixed $limit): bool
-    {
+    private function lt(mixed $value, mixed $limit): bool {
         if (is_numeric($value) and is_numeric($limit)) {
             if (floatval($value) < floatval($limit)) {
                 return true;
@@ -302,8 +286,7 @@ class ModelSet
      * @param mixed $limit The value to check if $value is less than or equal to.
      * @return bool `true` if $value is less than or equal to $limit. `false` if it is not.
      */
-    private function lte(mixed $value, mixed $limit): bool
-    {
+    private function lte(mixed $value, mixed $limit): bool {
         if (is_numeric($value) and is_numeric($limit)) {
             if (floatval($value) <= floatval($limit)) {
                 return true;
@@ -318,8 +301,7 @@ class ModelSet
      * @param mixed $limit The value to check if $value is greater than.
      * @return bool `true` if $value is greater than $limit. `false` if it is not.
      */
-    private function gt(mixed $value, mixed $limit): bool
-    {
+    private function gt(mixed $value, mixed $limit): bool {
         if (is_numeric($value) and is_numeric($limit)) {
             if (floatval($value) > floatval($limit)) {
                 return true;
@@ -334,8 +316,7 @@ class ModelSet
      * @param mixed $limit The value to check if $value is greater than or equal to.
      * @return bool `true` if $value is greater than or equal to $limit. `false` if it is not.
      */
-    private function gte(mixed $value, mixed $limit): bool
-    {
+    private function gte(mixed $value, mixed $limit): bool {
         if (is_numeric($value) and is_numeric($limit)) {
             if (floatval($value) >= floatval($limit)) {
                 return true;

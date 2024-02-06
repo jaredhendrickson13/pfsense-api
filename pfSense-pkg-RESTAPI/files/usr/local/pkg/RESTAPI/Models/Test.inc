@@ -16,8 +16,7 @@ use RESTAPI\Fields\StringField;
  * Defines a Test model object that can be used for unit testing. This model does not define any real object in pfSense
  * and should only be used for testing purposes!
  */
-class Test extends Model
-{
+class Test extends Model {
     public Field $test_bool;
     public Field $test_integer;
     public Field $test_string_conditional;
@@ -25,8 +24,7 @@ class Test extends Model
     public Field $test_string_many;
     public Field $test_string_namespace;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, array $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, array $data = [], mixed ...$options) {
         # Mark this model as a `many` model indicating multiple Test model objects can be created. This is also
         # required for the `unique` field to work.
         $this->many = true;
@@ -84,8 +82,7 @@ class Test extends Model
     /**
      * Defines a test 'internal_callable' method that can be assigned to this Model
      */
-    public function test_internal_callable(): array
-    {
+    public function test_internal_callable(): array {
         return [];
     }
 
@@ -93,8 +90,7 @@ class Test extends Model
      * Override the default apply method to write a file to disk. This is used for testing to determine if the
      * `apply` method did or didn't run when expected.
      */
-    public function apply()
-    {
+    public function apply() {
         file_put_contents(
             filename: '/tmp/.api_models_test_apply.txt',
             data: "This file is written by \RESTAPI\Models\Test to demonstrate a specific action is taken when the Model's

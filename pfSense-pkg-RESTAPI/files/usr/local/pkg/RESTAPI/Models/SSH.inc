@@ -8,15 +8,13 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 
-class SSH extends Model
-{
+class SSH extends Model {
     public BooleanField $enable;
     public PortField $port;
     public StringField $sshdkeyonly;
     public BooleanField $sshdagentforwarding;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'system/ssh';
         $this->always_apply = true;
@@ -53,8 +51,7 @@ class SSH extends Model
     /**
      * Applies the SSH server changes.
      */
-    public function apply()
-    {
+    public function apply() {
         # Stop the sshd service
         killbyname('sshd');
         $this->log_error('secure shell configuration has changed. Stopping sshd.');

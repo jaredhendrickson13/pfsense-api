@@ -10,8 +10,7 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\FilterNameValidator;
 
-class InterfaceGroup extends Model
-{
+class InterfaceGroup extends Model {
     public StringField $ifname;
     public InterfaceField $members;
     public StringField $descr;
@@ -19,8 +18,7 @@ class InterfaceGroup extends Model
     /**
      * @inheritDoc
      */
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'ifgroups/ifgroupentry';
         $this->many = true;
@@ -54,16 +52,14 @@ class InterfaceGroup extends Model
     /**
      * Applies the initial creation of an InterfaceGroup.
      */
-    public function apply_create()
-    {
+    public function apply_create() {
         interface_group_setup($this->to_internal());
     }
 
     /**
      * Applies updates to an existing InterfaceGroup.
      */
-    public function apply_update()
-    {
+    public function apply_update() {
         # Loop through each initial member interface and remove it from the group
         foreach ($this->initial_object->members->get_related_models()->model_objects as $member) {
             new Command("/sbin/ifconfig {$member->if->value} -group " . $this->ifname->value);
@@ -76,8 +72,7 @@ class InterfaceGroup extends Model
     /**
      * Applies the deletion of an interface group.
      */
-    public function apply_delete()
-    {
+    public function apply_delete() {
         # Loop through each member interface and remove it from the group
         foreach ($this->members->get_related_models()->model_objects as $member) {
             new Command("/sbin/ifconfig {$member->if->value} -group " . $this->ifname->value);
@@ -93,8 +88,7 @@ class InterfaceGroup extends Model
      * point, each Model object within this ModelSet has already been written to config. This method is responsible
      * for ensuring it is applied to any backend services.
      */
-    function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects)
-    {
+    function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects) {
         # Loop through each of the InterfaceGroup objects being replaced and remove the group from its members
         foreach ($initial_objects->model_objects as $old_if_group) {
             # Loop through each initial member interface and remove it from the group

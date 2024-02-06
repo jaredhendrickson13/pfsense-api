@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class SystemConsoleEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class SystemConsoleEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/system/console';
         $this->model_name = 'SystemConsole';

@@ -8,16 +8,14 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 
-class Service extends Model
-{
+class Service extends Model {
     public StringField $name;
     public StringField $action;
     public StringField $description;
     public BooleanField $enabled;
     public BooleanField $status;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set Model attributes
         $this->internal_callable = 'get_services';
         $this->many = true;
@@ -56,8 +54,7 @@ class Service extends Model
      * the internal field values for this Model.
      * @return array An array of available pfSense services and their current statuses.
      */
-    public static function get_services(): array
-    {
+    public static function get_services(): array {
         return get_services();
     }
 
@@ -65,8 +62,7 @@ class Service extends Model
      * Obtains all internal service choices for the `name` field.
      * @return array An array of available service names.
      */
-    public function get_service_name_choices(): array
-    {
+    public function get_service_name_choices(): array {
         $choices = [];
         foreach ($this->get_services() as $service) {
             $choices[] = $service['name'];
@@ -79,16 +75,14 @@ class Service extends Model
      * @param string $name The internal service to obtain the ID for.
      * @return int The representation ID of the service with this name.
      */
-    public function get_id_by_name(string $name): int
-    {
+    public function get_id_by_name(string $name): int {
         return $this->query(['name' => $name])->first()->id;
     }
 
     /**
      * Starts or stops a specified service.
      */
-    public function _create()
-    {
+    public function _create() {
         # Trigger the requested service action
         switch ($this->action->value) {
             case 'start':

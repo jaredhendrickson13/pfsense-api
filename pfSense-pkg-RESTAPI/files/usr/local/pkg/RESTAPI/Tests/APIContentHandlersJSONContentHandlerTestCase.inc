@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\ContentHandlers\JSONContentHandler;
 use RESTAPI\Core\TestCase;
 
-class APIContentHandlersJSONContentHandlerTestCase extends TestCase
-{
+class APIContentHandlersJSONContentHandlerTestCase extends TestCase {
     /**
      * Checks that the `get_content()` method correctly obtains a client's unprocessed request body.
      */
-    public function test_get_content(): void
-    {
+    public function test_get_content(): void {
         # Create a handler to test with
         $handler = new JSONContentHandler();
 
@@ -23,8 +21,7 @@ class APIContentHandlersJSONContentHandlerTestCase extends TestCase
     /**
      * Checks that the `_encode()` method correctly converts a provide value into a JSON encoded string
      */
-    public function test_encode(): void
-    {
+    public function test_encode(): void {
         # Create a handler to test with
         $handler = new JSONContentHandler();
 
@@ -39,8 +36,7 @@ class APIContentHandlersJSONContentHandlerTestCase extends TestCase
     /**
      * Checks that the `_decode()` method correctly converts a provide value into a JSON decoded string
      */
-    public function test_decode(): void
-    {
+    public function test_decode(): void {
         # Create a handler to test with
         $handler = new JSONContentHandler();
 
@@ -56,8 +52,7 @@ class APIContentHandlersJSONContentHandlerTestCase extends TestCase
      * Checks that JSONContentHandler's `can_encode()` and `can_decode()` both return true since these methods are
      * overridden in the child class.
      */
-    public function test_can_encode_and_decode(): void
-    {
+    public function test_can_encode_and_decode(): void {
         # Create a handler to test with
         $handler = new JSONContentHandler();
         $this->assert_is_true($handler->can_encode());

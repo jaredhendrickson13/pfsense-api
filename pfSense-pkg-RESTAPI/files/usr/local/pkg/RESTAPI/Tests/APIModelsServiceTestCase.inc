@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\Service;
 
-class APIModelsServiceTestCase extends TestCase
-{
+class APIModelsServiceTestCase extends TestCase {
     /**
      * Checks that the `get_services()` method correctly identifies all available services.
      */
-    public function test_get_services()
-    {
+    public function test_get_services() {
         # Ensure expected services are found in the method's response
         $expected_services = ['unbound', 'ntpd', 'syslogd', 'dhcpd', 'dpinger', 'sshd'];
 
@@ -24,8 +22,7 @@ class APIModelsServiceTestCase extends TestCase
     /**
      * Checks that the `get_service_name_choices()` method correctly identifies all available service names.
      */
-    public function test_get_service_name_choices()
-    {
+    public function test_get_service_name_choices() {
         # Ensure expected services are found in the method's response
         $expected_services = ['unbound', 'ntpd', 'syslogd', 'dhcpd', 'dpinger', 'sshd'];
 
@@ -38,8 +35,7 @@ class APIModelsServiceTestCase extends TestCase
     /**
      * Checks that the `get_id_by_name()` correctly obtains the ID of the Service object with a specific `name`
      */
-    public function test_get_id_by_name()
-    {
+    public function test_get_id_by_name() {
         # Create a Service object to test with
         $test_service = new Service();
 
@@ -51,8 +47,7 @@ class APIModelsServiceTestCase extends TestCase
     /**
      * Checks that a Service can be stopped, started and restarted.
      */
-    public function test_can_perform_service_actions()
-    {
+    public function test_can_perform_service_actions() {
         # Define a Service to test with
         $test_service = new Service(data: ['name' => 'ntpd']);
 

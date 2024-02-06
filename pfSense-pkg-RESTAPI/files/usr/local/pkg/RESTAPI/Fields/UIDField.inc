@@ -10,8 +10,7 @@ use RESTAPI;
  * Defines a UIDField class that extends the Core Field method. This field will automatically populate a unique ID that
  * is immutable.
  */
-class UIDField extends RESTAPI\Core\Field
-{
+class UIDField extends RESTAPI\Core\Field {
     /**
      * Defines the UIDField object and sets its options.
      * @param string $prefix A specific string to prefix to the generated UID.
@@ -78,8 +77,7 @@ class UIDField extends RESTAPI\Core\Field
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): string
-    {
+    protected function _from_internal(mixed $internal_value): string {
         return strval($internal_value);
     }
 }

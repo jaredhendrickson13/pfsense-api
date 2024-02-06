@@ -8,14 +8,12 @@ use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
-class TrafficShaperLimiterBandwidth extends Model
-{
+class TrafficShaperLimiterBandwidth extends Model {
     public IntegerField $bw;
     public StringField $bwscale;
     public ForeignModelField $bwsched;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->parent_model_class = 'TrafficShaperLimiter';
         $this->config_path = 'bandwidth/item';
@@ -48,8 +46,7 @@ class TrafficShaperLimiterBandwidth extends Model
     /**
      * Reloads the filter, and resets applicable RRD graphs
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new TrafficShaperApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

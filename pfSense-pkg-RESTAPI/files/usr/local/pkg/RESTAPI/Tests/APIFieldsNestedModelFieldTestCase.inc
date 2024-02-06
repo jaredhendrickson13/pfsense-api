@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Models\FirewallAlias;
 
-class APIFieldsNestedModelFieldTestCase extends TestCase
-{
+class APIFieldsNestedModelFieldTestCase extends TestCase {
     /**
      * Ensures NestedModelField objects are constructed with the necessary properties.
      */
-    public function test_construct()
-    {
+    public function test_construct() {
         # Create a NestedModelObject to test with
         $field = new NestedModelField('FirewallAlias', required: true);
 
@@ -31,8 +29,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
     /**
      * Ensures that the NestedModelField `validate_extra()` method performs the nested Model's `validate()` method.
      */
-    public function test_nested_validate()
-    {
+    public function test_nested_validate() {
         # Create a NestedModelObject to test with
         $field = new NestedModelField('FirewallAlias', required: true);
 
@@ -58,8 +55,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
     /**
      * Ensures `unique` validation works for NestedModelFields.
      */
-    public function test_unique_validation()
-    {
+    public function test_unique_validation() {
         # Create a NestedModelObject to test with
         $field = new NestedModelField('FirewallAlias', required: true);
         $field->name = 'test';
@@ -80,8 +76,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
     /**
      * Ensures `unique_together` validation works for NestedModelFields.
      */
-    public function test_unique_together_validation()
-    {
+    public function test_unique_together_validation() {
         # Create a NestedModelObject to test with. Use the DNSResolverHostOverride model for this test since its `host`
         # and `domain` Fields must be unique together.
         $field = new NestedModelField('DNSResolverHostOverride', required: true);
@@ -103,8 +98,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
     /**
      * Ensures nested model objects are correctly converted to their internal Forms.
      */
-    public function test_to_internal()
-    {
+    public function test_to_internal() {
         # Create a NestedModelObject to test with.
         $field = new NestedModelField('FirewallAlias', required: true);
         $field->name = 'test';
@@ -122,8 +116,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
     /**
      * Ensures nested model objects are correctly converted from their internal Forms.
      */
-    public function test_from_internal()
-    {
+    public function test_from_internal() {
         # Create a NestedModelObject to test with.
         $field = new NestedModelField('FirewallAlias', required: true);
         $field->name = 'test';
@@ -143,8 +136,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
     /**
      * Ensures the `sort()` method correctly sorts values based on the nested Model's sort criteria.
      */
-    public function test_sort()
-    {
+    public function test_sort() {
         # Create a NestedModelObject to test with.
         $field = new NestedModelField('FirewallAlias', required: true);
         $field->name = 'test';

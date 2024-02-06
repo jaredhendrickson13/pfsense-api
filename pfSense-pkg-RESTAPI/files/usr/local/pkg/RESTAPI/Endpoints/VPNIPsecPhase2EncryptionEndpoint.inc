@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class VPNIPsecPhase2EncryptionEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class VPNIPsecPhase2EncryptionEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/vpn/ipsec/phase2/encryption';
         $this->model_name = 'IPsecPhase2Encryption';

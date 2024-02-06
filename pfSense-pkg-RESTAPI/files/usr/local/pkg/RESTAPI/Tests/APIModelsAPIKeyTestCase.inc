@@ -7,13 +7,11 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RESTAPIKey;
 
-class APIModelsAPIKeyTestCase extends TestCase
-{
+class APIModelsAPIKeyTestCase extends TestCase {
     /**
      * Checks that API keys can only be issued to existing users.
      */
-    public function test_api_keys_can_only_be_issued_to_existing_users()
-    {
+    public function test_api_keys_can_only_be_issued_to_existing_users() {
         $this->assert_throws_response(
             response_id: 'API_KEY_USERNAME_MUST_EXIST',
             code: 400,
@@ -36,8 +34,7 @@ class APIModelsAPIKeyTestCase extends TestCase
     /**
      * Checks that the `key` and `hash` values are populated after API key creation.
      */
-    public function test_key_and_hash_populated_after_creation()
-    {
+    public function test_key_and_hash_populated_after_creation() {
         # Construct an RESTAPIKey model object to test with
         $key = new RESTAPIKey();
 
@@ -67,8 +64,7 @@ class APIModelsAPIKeyTestCase extends TestCase
     /**
      * Checks that the `authenticate()` method correctly authenticates API keys.
      */
-    public function test_authenticate()
-    {
+    public function test_authenticate() {
         # Construct an RESTAPIKey model object to test with
         $key = new RESTAPIKey();
         $key->client->username = 'admin';
@@ -85,8 +81,7 @@ class APIModelsAPIKeyTestCase extends TestCase
     /**
      * Checks that RESTAPIKey model objects cannot be updated.
      */
-    public function test_api_keys_cannot_be_updated()
-    {
+    public function test_api_keys_cannot_be_updated() {
         $this->assert_throws_response(
             response_id: 'API_KEY_CANNOT_BE_UPDATED',
             code: 500,

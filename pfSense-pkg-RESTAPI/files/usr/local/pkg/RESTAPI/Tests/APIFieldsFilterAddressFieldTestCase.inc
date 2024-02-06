@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Fields\FilterAddressField;
 use RESTAPI\Models\FirewallAlias;
 
-class APIFieldsFilterAddressFieldTestCase extends TestCase
-{
+class APIFieldsFilterAddressFieldTestCase extends TestCase {
     /**
      * Checks that IP address values are allowed when `allow_ipaddr` is set.
      */
-    public function test_allow_ipaddr()
-    {
+    public function test_allow_ipaddr() {
         # Create field object to test with
         $field = new FilterAddressField(allow_ipaddr: true);
 
@@ -37,8 +35,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that subnet values are allowed when `allow_subnet` is set.
      */
-    public function test_allow_subnet()
-    {
+    public function test_allow_subnet() {
         # Create field object to test with
         $field = new FilterAddressField(allow_subnet: true);
 
@@ -63,8 +60,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that alias values are allowed when `allow_alias` is set.
      */
-    public function test_allow_alias()
-    {
+    public function test_allow_alias() {
         # Create a host, network and port alias
         $host_alias = new FirewallAlias(data: ['name' => 'HOSTALIAS', 'type' => 'host']);
         $host_alias->create();
@@ -123,8 +119,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that interface values are allowed when `allow_interface` is set.
      */
-    public function test_allow_interface()
-    {
+    public function test_allow_interface() {
         # Create field object to test with
         $field = new FilterAddressField(allow_interface: true);
 
@@ -149,8 +144,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that any values are allowed when `allow_any` is set.
      */
-    public function test_allow_any()
-    {
+    public function test_allow_any() {
         # Create field object to test with
         $field = new FilterAddressField(allow_any: true);
 
@@ -175,8 +169,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that (self) values are allowed when `allow_self` is set.
      */
-    public function test_allow_self()
-    {
+    public function test_allow_self() {
         # Create field object to test with
         $field = new FilterAddressField(allow_self: true);
 
@@ -201,8 +194,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that l2tp values are allowed when `allow_l2tp` is set.
      */
-    public function test_allow_l2tp()
-    {
+    public function test_allow_l2tp() {
         # Create field object to test with
         $field = new FilterAddressField(allow_l2tp: true);
 
@@ -227,8 +219,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that pppoe values are allowed when `allow_pppoe` is set.
      */
-    public function test_allow_pppoe()
-    {
+    public function test_allow_pppoe() {
         # Create field object to test with
         $field = new FilterAddressField(allow_pppoe: true);
 
@@ -253,8 +244,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that inverted values are allowed when `allow_invert` is set.
      */
-    public function test_allow_invert()
-    {
+    public function test_allow_invert() {
         # Create field object to test with
         $field = new FilterAddressField(allow_invert: true);
 
@@ -289,8 +279,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that the interface IP modifier (`:ip`) is allowed when `allow_interface_ip` is set.
      */
-    public function test_allow_interface_ip_modifier()
-    {
+    public function test_allow_interface_ip_modifier() {
         # Create field object to test with
         $field = new FilterAddressField(allow_interface_ip: true);
 
@@ -325,8 +314,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that the `to_internal()` method correctly represents the field's value as it's internal array
      */
-    public function test_to_internal()
-    {
+    public function test_to_internal() {
         # Create a field to test with
         $field = new FilterAddressField(required: true);
         $field->name = 'test';
@@ -384,8 +372,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
      * Check that the `from_internal()` method correctly converts the internal value back to its represented
      * value.
      */
-    public function test_from_internal()
-    {
+    public function test_from_internal() {
         # Create a field to test with
         $field = new FilterAddressField();
 
@@ -405,8 +392,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
     /**
      * Checks that expected labels are set after running `validated_extra()`.
      */
-    public function test_validate_extra_sets_labels(): void
-    {
+    public function test_validate_extra_sets_labels(): void {
         # Create a firewall alias we can use to populate the `is_alias` label for this test
         $alias = new FirewallAlias(name: 'test_alias', type: 'host');
         $alias->create();

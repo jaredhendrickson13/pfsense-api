@@ -6,15 +6,13 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\CronJob;
 
-class APIModelsCronJobTestCase extends TestCase
-{
+class APIModelsCronJobTestCase extends TestCase {
     /**
      * Checks that the CronJob model requires the pfSense-pkg-Cron package unless $require_pkg is set to `false`
      * during construction. This is a parameter unique to the CronJob model since technically the Model can be
      * used without the package.
      */
-    public function test_requires_pkg(): void
-    {
+    public function test_requires_pkg(): void {
         # Ensure pfSense-pkg-Cron is listed as a required package if $require_pkg was enabled during construction
         $cron = new CronJob(require_pkg: true);
         $this->assert_equals($cron->packages, ['pfSense-pkg-Cron']);
@@ -27,8 +25,7 @@ class APIModelsCronJobTestCase extends TestCase
     /**
      * Checks that an error is thrown if the `who` field is not the username of an existing OS user.
      */
-    public function test_validate_who(): void
-    {
+    public function test_validate_who(): void {
         # Ensure an error is thrown if we try to create a CronJob with a non-existent user
         $this->assert_throws_response(
             response_id: 'CRON_JOB_WHO_USER_DOES_NOT_EXIST',
@@ -51,8 +48,7 @@ class APIModelsCronJobTestCase extends TestCase
     /**
      * Checks that the CronJob object is correctly represented in /etc/crontab after creation, modification and deletion.
      */
-    public function test_crud(): void
-    {
+    public function test_crud(): void {
         # Create a CronJob to test with
         $cron_job = new CronJob(
             data: [

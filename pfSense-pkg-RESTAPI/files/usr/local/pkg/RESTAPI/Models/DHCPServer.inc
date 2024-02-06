@@ -18,8 +18,7 @@ use RESTAPI\Validators\MACAddressValidator;
 /*
  * Defines a Model that configures the DHCP server for a given interface.
  */
-class DHCPServer extends Model
-{
+class DHCPServer extends Model {
     public BooleanField $enable;
     public StringField $range_from;
     public StringField $range_to;
@@ -45,8 +44,7 @@ class DHCPServer extends Model
     public NestedModelField $pool;
     public NestedModelField $staticmap;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define Model attributes
         $this->config_path = 'dhcpd';
         $this->many = true;
@@ -232,8 +230,7 @@ class DHCPServer extends Model
     /**
      * Provides extra validation for this entire Model object.
      */
-    public function validate_extra(): void
-    {
+    public function validate_extra(): void {
         # Do not allow this DHCPServers primary address pool to overlap with other objects
         $overlapped_model = $this->get_range_overlap($this->range_from->value, $this->range_to->value);
         if ($overlapped_model) {
@@ -252,8 +249,7 @@ class DHCPServer extends Model
      * @throws ValidationError When `enable` is `true` but interface associated with `id` does not have a static IP.
      * @throws ValidationError When `enable` is `true`, but there is a DHCP relay running on this interface.
      */
-    public function validate_enable(bool $enable): bool
-    {
+    public function validate_enable(bool $enable): bool {
         # Get the interface associated with this DHCP server
         $interface = NetworkInterface::query(['id' => $this->id])->first();
 
@@ -288,8 +284,7 @@ class DHCPServer extends Model
      * @throws ValidationError When `range_from` is not in the interface's subnet.
      * @throws ValidationError When `range_from` is greater than the `range_to` IP.
      */
-    public function validate_range_from(string $range_from): string
-    {
+    public function validate_range_from(string $range_from): string {
         # Get the parent interface for this DHCP server
         $interface = NetworkInterface::query(['id' => $this->id])->first();
 
@@ -328,8 +323,7 @@ class DHCPServer extends Model
      * @throws ValidationError When `range_from` is not in the interface's subnet.
      * @throws ValidationError When `range_from` is greater than the `range_to` IP.
      */
-    public function validate_range_to(string $range_to): string
-    {
+    public function validate_range_to(string $range_to): string {
         # Get the parent interface for this DHCP server
         $interface = NetworkInterface::query(['id' => $this->id])->first();
 
@@ -358,8 +352,7 @@ class DHCPServer extends Model
      * @return int The validated `maxleasetime` field value to be assigned.
      * @throws ValidationError When `maxleasetime` is less than the `defaultleasetime`
      */
-    public function validate_maxleasetime(int $maxleasetime): int
-    {
+    public function validate_maxleasetime(int $maxleasetime): int {
         if ($maxleasetime < $this->defaultleasetime->value) {
             throw new ValidationError(
                 message: 'DHCP server `maxleasetime` cannot be less than the `defaultleasetime`',
@@ -376,8 +369,7 @@ class DHCPServer extends Model
      * @return string The validated `gateway` field value to be assigned.
      * @throws ValidationError When `gateway` is not an IP within the interface's subnet
      */
-    public function validate_gateway(string $gateway): string
-    {
+    public function validate_gateway(string $gateway): string {
         # Get the parent interface for this DHCP server
         $interface = NetworkInterface::query(['id' => $this->id])->first();
 
@@ -398,8 +390,7 @@ class DHCPServer extends Model
      * @return bool The validated `nonak` field value to be assigned.
      * @throws ValidationError When `nonak` is `true` and a `failover_peerip` is assigned.
      */
-    public function validate_nonak(bool $nonak): bool
-    {
+    public function validate_nonak(bool $nonak): bool {
         # Do not allow `nonak` to be enabled if a `failover_peerip` is set.
         if ($nonak and $this->failover_peerip->value) {
             throw new ValidationError(
@@ -417,8 +408,7 @@ class DHCPServer extends Model
      * @return bool The validated `staticarp` field value to be assigned.
      * @throws ValidationError When `staticarp` is `true` but there are configured static mappings without IPs.
      */
-    public function validate_staticarp(bool $staticarp): bool
-    {
+    public function validate_staticarp(bool $staticarp): bool {
         # Do not allow `staticarp` to be enabled if there are any configured static mappings without IPs
         $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->id);
         foreach ($static_mappings->model_objects as $static_mapping) {
@@ -441,8 +431,7 @@ class DHCPServer extends Model
      * @return Model|null Returns the Model object that this range overlaps with, returns
      * null if the range did not overlap with an existing Model object.
      */
-    private function get_range_overlap(string $range_from, string $range_to): ?Model
-    {
+    private function get_range_overlap(string $range_from, string $range_to): ?Model {
         # Ensure range does not overlap with existing static mappings
         $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->id);
         foreach ($static_mappings->model_objects as $static_mapping) {
@@ -476,8 +465,7 @@ class DHCPServer extends Model
     /**
      * Applies the pending DHCP server changes.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         # Enable RRD graphing for DHCP if `statsgraph` changed
         if ($this->initial_object->statsgraph->value !== $this->statsgraph->value) {
             enable_rrd_graphing();

@@ -7,8 +7,7 @@ use RESTAPI\Models\Certificate;
 use RESTAPI\Models\CertificateAuthority;
 use RESTAPI\Models\IPsecPhase1;
 
-class APIModelsIPsecPhase1TestCase extends TestCase
-{
+class APIModelsIPsecPhase1TestCase extends TestCase {
     const BASE_DATA = [
         'iketype' => 'ikev2',
         'protocol' => 'inet',
@@ -31,8 +30,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that `remote_gateway` cannot be set to an IPv6 address if `protocol` is set to `inet`
      */
-    public function test_remote_gateway_cannot_be_ipv6_with_inet_protocol(): void
-    {
+    public function test_remote_gateway_cannot_be_ipv6_with_inet_protocol(): void {
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_IPV6_REMOTE_GATEWAY_NOT_ALLOWED',
             code: 400,
@@ -48,8 +46,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that `remote_gateway` cannot be set to an IPv4 address if `protocol` is set to `inet6`
      */
-    public function test_remote_gateway_cannot_be_ipv4_with_inet6_protocol(): void
-    {
+    public function test_remote_gateway_cannot_be_ipv4_with_inet6_protocol(): void {
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_IPV4_REMOTE_GATEWAY_NOT_ALLOWED',
             code: 400,
@@ -65,8 +62,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `remote_gateway` value must be unique unless all duplicate gateways have `gw_duplicates` enabled
      */
-    public function test_remote_gateway_unique_without_dup_gw(): void
-    {
+    public function test_remote_gateway_unique_without_dup_gw(): void {
         # Create an IPsec phase 1 entry to test with
         $p1 = new IPsecPhase1(data: self::BASE_DATA);
         $p1->create();
@@ -101,8 +97,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
      * Checks that the `remote_gateway` field can be shared with other phase 1 entries without `gw_duplicates` if it is
      * an INADRR_ANY address.
      */
-    public function test_remote_gateway_inaddr_any_without_gw_duplicates(): void
-    {
+    public function test_remote_gateway_inaddr_any_without_gw_duplicates(): void {
         # Create an IPsec phase 1 entry to test with and use an INADDR_ANY remote gateway
         $p1 = new IPsecPhase1(data: self::BASE_DATA);
         $p1->remote_gateway->value = '0.0.0.0';
@@ -131,8 +126,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `myid_data` field correctly enforces input validation depending on the `myid_type`.
      */
-    public function test_validate_myid_data(): void
-    {
+    public function test_validate_myid_data(): void {
         # Ensure `myid_type` value `address` must be IP address
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_MYID_DATA_MUST_BE_IP_ADDRESS',
@@ -209,8 +203,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `peerid_type` cannot be set to `peeraddress` when the `remote_gateway` is an INADDR_ANY IP
      */
-    public function test_peerid_type_cannot_be_peeraddress_with_inaddr_any_remote_gateway(): void
-    {
+    public function test_peerid_type_cannot_be_peeraddress_with_inaddr_any_remote_gateway(): void {
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_NO_INADDR_ANY_WITH_PEERADDRESS',
             code: 400,
@@ -225,8 +218,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `peerid_data` field correctly enforces input validation depending on the `peerid_type`.
      */
-    public function test_validate_peerid_data(): void
-    {
+    public function test_validate_peerid_data(): void {
         # Ensure `peerid_type` value `address` must be IP address
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_PEERID_DATA_MUST_BE_IP_ADDRESS',
@@ -303,8 +295,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `rekey_time` cannot be set to a value higher than `lifetime`
      */
-    public function test_rekey_time_cannot_be_greater_than_lifetime(): void
-    {
+    public function test_rekey_time_cannot_be_greater_than_lifetime(): void {
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_REKEY_TIME_GREATER_THAN_LIFETIME',
             code: 400,
@@ -319,8 +310,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `reauth_time` cannot be set to a value higher than `lifetime`
      */
-    public function test_reauth_time_cannot_be_greater_than_lifetime(): void
-    {
+    public function test_reauth_time_cannot_be_greater_than_lifetime(): void {
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_REAUTH_TIME_GREATER_THAN_LIFETIME',
             code: 400,
@@ -335,8 +325,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `startaction` must be set to `none` when `remote_gateway` is an INADDR_ANY IP
      */
-    public function test_startaction_must_be_none_with_inaddr_any_remote_gateway(): void
-    {
+    public function test_startaction_must_be_none_with_inaddr_any_remote_gateway(): void {
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_NO_STARTACTION_WITH_INADDR_ANY_REMOTE_GATEWAY',
             code: 400,
@@ -351,8 +340,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `nattport` cannot use the same port as `ikeport`
      */
-    public function test_nattport_cannot_match_ikeport(): void
-    {
+    public function test_nattport_cannot_match_ikeport(): void {
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_1_NATTPORT_CANNOT_MATCH_IKEPORT',
             code: 400,
@@ -367,8 +355,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `iketype` is correctly represented on the backend after applying.
      */
-    public function test_iketype_found_in_swanctl(): void
-    {
+    public function test_iketype_found_in_swanctl(): void {
         # Create a new IPsec phase 1 using IKEv2
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->iketype->value = 'ikev2';
@@ -392,8 +379,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the IKEv1 `mode` setting is correctly represented on the backend after applying.
      */
-    public function test_ikev1_mode_found_in_swanctl(): void
-    {
+    public function test_ikev1_mode_found_in_swanctl(): void {
         # Create a new IPsec phase 1 in main mode
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->iketype->value = 'ikev1';
@@ -417,8 +403,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `interface` field is correctly represented on the backend after apply
      */
-    public function test_interface_found_in_swanctl(): void
-    {
+    public function test_interface_found_in_swanctl(): void {
         # Create a new IPsec phase 1 using the wan interface
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->interface->value = 'wan';
@@ -444,8 +429,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `remote_gateway` value is correctly represented on the backend after applying
      */
-    public function test_remote_gateway_found_in_swanctl(): void
-    {
+    public function test_remote_gateway_found_in_swanctl(): void {
         # Create a new IPsec phase 1 using the wan interface
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->remote_gateway->value = '1.2.3.4';
@@ -469,8 +453,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `authentication_method` is correctly represented on the backend after applying.
      */
-    public function test_authentication_method_found_in_swanctl(): void
-    {
+    public function test_authentication_method_found_in_swanctl(): void {
         # Create a new IPsec phase 1 using PSK auth
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->authentication_method->value = 'pre_shared_key';
@@ -508,8 +491,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `lifetime` is correctly represented on the backend after applying.
      */
-    public function test_lifetime_found_in_swanctl(): void
-    {
+    public function test_lifetime_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific lifetime and rekey_time values
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->lifetime->value = 30000;
@@ -528,8 +510,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `rekey_time` is correctly represented on the backend after applying.
      */
-    public function test_rekey_time_found_in_swanctl(): void
-    {
+    public function test_rekey_time_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific rekey_time value
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->rekey_time->value = 25000;
@@ -546,8 +527,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `reauth_time` is correctly represented on the backend after applying.
      */
-    public function test_reauth_time_found_in_swanctl(): void
-    {
+    public function test_reauth_time_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific reauth_time value
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->reauth_time->value = 25000;
@@ -564,8 +544,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `rand_time` is correctly represented on the backend after applying.
      */
-    public function test_rand_time_found_in_swanctl(): void
-    {
+    public function test_rand_time_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific rand_time value
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->rand_time->value = 3000;
@@ -582,8 +561,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `nat_traversal` is correctly represented on the backend after applying.
      */
-    public function test_nat_traversal_found_in_swanctl(): void
-    {
+    public function test_nat_traversal_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific nat_traversal value
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->nat_traversal->value = 'force';
@@ -600,8 +578,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `mobike` is correctly represented on the backend after applying.
      */
-    public function test_mobike_found_in_swanctl(): void
-    {
+    public function test_mobike_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific mobike value
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->mobike->value = true;
@@ -624,8 +601,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `ikeport` is correctly represented on the backend after applying.
      */
-    public function test_ikeport_found_in_swanctl(): void
-    {
+    public function test_ikeport_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific ikeport value
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->ikeport->value = '501';
@@ -642,8 +618,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `dpd_delay` is correctly represented on the backend after applying.
      */
-    public function test_dpd_delay_found_in_swanctl(): void
-    {
+    public function test_dpd_delay_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific dpd_delay value
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->dpd_delay->value = 15;
@@ -660,8 +635,7 @@ class APIModelsIPsecPhase1TestCase extends TestCase
     /**
      * Checks that the `dpd_maxfail` is correctly represented on the backend after applying.
      */
-    public function test_dpd_maxfail_found_in_swanctl(): void
-    {
+    public function test_dpd_maxfail_found_in_swanctl(): void {
         # Create a new IPsec phase 1 with a specific dpd_maxfail value
         $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
         $p1->iketype->value = 'ikev1';

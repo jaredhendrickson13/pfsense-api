@@ -7,14 +7,12 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\CARP;
 use RESTAPI\Models\VirtualIP;
 
-class APIModelsCARPTestCase extends TestCase
-{
+class APIModelsCARPTestCase extends TestCase {
     /**
      * Checks that CARP is not enabled when no CARP virtual IPs exist, but is then enabled after the first CARP
      * virtual IP is created.
      */
-    public function test_enable()
-    {
+    public function test_enable() {
         # Create CARP status and CARP VIP objects to test with
         $carp_status = new CARP(async: false);
         $carp_vip = new VirtualIP(
@@ -54,8 +52,7 @@ class APIModelsCARPTestCase extends TestCase
     /**
      * Checks that `maintenance_mode` properly marks CARP members as backup when set.
      */
-    public function test_maintenance_mode()
-    {
+    public function test_maintenance_mode() {
         # Create CARP status and CARP VIP objects to test with
         $carp_status = new CARP(async: false);
         $carp_vip = new VirtualIP(

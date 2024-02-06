@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\WakeOnLANSend;
 
-class APIModelsWakeOnLANSendTestCase extends TestCase
-{
+class APIModelsWakeOnLANSendTestCase extends TestCase {
     /**
      * Checks that the assigned `interface` must have a valid IPv4 broadcast address.
      */
-    public function test_interface_must_have_broadcast_ip(): void
-    {
+    public function test_interface_must_have_broadcast_ip(): void {
         # Create an interface without an IP
         $if = new NetworkInterface(
             data: [
@@ -42,8 +40,7 @@ class APIModelsWakeOnLANSendTestCase extends TestCase
     /**
      * Checks that the _create() method throws an error if the wol command fails for any reason.
      */
-    public function test_error_thrown_if_wol_cmd_fails(): void
-    {
+    public function test_error_thrown_if_wol_cmd_fails(): void {
         # Ensure an error is thrown if the wol command fails (i.e. the mac address is somehow invalid, etc.)
         $this->assert_throws_response(
             response_id: 'WAKE_ON_LAN_SEND_COMMAND_FAILED',

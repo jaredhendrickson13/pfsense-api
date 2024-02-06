@@ -10,8 +10,7 @@ use RESTAPI\Responses\ValidationError;
 /**
  * Defines a Validator that determines if a given string is an X509 encoded object
  */
-class X509Validator extends Validator
-{
+class X509Validator extends Validator {
     const CRT_BEGIN = 'BEGIN CERTIFICATE';
     const CRT_END = 'BEGIN CERTIFICATE';
     const CSR_BEGIN = 'BEGIN CERTIFICATE REQUEST';
@@ -44,8 +43,7 @@ class X509Validator extends Validator
      * @param string $field_name The name of the field being validated.
      * @throws ValidationError When the $value is not a valid X509 string.
      */
-    public function validate(mixed $value, string $field_name = ''): void
-    {
+    public function validate(mixed $value, string $field_name = ''): void {
         # Accept X509 certificates if allowed
         if ($this->allow_crt and str_contains($value, self::CRT_BEGIN) and str_contains($value, self::CRT_END)) {
             return;
@@ -81,8 +79,7 @@ class X509Validator extends Validator
     /**
      * Uses the `allow_*` properties to format a string of value options this validator will accept.
      */
-    private function get_options_str(): string
-    {
+    private function get_options_str(): string {
         $options = [];
         $options += $this->allow_crt ? ['certificate'] : [];
         $options += $this->allow_csr ? ['certificate signing request'] : [];
@@ -97,8 +94,7 @@ class X509Validator extends Validator
      * @param string $private_key the x509 private key to evaluate
      * @returns bool true if the public key and private key are matching key pairs.
      */
-    public static function is_matching_keypair(string $public_key, string $private_key): bool
-    {
+    public static function is_matching_keypair(string $public_key, string $private_key): bool {
         $crt_public_key = cert_get_publickey($public_key, decode: false, type: 'crt');
         $prv_public_key = cert_get_publickey($private_key, decode: false, type: 'prv');
         return $crt_public_key === $prv_public_key;

@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\Certificate;
 
-class APIModelsCertificateTestCase extends TestCase
-{
+class APIModelsCertificateTestCase extends TestCase {
     const EXAMPLE_CRT = "-----BEGIN CERTIFICATE-----
 MIIDnzCCAoegAwIBAgIUd9R9uoNKE2GoxgJPwzRn67WV4bgwDQYJKoZIhvcNAQEL
 BQAwXzELMAkGA1UEBhMCVVMxDTALBgNVBAgMBFV0YWgxFzAVBgNVBAcMDlNhbHQg
@@ -66,8 +65,7 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
     /**
      * Checks that a Certificate cannot be have `crt` and `prv` values that are not a matching key pair.
      */
-    public function test_crt_and_prv_are_matching_keypair()
-    {
+    public function test_crt_and_prv_are_matching_keypair() {
         $this->assert_throws_response(
             response_id: 'CERTIFICATE_CRT_AND_PRV_NOT_KEYPAIR',
             code: 400,
@@ -102,8 +100,7 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
     /**
      * Checks that Certificates cannot be deleted while they're in use.
      */
-    public function test_certificate_cannot_be_deleted_while_in_use()
-    {
+    public function test_certificate_cannot_be_deleted_while_in_use() {
         $this->assert_throws_response(
             response_id: 'CERTIFICATE_CANNOT_BE_DELETED_WHILE_IN_USE',
             code: 403,

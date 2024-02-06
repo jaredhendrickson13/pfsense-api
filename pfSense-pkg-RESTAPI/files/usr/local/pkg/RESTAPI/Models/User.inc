@@ -15,8 +15,7 @@ use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 
-class User extends Model
-{
+class User extends Model {
     public StringField $name;
     public StringField $password;
     public IntegerField $uid;
@@ -29,8 +28,7 @@ class User extends Model
     public Base64Field $authorizedkeys;
     public StringField $ipsecpsk;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'system/user';
         $this->many = true;
@@ -115,8 +113,7 @@ class User extends Model
      * @param string $name The incoming value to be validated
      * @return string The validated value to be assigned.
      */
-    public function validate_name(string $name): string
-    {
+    public function validate_name(string $name): string {
         # Do not allow users to use usernames that are reserved by the system
         if ($this->is_username_reserved($name) and $name !== $this->initial_object->name->value) {
             throw new ValidationError(
@@ -133,8 +130,7 @@ class User extends Model
      * @param string $password The incoming value to be validated
      * @return string The validated value to be assigned.
      */
-    public function validate_password(string $password): string
-    {
+    public function validate_password(string $password): string {
         # Hash the password if the password has changed
         if ($this->initial_object->password->value !== $password) {
             $hash = [];
@@ -150,8 +146,7 @@ class User extends Model
      * @param string $priv The incoming value to be validated
      * @return string The validated value to be assigned.
      */
-    public function validate_priv(string $priv): string
-    {
+    public function validate_priv(string $priv): string {
         global $priv_list;
 
         # Ensure requested privileges are valid privilege names
@@ -170,8 +165,7 @@ class User extends Model
      * @param string $cert The incoming value to be validated
      * @return string The validated value to be assigned.
      */
-    public function validate_cert(string $cert): string
-    {
+    public function validate_cert(string $cert): string {
         # TODO: Remove this function once the Certificate model is developed and this field is converted to a
         # TODO: ForeignModelField
         # Loop through all certificates and check for matches
@@ -191,8 +185,7 @@ class User extends Model
     /**
      * Extend the _create() method so it bumps the next UID before creating the object
      */
-    public function _create()
-    {
+    public function _create() {
         # Bump the nextuid in config to one greater than this UID
         $this->set_config('system/nextuid', $this->uid->value + 1);
         parent::_create();
@@ -201,8 +194,7 @@ class User extends Model
     /**
      * Extends the _delete() method to ensure system users cannot be deleted.
      */
-    public function _delete()
-    {
+    public function _delete() {
         # Do not allow system users to be deleted
         # TODO: replace this with a protected_model_query
         if ($this->scope->value !== 'user') {
@@ -217,16 +209,14 @@ class User extends Model
     /**
      * Apply the creation of this User.
      */
-    public function apply_create()
-    {
+    public function apply_create() {
         local_user_set($this->to_internal());
     }
 
     /**
      * Apply the update of this User.
      */
-    public function apply_update()
-    {
+    public function apply_update() {
         local_user_del($this->initial_object->to_internal());
         local_user_set($this->to_internal());
     }
@@ -234,8 +224,7 @@ class User extends Model
     /**
      * Apply the deletion of this User.
      */
-    protected function apply_delete()
-    {
+    protected function apply_delete() {
         local_user_del($this->to_internal());
     }
 
@@ -244,8 +233,7 @@ class User extends Model
      * @param string $username The username to check.
      * @return bool `true` if the username is reserved, `false` if it is not.
      */
-    public static function is_username_reserved(string $username): bool
-    {
+    public static function is_username_reserved(string $username): bool {
         # Open the /etc/passwd file to read all system users
         $sys_users = explode(PHP_EOL, file_get_contents('/etc/passwd'));
 

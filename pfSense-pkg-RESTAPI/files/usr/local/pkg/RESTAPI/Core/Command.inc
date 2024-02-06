@@ -10,8 +10,7 @@ namespace RESTAPI\Core;
  * @property int $result_code The exit/return code of the executed shell command.
  * @property bool $trim_whitespace Automatically remove excessive whitespace from the command $output.
  */
-class Command
-{
+class Command {
     use BaseTraits;
 
     public string $command;
@@ -29,8 +28,7 @@ class Command
      * @return Command Returns this object containing the results of the executed command. Note: the object returned
      * cannot be used to initiate new commands. A new Command object should be created for any additional commands.
      */
-    public function __construct(string $command, bool $trim_whitespace = false, string $redirect = '2>&1')
-    {
+    public function __construct(string $command, bool $trim_whitespace = false, string $redirect = '2>&1') {
         $this->command = $command;
         $this->trim_whitespace = $trim_whitespace;
         $this->redirect = $redirect;
@@ -42,8 +40,7 @@ class Command
      * Executes the assigned $command. The $output and $result_code properties will be set after running
      * this method.
      */
-    private function run_command(): void
-    {
+    private function run_command(): void {
         exec(command: "$this->command $this->redirect", output: $raw_output, result_code: $this->result_code);
         $this->output = implode(PHP_EOL, $raw_output);
 

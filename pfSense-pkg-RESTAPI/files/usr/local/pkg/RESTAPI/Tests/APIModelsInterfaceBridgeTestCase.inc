@@ -7,14 +7,12 @@ use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\InterfaceBridge;
 
-class APIModelsInterfaceBridgeTestCase extends TestCase
-{
+class APIModelsInterfaceBridgeTestCase extends TestCase {
     /**
      * Checks that interface bridges cannot be created with wireless interface members unless
      * the wireless mode is set to `hostap`.
      */
-    public function test_no_non_hostap_wireless_members()
-    {
+    public function test_no_non_hostap_wireless_members() {
         # Mock a non-hostap wireless interface in config for testing
         Model::set_config('interfaces/lan/wireless', ['mode' => 'test']);
 
@@ -33,8 +31,7 @@ class APIModelsInterfaceBridgeTestCase extends TestCase
      * Checks that interface bridges cannot be created with members that are also assigned to an
      * existing captive portal
      */
-    public function test_no_captive_portal_assigned_members()
-    {
+    public function test_no_captive_portal_assigned_members() {
         # Mock a captive portal for testing
         Model::set_config('captiveportal/0', ['interface' => 'wan,lan']);
 
@@ -52,8 +49,7 @@ class APIModelsInterfaceBridgeTestCase extends TestCase
     /**
      * Checks that the `get_next_bridgeif() method correctly obtains the next bridgeif value
      */
-    public function test_get_next_bridgeif()
-    {
+    public function test_get_next_bridgeif() {
         # Construct a interface bridge object to test with
         $if_bridge = new InterfaceBridge();
 
@@ -73,8 +69,7 @@ class APIModelsInterfaceBridgeTestCase extends TestCase
     /**
      * Checks that the interface bridge is correctly represented in ifconfig after creation, modification and deletion
      */
-    public function test_crud()
-    {
+    public function test_crud() {
         # Construct a interface bridge object to test with
         $if_bridge = new InterfaceBridge();
         $if_bridge->members->value = ['lan'];

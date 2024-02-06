@@ -6,14 +6,12 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\InterfaceGroup;
 
-class APIModelsInterfaceGroupTestCase extends TestCase
-{
+class APIModelsInterfaceGroupTestCase extends TestCase {
     /**
      * Ensures the interface groups members are properly assigned the group when created and updated, and removed from
      * group when deleted.
      */
-    public function test_crud()
-    {
+    public function test_crud() {
         # Create an InterfaceGroup object to use for testing
         $if_group = new InterfaceGroup(data: ['ifname' => 'test', 'members' => ['lan'], 'descr' => 'test']);
         $if_group->create();

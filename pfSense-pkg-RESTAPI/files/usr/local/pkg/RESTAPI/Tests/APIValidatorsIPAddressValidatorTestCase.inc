@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Validators\IPAddressValidator;
 
-class APIValidatorsIPAddressValidatorTestCase extends TestCase
-{
+class APIValidatorsIPAddressValidatorTestCase extends TestCase {
     /**
      * Checks that validation fails if a value is not a valid IP address.
      */
-    public function test_throw_response_for_non_ip_value()
-    {
+    public function test_throw_response_for_non_ip_value() {
         $this->assert_throws_response(
             response_id: 'IP_ADDRESS_VALIDATOR_FAILED',
             code: 400,
@@ -26,8 +24,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Checks that validation fails if a value is not a valid IP address.
      */
-    public function test_throw_response_for_non_ip_or_fqdn_value()
-    {
+    public function test_throw_response_for_non_ip_or_fqdn_value() {
         $this->assert_throws_response(
             response_id: 'IP_ADDRESS_VALIDATOR_FAILED',
             code: 400,
@@ -41,8 +38,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Checks that IPv4 address validation works when allowed and fails when not allowed
      */
-    public function test_ipv4_validation_value()
-    {
+    public function test_ipv4_validation_value() {
         # Ensure IPv4 address validation works when allowed
         $this->assert_does_not_throw(
             callable: function () {
@@ -65,8 +61,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Checks that IPv6 address validation works when allowed and fails when not allowed.
      */
-    public function test_ipv6_validation_value()
-    {
+    public function test_ipv6_validation_value() {
         # Ensure IPv6 address validation works when allowed
         $this->assert_does_not_throw(
             callable: function () {
@@ -89,8 +84,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Checks that IPv6 link-local address validation works when allowed and fails when not allowed.
      */
-    public function test_ipv6_link_local_validation_value()
-    {
+    public function test_ipv6_link_local_validation_value() {
         # Ensure IPv6 link-local address validation works when allowed
         $this->assert_does_not_throw(
             callable: function () {
@@ -113,8 +107,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Checks that values in `allow_keywords` are always considered valid
      */
-    public function test_allow_keywords_validation()
-    {
+    public function test_allow_keywords_validation() {
         # Ensure keyword validation works when allowed
         $this->assert_does_not_throw(
             callable: function () {
@@ -147,8 +140,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Checks that host type aliases are valid when alias values are allowed.
      */
-    public function test_host_alias_ip_address_validator()
-    {
+    public function test_host_alias_ip_address_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
             data: [
@@ -179,8 +171,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Checks that host type aliases are valid when alias values are allowed.
      */
-    public function test_network_alias_ip_address_validator()
-    {
+    public function test_network_alias_ip_address_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
             data: [
@@ -211,8 +202,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Checks that port type aliases are always invalid.
      */
-    public function test_port_alias_ip_address_validator()
-    {
+    public function test_port_alias_ip_address_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
             data: [
@@ -245,8 +235,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase
     /**
      * Check that the IPAddressValidator does not throw any errors for values that are IP addresses.
      */
-    public function test_ip_address_validator()
-    {
+    public function test_ip_address_validator() {
         $this->assert_does_not_throw(function () {
             $test_validator = new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true);
             $test_validator->validate('1.2.3.4');

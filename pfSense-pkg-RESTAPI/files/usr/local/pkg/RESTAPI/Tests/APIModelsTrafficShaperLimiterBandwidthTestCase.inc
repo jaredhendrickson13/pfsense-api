@@ -8,14 +8,12 @@ use RESTAPI\Models\FirewallSchedule;
 use RESTAPI\Models\TrafficShaperLimiter;
 use RESTAPI\Models\TrafficShaperLimiterBandwidth;
 
-class APIModelsTrafficShaperLimiterBandwidthTestCase extends TestCase
-{
+class APIModelsTrafficShaperLimiterBandwidthTestCase extends TestCase {
     /**
      * Checks that we can successfully create, update and delete limiters and that they are correctly represented
      * in dnctl
      */
-    public function test_crud(): void
-    {
+    public function test_crud(): void {
         # Create a limiter to test with
         $limiter = new TrafficShaperLimiter(
             name: 'test',
@@ -49,15 +47,15 @@ class APIModelsTrafficShaperLimiterBandwidthTestCase extends TestCase
      */
     public function test_bwsched(): void {
         $sched = new FirewallSchedule(
-            name: "test_schedule",
+            name: 'test_schedule',
             timerange: [
                 [
                     'month' => [1],
                     'day' => [5],
-                    'hour' => '0:00-23:59'
-                ]
+                    'hour' => '0:00-23:59',
+                ],
             ],
-            async: true
+            async: true,
         );
         $sched->create();
 
@@ -74,9 +72,7 @@ class APIModelsTrafficShaperLimiterBandwidthTestCase extends TestCase
         $limiter->create(apply: true);
 
         # Ensure we can update the limiter to remove the schedule
-        $limiter->from_representation(
-            bandwidth: [['bw' => 20, 'bwscale' => 'Mb', 'sched' => 'none']],
-        );
+        $limiter->from_representation(bandwidth: [['bw' => 20, 'bwscale' => 'Mb', 'sched' => 'none']]);
         $limiter->update(apply: true);
 
         # Delete the limiter

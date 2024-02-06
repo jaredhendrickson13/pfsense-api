@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Validators\HexValidator;
 
-class APIValidatorsHexValidatorTestCase extends TestCase
-{
+class APIValidatorsHexValidatorTestCase extends TestCase {
     /**
      * Checks that the $expected_length property is always twice the $bytes length.
      */
-    public function test_hex_value_must_match_bytes_length()
-    {
+    public function test_hex_value_must_match_bytes_length() {
         # Ensure hex values matching this bytes length are allowed
         $this->assert_does_not_throw(function () {
             # Create a HexValidator to test with
@@ -36,8 +34,7 @@ class APIValidatorsHexValidatorTestCase extends TestCase
     /**
      * Checks that the value must only contain hex characters.
      */
-    public function test_hex_value_must_only_contain_hex_chars()
-    {
+    public function test_hex_value_must_only_contain_hex_chars() {
         # Ensure hex values are allowed
         $this->assert_does_not_throw(function () {
             # Create a HexValidator to test with

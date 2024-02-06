@@ -9,8 +9,7 @@ use RESTAPI\Core\Response;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
-class NestedModelField extends Field
-{
+class NestedModelField extends Field {
     public string $model_class;
     private string $model_class_short;
     public Model $model;
@@ -93,8 +92,7 @@ class NestedModelField extends Field
      * Validates the incoming value using the assigned Model's `validate()` method.
      * @throws ValidationError If any Response error occurred when validating the nested Model object
      */
-    public function validate_extra(mixed $value)
-    {
+    public function validate_extra(mixed $value) {
         # Create a new Model object for this value and validate it. Remove any assigned IDs
         unset($value['id']);
         unset($value['parent_id']);
@@ -126,8 +124,7 @@ class NestedModelField extends Field
      * @param ModelSet|null $modelset
      * @return bool Returns true if the validation was successful.
      */
-    public function validate(?ModelSet $modelset = null): bool
-    {
+    public function validate(?ModelSet $modelset = null): bool {
         # Empty any existing ModelSet entries in the event this is a subsequent `validate()` call.
         $this->validation_modelset->model_objects = [];
         $return_value = parent::validate();
@@ -143,8 +140,7 @@ class NestedModelField extends Field
      * Converts the value from its representation value to its internal value.
      * @return array|string|null The internal value to be stored in the pfSense config
      */
-    public function to_internal(): array|string|null
-    {
+    public function to_internal(): array|string|null {
         # Sort values before convert them to their internal form
         $this->sort();
 
@@ -171,8 +167,7 @@ class NestedModelField extends Field
      * Converts any nested Model objects from their internal values to their representation values.
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function from_internal(mixed $internal_value)
-    {
+    public function from_internal(mixed $internal_value) {
         # Create the nested Model object
         $model = new $this->model_class();
 
@@ -201,8 +196,7 @@ class NestedModelField extends Field
      * Sorts the nested Model data use the nested Model's `sort_option` and `sort_by_field` setting. This method
      * closely resembles the Model->sort() method, but does not require values to be set in config beforehand.
      */
-    public function sort()
-    {
+    public function sort() {
         # Only sort this Field's values if this is a `many` field and it has a value
         if ($this->many and $this->value) {
             # Do not sort if there is no `sort_option` or `sort_by_field` set for this nested Model
@@ -233,8 +227,7 @@ class NestedModelField extends Field
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
      */
-    public function to_openapi_property(): array
-    {
+    public function to_openapi_property(): array {
         # Assign primitive property attributes
         $openapi_property = [];
         $openapi_property['description'] = $this->help_text . '<br>' . $this->get_conditions_text();

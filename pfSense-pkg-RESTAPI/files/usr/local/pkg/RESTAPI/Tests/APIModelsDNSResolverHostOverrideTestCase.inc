@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\DNSResolverHostOverride;
 
-class APIModelsDNSResolverHostOverrideTestCase extends TestCase
-{
+class APIModelsDNSResolverHostOverrideTestCase extends TestCase {
     /**
      * Ensures that host overrides are correctly configured in Unbound after creation, modification, and deletion.
      */
-    public function test_create_update_and_delete()
-    {
+    public function test_create_update_and_delete() {
         # Create a host override to test with
         $host = new DNSResolverHostOverride(
             data: ['host' => 'test', 'domain' => 'example.com', 'ip' => ['127.0.0.53', '127.0.0.54']],

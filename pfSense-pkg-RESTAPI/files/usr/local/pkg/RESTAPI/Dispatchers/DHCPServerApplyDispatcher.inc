@@ -5,16 +5,14 @@ namespace RESTAPI\Dispatchers;
 use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\Model;
 
-class DHCPServerApplyDispatcher extends Dispatcher
-{
+class DHCPServerApplyDispatcher extends Dispatcher {
     # Only allow one DHCP server reload to occur at a time
     public int $max_concurrency = 1;
 
     /**
      * Reloads the DHCP server and associated services.
      */
-    public function process(mixed ...$arguments): void
-    {
+    public function process(mixed ...$arguments): void {
         $retvaldhcp = 0;
         $retvaldns = 0;
 

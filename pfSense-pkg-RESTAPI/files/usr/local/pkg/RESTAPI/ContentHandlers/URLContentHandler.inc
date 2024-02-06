@@ -6,17 +6,14 @@ use JsonException;
 use RESTAPI\Core\ContentHandler;
 use RESTAPI\Responses\ValidationError;
 
-class URLContentHandler extends ContentHandler
-{
+class URLContentHandler extends ContentHandler {
     public string $mime_type = 'application/x-www-form-urlencoded';
 
-    public function get_content(): array
-    {
+    public function get_content(): array {
         return $_GET;
     }
 
-    protected function _decode(mixed $content = null): mixed
-    {
+    protected function _decode(mixed $content = null): mixed {
         # Loop through each query string item and check for expected data types
         foreach ($content as $key => $value) {
             # Check for boolean type query strings

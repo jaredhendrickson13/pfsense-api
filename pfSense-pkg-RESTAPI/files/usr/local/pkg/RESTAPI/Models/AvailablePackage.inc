@@ -10,8 +10,7 @@ use RESTAPI\Fields\StringField;
 /**
  * Defines a Model for packages that are available to install on this system.
  */
-class AvailablePackage extends Model
-{
+class AvailablePackage extends Model {
     public StringField $name;
     public StringField $shortname;
     public StringField $descr;
@@ -19,8 +18,7 @@ class AvailablePackage extends Model
     public BooleanField $installed;
     public StringField $deps;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_all_pkgs';
         $this->many = true;
@@ -60,8 +58,7 @@ class AvailablePackage extends Model
      * @note To avoid flooding the package servers with requests, this method will automatically cache package
      * information obtained from the remote repos hourly.
      */
-    protected function get_all_pkgs(): array
-    {
+    protected function get_all_pkgs(): array {
         # Variables
         $pkgs = [];
 

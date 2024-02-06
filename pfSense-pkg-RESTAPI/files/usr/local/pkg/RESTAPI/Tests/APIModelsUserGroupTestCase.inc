@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\UserGroup;
 
-class APIModelsUserGroupTestCase extends TestCase
-{
+class APIModelsUserGroupTestCase extends TestCase {
     /**
      * Ensure the GID increases with each new Model.
      */
-    public function test_gid_increment()
-    {
+    public function test_gid_increment() {
         # Create UserGroup model to test with
         $user_group = new UserGroup();
 
@@ -23,8 +21,7 @@ class APIModelsUserGroupTestCase extends TestCase
      * Checks that the maximum length of the `name` field is effectively limited to 16 characters for `local`
      * UserGroups, but is allowed up to 64 characters for `remote` UserGroups.
      */
-    public function test_name_maximum_length()
-    {
+    public function test_name_maximum_length() {
         # Create a UserGroup to test with
         $user_group = new UserGroup();
 
@@ -50,8 +47,7 @@ class APIModelsUserGroupTestCase extends TestCase
     /**
      * Checks that any value assigned to the `priv` field must be a valid pfSense privilege name.
      */
-    public function test_validate_priv()
-    {
+    public function test_validate_priv() {
         # Create a UserGroup to test with
         $user_group = new UserGroup();
 
@@ -68,8 +64,7 @@ class APIModelsUserGroupTestCase extends TestCase
     /**
      * Checks that user groups are correctly configured on the OS when created, updated, and deleted.
      */
-    public function test_crud()
-    {
+    public function test_crud() {
         # Create a UserGroup to test with
         $user_group = new UserGroup(data: ['name' => 'testgroup', 'scope' => 'local', 'member' => ['admin']]);
         $user_group->create();
@@ -105,8 +100,7 @@ class APIModelsUserGroupTestCase extends TestCase
     /**
      * Checks that groups with the `system` scope cannot be deleted or replaced.
      */
-    public function test_cannot_delete_or_replace_system_scope_user_groups()
-    {
+    public function test_cannot_delete_or_replace_system_scope_user_groups() {
         # Create a UserGroup to test with
         $user_group = new UserGroup();
 

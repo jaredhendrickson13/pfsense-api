@@ -7,13 +7,11 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\TestCase;
 use RESTAPI\Validators\RegexValidator;
 
-class APIValidatorsRegexValidatorTestCase extends TestCase
-{
+class APIValidatorsRegexValidatorTestCase extends TestCase {
     /**
      * Checks that the RegexValidator exceeds when the value matches the patterns, and fails when it doesn't.
      */
-    public function test_regex_validator()
-    {
+    public function test_regex_validator() {
         # Ensure an error is thrown if the context is not inverted and the value does not match the pattern
         $this->assert_throws_response(
             response_id: 'REGEX_VALIDATOR_FAILED',

@@ -10,8 +10,7 @@ use RESTAPI;
  * Defines a FloatField class that extends the Core Field method. This Field adds validation and representation for
  * float type Model Fields.
  */
-class FloatField extends RESTAPI\Core\Field
-{
+class FloatField extends RESTAPI\Core\Field {
     public int $minimum;
     public int $maximum;
 
@@ -130,8 +129,7 @@ class FloatField extends RESTAPI\Core\Field
      * @param string $internal_value The internal value from the pfSense configuration.
      * @return int The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): mixed
-    {
+    protected function _from_internal(mixed $internal_value): mixed {
         # Return the value as an integer if it's numeric
         if (is_numeric($internal_value)) {
             return floatval($internal_value);
@@ -157,8 +155,7 @@ class FloatField extends RESTAPI\Core\Field
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as a OpenAPI schema property configuration.
      */
-    public function to_openapi_property(): array
-    {
+    public function to_openapi_property(): array {
         # Run the parent to_openapi_property() to obtain the base property object, then make changes as needed.
         $openapi_property = parent::to_openapi_property();
 
@@ -186,8 +183,7 @@ class FloatField extends RESTAPI\Core\Field
      * @return object The pfSense webConfigurator form input object.
      * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
      */
-    public function to_form_input(string $type = 'number', array $attributes = []): object
-    {
+    public function to_form_input(string $type = 'number', array $attributes = []): object {
         $attributes += ['min' => $this->minimum, 'max' => $this->maximum];
         return parent::to_form_input(type: $type, attributes: $attributes);
     }

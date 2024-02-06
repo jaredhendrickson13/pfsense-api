@@ -11,13 +11,11 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\MACAddressValidator;
 
-class WakeOnLANSend extends Model
-{
+class WakeOnLANSend extends Model {
     public InterfaceField $interface;
     public StringField $mac_addr;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->many = false;
         $this->internal_callable = 'void_internal_callable';
@@ -41,8 +39,7 @@ class WakeOnLANSend extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When $interface does not have a valid broadcast address
      */
-    public function validate_interface(string $interface): string
-    {
+    public function validate_interface(string $interface): string {
         # Throw an error if the $interface does not have a valid IPv4 broadcast address.
         if (!$this->interface->get_related_model()->get_broadcast_ipv4()) {
             throw new ValidationError(
@@ -57,8 +54,7 @@ class WakeOnLANSend extends Model
     /**
      * Send a wake-on-LAN packet from the `interface` broadcast IP to the specified `mac_addr`.
      */
-    public function _create(): void
-    {
+    public function _create(): void {
         # Send a WOL packet to the requested MAC address from the requested interface
         $if_broadcast_ip = $this->interface->get_related_model()->get_broadcast_ipv4();
         $mac_addr = $this->mac_addr->value;
@@ -78,8 +74,7 @@ class WakeOnLANSend extends Model
      * this method essentially reads nothing.
      * @returns array An empty array to act as a blank internal callable.
      */
-    public function void_internal_callable(): array
-    {
+    public function void_internal_callable(): array {
         return [];
     }
 }

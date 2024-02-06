@@ -12,8 +12,7 @@ use RESTAPI\Responses\ServerError;
  * Defines a Base64Field class that extends the Core Field method. This Field adds validation and representation for
  * Base64 encoded Model Fields.
  */
-class Base64Field extends Field
-{
+class Base64Field extends Field {
     /**
      * Defines the Base64Field object and sets its options.
      * @param bool $required If `true`, this field is required to have a value at all times.
@@ -128,8 +127,7 @@ class Base64Field extends Field
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value): array|string|null
-    {
+    protected function _to_internal(mixed $representation_value): array|string|null {
         return base64_encode($representation_value);
     }
 
@@ -138,8 +136,7 @@ class Base64Field extends Field
      * @param string $internal_value The internal config value to convert to a representation value.
      * @throws ServerError When the child Field class does not override this method.
      */
-    protected function _from_internal(string $internal_value)
-    {
+    protected function _from_internal(string $internal_value) {
         return base64_decode($internal_value);
     }
 }

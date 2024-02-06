@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class ServicesWakeOnLANSendEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class ServicesWakeOnLANSendEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/services/wake_on_lan/send';
         $this->model_name = 'WakeOnLANSend';

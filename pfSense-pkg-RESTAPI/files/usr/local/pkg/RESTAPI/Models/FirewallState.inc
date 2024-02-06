@@ -6,8 +6,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
-class FirewallState extends Model
-{
+class FirewallState extends Model {
     public StringField $interface;
     public StringField $protocol;
     public StringField $direction;
@@ -23,8 +22,7 @@ class FirewallState extends Model
     public IntegerField $bytes_in;
     public IntegerField $bytes_out;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_pf_states';
         $this->many = true;
@@ -116,16 +114,14 @@ class FirewallState extends Model
      * Obtains all current firewall states from pf
      * @return array The array of states currently registered in pf
      */
-    protected function get_pf_states(): array
-    {
+    protected function get_pf_states(): array {
         return pfSense_get_pf_states();
     }
 
     /**
      * Deletes this FirewallState from pf. This method should not be called directly, use the `delete()` method instead.
      */
-    protected function _delete(): void
-    {
+    protected function _delete(): void {
         # Obtain the IP from the source and destination. This is required by pfSense_kill_states()
         $source = $this->source->value;
         $source_ip = str_contains($source, ':') ? explode(':', $source)[0] : $source;

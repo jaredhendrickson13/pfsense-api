@@ -5,14 +5,12 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\NTPTimeServer;
 
-class APIModelsNTPTimeServerTestCase extends TestCase
-{
+class APIModelsNTPTimeServerTestCase extends TestCase {
     /**
      * Checks that the get_timeservers_from_internal() method correctly reads timeserver values from their internal
      * config values
      */
-    public function test_get_timeservers_from_internal(): void
-    {
+    public function test_get_timeservers_from_internal(): void {
         # Create a timeserver and ensure we can read it correctly from internal
         $timeserver = new NTPTimeServer(timeserver: 'example.com', type: 'pool', prefer: true, noselect: false);
         $timeserver->create();
@@ -40,8 +38,7 @@ class APIModelsNTPTimeServerTestCase extends TestCase
     /**
      * Checks that `timeserver` values that end with pool.ntp.org have their `type` force set as `pool`
      */
-    public function test_time_server_with_auto_pool_suffix_forced_as_pool_type(): void
-    {
+    public function test_time_server_with_auto_pool_suffix_forced_as_pool_type(): void {
         # Try to create a timeserver that uses the auto pool suffix and ensure its type is automatically changed to pool
         $timeserver = new NTPTimeServer(timeserver: NTPTimeServer::AUTO_POOL_SUFFIX, type: 'server');
         $timeserver->validate();
@@ -55,8 +52,7 @@ class APIModelsNTPTimeServerTestCase extends TestCase
     /**
      * Check that the get_next_id() method correctly determines the next available ID.
      */
-    public function test_get_next_id(): void
-    {
+    public function test_get_next_id(): void {
         # Manually set 3 time servers and ensure the next available ID is 3 (starts at 0)
         $timeserver = new NTPTimeServer();
         $timeserver->set_config(
@@ -77,8 +73,7 @@ class APIModelsNTPTimeServerTestCase extends TestCase
     /**
      * Checks that the _create() method correctly adds a new timeserver to configuration
      */
-    public function test_crud(): void
-    {
+    public function test_crud(): void {
         # Create a timeserver and ensure it is stored correctly in config
         $timeserver = new NTPTimeServer(timeserver: 'example.com', type: 'peer', prefer: true, noselect: true);
         $timeserver->create();
@@ -130,8 +125,7 @@ class APIModelsNTPTimeServerTestCase extends TestCase
     /**
      * Checks that timeservers are correctly represented in ntpd.conf
      */
-    public function test_timeservers_found_in_ntpd_conf(): void
-    {
+    public function test_timeservers_found_in_ntpd_conf(): void {
         # Create timeservers for each type and ensure they are correctly seen in ntpd.conf
         $pool_ts = new NTPTimeServer(timeserver: 'pool.example.com', type: 'pool', prefer: true, noselect: false);
         $pool_ts->create();

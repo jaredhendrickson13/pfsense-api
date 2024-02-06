@@ -10,8 +10,7 @@ require_once 'RESTAPI/autoloader.inc';
  * Defines a Form object that can be used to dynamically generate custom pfSense webConfigurator pages for a specified
  * Model object.
  */
-class Form
-{
+class Form {
     use BaseTraits;
 
     /**
@@ -129,8 +128,7 @@ class Form
     /**
      * Construct the Form object
      */
-    public function __construct()
-    {
+    public function __construct() {
         # Obtain submitted form data
         $this->form_data = $_POST;
 
@@ -165,8 +163,7 @@ class Form
      * Auto-generates a verbose name for this Form class using its class name.
      * @returns string The human-readable name for this Form class.
      */
-    private function generate_verbose_name(): string
-    {
+    private function generate_verbose_name(): string {
         # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
         $form_name = $this->get_class_shortname();
         return preg_replace('/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ': ', $form_name);
@@ -176,8 +173,7 @@ class Form
      * Populates the form sections with the desired Fields and returns an array of
      * @return \Form The pfSense webConfigurator \Form object.
      */
-    final public function get_form(): \Form
-    {
+    final public function get_form(): \Form {
         # Create the Form object to assign sections and Fields to
         $form = new \Form();
 
@@ -226,8 +222,7 @@ class Form
     /**
      * Obtains a PHP table that contains all current Model objects for `many` Forms.
      */
-    public function get_table()
-    {
+    public function get_table() {
         # Setup the table structure
         $tb = "<div class='panel panel-default'>";
         $tb .=
@@ -316,8 +311,7 @@ class Form
      * Prints this form as a web page. This method is intended to be called by a PHP endpoint somewhere in the pfSense
      * web root.
      */
-    final public function print_form(): void
-    {
+    final public function print_form(): void {
         # Print the static pfSense UI and include any custom CSS or JS files
         global $config;
         $pgtitle = $this->title_path;
@@ -361,15 +355,13 @@ class Form
      * Performs tasks when the Form page is initially loaded. This method is intended to be overridden by the child
      * class.
      */
-    public function on_load(): void
-    {
+    public function on_load(): void {
     }
 
     /**
      * Performs validation and saves the Model assigned to this ModelForm.
      */
-    public function on_save(): void
-    {
+    public function on_save(): void {
         # Update settings with the newly provided values
         $representation_data = $this->id ? ['id' => $this->id] : [];
         $representation_data += $this->form_data_to_model_representation(form_data: $_POST, model: $this->model);
@@ -397,8 +389,7 @@ class Form
      * Tries to delete the Model object when requested.
      * @param int|string $id The ID of the Model object to delete.
      */
-    public function on_delete(int|string $id): void
-    {
+    public function on_delete(int|string $id): void {
         # Convert the ID to an integer if it is numeric
         if (is_numeric($id)) {
             $id = (int) $id;
@@ -420,8 +411,7 @@ class Form
      * @param Model $model The Model object to represent.
      * @return array The representation of the Model object from the form data.
      */
-    protected function form_data_to_model_representation(array $form_data, Model $model): array
-    {
+    protected function form_data_to_model_representation(array $form_data, Model $model): array {
         # Variables
         $representation = [];
 
@@ -462,8 +452,7 @@ class Form
      * Prints the green success banner at the top of the form page.
      * @param string $message Adds an extra message to the banner.
      */
-    public function print_success_banner(string $message = ''): void
-    {
+    public function print_success_banner(string $message = ''): void {
         print_apply_result_box(retval: 0, extra_text: $message);
     }
 
@@ -471,8 +460,7 @@ class Form
      * Prints the input error banner at the top of the form page.
      * @param string $message Adds an extra message to the banner.
      */
-    public function print_input_error_banner(string $message = ''): void
-    {
+    public function print_input_error_banner(string $message = ''): void {
         print_input_errors([$message]);
     }
 
@@ -481,8 +469,7 @@ class Form
      * @param string $message The message to display on the banner.
      * @param string $class The CSS class to use for the banner.
      */
-    public function print_info_banner(string $message = '', string $class = 'alert-warning'): void
-    {
+    public function print_info_banner(string $message = '', string $class = 'alert-warning'): void {
         print_info_box(msg: $message, class: $class);
     }
 
@@ -491,8 +478,7 @@ class Form
      * $url attribute and formats it to be consistent with the other webConfigurator page privileges.
      * @returns string The pfSense privilege name for this Form (i.e. page-test-form)
      */
-    public function get_priv_name(): string
-    {
+    public function get_priv_name(): string {
         # Obtain the PHP file name for this Form using it's webroot URL
         $name = basename($this->url);
 
@@ -509,8 +495,7 @@ class Form
      * The resulting array is then supplied to the pfSense privilege system located at /etc/inc/priv/.
      * @returns array The pfSense priv list entry array corresponding to the privileges of this Endpoint.
      */
-    public function generate_pfsense_privs(): array
-    {
+    public function generate_pfsense_privs(): array {
         return [
             $this->get_priv_name() => [
                 'name' => 'WebCfg - ' . $this->verbose_name,
@@ -523,8 +508,7 @@ class Form
      * Generate an endpoint for this Form in the pfSense webroot.
      * @returns bool Returns true if the form was successfully built, otherwise false.
      */
-    public function build_form_url(): bool
-    {
+    public function build_form_url(): bool {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
         $nq_class_name = $this->get_class_shortname();

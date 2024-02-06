@@ -6,8 +6,7 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
 
-class SystemVersion extends Model
-{
+class SystemVersion extends Model {
     const VERSION_PATH = '/etc/version';
     const VERSION_PATCH_PATH = '/etc/version.patch';
     const VERSION_BUILDTIME_PATH = '/etc/version.buildtime';
@@ -17,8 +16,7 @@ class SystemVersion extends Model
     public StringField $patch;
     public StringField $buildtime;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_pfsense_version';
 
@@ -45,8 +43,7 @@ class SystemVersion extends Model
      * Obtains details about the current running version of pfSense.
      * @return array An array of the running pfSense version details
      */
-    protected static function get_pfsense_version(): array
-    {
+    protected static function get_pfsense_version(): array {
         # VARIABLES
         $ver_data = [];
 

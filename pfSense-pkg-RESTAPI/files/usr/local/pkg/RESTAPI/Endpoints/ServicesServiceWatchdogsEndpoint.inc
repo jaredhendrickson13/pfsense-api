@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class ServicesServiceWatchdogsEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class ServicesServiceWatchdogsEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/services/service_watchdogs';
         $this->model_name = 'ServiceWatchdog';

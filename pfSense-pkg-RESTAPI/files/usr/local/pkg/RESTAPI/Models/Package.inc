@@ -11,8 +11,7 @@ use RESTAPI\Fields\StringField;
 /**
  * Defines a Model for packages that are available to install on this system.
  */
-class Package extends Model
-{
+class Package extends Model {
     public ForeignModelField $name;
     public StringField $shortname;
     public StringField $descr;
@@ -20,8 +19,7 @@ class Package extends Model
     public StringField $latest_version;
     public BooleanField $update_available;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_installed_pkgs';
         $this->many = true;
@@ -61,8 +59,7 @@ class Package extends Model
      * used to populate this Model's Field object internal values.
      * @return array An array containing the internal values of all available packages
      */
-    protected function get_installed_pkgs(): array
-    {
+    protected function get_installed_pkgs(): array {
         # Variables
         $pkgs = [];
         $pkgs_info = get_pkg_info(pkgs: 'all', remote_repo_usage_disabled: true, installed_pkgs_only: true);
@@ -89,8 +86,7 @@ class Package extends Model
     /**
      * Installs the package assigned to the `name` field.
      */
-    public function _create()
-    {
+    public function _create() {
         # Install the package
         pkg_install($this->name->value);
 
@@ -102,8 +98,7 @@ class Package extends Model
     /**
      * Deletes the package assigned to the `name` field.
      */
-    public function _delete()
-    {
+    public function _delete() {
         pkg_delete($this->name->value);
     }
 }

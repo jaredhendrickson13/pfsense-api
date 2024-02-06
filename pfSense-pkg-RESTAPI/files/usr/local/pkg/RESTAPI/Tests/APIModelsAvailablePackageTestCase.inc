@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\AvailablePackage;
 use RESTAPI\Models\Package;
 
-class APIModelsAvailablePackageTestCase extends TestCase
-{
+class APIModelsAvailablePackageTestCase extends TestCase {
     /**
      * Checks that available packages can be successfully read from the external package repos.
      */
-    public function test_read_available_packages(): void
-    {
+    public function test_read_available_packages(): void {
         # Try to obtain info about the pfSense-pkg-sudo package from remote repos
         $avail_pkgs = AvailablePackage::query(name: 'pfSense-pkg-sudo')->first();
 

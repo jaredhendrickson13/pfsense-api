@@ -6,13 +6,11 @@ use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\User;
 
-class APIModelsUserTestCase extends TestCase
-{
+class APIModelsUserTestCase extends TestCase {
     /**
      * Checks that the user's `name` cannot be reserved by the system
      */
-    public function test_name_cannot_be_reserved()
-    {
+    public function test_name_cannot_be_reserved() {
         $this->assert_throws_response(
             response_id: 'USER_CANNOT_USE_RESERVED_USERNAME',
             code: 400,
@@ -27,8 +25,7 @@ class APIModelsUserTestCase extends TestCase
      * Ensure the `password` field is hashed during validation when there is no existing password
      * or the password has changed.
      */
-    public function test_password_is_hashed()
-    {
+    public function test_password_is_hashed() {
         # Create a new user to test with
         $user = new User(data: ['name' => 'testuser', 'password' => 'testpasswd']);
         $user->create();
@@ -50,8 +47,7 @@ class APIModelsUserTestCase extends TestCase
     /**
      * Checks that the valid `priv` values are accepted and invalid `priv` values are not.
      */
-    public function test_correctly_identifies_valid_privs()
-    {
+    public function test_correctly_identifies_valid_privs() {
         $this->assert_throws_response(
             response_id: 'USER_PRIV_NOT_FOUND',
             code: 404,
@@ -72,8 +68,7 @@ class APIModelsUserTestCase extends TestCase
     /**
      * Checks the `nextuid` config value is updated after user creation.
      */
-    public function test_next_uid_is_incremented()
-    {
+    public function test_next_uid_is_incremented() {
         # Read the current `nextuid`
         $original_next_uid = (int) Model::get_config('system/nextuid');
 
@@ -93,8 +88,7 @@ class APIModelsUserTestCase extends TestCase
     /**
      * Checks that a user is correctly created/update/deleted in /etc/passwd after apply.
      */
-    public function test_etc_passwd()
-    {
+    public function test_etc_passwd() {
         # Create a new user to test with
         $user = new User(
             data: [
@@ -151,8 +145,7 @@ class APIModelsUserTestCase extends TestCase
     /**
      * Checks that system users cannot be deleted.
      */
-    public function test_system_users_cannot_be_deleted()
-    {
+    public function test_system_users_cannot_be_deleted() {
         $this->assert_throws_response(
             response_id: 'USER_WITH_SYSTEM_SCOPE_CANNOT_BE_DELETED',
             code: 400,

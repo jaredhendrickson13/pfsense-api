@@ -6,13 +6,11 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\ARPTable;
 
-class APIModelsARPTableTestCase extends TestCase
-{
+class APIModelsARPTableTestCase extends TestCase {
     /**
      * Checks that ARP table entries are correctly deleted from the ARP table when the `delete()` method runs.
      */
-    public function test_arp_table_entry_deletion()
-    {
+    public function test_arp_table_entry_deletion() {
         # Create a static ARP entry to use for testing
         new Command('arp -s 192.168.1.2 11:22:33:44:aa:bb');
 

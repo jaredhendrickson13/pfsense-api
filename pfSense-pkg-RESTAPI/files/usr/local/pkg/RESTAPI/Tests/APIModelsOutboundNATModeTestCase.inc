@@ -6,16 +6,14 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\OutboundNATMapping;
 use RESTAPI\Models\OutboundNATMode;
 
-class APIModelsOutboundNATModeTestCase extends TestCase
-{
+class APIModelsOutboundNATModeTestCase extends TestCase {
     /**
      * Checks that the `automatic` outbound NAT mode auto-generates NAT rules, but does not included user defined
      * outbound NAT mappings. `hybrid` outbound NAT mode auto-generates NAT rules and includes user defined outbound
      * NAT mappings, `advanced` does not auto-generate NAT rules but includes user defined outbound NAT mappings,
      * and `disabled` does not auto-generate NAT rules and does not include user defined outbound NAT mappings
      */
-    public function test_nat_modes()
-    {
+    public function test_nat_modes() {
         # Create OutboundNATMode and OutboundNATMapping objects to test with
         $nat_mode = new OutboundNATMode(data: ['mode' => 'automatic'], async: false);
         $nat_map = new OutboundNATMapping(

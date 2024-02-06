@@ -7,14 +7,12 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\IntegerField;
 
-class FirewallStatesSize extends Model
-{
+class FirewallStatesSize extends Model {
     public IntegerField $maximumstates;
     public IntegerField $defaultmaximumstates;
     public IntegerField $currentstates;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'system';
         $this->update_strategy = 'merge';
@@ -40,24 +38,21 @@ class FirewallStatesSize extends Model
     /**
      * Obtains the default maximum states value from internal pfSense functions.
      */
-    protected function from_internal_defaultmaximumstates(): int
-    {
+    protected function from_internal_defaultmaximumstates(): int {
         return (int) pfsense_default_state_size();
     }
 
     /**
      * Obtains the current number of states value from internal pfSense functions.
      */
-    protected function from_internal_currentstates(): int
-    {
+    protected function from_internal_currentstates(): int {
         return (int) explode('/', get_pfstate())[0];
     }
 
     /**
      * Applies the firewall states size changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

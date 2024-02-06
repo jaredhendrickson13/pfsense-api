@@ -8,14 +8,12 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
-class InterfaceBridge extends Model
-{
+class InterfaceBridge extends Model {
     public InterfaceField $members;
     public StringField $descr;
     public StringField $bridgeif;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'bridges/bridged';
         $this->many = true;
@@ -49,8 +47,7 @@ class InterfaceBridge extends Model
      * @param string $members The incoming value to validate.
      * @returns string The validated value to be set.
      */
-    public function validate_members(string $members): string
-    {
+    public function validate_members(string $members): string {
         # Variables
         $member_internal = NetworkInterface::query([$this->members->represented_as => $members])->first()->id;
         $is_wireless = $this->get_config("interfaces/$member_internal/wireless");
@@ -80,24 +77,21 @@ class InterfaceBridge extends Model
     /**
      * Applies this interface bridge on the backend.
      */
-    public function apply()
-    {
+    public function apply() {
         interface_bridge_configure($this->to_internal());
     }
 
     /**
      * Applies the deletion of this interface bridge.
      */
-    public function apply_delete()
-    {
+    public function apply_delete() {
         pfSense_interface_destroy($this->bridgeif->value);
     }
 
     /**
      * Extends the default Model `_delete()` method to add custom validation for deletions.
      */
-    public function _delete()
-    {
+    public function _delete() {
         # Do not allow this object to be delete if it is assigned to an existing interface
         $if_query = NetworkInterface::query(if: $this->bridgeif->value);
         if ($if_query->exists()) {
@@ -116,8 +110,7 @@ class InterfaceBridge extends Model
      * Obtains the next available bridgeif value
      * @returns string The next available bridgeif value.
      */
-    public function get_next_bridgeif(): string
-    {
+    public function get_next_bridgeif(): string {
         # Local variables
         $counter = 0;
         $in_use = true;

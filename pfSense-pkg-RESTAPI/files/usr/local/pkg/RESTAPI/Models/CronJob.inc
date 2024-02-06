@@ -8,8 +8,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Validators\RegexValidator;
 
-class CronJob extends Model
-{
+class CronJob extends Model {
     const CRON_PREDEFINED_EVENTS = [
         '@reboot',
         '@yearly',
@@ -128,8 +127,7 @@ class CronJob extends Model
      * @returns string The validated value to be assigned.
      * @throws NotFoundError When $who is not an existing user on the OS.
      */
-    public function validate_who(string $who): string
-    {
+    public function validate_who(string $who): string {
         # Throw a validation error if the requested user does not exist
         if (posix_getpwnam($who) === false) {
             throw new NotFoundError(
@@ -144,8 +142,7 @@ class CronJob extends Model
     /**
      * Apply changes to cron.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         configure_cron();
     }
 }

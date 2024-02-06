@@ -6,8 +6,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\IPsecPhase1;
 use RESTAPI\Models\IPsecPhase2;
 
-class APIModelsIPsecPhase2TestCase extends TestCase
-{
+class APIModelsIPsecPhase2TestCase extends TestCase {
     const BASE_P1_DATA = [
         'iketype' => 'ikev2',
         'protocol' => 'inet',
@@ -49,8 +48,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Before running tests, create an IPsecPhase1 entry we can use during tests.
      */
-    public function setup(): void
-    {
+    public function setup(): void {
         $this->p1 = new IPsecPhase1(data: self::BASE_P1_DATA, async: false);
         $this->p1->create(apply: true);
     }
@@ -58,16 +56,14 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * After running tests, destroy the IPsecPhase1 entry we created before running tests.
      */
-    public function teardown(): void
-    {
+    public function teardown(): void {
         $this->p1->delete(apply: true);
     }
 
     /**
      * Checks that the `localid_type` cannot be set to an interface if `mode` is set to `vti`
      */
-    public function test_localid_type_cannot_be_interface_while_mode_is_vti(): void
-    {
+    public function test_localid_type_cannot_be_interface_while_mode_is_vti(): void {
         # Ensure interfaces are not accepted when mode is vti
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_LOCALID_TYPE_CANNOT_BE_INTERFACE_WITH_VTI_MODE',
@@ -92,8 +88,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that `localid_address` must be an IPv4 address when `mode` is set to `tunnel`
      */
-    public function test_localid_address_must_be_ipv4_with_tunnel_mode(): void
-    {
+    public function test_localid_address_must_be_ipv4_with_tunnel_mode(): void {
         # Ensure an error is thrown if mode is tunnel but localid_address is an IPv6
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_LOCALID_ADDRESS_MUST_BE_IPV4_WITH_TUNNEL_MODE',
@@ -120,8 +115,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that `localid_address` must be an IPv6 address when `mode` is set to `tunnel6`
      */
-    public function test_localid_address_must_be_ipv6_with_tunnel6_mode(): void
-    {
+    public function test_localid_address_must_be_ipv6_with_tunnel6_mode(): void {
         # Ensure an error is thrown if mode is tunnel6 but localid_address is an IPv6
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_LOCALID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL6_MODE',
@@ -149,8 +143,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `localid_netbits` field cannot be greater than 32 if `localid_address` is an IPv4 address
      */
-    public function test_localid_netbits_cannot_be_greater_than_32_with_ipv4(): void
-    {
+    public function test_localid_netbits_cannot_be_greater_than_32_with_ipv4(): void {
         # Ensure an error is thrown if a localid_netbits value greater than 32 is assigned to an IPv4 address
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_LOCALID_NETBITS_EXCEEDS_IPV4_MAXIMUM',
@@ -189,8 +182,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `localid_type` and `natlocalid_type` cannot be mismatched.
      */
-    public function test_natlocalid_type_must_match_localid_type(): void
-    {
+    public function test_natlocalid_type_must_match_localid_type(): void {
         # Ensure an error is thrown if a natlocalid_type is address and localid_type is network.
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_NATLOCALID_TYPE_MUST_MATCH_LOCALID_TYPE',
@@ -228,8 +220,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that `natlocalid_address` must be an IPv4 address when `mode` is set to `tunnel`
      */
-    public function test_natlocalid_address_must_be_ipv4_with_tunnel_mode(): void
-    {
+    public function test_natlocalid_address_must_be_ipv4_with_tunnel_mode(): void {
         # Ensure an error is thrown if mode is tunnel but natlocalid_address is an IPv6
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_NATLOCALID_ADDRESS_MUST_BE_IPV4_WITH_TUNNEL_MODE',
@@ -260,8 +251,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that `natlocalid_address` must be an IPv6 address when `mode` is set to `tunnel6`
      */
-    public function test_natlocalid_address_must_be_ipv6_with_tunnel6_mode(): void
-    {
+    public function test_natlocalid_address_must_be_ipv6_with_tunnel6_mode(): void {
         # Ensure an error is thrown if mode is tunnel6 but natlocalid_address is an IPv6
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_NATLOCALID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL6_MODE',
@@ -296,8 +286,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `natlocalid_netbits` field cannot be greater than 32 if `natlocalid_address` is an IPv4 address
      */
-    public function test_natlocalid_netbits_cannot_be_greater_than_32_with_ipv4(): void
-    {
+    public function test_natlocalid_netbits_cannot_be_greater_than_32_with_ipv4(): void {
         # Ensure an error is thrown if a natlocalid_netbits value greater than 32 is assigned to an IPv4 address
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_NATLOCALID_NETBITS_EXCEEDS_IPV4_MAXIMUM',
@@ -340,8 +329,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that `remoteid_address` must be an IPv4 address when `mode` is set to `tunnel`
      */
-    public function test_remoteid_address_must_be_ipv4_with_tunnel_mode(): void
-    {
+    public function test_remoteid_address_must_be_ipv4_with_tunnel_mode(): void {
         # Ensure an error is thrown if mode is tunnel but remoteid_address is an IPv6
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_REMOTEID_ADDRESS_MUST_BE_IPV4_WITH_TUNNEL_MODE',
@@ -372,8 +360,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that `remoteid_address` must be an IPv6 address when `mode` is set to `tunnel6`
      */
-    public function test_remoteid_address_must_be_ipv6_with_tunnel6_mode(): void
-    {
+    public function test_remoteid_address_must_be_ipv6_with_tunnel6_mode(): void {
         # Ensure an error is thrown if mode is tunnel6 but remoteid_address is an IPv6
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_REMOTEID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL6_MODE',
@@ -406,8 +393,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `remoteid_netbits` field cannot be greater than 32 if `remoteid_address` is an IPv4 address
      */
-    public function test_remoteid_netbits_cannot_be_greater_than_32_with_ipv4(): void
-    {
+    public function test_remoteid_netbits_cannot_be_greater_than_32_with_ipv4(): void {
         # Ensure an error is thrown if a remoteid_netbits value greater than 32 is assigned to an IPv4 address
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_REMOTEID_NETBITS_EXCEEDS_IPV4_MAXIMUM',
@@ -449,8 +435,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `rekey_time` must be less than the `lifetime` value.
      */
-    public function test_rekey_time_must_be_less_than_lifetime(): void
-    {
+    public function test_rekey_time_must_be_less_than_lifetime(): void {
         # Ensure an error is thrown when `rekey_time` is greater than `lifetime`
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_REKEY_TIME_GREATER_THAN_LIFETIME',
@@ -486,8 +471,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Check that the `mode` field is correctly represented in swanctl.conf after applying.
      */
-    public function test_mode_found_in_swanctl(): void
-    {
+    public function test_mode_found_in_swanctl(): void {
         # Create a tunnel mode p2 to test with
         $p2 = new IPsecPhase2(data: self::BASE_P2_DATA, async: false);
         $p2->ikeid->value = $this->p1->ikeid->value;
@@ -526,8 +510,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `localid_*` fields are correctly represented in swanctl.conf
      */
-    public function test_localid_found_in_swanctl(): void
-    {
+    public function test_localid_found_in_swanctl(): void {
         # Create a p2 to test with and interface as the localid
         $p2 = new IPsecPhase2(data: self::BASE_P2_DATA, async: false);
         $p2->ikeid->value = $this->p1->ikeid->value;
@@ -563,8 +546,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `natlocalid_*` fields are correctly represented in swanctl.conf
      */
-    public function test_natlocalid_found_in_swanctl(): void
-    {
+    public function test_natlocalid_found_in_swanctl(): void {
         # Create a p2 to test with
         $p2 = new IPsecPhase2(data: self::BASE_P2_DATA, async: false);
         $p2->ikeid->value = $this->p1->ikeid->value;
@@ -589,8 +571,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `remote_id*` fields are correctly represented in swanctl.conf
      */
-    public function test_remoteid_found_in_swanctl(): void
-    {
+    public function test_remoteid_found_in_swanctl(): void {
         # Create a p2 to test with
         $p2 = new IPsecPhase2(data: self::BASE_P2_DATA, async: false);
         $p2->ikeid->value = $this->p1->ikeid->value;
@@ -620,8 +601,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `protocol` field is correctly represented in swanctl.conf
      */
-    public function test_protocol_found_in_swanctl(): void
-    {
+    public function test_protocol_found_in_swanctl(): void {
         # Create a p2 to test with
         $p2 = new IPsecPhase2(data: self::BASE_P2_DATA, async: false);
         $p2->ikeid->value = $this->p1->ikeid->value;
@@ -651,8 +631,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `lifetime` field is correctly represented in swanctl.conf
      */
-    public function test_lifetime_found_in_swanctl(): void
-    {
+    public function test_lifetime_found_in_swanctl(): void {
         # Create a p2 to test with
         $p2 = new IPsecPhase2(data: self::BASE_P2_DATA, async: false);
         $p2->ikeid->value = $this->p1->ikeid->value;
@@ -668,8 +647,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `rekey_time` field is correctly represented in swanctl.conf
      */
-    public function test_rekey_time_found_in_swanctl(): void
-    {
+    public function test_rekey_time_found_in_swanctl(): void {
         # Create a p2 to test with
         $p2 = new IPsecPhase2(data: self::BASE_P2_DATA, async: false);
         $p2->ikeid->value = $this->p1->ikeid->value;
@@ -685,8 +663,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Checks that the `rand_time` field is correctly represented in swanctl.conf
      */
-    public function test_rand_time_found_in_swanctl(): void
-    {
+    public function test_rand_time_found_in_swanctl(): void {
         # Create a p2 to test with
         $p2 = new IPsecPhase2(data: self::BASE_P2_DATA, async: false);
         $p2->ikeid->value = $this->p1->ikeid->value;
@@ -702,8 +679,7 @@ class APIModelsIPsecPhase2TestCase extends TestCase
     /**
      * Generates the ESP or AH proposals line expected to be found in swanctl.conf for a given IPsecPhase2 object.
      */
-    public function get_expected_proposals(IPsecPhase2 $p2): string
-    {
+    public function get_expected_proposals(IPsecPhase2 $p2): string {
         # Variables
         $proposals = [];
         $pfs = ipsec_convert_to_modp($p2->pfsgroup->value);

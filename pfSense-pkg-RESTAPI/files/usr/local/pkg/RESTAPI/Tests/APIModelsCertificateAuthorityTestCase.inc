@@ -6,8 +6,7 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\CertificateAuthority;
 
-class APIModelsCertificateAuthorityTestCase extends TestCase
-{
+class APIModelsCertificateAuthorityTestCase extends TestCase {
     const EXAMPLE_CRT = "-----BEGIN CERTIFICATE-----
 MIIDnzCCAoegAwIBAgIUd9R9uoNKE2GoxgJPwzRn67WV4bgwDQYJKoZIhvcNAQEL
 BQAwXzELMAkGA1UEBhMCVVMxDTALBgNVBAgMBFV0YWgxFzAVBgNVBAcMDlNhbHQg
@@ -67,8 +66,7 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
     /**
      * Checks that a CertificateAuthority cannot have `crt` and `prv` values that are not a matching key pair.
      */
-    public function test_crt_and_prv_are_matching_keypair()
-    {
+    public function test_crt_and_prv_are_matching_keypair() {
         $this->assert_throws_response(
             response_id: 'CERTIFICATE_AUTHORITY_CRT_AND_PRV_NOT_KEYPAIR',
             code: 400,
@@ -101,8 +99,7 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
     /**
      * Checks that the CA is found in the OS trust store when `trust` is enabled.
      */
-    public function test_ca_trust()
-    {
+    public function test_ca_trust() {
         # Create a CA to test with
         $ca = new CertificateAuthority(
             data: [

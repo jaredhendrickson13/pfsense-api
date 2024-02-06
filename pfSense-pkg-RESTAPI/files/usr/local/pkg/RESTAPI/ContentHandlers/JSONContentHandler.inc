@@ -6,22 +6,18 @@ use JsonException;
 use RESTAPI\Core\ContentHandler;
 use RESTAPI\Responses\ValidationError;
 
-class JSONContentHandler extends ContentHandler
-{
+class JSONContentHandler extends ContentHandler {
     public string $mime_type = 'application/json';
 
-    public function get_content(): string
-    {
+    public function get_content(): string {
         return file_get_contents('php://input') ?: '';
     }
 
-    protected function _encode(mixed $content = null): mixed
-    {
+    protected function _encode(mixed $content = null): mixed {
         return $content ? json_encode($content) : [];
     }
 
-    protected function _decode(mixed $content = null): mixed
-    {
+    protected function _decode(mixed $content = null): mixed {
         # Allow empty strings, but convert it to an empty array.
         if (empty($content)) {
             return [];

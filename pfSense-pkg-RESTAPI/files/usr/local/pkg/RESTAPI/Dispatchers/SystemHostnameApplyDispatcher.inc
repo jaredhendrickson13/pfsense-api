@@ -5,16 +5,14 @@ namespace RESTAPI\Dispatchers;
 use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\Model;
 
-class SystemHostnameApplyDispatcher extends Dispatcher
-{
+class SystemHostnameApplyDispatcher extends Dispatcher {
     # Only allow the system hostname services to be applied one at a time
     public int $max_concurrency = 1;
 
     /**
      * Restarts system hostname services.
      */
-    public function process(mixed ...$arguments): void
-    {
+    public function process(mixed ...$arguments): void {
         # Restart system hostname/DNS services
         system_hostname_configure();
         system_hosts_generate();

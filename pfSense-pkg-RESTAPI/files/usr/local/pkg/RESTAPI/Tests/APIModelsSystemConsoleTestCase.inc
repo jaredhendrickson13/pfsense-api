@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\SystemConsole;
 
-class APIModelsSystemConsoleTestCase extends TestCase
-{
+class APIModelsSystemConsoleTestCase extends TestCase {
     /**
      * Ensure /etc/ttys correctly shows the console menu's current password requirement.
      */
-    public function test_ttys_set_after_update(): void
-    {
+    public function test_ttys_set_after_update(): void {
         # Create a SystemConsole object to test with
         $console = new SystemConsole();
 

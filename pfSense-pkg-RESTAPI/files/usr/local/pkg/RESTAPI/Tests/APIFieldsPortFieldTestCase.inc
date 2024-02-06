@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Models\FirewallAlias;
 
-class APIFieldsPortFieldTestCase extends TestCase
-{
+class APIFieldsPortFieldTestCase extends TestCase {
     /**
      * Checks that alias values are accepted when `allow_alias` is set, and rejected when it is not.
      */
-    public function test_allow_alias()
-    {
+    public function test_allow_alias() {
         # Create a Field object to test with
         $field = new PortField(allow_alias: true);
 
@@ -56,8 +54,7 @@ class APIFieldsPortFieldTestCase extends TestCase
     /**
      * Checks that port range values are accepted when `allow_range` is set, and rejected when it is not.
      */
-    public function test_allow_range()
-    {
+    public function test_allow_range() {
         # Create a Field object to test with
         $field = new PortField(allow_range: true);
 
@@ -82,8 +79,7 @@ class APIFieldsPortFieldTestCase extends TestCase
     /**
      * Checks that single port values are always accepted.
      */
-    public function test_alway_allow_port()
-    {
+    public function test_alway_allow_port() {
         # Create a Field object to test with
         $field = new PortField();
 
@@ -98,8 +94,7 @@ class APIFieldsPortFieldTestCase extends TestCase
     /**
      * Checks that the field's `to_internal()` method correctly converts the representation value to its internal form
      */
-    public function test_to_internal()
-    {
+    public function test_to_internal() {
         # Create a Field object to test with
         $field = new PortField();
 
@@ -119,8 +114,7 @@ class APIFieldsPortFieldTestCase extends TestCase
     /**
      * Checks that the field's `from_internal()` method correctly converts the internal value to its representation form
      */
-    public function test_from_internal()
-    {
+    public function test_from_internal() {
         # Create a Field object to test with
         $field = new PortField();
 

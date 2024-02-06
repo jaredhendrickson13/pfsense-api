@@ -8,8 +8,7 @@ use RESTAPI;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
-class LengthValidator extends RESTAPI\Core\Validator
-{
+class LengthValidator extends RESTAPI\Core\Validator {
     public int $minimum;
     public int $maximum;
 
@@ -18,8 +17,7 @@ class LengthValidator extends RESTAPI\Core\Validator
      * @param int $minimum The minimum length allowed by the value.
      * @param int $maximum The maximum length allowed by the value.
      */
-    public function __construct(int $minimum, int $maximum)
-    {
+    public function __construct(int $minimum, int $maximum) {
         $this->minimum = $minimum;
         $this->maximum = $maximum;
     }
@@ -31,8 +29,7 @@ class LengthValidator extends RESTAPI\Core\Validator
      * the maximum length requirement.
      * @throws \RESTAPI\Responses\ServerError When the value was not a string or an array.
      */
-    public function validate(mixed $value, string $field_name = '')
-    {
+    public function validate(mixed $value, string $field_name = '') {
         # Perform specific validation for string values
         if (is_string($value)) {
             # Throw an error if the string contains less characters than the specified minimum

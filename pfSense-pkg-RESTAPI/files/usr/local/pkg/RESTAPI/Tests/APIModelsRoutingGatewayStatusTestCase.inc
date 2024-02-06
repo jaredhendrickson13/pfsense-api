@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RoutingGatewayStatus;
 
-class APIModelsRoutingGatewayStatusTestCase extends TestCase
-{
+class APIModelsRoutingGatewayStatusTestCase extends TestCase {
     /**
      * Checks that we are able to read gateway status using the RoutingGatewayStatus model.
      */
-    public function test_read(): void
-    {
+    public function test_read(): void {
         # Read a gateway status and ensure the field values are correctly populated
         $gateway_status = new RoutingGatewayStatus(id: 0);
 

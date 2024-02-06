@@ -9,14 +9,12 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
-class SystemDNS extends Model
-{
+class SystemDNS extends Model {
     public BooleanField $dnsallowoverride;
     public StringField $dnslocalhost;
     public StringField $dnsserver;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'system';
         $this->update_strategy = 'merge';
@@ -50,8 +48,7 @@ class SystemDNS extends Model
     /**
      * Apply these DNS server changes to the system and restart associated services.
      */
-    public function apply()
-    {
+    public function apply() {
         (new SystemHostnameApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

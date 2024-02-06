@@ -8,13 +8,11 @@ use RESTAPI\Fields\SpecialNetworkField;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\RESTAPISettings;
 
-class APIFieldsSpecialNetworkFieldTestCase extends TestCase
-{
+class APIFieldsSpecialNetworkFieldTestCase extends TestCase {
     /**
      * Checks that the SpecialNetworkField accepts IP addresses when configured.
      */
-    public function test_validate_ipaddr()
-    {
+    public function test_validate_ipaddr() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allow_ipaddr: true);
 
@@ -38,8 +36,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that the SpecialNetworkField accepts allowed_keywords when configured.
      */
-    public function test_validate_allowed_keywords()
-    {
+    public function test_validate_allowed_keywords() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allowed_keywords: ['allow_this_value', 'allow_this_value_too']);
 
@@ -62,8 +59,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that the SpecialNetworkField accepts subnets when configured.
      */
-    public function test_validate_subnet()
-    {
+    public function test_validate_subnet() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allow_subnet: true);
 
@@ -87,8 +83,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that the SpecialNetworkField accepts aliases when configured.
      */
-    public function test_validate_alias()
-    {
+    public function test_validate_alias() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allow_alias: true);
 
@@ -129,8 +124,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that the SpecialNetworkField accepts literal `(self)` when configured.
      */
-    public function test_validate_self()
-    {
+    public function test_validate_self() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allow_self: true);
 
@@ -153,8 +147,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that the SpecialNetworkField accepts literal `l2tp` when configured.
      */
-    public function test_validate_l2tp()
-    {
+    public function test_validate_l2tp() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allow_l2tp: true);
 
@@ -177,8 +170,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that the SpecialNetworkField accepts literal `pppoe` when configured.
      */
-    public function test_validate_pppoe()
-    {
+    public function test_validate_pppoe() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allow_pppoe: true);
 
@@ -201,8 +193,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that the SpecialNetworkField accepts interface values when configured.
      */
-    public function test_validate_interface()
-    {
+    public function test_validate_interface() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allow_interface: true, allow_interface_ip: false);
 
@@ -234,8 +225,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that the SpecialNetworkField accepts interface_ip values when configured.
      */
-    public function test_validate_interface_ip()
-    {
+    public function test_validate_interface_ip() {
         # Create a SpecialNetworkField to test with
         $field = new SpecialNetworkField(allow_interface: false, allow_interface_ip: true);
 
@@ -267,8 +257,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that to_internal() correctly converts representation values to their interval values
      */
-    public function test_to_internal()
-    {
+    public function test_to_internal() {
         # Ensure interface values are converted to their internal values correctly
         $api_settings = new RESTAPISettings();
         $api_settings->represent_interfaces_as->value = 'descr';
@@ -291,8 +280,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that from_internal() correctly converts internal values into their representation values
      */
-    public function test_from_internal()
-    {
+    public function test_from_internal() {
         # Ensure interface values are correctly represented
         $api_settings = new RESTAPISettings();
         $api_settings->represent_interfaces_as->value = 'descr';
@@ -320,8 +308,7 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     /**
      * Checks that expected labels are set after running `validated_extra()`.
      */
-    public function test_validate_extra_sets_labels(): void
-    {
+    public function test_validate_extra_sets_labels(): void {
         # Create a firewall alias we can use to populate the `is_alias` label for this test
         $alias = new FirewallAlias(name: 'test_alias', type: 'host');
         $alias->create();

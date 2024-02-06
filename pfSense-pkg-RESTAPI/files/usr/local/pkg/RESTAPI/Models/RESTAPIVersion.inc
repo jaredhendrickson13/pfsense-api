@@ -7,16 +7,14 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 
-class RESTAPIVersion extends Model
-{
+class RESTAPIVersion extends Model {
     public StringField $current_version;
     public StringField $latest_version;
     public StringField $latest_version_release_date;
     public BooleanField $update_available;
     public StringField $install_version;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_api_version_details';
         $this->cache_class = 'RESTAPIVersionReleasesCache';
@@ -53,8 +51,7 @@ class RESTAPIVersion extends Model
      * Obtains API version details. This method is the internal callable for this model.
      * @return array An array of API version details that correspond with this model's Fields.
      */
-    protected function get_api_version_details(): array
-    {
+    protected function get_api_version_details(): array {
         return [
             'current_version' => $this->get_api_version(),
             'latest_version' => $this->get_latest_api_version(),
@@ -68,8 +65,7 @@ class RESTAPIVersion extends Model
      * Obtains the current API version installed on the system.
      * @return string The current API version installed in vX.X.X format
      */
-    public static function get_api_version(): string
-    {
+    public static function get_api_version(): string {
         # Pull the raw pkg info for the API package into an array for each line
         $pkg_info = explode(PHP_EOL, shell_exec('pkg-static info pfSense-pkg-RESTAPI'));
 
@@ -92,8 +88,7 @@ class RESTAPIVersion extends Model
      * Obtains the latest API version available to this system.
      * @return string|null The latest API version available to this system or `null` if none are available.
      */
-    public function get_latest_api_version(): string|null
-    {
+    public function get_latest_api_version(): string|null {
         # Fetch our latest version and format it semantically (x.x.x)
         return array_key_first($this->get_all_available_versions());
     }
@@ -102,8 +97,7 @@ class RESTAPIVersion extends Model
      * Obtains the release date of the latest API version available to this system.
      * @return string The release date of the latest API version available to this system.
      */
-    public function get_latest_api_release_date(): string
-    {
+    public function get_latest_api_release_date(): string {
         # Loop through each release and locate the latest available releases creation date
         foreach ($this->get_github_releases() as $release) {
             # Check if this releases is latest available for our platform
@@ -119,8 +113,7 @@ class RESTAPIVersion extends Model
      * Determines if an API update is available to this system.
      * @return bool `true` if there is an API update available to this system. `false` if it is up-to-date.
      */
-    public function is_update_available(): bool
-    {
+    public function is_update_available(): bool {
         return version_compare($this->get_api_version(), $this->get_latest_api_version(), operator: '<');
     }
 
@@ -131,8 +124,7 @@ class RESTAPIVersion extends Model
      * @return array An array of all releases from the pfsense-RESTAPI repository on GitHub via GitHub API.
      * @link https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases
      */
-    public function get_github_releases(): array
-    {
+    public function get_github_releases(): array {
         return $this->cache->read();
     }
 
@@ -141,8 +133,7 @@ class RESTAPIVersion extends Model
      * @returns array Returns an array of all REST API versions available to this host. The array keys will be the
      * semantic version strings and the array value will a descriptive representation of the version.
      */
-    public function get_all_available_versions(): array
-    {
+    public function get_all_available_versions(): array {
         # Variables
         $pf_version = new SystemVersion();
         $api_settings = new RESTAPISettings();

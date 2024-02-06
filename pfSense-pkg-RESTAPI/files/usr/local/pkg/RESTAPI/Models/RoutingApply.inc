@@ -11,12 +11,10 @@ use RESTAPI\Fields\BooleanField;
 /**
  * Defines a Model that provides details on pending routing changes and allows pending routing changes to be applied.
  */
-class RoutingApply extends Model
-{
+class RoutingApply extends Model {
     public BooleanField $applied;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_applied_status';
         $this->always_apply = true;
@@ -36,23 +34,20 @@ class RoutingApply extends Model
      * Obtains the current applied status.
      * @return array The internal value array to be loaded by this model as the internal callable
      */
-    public function get_applied_status(): array
-    {
+    public function get_applied_status(): array {
         return ['applied' => !is_subsystem_dirty('staticroutes')];
     }
 
     /**
      * Override the _create method so it does nothing. We only want to apply changes when this is called.
      */
-    public function _create(): void
-    {
+    public function _create(): void {
     }
 
     /**
      * Applies pending routing changes.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

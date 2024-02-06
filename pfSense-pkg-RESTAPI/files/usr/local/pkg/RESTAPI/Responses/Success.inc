@@ -13,8 +13,7 @@ use RESTAPI\Core\Response;
  * Exception class that indicates a successful transaction occurred. This exception generally corresponds with a 200
  * OK HTTP code and is typically not thrown as an error.
  */
-class Success extends Response
-{
+class Success extends Response {
     public $code = 200;
     public string $help_text = 'The client has made a successful request.';
 

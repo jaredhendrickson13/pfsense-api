@@ -13,14 +13,12 @@ use RESTAPI\Validators\IPAddressValidator;
 /**
  * Defines access list entries for the DNS Resolver (Unbound) service.
  */
-class DNSResolverAccessListNetwork extends Model
-{
+class DNSResolverAccessListNetwork extends Model {
     public StringField $network;
     public IntegerField $mask;
     public StringField $description;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->parent_model_class = 'DNSResolverAccessList';
         $this->config_path = 'row';
@@ -57,8 +55,7 @@ class DNSResolverAccessListNetwork extends Model
      * @return int The validated value to be set.
      * @throws ValidationError When the `mask` value is greater than 32 but `network` is not an IPv4
      */
-    public function validate_mask(int $mask): int
-    {
+    public function validate_mask(int $mask): int {
         # Do not allow value to be greater than 32 if `network` is not an IPv6
         if (!$this->network->has_label('is_ipaddrv6') and $mask > 32) {
             throw new ValidationError(
@@ -73,8 +70,7 @@ class DNSResolverAccessListNetwork extends Model
     /**
      * Applies pending DNS Resolver changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new DNSResolverApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

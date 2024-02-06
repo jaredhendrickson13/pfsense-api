@@ -9,13 +9,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPIKey;
 
-class APIAuthKeyAuthTestCase extends TestCase
-{
+class APIAuthKeyAuthTestCase extends TestCase {
     /**
      * Checks that the _authenticate_method() correctly determines whether a client successfully authenticates or not.
      */
-    public function test_authenticate(): void
-    {
+    public function test_authenticate(): void {
         # Simulate success key auth
         $jwt = new RESTAPIKey();
         $jwt->client->username = 'admin';

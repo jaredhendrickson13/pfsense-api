@@ -7,13 +7,11 @@ use RESTAPI\Core\ResourceLinkSet;
 use RESTAPI\Core\TestCase;
 use const RESTAPI\Core\Globals\HAL_REL_NAMESPACE;
 
-class APICoreResourceLinkSetTestCase extends TestCase
-{
+class APICoreResourceLinkSetTestCase extends TestCase {
     /**
      * Checks that the package's HAL namespace is prefixed to custom HAL rel links
      */
-    public function test_use_namespace()
-    {
+    public function test_use_namespace() {
         $namespaced_link = new ResourceLinkSet(rel: 'test', use_namespace: true);
         $non_namespaced_link = new ResourceLinkSet(rel: 'test', use_namespace: false);
         $this->assert_equals($namespaced_link->rel, HAL_REL_NAMESPACE . ':test');
@@ -24,8 +22,7 @@ class APICoreResourceLinkSetTestCase extends TestCase
      * Ensures that only ResourceLink and ResourceLinkSet objects can be assigned to the ResourceLinkSet's
      * `resource_link` property.
      */
-    public function test_resource_links_must_be_resource_link()
-    {
+    public function test_resource_links_must_be_resource_link() {
         $this->assert_throws_response(
             response_id: 'RESOURCE_LINK_SET_CONTAINS_NON_RESOURCE_LINK',
             code: 500,
@@ -41,8 +38,7 @@ class APICoreResourceLinkSetTestCase extends TestCase
      * Checks that the `to_representation()` correctly represents nested ResourceLinks and ResourceLinkSets as a HAL
      * _links array
      */
-    public function test_to_representation()
-    {
+    public function test_to_representation() {
         $link1 = new ResourceLink(rel: 'test1', href: 'test1', use_namespace: false);
         $link2 = new ResourceLink(rel: 'test2', href: 'test2', use_namespace: false);
         $nested_linkset = new ResourceLinkSet(resource_links: [$link1, $link2], rel: 'nested');

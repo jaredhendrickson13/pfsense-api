@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\DNSResolverAccessList;
 
-class APIModelsDNSResolverAccessListTestCase extends TestCase
-{
+class APIModelsDNSResolverAccessListTestCase extends TestCase {
     /**
      * Checks that the DNS Resolver (Unbound) access list is correctly configured after creation/update/delete
      */
-    public function test_crud()
-    {
+    public function test_crud() {
         # Create an access list to test with
         $access_list = new DNSResolverAccessList(
             data: [

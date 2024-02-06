@@ -7,8 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Form;
 use RESTAPI\Models\RESTAPIJWT;
 
-class SystemRESTAPISettingsForm extends Form
-{
+class SystemRESTAPISettingsForm extends Form {
     public string $url = '/system_restapi_settings.php';
     public string $model_class = 'RESTAPISettings';
     public array $title_path = ['System', 'REST API', 'Settings'];
@@ -64,8 +63,7 @@ class SystemRESTAPISettingsForm extends Form
      * A button callable method that rotates the JWT server key when the `rotate_server_key` button is pressed.
      * @throws \Exception When the JWT server key fails to be generated.
      */
-    public function rotate_server_key()
-    {
+    public function rotate_server_key() {
         RESTAPIJWT::init_server_key(rotate: true);
         $this->print_success_banner(message: 'The JWT server key has been rotated.');
     }

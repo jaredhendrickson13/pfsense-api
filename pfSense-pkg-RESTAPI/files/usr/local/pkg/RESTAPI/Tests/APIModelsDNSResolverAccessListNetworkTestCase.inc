@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\DNSResolverAccessList;
 use RESTAPI\Models\DNSResolverAccessListNetwork;
 
-class APIModelsDNSResolverAccessListNetworkTestCase extends TestCase
-{
+class APIModelsDNSResolverAccessListNetworkTestCase extends TestCase {
     /**
      * Checks that the DNS Resolver (Unbound) access list is correctly configured after creation/update/delete
      */
-    public function test_crud()
-    {
+    public function test_crud() {
         # Create a parent access list to test with
         $access_list = new DNSResolverAccessList(
             data: [
@@ -69,8 +67,7 @@ class APIModelsDNSResolverAccessListNetworkTestCase extends TestCase
     /**
      * Checks that IPv4 network entries cannot use a `mask` greater than `32`
      */
-    public function test_validate_mask()
-    {
+    public function test_validate_mask() {
         # Try to create an IPv4 access list network entry with a mask greater than 32
         $access_list_network = new DNSResolverAccessListNetwork(
             data: ['network' => '4.3.2.1', 'mask' => 33],

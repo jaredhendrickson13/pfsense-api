@@ -12,8 +12,7 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
-class RESTAPIKey extends Model
-{
+class RESTAPIKey extends Model {
     public StringField $descr;
     public StringField $username;
     public StringField $hash_algo;
@@ -21,8 +20,7 @@ class RESTAPIKey extends Model
     public StringField $hash;
     public StringField $key;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Gather information about current API settings
         $api_pkg_id = RESTAPISettings::get_pkg_id();
 
@@ -79,8 +77,7 @@ class RESTAPIKey extends Model
      * @param string $username The incoming username value to be validated.
      * @return string The validated username value to be assigned.
      */
-    public function validate_username(string $username): string
-    {
+    public function validate_username(string $username): string {
         # Force username to match the authenticating user's name
         $username = $this->client->username;
 
@@ -99,8 +96,7 @@ class RESTAPIKey extends Model
     /**
      * Generates the API key and hash values and saves the Model to config.
      */
-    public function _create()
-    {
+    public function _create() {
         # Generate the API key and its hash
         $this->key->value = bin2hex(random_bytes($this->length_bytes->value));
         $this->hash->value = hash($this->hash_algo->value, $this->key->value);
@@ -112,8 +108,7 @@ class RESTAPIKey extends Model
     /**
      * Override the default _update() method to prevent RESTAPIKeys from being updated.
      */
-    public function _update()
-    {
+    public function _update() {
         # Do not allow RESTAPIKey objects to be updated.
         throw new RESTAPI\Responses\ServerError(
             message: 'RESTAPIKey model objects cannot be updated.',
@@ -126,8 +121,7 @@ class RESTAPIKey extends Model
      * @param string $key The real API key to authenticate with.
      * @return bool true if the hashed $key matches this Model object's `hash` property, otherwise false.
      */
-    public function authenticate(string $key): bool
-    {
+    public function authenticate(string $key): bool {
         # Hash the incoming key according to the algorithm of this stored key
         $hash = hash($this->hash_algo->value, $key);
 
@@ -142,8 +136,7 @@ class RESTAPIKey extends Model
     /**
      * Refresh the API backup file and sync changes to API clients if configured.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         RESTAPISettings::backup_to_file();
         (new RESTAPISettingsSyncDispatcher(async: $this->async))->spawn_process();
     }

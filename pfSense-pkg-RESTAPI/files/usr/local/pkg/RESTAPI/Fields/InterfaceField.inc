@@ -15,8 +15,7 @@ use RESTAPI\Responses\NotFoundError;
  * Defines an InterfaceField class that extends the Core Field method. This Field adds validation and representation for
  * Fields that accept interface IDs and/or names as input.
  */
-class InterfaceField extends StringField
-{
+class InterfaceField extends StringField {
     /**
      * @var string $represented_as The interface field that interfaces are represented as by this field. This value
      * directly corresponds with the REST API setting's `represent_interfaces_as` field.
@@ -137,8 +136,7 @@ class InterfaceField extends StringField
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): string
-    {
+    protected function _from_internal(mixed $internal_value): string {
         # Variables
         $interfaces = Model::get_config('interfaces', []);
 
@@ -161,8 +159,7 @@ class InterfaceField extends StringField
     /**
      * Converts the field's representation value into it's internal pfSense value.
      */
-    protected function _to_internal(mixed $representation_value): array|null|string
-    {
+    protected function _to_internal(mixed $representation_value): array|null|string {
         # Query to find this interface using the interfaces representation field and value
         $interface_query = NetworkInterface::query(query_params: [$this->represented_as => $representation_value]);
 
@@ -179,8 +176,7 @@ class InterfaceField extends StringField
      * Enumerates a list of every interface choice available to this Field.
      * @return array A list of every interface option available to this Field.
      */
-    public function get_interface_choices(): array
-    {
+    public function get_interface_choices(): array {
         # Variables
         $choices = [];
         $interface_query = NetworkInterface::query($this->interface_query);
@@ -244,8 +240,7 @@ class InterfaceField extends StringField
      * @return array|string An array of the internal interfaces assigned to this Field (e.g. ["wan", "lan", "opt1"])
      * when this is a `many` Field, or the internal interface value as a string
      */
-    public function to_internal_interfaces(): array|string
-    {
+    public function to_internal_interfaces(): array|string {
         # Return the internal interface values for each interface value when this is a `many` Field
         if ($this->many) {
             return explode($this->delimiter, $this->to_internal());
@@ -262,8 +257,7 @@ class InterfaceField extends StringField
      * @throws NotFoundError when a NetworkInterface object could not be found using one or more of this Field's
      * assigned values.
      */
-    public function get_related_model(): Model|null
-    {
+    public function get_related_model(): Model|null {
         # Query for the NetworkInterface object that matches our current value
         $query = NetworkInterface::query([$this->represented_as => $this->value]);
 
@@ -281,8 +275,7 @@ class InterfaceField extends StringField
      * @return ModelSet Returns a ModelSet containing the NetworkInterface Model's associated with this Field's
      * current values, or `null` if no
      */
-    public function get_related_models(): ModelSet
-    {
+    public function get_related_models(): ModelSet {
         # Create a ModelSet object to store our located NetworkInterface objects in
         $modelset = new ModelSet(model_objects: []);
 

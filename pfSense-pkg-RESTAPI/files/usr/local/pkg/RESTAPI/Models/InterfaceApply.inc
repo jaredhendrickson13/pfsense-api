@@ -14,13 +14,11 @@ use RESTAPI\Fields\InterfaceField;
 /**
  * A Model object that gathers details on pending interface changes as well as tools to apply pending interface changes.
  */
-class InterfaceApply extends Model
-{
+class InterfaceApply extends Model {
     public BooleanField $applied;
     public InterfaceField $pending_interfaces;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_applied_status';
         $this->always_apply = true;
@@ -48,8 +46,7 @@ class InterfaceApply extends Model
      * interface changes.
      * @return array An array of internal values for Field objects in this Model
      */
-    public function get_applied_status(): array
-    {
+    public function get_applied_status(): array {
         global $g;
 
         # Check if there are pending interface changes
@@ -69,16 +66,14 @@ class InterfaceApply extends Model
         ];
     }
 
-    public function _create()
-    {
+    public function _create() {
         # Override this method but don't do anything. We only want to apply the changes.
     }
 
     /**
      * Spawns a new dispatcher process which applies any pending interface changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new InterfaceApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

@@ -6,8 +6,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\IPsecPhase1;
 use RESTAPI\Models\IPsecPhase1Encryption;
 
-class APIModelsIPsecPhase1EncryptionTestCase extends TestCase
-{
+class APIModelsIPsecPhase1EncryptionTestCase extends TestCase {
     const BASE_P1_DATA = [
         'iketype' => 'ikev2',
         'protocol' => 'inet',
@@ -31,8 +30,7 @@ class APIModelsIPsecPhase1EncryptionTestCase extends TestCase
      * Checks that the `encryption_algorithm_keylen` field can only be assigned key lengths that are supported by the
      * `encryption_algorithm_name.
      */
-    public function test_validate_encryption_algorithm_keylen(): void
-    {
+    public function test_validate_encryption_algorithm_keylen(): void {
         # Create a p1 and p1 encryption entry to test with
         $p1 = new IPsecPhase1(data: self::BASE_P1_DATA);
         $p1->create();
@@ -79,8 +77,7 @@ class APIModelsIPsecPhase1EncryptionTestCase extends TestCase
      * Checks that the `get_supported_keylens()` method throws a ValidationError if the provided $name is not a
      * supported encryption algorithm
      */
-    public function test_get_support_keylens_name_must_support_key_lengths(): void
-    {
+    public function test_get_support_keylens_name_must_support_key_lengths(): void {
         # Ensure an error is not thrown if `get_supported_keylens()` receives a valid `name`
         $this->assert_does_not_throw(
             callable: function () {
@@ -103,8 +100,7 @@ class APIModelsIPsecPhase1EncryptionTestCase extends TestCase
      * Checks that the `get_supported_keylens()` correctly obtains each possible key length option for the provide
      * encryption algorithm name.
      */
-    public function test_get_supported_keylens(): void
-    {
+    public function test_get_supported_keylens(): void {
         global $p1_ealgos;
 
         # Loop each encryption algorithm that supported variable key lengths
@@ -132,8 +128,7 @@ class APIModelsIPsecPhase1EncryptionTestCase extends TestCase
      * Checks that `get_keylen_enabled_algos()` only returns the name of encryption algorithms that support variable
      * key lengths.
      */
-    public function test_get_keylen_enabled_algos(): void
-    {
+    public function test_get_keylen_enabled_algos(): void {
         global $p1_ealgos;
 
         # Loop through each algorithm name returned by get_keylen_enabled_algos()
@@ -147,8 +142,7 @@ class APIModelsIPsecPhase1EncryptionTestCase extends TestCase
      * Checks that the encryption algorithm is correctly represented in swanctl when the IPsecPhase1Encryption object
      * is created, updated, and deleted.
      */
-    public function test_crud(): void
-    {
+    public function test_crud(): void {
         # Create a p1 and p1 encryption entry to test with
         $p1 = new IPsecPhase1(data: self::BASE_P1_DATA, async: false);
         $p1->encryption->value = [
@@ -181,8 +175,7 @@ class APIModelsIPsecPhase1EncryptionTestCase extends TestCase
      * @param IPsecPhase1 $p1 The IPsecPhase1 object to use to generate the swanctl proposal
      * @return string The swanctl.conf `proposals` line expected from the IPsecPhase1 object
      */
-    private function get_expected_proposals(IPsecPhase1 $p1): string
-    {
+    private function get_expected_proposals(IPsecPhase1 $p1): string {
         # Init an array to store the swanctl propoasl values (e.g. aes128-sha256-modp2048)
         $proposals = [];
 

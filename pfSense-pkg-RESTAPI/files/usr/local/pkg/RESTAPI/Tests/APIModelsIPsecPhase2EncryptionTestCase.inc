@@ -5,15 +5,13 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\IPsecPhase2Encryption;
 
-class APIModelsIPsecPhase2EncryptionTestCase extends TestCase
-{
+class APIModelsIPsecPhase2EncryptionTestCase extends TestCase {
     # NOTE: This model is partially tested by /RESTAPI/Tests/APIModelsIPsecPhase2TestCase
 
     /**
      * Checks that the `keylen` must be valid for the given encryption algorithm `name`.
      */
-    public function test_keylen_choices(): void
-    {
+    public function test_keylen_choices(): void {
         # Ensure an error is thrown if the requested key length is not supported for the given encryption algorithm
         $this->assert_throws_response(
             response_id: 'IPSEC_PHASE_2_ENCRYPTION_ALGORITHM_KEYLEN_INVALID_CHOICE',
@@ -39,8 +37,7 @@ class APIModelsIPsecPhase2EncryptionTestCase extends TestCase
      * Checks that the `get_supported_keylens()` method throws a ValidationError if the provided $name is not a
      * supported encryption algorithm
      */
-    public function test_get_support_keylens_name_must_support_key_lengths(): void
-    {
+    public function test_get_support_keylens_name_must_support_key_lengths(): void {
         # Ensure an error is not thrown if `get_supported_keylens()` receives a valid `name`
         $this->assert_does_not_throw(
             callable: function () {
@@ -63,8 +60,7 @@ class APIModelsIPsecPhase2EncryptionTestCase extends TestCase
      * Checks that the `get_supported_keylens()` correctly obtains each possible key length option for the provide
      * encryption algorithm name.
      */
-    public function test_get_supported_keylens(): void
-    {
+    public function test_get_supported_keylens(): void {
         global $p2_ealgos;
 
         # Loop each encryption algorithm that supported variable key lengths
@@ -92,8 +88,7 @@ class APIModelsIPsecPhase2EncryptionTestCase extends TestCase
      * Checks that `get_keylen_enabled_algos()` only returns the name of encryption algorithms that support variable
      * key lengths.
      */
-    public function test_get_keylen_enabled_algos(): void
-    {
+    public function test_get_keylen_enabled_algos(): void {
         global $p2_ealgos;
 
         # Loop through each algorithm name returned by get_keylen_enabled_algos()

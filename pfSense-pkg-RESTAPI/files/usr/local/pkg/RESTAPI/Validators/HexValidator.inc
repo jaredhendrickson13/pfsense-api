@@ -5,8 +5,7 @@ namespace RESTAPI\Validators;
 use RESTAPI\Core\Validator;
 use RESTAPI\Responses\ValidationError;
 
-class HexValidator extends Validator
-{
+class HexValidator extends Validator {
     /**
      * @const Stores the hexadecimal prefix value `0x`
      */
@@ -22,8 +21,7 @@ class HexValidator extends Validator
      * @param int $bytes The expected byte length of the hexadecimal value. Set to 0 to allow hex values of any length.
      * @param bool $allow_hex_prefix Set to true to allow the hex prefix (0x) to be present in the value.
      */
-    public function __construct(public int $bytes, public bool $allow_hex_prefix = true)
-    {
+    public function __construct(public int $bytes, public bool $allow_hex_prefix = true) {
         $this->expected_length = 2 * $this->bytes;
     }
 
@@ -34,8 +32,7 @@ class HexValidator extends Validator
      * @throws ValidationError When the $value is greater than or less than $this->maximum_length.
      * @throws ValidationError When the $value is not a hexadecimal string.
      */
-    public function validate(mixed $value, string $field_name = '')
-    {
+    public function validate(mixed $value, string $field_name = '') {
         # Strip the hex prefix if the hex prefix is allowed
         if ($this->allow_hex_prefix and str_starts_with($value, self::HEX_PREFIX)) {
             $value = str_replace(self::HEX_PREFIX, '', $value);

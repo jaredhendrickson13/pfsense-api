@@ -8,13 +8,11 @@ use RESTAPI\Dispatchers\SystemHostnameApplyDispatcher;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\HostnameValidator;
 
-class SystemHostname extends Model
-{
+class SystemHostname extends Model {
     public StringField $hostname;
     public StringField $domain;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'system';
         $this->update_strategy = 'merge';
@@ -40,8 +38,7 @@ class SystemHostname extends Model
     /**
      * Apply this hostname to the system and restart associated services.
      */
-    public function apply()
-    {
+    public function apply() {
         (new SystemHostnameApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

@@ -6,13 +6,11 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallStatesSize;
 
-class APIModelsFirewallStatesSizeTestCase extends TestCase
-{
+class APIModelsFirewallStatesSizeTestCase extends TestCase {
     /**
      * Ensure the `from_internal_defaultmaximumstates()` obtains the correct default state table size.
      */
-    public function test_from_internal_defaultmaximumstates()
-    {
+    public function test_from_internal_defaultmaximumstates() {
         # Create a FirewallStatesSize object to test with
         $states_size = new FirewallStatesSize();
 
@@ -23,8 +21,7 @@ class APIModelsFirewallStatesSizeTestCase extends TestCase
     /**
      * Ensure setting the `maximumstates` field actually sets the states limit in pfctl
      */
-    public function test_maximumstates_set_in_pfctl()
-    {
+    public function test_maximumstates_set_in_pfctl() {
         # Create a FirewallStatesSize object to test with
         $states_size = new FirewallStatesSize(async: false);
         $states_size->maximumstates->value = 500;

@@ -11,16 +11,14 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 
-class DNSResolverHostOverride extends Model
-{
+class DNSResolverHostOverride extends Model {
     public StringField $host;
     public StringField $domain;
     public StringField $ip;
     public StringField $descr;
     public NestedModelField $aliases;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'unbound/hosts';
         $this->subsystem = 'unbound';
@@ -67,8 +65,7 @@ class DNSResolverHostOverride extends Model
     /**
      * Applies pending DNS Resolver changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new DNSResolverApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

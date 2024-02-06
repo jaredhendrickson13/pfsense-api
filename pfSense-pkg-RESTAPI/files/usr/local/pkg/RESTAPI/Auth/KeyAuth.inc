@@ -5,8 +5,7 @@ namespace RESTAPI\Auth;
 use RESTAPI\Core\Auth;
 use RESTAPI\Models\RESTAPIKey;
 
-class KeyAuth extends Auth
-{
+class KeyAuth extends Auth {
     /**
      * @var string|null $verbose_name The human-readable name for this Auth class.
      */
@@ -22,8 +21,7 @@ class KeyAuth extends Auth
      * @return bool Returns true if match for this client's key found a match stored in config, returns false
      * otherwise.
      */
-    public function _authenticate(): bool
-    {
+    public function _authenticate(): bool {
         # Obtain the API key from the client via Authorization header with 'key' identifier.
         $key = $this->get_auth_key(identifier: 'KeyAuth');
 

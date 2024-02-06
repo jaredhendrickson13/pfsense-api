@@ -14,16 +14,14 @@ use RESTAPI\Validators\FilterNameValidator;
 /**
  * Defines a model object for firewall aliases.
  */
-class FirewallAlias extends Model
-{
+class FirewallAlias extends Model {
     public StringField $name;
     public StringField $type;
     public StringField $descr;
     public StringField $address;
     public StringField $detail;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         $this->config_path = 'aliases/alias';
         $this->subsystem = 'aliases';
         $this->many = true;
@@ -78,8 +76,7 @@ class FirewallAlias extends Model
      * @returns string The validated $name to set.
      * @throws ValidationError When the `name` value is invalid.
      */
-    public function validate_name(string $name): string
-    {
+    public function validate_name(string $name): string {
         # Throw an exception if this name is not a valid alias name
         if (!is_validaliasname($name)) {
             throw new ValidationError(
@@ -97,8 +94,7 @@ class FirewallAlias extends Model
      * @returns string The validated value to set.
      * @throws ValidationError When the `address` value is invalid.
      */
-    public function validate_address(string $addresses): string
-    {
+    public function validate_address(string $addresses): string {
         # Ensure value is a port, port range or port alias when `type` is `port`
         if ($this->type->value === 'port' and !is_port_or_range_or_alias($addresses)) {
             throw new ValidationError(
@@ -134,8 +130,7 @@ class FirewallAlias extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When the `detail` value is invalid.
      */
-    public function validate_detail(string $detail): string
-    {
+    public function validate_detail(string $detail): string {
         # Throw an error if there are more `detail` items than `address` items
         if (count($this->detail->value) > count($this->address->value)) {
             throw new ValidationError(
@@ -156,8 +151,7 @@ class FirewallAlias extends Model
      * Set the apply method to reload the firewall filter after successfully validating and writing firewall alias
      * changes to config.
      */
-    public function apply()
-    {
+    public function apply() {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

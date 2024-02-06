@@ -13,8 +13,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\bandwidth_to_bits;
 
-class TrafficShaper extends Model
-{
+class TrafficShaper extends Model {
     public BooleanField $enabled;
     public InterfaceField $interface;
     public StringField $name;
@@ -25,8 +24,7 @@ class TrafficShaper extends Model
     public IntegerField $tbrconfig;
     public NestedModelField $queue;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'shaper/queue';
         $this->many = true;
@@ -96,8 +94,7 @@ class TrafficShaper extends Model
      * @param string|null $name The incoming internal `name` value.
      * @returns string The internal `name` value to assign.
      */
-    public function from_internal_name(string|null $name): string
-    {
+    public function from_internal_name(string|null $name): string {
         return $this->interface->to_internal();
     }
 
@@ -107,8 +104,7 @@ class TrafficShaper extends Model
      * @returns int The validated value to be assigned.
      * @throws ValidationError When $bandwidth is greater than 100, but the `bandwithtype` field is `%`.
      */
-    public function validate_bandwidth(int $bandwidth): int
-    {
+    public function validate_bandwidth(int $bandwidth): int {
         # Do not allow the $bandwidth value to be greater than 100 if the bandwidthtype field is set %
         if ($this->bandwidthtype->value === '%' and $bandwidth > 100) {
             throw new ValidationError(
@@ -123,8 +119,7 @@ class TrafficShaper extends Model
     /**
      * Reloads the firewall filter and restarts queue graphing.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
         system('rm -f /var/db/rrd/*queuedrops.rrd');
         system('rm -f /var/db/rrd/*queues.rrd');
@@ -137,8 +132,7 @@ class TrafficShaper extends Model
      * @returns int The bandwidth percentage limit (1-100) for percentage based bandwidths, or the bandwidth's
      * total in bits.
      */
-    public function get_bandwidth_bits(): int
-    {
+    public function get_bandwidth_bits(): int {
         # When the bandwidth type is percentage, just return the direct bandwidth value as it's already a percentage.
         if ($this->bandwidthtype->value === '%') {
             return $this->bandwidth->value;

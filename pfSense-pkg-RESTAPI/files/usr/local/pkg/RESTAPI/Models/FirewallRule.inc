@@ -15,8 +15,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
 use RESTAPI\Responses\ValidationError;
 
-class FirewallRule extends Model
-{
+class FirewallRule extends Model {
     public StringField $type;
     public InterfaceField $interface;
     public StringField $ipprotocol;
@@ -46,8 +45,7 @@ class FirewallRule extends Model
     public UnixTimeField $updated_time;
     public StringField $updated_by;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'filter/rule';
         $this->many = true;
@@ -291,8 +289,7 @@ class FirewallRule extends Model
      * @return string The validated value to be set.
      * @throws ValidationError When multiple `interface` values are assigned but `floating` is not enabled
      */
-    public function validate_interface(string $interface): string
-    {
+    public function validate_interface(string $interface): string {
         # Do not allow more than one interface to be assigned if this is not a floating rule
         if (!$this->floating->value and count($this->interface->value) > 1) {
             throw new ValidationError(
@@ -309,8 +306,7 @@ class FirewallRule extends Model
      * @param string $statetype The incoming value to be validated.
      * @return string The validated value to be set.
      */
-    public function validate_statetype(string $statetype): string
-    {
+    public function validate_statetype(string $statetype): string {
         # Do not allow the `synproxy state` value to be set if `protocol` is not `tcp`
         if ($statetype === 'synproxy state' and $this->protocol->value !== 'tcp') {
             throw new ValidationError(
@@ -335,8 +331,7 @@ class FirewallRule extends Model
      * @param string $tcp_flags_set The incoming value to be validated.
      * @return string The validated value to be set.
      */
-    public function validate_tcp_flags_set(string $tcp_flags_set): string
-    {
+    public function validate_tcp_flags_set(string $tcp_flags_set): string {
         # Ensure this value is also present in `tcp_flags_out_of`
         if (!in_array($tcp_flags_set, $this->tcp_flags_out_of->value)) {
             throw new ValidationError(
@@ -355,8 +350,7 @@ class FirewallRule extends Model
      * @throws ValidationError When both the `ackqueue` and `defaultqueue` are the same.
      * @throws ValidationError When `ackqueue` is defined but `defaultqueue` is not.
      */
-    public function validate_ackqueue(string $ackqueue): string
-    {
+    public function validate_ackqueue(string $ackqueue): string {
         # Throw an error if ackqueue is defined, but defaultqueue is not
         if ($ackqueue and !$this->defaultqueue->value) {
             throw new ValidationError(
@@ -381,8 +375,7 @@ class FirewallRule extends Model
      * @param string $updated_by The incoming value to be validated.
      * @return string The validated value to be set.
      */
-    public function validate_updated_by(string $updated_by): string
-    {
+    public function validate_updated_by(string $updated_by): string {
         # Auto update this value to the current username and IP
         return "{$this->client->username}@{$this->client->ip_address} (API)";
     }
@@ -390,8 +383,7 @@ class FirewallRule extends Model
     /**
      * Applies firewall rule changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

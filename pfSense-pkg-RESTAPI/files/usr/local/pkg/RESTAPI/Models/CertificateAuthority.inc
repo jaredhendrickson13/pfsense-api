@@ -14,8 +14,7 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 use RESTAPI\Validators\X509Validator;
 
-class CertificateAuthority extends Model
-{
+class CertificateAuthority extends Model {
     public StringField $descr;
     public UIDField $refid;
     public BooleanField $trust;
@@ -24,8 +23,7 @@ class CertificateAuthority extends Model
     public Base64Field $crt;
     public Base64Field $prv;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'ca';
         $this->many = true;
@@ -78,8 +76,7 @@ class CertificateAuthority extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When $crt is not capable of operating as a Certificate Authority
      */
-    public function validate_crt(string $crt): string
-    {
+    public function validate_crt(string $crt): string {
         # Do not allow this $crt if it is not capable of operating as a Certificate Authority
         if (cert_get_purpose($crt, decode: false)['ca'] !== 'Yes') {
             throw new ValidationError(
@@ -97,8 +94,7 @@ class CertificateAuthority extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When $prv and the `crt` field's current value are not a matching key pair
      */
-    public function validate_prv(string $prv): string
-    {
+    public function validate_prv(string $prv): string {
         # Throw a validation error if $prv and the `crt` field's current value are not a matching key pair
         if (!X509Validator::is_matching_keypair(public_key: $this->crt->value, private_key: $prv)) {
             throw new ValidationError(
@@ -114,8 +110,7 @@ class CertificateAuthority extends Model
      * Deletes this CertificateAuthority object from configuration.
      * @throws ForbiddenError When the CertificateAuthority cannot be deleted because it is in use.
      */
-    public function _delete(): void
-    {
+    public function _delete(): void {
         # Do not allow this CertificateAuthority to be deleted if it is in use
         if (cert_in_use($this->refid->value)) {
             throw new ForbiddenError(
@@ -130,8 +125,7 @@ class CertificateAuthority extends Model
     /**
      * Apply CA changes to the OS trust store.
      */
-    public function apply()
-    {
+    public function apply() {
         ca_setup_trust_store();
     }
 }

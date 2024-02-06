@@ -19,8 +19,7 @@ use RESTAPI\Validators\MACAddressValidator;
 /*
  * Defines a Model that configures a static DHCP mapping for a given client.
  */
-class DHCPServerStaticMapping extends Model
-{
+class DHCPServerStaticMapping extends Model {
     public StringField $mac;
     public StringField $ipaddr;
     public StringField $cid;
@@ -36,8 +35,7 @@ class DHCPServerStaticMapping extends Model
     public BooleanField $arp_table_static_entry;
     public StringField $descr;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define model attributes
         $this->parent_model_class = 'DHCPServer';
         $this->config_path = 'staticmap';
@@ -149,8 +147,7 @@ class DHCPServerStaticMapping extends Model
      * @throws ConflictError When the $ipaddr value is in use or overlaps another object such as virtual IPs,
      * or DHCP address pools.
      */
-    public function validate_ipaddr(string $ipaddr): string
-    {
+    public function validate_ipaddr(string $ipaddr): string {
         # Do not allow this $ipaddr to overlap other model objects
         $overlapped_model = $this->get_ip_overlap($ipaddr);
         if ($overlapped_model) {
@@ -170,8 +167,7 @@ class DHCPServerStaticMapping extends Model
      * @return int The validated `maxleasetime` field value to be assigned.
      * @throws ValidationError When `maxleasetime` is less than the `defaultleasetime`
      */
-    public function validate_maxleasetime(int $maxleasetime): int
-    {
+    public function validate_maxleasetime(int $maxleasetime): int {
         if ($maxleasetime < $this->defaultleasetime->value) {
             throw new ValidationError(
                 message: 'DHCP server `maxleasetime` cannot be less than the `defaultleasetime`',
@@ -188,8 +184,7 @@ class DHCPServerStaticMapping extends Model
      * @return string The validated `gateway` field value to be assigned.
      * @throws ValidationError When `gateway` is not an IP within the interface's subnet
      */
-    public function validate_gateway(string $gateway): string
-    {
+    public function validate_gateway(string $gateway): string {
         # Get the parent interface for this DHCP server
         $interface = NetworkInterface::query(['id' => $this->parent_id])->first();
 
@@ -213,8 +208,7 @@ class DHCPServerStaticMapping extends Model
      * @return Model|null Returns the Model object that has this
      * $ipaddr reserved if found, returns null if this $ipaddr is not reserved.
      */
-    private function get_ip_overlap(string $ipaddr): ?Model
-    {
+    private function get_ip_overlap(string $ipaddr): ?Model {
         # Ensure this IP address is not reserved by the primary DHCPServer address pool
         if (is_inrange_v4($ipaddr, $this->parent_model->range_from->value, $this->parent_model->range_to->value)) {
             return $this;
@@ -242,8 +236,7 @@ class DHCPServerStaticMapping extends Model
     /**
      * Applies the pending DHCP server changes.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new DHCPServerApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

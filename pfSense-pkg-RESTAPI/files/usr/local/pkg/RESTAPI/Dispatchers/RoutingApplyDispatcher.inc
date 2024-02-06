@@ -4,16 +4,14 @@ namespace RESTAPI\Dispatchers;
 
 use RESTAPI\Core\Dispatcher;
 
-class RoutingApplyDispatcher extends Dispatcher
-{
+class RoutingApplyDispatcher extends Dispatcher {
     # Only allow one routing apply to occur at a time
     public int $max_concurrency = 1;
 
     /**
      * Reload routing services to apply routing changes.
      */
-    public function process(...$arguments): void
-    {
+    public function process(...$arguments): void {
         global $g;
 
         # Check for the pending changes file and unserialize it

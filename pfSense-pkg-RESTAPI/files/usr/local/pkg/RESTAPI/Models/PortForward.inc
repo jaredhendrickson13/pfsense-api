@@ -13,8 +13,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
 use RESTAPI\Validators\IPAddressValidator;
 
-class PortForward extends Model
-{
+class PortForward extends Model {
     public InterfaceField $interface;
     public StringField $protocol;
     public FilterAddressField $source;
@@ -34,8 +33,7 @@ class PortForward extends Model
     public UnixTimeField $updated_time;
     public StringField $updated_by;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'nat/rule';
         $this->many = true;
@@ -169,8 +167,7 @@ class PortForward extends Model
     /**
      * Applies port forward changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

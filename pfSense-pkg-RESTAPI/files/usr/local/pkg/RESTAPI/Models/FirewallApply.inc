@@ -14,15 +14,13 @@ use RESTAPI\Fields\StringField;
 /**
  * A Model object that gathers details on pending firewall changes as well as tools to apply pending firewall changes.
  */
-class FirewallApply extends Model
-{
+class FirewallApply extends Model {
     const FIREWALL_SUBSYSTEMS = ['aliases', 'natconf', 'filter', 'shaper'];
 
     public BooleanField $applied;
     public StringField $pending_subsystems;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_applied_status';
         $this->always_apply = true;
@@ -51,8 +49,7 @@ class FirewallApply extends Model
      * firewall changes.
      * @return array An array of internal values for Field objects in this Model
      */
-    public function get_applied_status(): array
-    {
+    public function get_applied_status(): array {
         # Variables
         $internal_values = ['applied' => true, 'pending_subsystems' => []];
 
@@ -68,16 +65,14 @@ class FirewallApply extends Model
         return $internal_values;
     }
 
-    public function _create()
-    {
+    public function _create() {
         # Override this method but don't do anything. We only want to apply the changes.
     }
 
     /**
      * Spawns a new dispatcher process which applies any pending firewall changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
         $this->from_internal();
     }

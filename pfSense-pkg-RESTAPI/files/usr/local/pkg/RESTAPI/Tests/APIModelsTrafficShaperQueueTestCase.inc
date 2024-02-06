@@ -8,8 +8,7 @@ use RESTAPI\Models\TrafficShaper;
 use RESTAPI\Models\TrafficShaperQueue;
 use function RESTAPI\Core\Tools\bandwidth_to_bits;
 
-class APIModelsTrafficShaperQueueTestCase extends TestCase
-{
+class APIModelsTrafficShaperQueueTestCase extends TestCase {
     const PARENT_BASE_DATA = [
         'interface' => 'lan',
         'enabled' => true,
@@ -21,8 +20,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
     /**
      * Ensure TrafficShaperQueues cannot be created for parent TrafficShapers using the CODELQ scheduler.
      */
-    public function test_no_child_queues_when_codelq_parent(): void
-    {
+    public function test_no_child_queues_when_codelq_parent(): void {
         # Create a parent CODELQ TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->scheduler->value = 'CODELQ';
@@ -46,8 +44,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * Checks that a child TrafficShaperQueue must use the % bandwidthtype if the parent TrafficShaper is using the
      * % bandwidthtype.
      */
-    public function test_queue_bandwdith_type_must_match_parent_with_percent(): void
-    {
+    public function test_queue_bandwdith_type_must_match_parent_with_percent(): void {
         # Create a parent TrafficShaper and child TrafficShaperQueue
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->bandwidthtype->value = '%';
@@ -71,8 +68,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * Checks that the sum of all child TrafficShaperQueues bandwidth for a parent TrafficShaper cannot exceed the
      * parent's allowed bandwidth.
      */
-    public function test_queues_cannot_exceed_parent_bandwidth_limits(): void
-    {
+    public function test_queues_cannot_exceed_parent_bandwidth_limits(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->bandwidth->value = 100;
@@ -109,8 +105,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * Checks that the `priority` field value cannot be greater than 7 unless the parent TrafficShaper's `scheduler`
      * is set to `PRIQ`.
      */
-    public function test_priority_maximum_condition(): void
-    {
+    public function test_priority_maximum_condition(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->scheduler->value = 'HFSC';
@@ -145,8 +140,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * Checks that the `validate_upperlimit_m1()` method correctly enforces the `upperlimit_m1` field being a
      * bandwidth formatting string (i.e. 10Mb).
      */
-    public function test_upperlimit_m1_must_be_bandwidth_formatted_string(): void
-    {
+    public function test_upperlimit_m1_must_be_bandwidth_formatted_string(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->scheduler->value = 'HFSC'; // Required to enable the upperlimit fields
@@ -182,8 +176,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * Checks that the `validate_realtime_m1()` method correctly enforces the `realtime_m1` field being a
      * bandwidth formatting string (i.e. 10Mb).
      */
-    public function test_realtime_m1_must_be_bandwidth_formatted_string(): void
-    {
+    public function test_realtime_m1_must_be_bandwidth_formatted_string(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->scheduler->value = 'HFSC'; // Required to enable the realtime fields
@@ -219,8 +212,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * Checks that the `validate_linkshare_m1()` method correctly enforces the `linkshare_m1` field being a
      * bandwidth formatting string (i.e. 10Mb).
      */
-    public function test_linkshare_m1_must_be_bandwidth_formatted_string(): void
-    {
+    public function test_linkshare_m1_must_be_bandwidth_formatted_string(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->scheduler->value = 'HFSC'; // Required to enable the linkshare fields
@@ -255,8 +247,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
     /**
      * Checks that the `is_bandwidth_method()` correctly identifies bandwidth formatted strings (i.e. 10Mb, 1Gb, 100Kb)
      */
-    public function test_is_bandwidth_string(): void
-    {
+    public function test_is_bandwidth_string(): void {
         # Ensure valid bandwidth formatted strings are accepted
         $this->assert_is_true(TrafficShaperQueue::is_bandwidth_string('10Mb'));
         $this->assert_is_true(TrafficShaperQueue::is_bandwidth_string('1000Kb'));
@@ -274,8 +265,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * Checks that the `get_bandwidth_bits()` method correctly determines the total amount of bandwidth in bits for
      * queues with exact bandwidth amounts (not percentages).
      */
-    public function test_get_bandwidth_bits_exact(): void
-    {
+    public function test_get_bandwidth_bits_exact(): void {
         # Create a parent TrafficShaper and child TrafficShaperQueue
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->create();
@@ -326,8 +316,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * for queues with percentage bandwidth amounts when both the parent TrafficShaper and child TrafficShaperQueue
      * have % set as their `bandwidthtype`.
      */
-    public function test_get_bandwidth_bits_percent(): void
-    {
+    public function test_get_bandwidth_bits_percent(): void {
         # Create a parent TrafficShaper and child TrafficShaperQueue
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->bandwidth->value = 100;
@@ -360,8 +349,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * (i.e. a parent with a 100b bandwidth would give a child queue 30b of bandwidth when the child queues bandwidth
      * value is 30%)
      */
-    public function test_get_bandwidth_bits_mixed(): void
-    {
+    public function test_get_bandwidth_bits_mixed(): void {
         # Create a parent TrafficShaper and child TrafficShaperQueue
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->bandwidth->value = 100;
@@ -404,8 +392,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * Checks that a TrafficShaperQueue cannot be saved if its current bandwidth value will force the sum of all the
      * parents child queues bandwidth to exceed the parents maximum bandwidth
      */
-    public function test_is_bandwidth_exceeded(): void
-    {
+    public function test_is_bandwidth_exceeded(): void {
         # Create a parent TrafficShaper with a maximum of 100Mb bandwidth
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
         $shaper->bandwidth->value = 100;
@@ -465,8 +452,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
     /**
      * Checks that an HFSC TrafficShaperQueue is correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_hfsc_crud(): void
-    {
+    public function test_hfsc_crud(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA, async: false);
         $shaper->create();
@@ -542,8 +528,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * @param TrafficShaperQueue $queue The queue to obtain the line for.
      * @return string The expected pfctl HFSC queue line.
      */
-    private function get_hfsc_pfctl_queue_line(TrafficShaperQueue $queue): string
-    {
+    private function get_hfsc_pfctl_queue_line(TrafficShaperQueue $queue): string {
         $bw = $queue->bandwidth->value . $queue->bandwidthtype->value;
         $if = $queue->interface->get_related_model()->if->value;
         $name = $queue->name->value;
@@ -559,8 +544,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
     /**
      * Checks that an CBQ TrafficShaperQueue is correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_cbq_crud(): void
-    {
+    public function test_cbq_crud(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA, async: false);
         $shaper->scheduler->value = 'CBQ';
@@ -615,8 +599,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * @param TrafficShaperQueue $queue The queue to obtain the line for.
      * @return string The expected pfctl CBQ queue line.
      */
-    private function get_cbq_pfctl_queue_line(TrafficShaperQueue $queue): string
-    {
+    private function get_cbq_pfctl_queue_line(TrafficShaperQueue $queue): string {
         $bw = $queue->bandwidth->value . $queue->bandwidthtype->value;
         $if = $queue->interface->get_related_model()->if->value;
         $name = $queue->name->value;
@@ -629,8 +612,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
     /**
      * Checks that an FAIRQ TrafficShaperQueue is correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_fairq_crud(): void
-    {
+    public function test_fairq_crud(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA, async: false);
         $shaper->scheduler->value = 'FAIRQ';
@@ -685,8 +667,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * @param TrafficShaperQueue $queue The queue to obtain the line for.
      * @return string The expected pfctl FAIRQ queue line.
      */
-    private function get_fairq_pfctl_queue_line(TrafficShaperQueue $queue): string
-    {
+    private function get_fairq_pfctl_queue_line(TrafficShaperQueue $queue): string {
         $bw = $queue->bandwidth->value . $queue->bandwidthtype->value;
         $if = $queue->interface->get_related_model()->if->value;
         $name = $queue->name->value;
@@ -698,8 +679,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
     /**
      * Checks that an PRIQ TrafficShaperQueue is correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_priq_crud(): void
-    {
+    public function test_priq_crud(): void {
         # Create a parent TrafficShaper
         $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA, async: false);
         $shaper->scheduler->value = 'PRIQ';
@@ -750,8 +730,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase
      * @param TrafficShaperQueue $queue The queue to obtain the line for.
      * @return string The expected pfctl PRIQ queue line.
      */
-    private function get_priq_pfctl_queue_line(TrafficShaperQueue $queue): string
-    {
+    private function get_priq_pfctl_queue_line(TrafficShaperQueue $queue): string {
         $if = $queue->interface->get_related_model()->if->value;
         $name = $queue->name->value;
         $qlimit = $queue->qlimit->value;

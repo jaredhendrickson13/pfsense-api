@@ -7,12 +7,10 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\StringField;
 
-class OutboundNATMode extends Model
-{
+class OutboundNATMode extends Model {
     public StringField $mode;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'nat/outbound';
 
@@ -33,8 +31,7 @@ class OutboundNATMode extends Model
     /**
      * Applies changes to the outbound NAT mode.
      */
-    public function apply()
-    {
+    public function apply() {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

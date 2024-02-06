@@ -11,8 +11,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\LengthValidator;
 
-class NTPSettings extends Model
-{
+class NTPSettings extends Model {
     public BooleanField $enable;
     public InterfaceField $interface;
     public IntegerField $ntpmaxpeers;
@@ -31,8 +30,7 @@ class NTPSettings extends Model
     public Base64Field $serverauthkey;
     public StringField $serverauthalgo;
 
-    public function __construct(mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'ntpd';
         $this->update_strategy = 'merge';
@@ -146,8 +144,7 @@ class NTPSettings extends Model
     /**
      * Adds extra validation to the entire model.
      */
-    public function validate_extra(): void
-    {
+    public function validate_extra(): void {
         # Ensure the `ntpminpoll` value is not greater than `ntpmaxpoll`
         $min_poll = $this->ntpminpoll->value;
         $max_poll = $this->ntpmaxpoll->value;
@@ -168,8 +165,7 @@ class NTPSettings extends Model
      * @throws ValidationError When $serverauthkey is not exactly 64 characters and `serverauthalgo` is `sha256`
      * @throws ValidationError When $serverauthkey is not a hex encoded value and `serverauthalgo` is `sha1` or `sha256`
      */
-    public function validate_serverauthkey(string $serverauthkey): string
-    {
+    public function validate_serverauthkey(string $serverauthkey): string {
         # Throw an error if $serverauthkey is greater than 20 characters and `serverauthalgo` is md5
         if ($this->serverauthalgo->value === 'md5' and strlen($serverauthkey) > 20) {
             throw new ValidationError(
@@ -216,8 +212,7 @@ class NTPSettings extends Model
     /**
      * Applies changes to NTP server.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         system_ntp_configure();
     }
 }

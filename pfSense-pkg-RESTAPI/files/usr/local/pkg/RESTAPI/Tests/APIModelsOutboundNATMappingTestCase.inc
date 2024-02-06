@@ -7,13 +7,11 @@ use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\OutboundNATMapping;
 use RESTAPI\Models\OutboundNATMode;
 
-class APIModelsOutboundNATMappingTestCase extends TestCase
-{
+class APIModelsOutboundNATMappingTestCase extends TestCase {
     /**
      * Checks that outbound NAT mappings are correctly shown in pfctl when created, updated and deleted.
      */
-    public function test_crud()
-    {
+    public function test_crud() {
         # Set the outbound NAT mode for testing
         $nat_mode = new OutboundNATMode(data: ['mode' => 'hybrid'], async: false);
         $nat_mode->update(apply: true);
@@ -77,8 +75,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
     /**
      * Checks that outbound NAT mappings with `nonat` set are correctly represented in the pfctl rules
      */
-    public function test_nonat_in_pfctl()
-    {
+    public function test_nonat_in_pfctl() {
         # Set the outbound NAT mode for testing
         $nat_mode = new OutboundNATMode(data: ['mode' => 'hybrid'], async: false);
         $nat_mode->update(apply: true);
@@ -109,8 +106,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
     /**
      * Checks that outbound NAT mappings with `static_nat_port` set are correctly represented in the pfctl rules
      */
-    public function test_static_nat_port_in_pfctl()
-    {
+    public function test_static_nat_port_in_pfctl() {
         # Set the outbound NAT mode for testing
         $nat_mode = new OutboundNATMode(data: ['mode' => 'hybrid'], async: false);
         $nat_mode->update(apply: true);
@@ -144,8 +140,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
     /**
      * Checks that outbound NAT mappings with a `source_hash_key` set is correctly represented in the pfctl rules.
      */
-    public function test_source_hash_key()
-    {
+    public function test_source_hash_key() {
         # Set the outbound NAT mode for testing
         $nat_mode = new OutboundNATMode(data: ['mode' => 'hybrid'], async: false);
         $nat_mode->update(apply: true);
@@ -184,8 +179,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
     /**
      * Checks that `poolopt` cannot be set unless `target` is an alias or IP address
      */
-    public function test_poolopts_must_have_supporting_target()
-    {
+    public function test_poolopts_must_have_supporting_target() {
         # Create an alias and outbound NAT mapping to test with
         $alias = new FirewallAlias(data: ['name' => 'test_alias', 'type' => 'host']);
         $alias->create();
@@ -250,8 +244,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
      * Ensures an error is thrown if we try to set `target_subnet` to a value greater than 32 when `target` is an IPv4
      * address
      */
-    public function test_ipv4_targets_must_have_valid_subnet()
-    {
+    public function test_ipv4_targets_must_have_valid_subnet() {
         $this->assert_throws_response(
             response_id: 'OUTBOUND_NAT_MAPPING_TARGET_SUBNET_TOO_LARGE_FOR_IPV4',
             code: 400,
@@ -273,8 +266,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
     /**
      * Ensures the `target_subnet` field is unset if `target` is not an IP or alias
      */
-    public function test_no_target_subnet_if_target_is_not_ip_or_alias()
-    {
+    public function test_no_target_subnet_if_target_is_not_ip_or_alias() {
         # Ensure non IP or alias `target` values set to `target_subnet` to `null`
         $nat_map = new OutboundNATMapping(
             data: [

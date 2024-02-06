@@ -10,8 +10,7 @@ use RESTAPI;
  * Defines a StringField class that extends the Core Field method. This Field adds validation and representation for
  * string Model Fields.
  */
-class StringField extends RESTAPI\Core\Field
-{
+class StringField extends RESTAPI\Core\Field {
     public int $minimum_length;
     public int $maximum_length;
 
@@ -136,8 +135,7 @@ class StringField extends RESTAPI\Core\Field
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): string
-    {
+    protected function _from_internal(mixed $internal_value): string {
         return strval($internal_value);
     }
 
@@ -148,8 +146,7 @@ class StringField extends RESTAPI\Core\Field
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as a OpenAPI schema property configuration.
      */
-    public function to_openapi_property(): array
-    {
+    public function to_openapi_property(): array {
         # Run the parent to_openapi_property() to obtain the base property object, then make changes as needed.
         $openapi_property = parent::to_openapi_property();
 

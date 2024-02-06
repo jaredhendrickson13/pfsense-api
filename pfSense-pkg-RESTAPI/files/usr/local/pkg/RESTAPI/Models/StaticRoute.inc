@@ -14,8 +14,7 @@ use RESTAPI\Validators\SubnetValidator;
 /**
  * Defines a Model object for StaticRoutes
  */
-class StaticRoute extends Model
-{
+class StaticRoute extends Model {
     public StringField $network;
     public StringField $gateway;
     public StringField $descr;
@@ -24,8 +23,7 @@ class StaticRoute extends Model
     /**
      * Constructs the StaticRoute object.
      */
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define model attributes
         $this->config_path = 'staticroutes/route';
         $this->many = true;
@@ -57,8 +55,7 @@ class StaticRoute extends Model
      * @param string $network The incoming `network` value to be validated.
      * @return string The validated `network` value to set.
      */
-    public function validate_network(string $network): string
-    {
+    public function validate_network(string $network): string {
         # Skip additional validation if the `network` is an alias
         if ($this->network->has_label('is_alias')) {
             return $network;
@@ -112,8 +109,7 @@ class StaticRoute extends Model
      * @param string $gateway The incoming `gateway` value to be validated.
      * @return string The validated `gateway` value to set.
      */
-    public function validate_gateway(string $gateway): string
-    {
+    public function validate_gateway(string $gateway): string {
         # Skip extra validation if the `network` is an alias
         if ($this->network->has_label('is_alias')) {
             return $gateway;
@@ -146,8 +142,7 @@ class StaticRoute extends Model
      * @param bool $disabled The incoming `disabled` value to be validated.
      * @return bool The validated `disabled` value to set.
      */
-    public function validate_disabled(bool $disabled): bool
-    {
+    public function validate_disabled(bool $disabled): bool {
         # Fetch the gateway object of the gateway assigned
         $gateway_obj = RoutingGateway::query(['name' => $this->gateway->value])->first();
 
@@ -165,24 +160,21 @@ class StaticRoute extends Model
     /**
      * Applies pending static route changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**
      * Ensure routing changes are serialized and store at /tmp/.system_routes.apply before applying.
      */
-    public function pre_apply_update()
-    {
+    public function pre_apply_update() {
         $this->serialize_route();
     }
 
     /**
      * Ensures the static route deletion is performed before removing it from config
      */
-    public function _delete()
-    {
+    public function _delete() {
         delete_static_route($this->id, true);
         parent::_delete();
     }
@@ -190,8 +182,7 @@ class StaticRoute extends Model
     /**
      * Expands `network` values that are aliases in an array of subnets to apply static routes for.
      */
-    public function get_networks()
-    {
+    public function get_networks() {
         # Keep track of networks that can be applied to a static route
         $networks = [];
 
@@ -227,8 +218,7 @@ class StaticRoute extends Model
     /**
      * Serializes pending routing changes and stores them at /tmp/.system_routes.apply to apply later.
      */
-    private function serialize_route(): void
-    {
+    private function serialize_route(): void {
         global $g;
 
         # Include pending route changes that haven't been applied yet, or simply initialize our pending change var

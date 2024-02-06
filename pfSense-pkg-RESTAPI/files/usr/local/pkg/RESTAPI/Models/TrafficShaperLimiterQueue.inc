@@ -12,8 +12,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\FilterNameValidator;
 use RESTAPI\Validators\UniqueFromForeignModelValidator;
 
-class TrafficShaperLimiterQueue extends Model
-{
+class TrafficShaperLimiterQueue extends Model {
     public StringField $name;
     public IntegerField $number;
     public BooleanField $enabled;
@@ -48,8 +47,7 @@ class TrafficShaperLimiterQueue extends Model
     public FloatField $plr;
     public IntegerField $buckets;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->parent_model_class = 'TrafficShaperLimiter';
         $this->config_path = 'queue';
@@ -61,8 +59,8 @@ class TrafficShaperLimiterQueue extends Model
             required: true,
             unique: true,
             validators: [
-                new FilterNameValidator(), 
-                new UniqueFromForeignModelValidator(model: "TrafficShaperLimiter", field: "name")
+                new FilterNameValidator(),
+                new UniqueFromForeignModelValidator(model: 'TrafficShaperLimiter', field: 'name'),
             ],
             help_text: 'The unique name for this limiter queue.',
         );
@@ -262,21 +260,19 @@ class TrafficShaperLimiterQueue extends Model
     /**
      * Reloads the filter, and resets applicable RRD graphs
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new TrafficShaperApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**
      * Extends the default _delete() method to ensure the queue is removed from dnctl afterward.
      */
-    public function _delete(): void
-    {
+    public function _delete(): void {
         # Delete the limiter from config and remove the limiter from dnctl
         parent::_delete();
         new Command('dnctl queue delete ' . $this->number->value);
     }
-    
+
     /**
      * Obtains the next available DN queue `number`.
      * @return int The next available queue `number` value.

@@ -10,8 +10,7 @@ use const RESTAPI\Core\Globals\HAL_REL_NAMESPACE;
 /**
  * Defines a class that allows the storage and processing of many ResourceLink objects at once.
  */
-class ResourceLinkSet
-{
+class ResourceLinkSet {
     use BaseTraits;
 
     /**
@@ -48,8 +47,7 @@ class ResourceLinkSet
      * @returns array An array representation of each HAL ResourceLink object nested under the HAL standard `_links`
      * array key.
      */
-    public function to_representation(): array
-    {
+    public function to_representation(): array {
         # If an explicit $this->rel value was not given to this object, this object will be assumed as the root
         # ResourceLinkSet and be represented under the "_links" parent key.
         $representation = [$this->rel => []];

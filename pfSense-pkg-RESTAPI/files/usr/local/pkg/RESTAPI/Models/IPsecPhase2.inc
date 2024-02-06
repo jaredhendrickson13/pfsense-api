@@ -15,8 +15,7 @@ use RESTAPI\Fields\UIDField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 
-class IPsecPhase2 extends Model
-{
+class IPsecPhase2 extends Model {
     public UIDField $uniqid;
     public IntegerField $reqid;
     public ForeignModelField $ikeid;
@@ -42,8 +41,7 @@ class IPsecPhase2 extends Model
     public StringField $pinghost;
     public BooleanField $keepalive;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Obtain global IPsec phase 2 variables
         global $p2_modes;
         global $p2_halgos;
@@ -254,8 +252,7 @@ class IPsecPhase2 extends Model
      * @returns string The validated value to be assigned.
      * @throws ValidationError When $localid_type is an existing interface but the `mode` field's value is set to `vti`
      */
-    public function validate_localid_type(string $localid_type): string
-    {
+    public function validate_localid_type(string $localid_type): string {
         # Do not allow this field to use interface values if `mode` is set to `vti`
         if (!in_array($localid_type, $this->localid_type->allowed_keywords) and $this->mode->value === 'vti') {
             throw new ValidationError(
@@ -274,8 +271,7 @@ class IPsecPhase2 extends Model
      * @throws ValidationError When `mode` is set to `tunnel` but $localid_address is not an IPv4 address
      * @throws ValidationError When `mode` is set to `tunnel6` but $localid_address is not an IPv6 address
      */
-    public function validate_localid_address(string $localid_address): string
-    {
+    public function validate_localid_address(string $localid_address): string {
         # Require this value to be an IPv4 address if `mode` is set to `tunnel`
         if (!$this->localid_address->has_label('is_ipaddrv4') and $this->mode->value === 'tunnel') {
             throw new ValidationError(
@@ -300,8 +296,7 @@ class IPsecPhase2 extends Model
      * @returns int The validated value to be assigned.
      * @throws ValidationError When `localid_address` is an IPv4 address but the $localid_netbits is greater than 32
      */
-    public function validate_localid_netbits(int $localid_netbits): int
-    {
+    public function validate_localid_netbits(int $localid_netbits): int {
         # Do not allow this value to exceed 32 if it is an IPv4 address
         if ($localid_netbits > 32 and $this->localid_address->has_label('is_ipaddrv4')) {
             throw new ValidationError(
@@ -319,8 +314,7 @@ class IPsecPhase2 extends Model
      * @returns string The validated value to be assigned.
      * @throws ValidationError When $natlocalid_type is an existing interface but the `mode` field's value is set to `vti`
      */
-    public function validate_natlocalid_type(string $natlocalid_type): string
-    {
+    public function validate_natlocalid_type(string $natlocalid_type): string {
         # Variables
         $localid_type = $this->localid_type->value;
 
@@ -346,8 +340,7 @@ class IPsecPhase2 extends Model
      * @throws ValidationError When `mode` is set to `tunnel` but $natlocalid_address is not an IPv4 address
      * @throws ValidationError When `mode` is set to `tunnel6` but $natlocalid_address is not an IPv6 address
      */
-    public function validate_natlocalid_address(string $natlocalid_address): string
-    {
+    public function validate_natlocalid_address(string $natlocalid_address): string {
         # Require this value to be an IPv4 address if `mode` is set to `tunnel`
         if (!$this->natlocalid_address->has_label('is_ipaddrv4') and $this->mode->value === 'tunnel') {
             throw new ValidationError(
@@ -372,8 +365,7 @@ class IPsecPhase2 extends Model
      * @returns int The validated value to be assigned.
      * @throws ValidationError When `natlocalid_address` is an IPv4 address but the $natlocalid_netbits is greater than 32
      */
-    public function validate_natlocalid_netbits(int $natlocalid_netbits): int
-    {
+    public function validate_natlocalid_netbits(int $natlocalid_netbits): int {
         # Do not allow this value to exceed 32 if it is an IPv4 address
         if ($natlocalid_netbits > 32 and $this->natlocalid_address->has_label('is_ipaddrv4')) {
             throw new ValidationError(
@@ -392,8 +384,7 @@ class IPsecPhase2 extends Model
      * @throws ValidationError When `mode` is set to `tunnel` but $remoteid_address is not an IPv4 address
      * @throws ValidationError When `mode` is set to `tunnel6` but $remoteid_address is not an IPv6 address
      */
-    public function validate_remoteid_address(string $remoteid_address): string
-    {
+    public function validate_remoteid_address(string $remoteid_address): string {
         # Require this value to be an IPv4 address if `mode` is set to `tunnel`
         if (!$this->remoteid_address->has_label('is_ipaddrv4') and $this->mode->value === 'tunnel') {
             throw new ValidationError(
@@ -418,8 +409,7 @@ class IPsecPhase2 extends Model
      * @returns int The validated value to be assigned.
      * @throws ValidationError When `remoteid_address` is an IPv4 address but the $remoteid_netbits is greater than 32
      */
-    public function validate_remoteid_netbits(int $remoteid_netbits): int
-    {
+    public function validate_remoteid_netbits(int $remoteid_netbits): int {
         # Do not allow this value to exceed 32 if it is an IPv4 address
         if ($remoteid_netbits > 32 and $this->remoteid_address->has_label('is_ipaddrv4')) {
             throw new ValidationError(
@@ -437,8 +427,7 @@ class IPsecPhase2 extends Model
      * @returns int The validated value to be set.
      * @throws ValidationError When $rekey_time is greater than or equal to the `lifetime` Field's value.
      */
-    public function validate_rekey_time(int $rekey_time): int
-    {
+    public function validate_rekey_time(int $rekey_time): int {
         # Throw a validation error if $rekey_time is greater than or equal to the `lifetime` field's value
         if ($rekey_time >= $this->lifetime->value) {
             throw new ValidationError(
@@ -453,8 +442,7 @@ class IPsecPhase2 extends Model
     /**
      * Applies pending changes to IPsec.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

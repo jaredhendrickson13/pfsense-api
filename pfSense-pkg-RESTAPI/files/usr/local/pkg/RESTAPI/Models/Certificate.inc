@@ -12,16 +12,14 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 use RESTAPI\Validators\X509Validator;
 
-class Certificate extends Model
-{
+class Certificate extends Model {
     public StringField $descr;
     public UIDField $refid;
     public StringField $type;
     public Base64Field $crt;
     public Base64Field $prv;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'cert';
         $this->many = true;
@@ -64,8 +62,7 @@ class Certificate extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When $prv and the `crt` field's current value are not a matching key pair
      */
-    public function validate_prv(string $prv): string
-    {
+    public function validate_prv(string $prv): string {
         # Throw a validation error if $prv and the `crt` field's current value are not a matching key pair
         if (!X509Validator::is_matching_keypair(public_key: $this->crt->value, private_key: $prv)) {
             throw new ValidationError(
@@ -81,8 +78,7 @@ class Certificate extends Model
      * Deletes this Certificate object from configuration.
      * @throws ForbiddenError When the Certificate cannot be deleted because it is in use.
      */
-    public function _delete(): void
-    {
+    public function _delete(): void {
         # Do not allow this Certificate to be deleted if it is in use
         if (cert_in_use($this->refid->value)) {
             throw new ForbiddenError(

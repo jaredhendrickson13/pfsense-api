@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class StaticRouteEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class StaticRouteEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/system/routing/static_route';
         $this->model_name = 'StaticRoute';

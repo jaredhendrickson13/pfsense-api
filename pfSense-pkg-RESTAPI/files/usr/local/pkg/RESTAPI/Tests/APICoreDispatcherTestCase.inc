@@ -5,14 +5,12 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\TestCase;
 
-class APICoreDispatcherTestCase extends TestCase
-{
+class APICoreDispatcherTestCase extends TestCase {
     /**
      * Checks that the `max_concurrency` property limits the number of active Dispatcher process that can
      * be spawn.
      */
-    public function test_max_concurrency()
-    {
+    public function test_max_concurrency() {
         # Create a test dispatcher and spawn the maximum number of processes
         $dispatcher = new Dispatcher();
         $dispatcher->max_concurrency = 2;
@@ -35,8 +33,7 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that running processes are correctly identified by `get_running_processes()`
      */
-    public function test_get_running_processes()
-    {
+    public function test_get_running_processes() {
         # Create a test dispatcher
         $dispatcher = new Dispatcher();
 
@@ -54,8 +51,7 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that the PID file is created after process spawns.
      */
-    public function test_pid_file_exists_after_spawn()
-    {
+    public function test_pid_file_exists_after_spawn() {
         # Create a test dispatcher
         $dispatcher = new Dispatcher();
         $dispatcher->timeout = 2;
@@ -73,8 +69,7 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that the PID and PID file are killed when `kill_running_processes()` is called
      */
-    public function test_kill_running_processes()
-    {
+    public function test_kill_running_processes() {
         # Create a test dispatcher
         $dispatcher = new Dispatcher();
         $dispatcher->timeout = 2;
@@ -92,8 +87,7 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that Dispatcher processes is correctly timed out after the specified amount of time.
      */
-    public function test_process_timeout()
-    {
+    public function test_process_timeout() {
         # Create a test dispatcher
         $dispatcher = new Dispatcher();
         $dispatcher->timeout = 2;
@@ -114,8 +108,7 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that a Dispatcher cannot be assigned an unsupported `schedule` value
      */
-    public function test_schedule_options(): void
-    {
+    public function test_schedule_options(): void {
         $this->assert_throws_response(
             response_id: 'DISPATCHER_SCHEDULE_UNSUPPORTED',
             code: 500,
@@ -131,8 +124,7 @@ class APICoreDispatcherTestCase extends TestCase
      * Checks that the Dispatcher's `setup_schedule()` method creates a CronJob for the Dispatcher using the `schedule`
      * property.
      */
-    public function test_setup_schedule(): void
-    {
+    public function test_setup_schedule(): void {
         # Create a Dispatcher to test with but do not assign it a schedule yet
         $dispatcher = new Dispatcher();
 

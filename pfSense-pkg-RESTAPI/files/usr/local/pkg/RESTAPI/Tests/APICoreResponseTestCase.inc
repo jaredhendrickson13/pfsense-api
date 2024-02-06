@@ -7,13 +7,11 @@ use RESTAPI;
 /**
  * Defines test case for testing RESTAPI\Core\Response.
  */
-class APICoreResponseTestCase extends RESTAPI\Core\TestCase
-{
+class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that Response objects are throwable and checks that it corresponds with an HTTP 500 status code.
      */
-    public function test_response_throwable()
-    {
+    public function test_response_throwable() {
         $this->assert_throws_response(
             response_id: 'TEST_ERROR',
             code: 500,
@@ -27,8 +25,7 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase
      * Checks that the `get_http_status_message()` method correctly returns the status message associated with a
      * given HTTP status code, or returns 'unknown' if the code is not a known HTTP status code.
      */
-    public function test_get_http_status_message()
-    {
+    public function test_get_http_status_message() {
         $this->assert_equals('unknown', RESTAPI\Core\Response::get_http_status_message(5000));
 
         foreach (RESTAPI\Core\HTTP_STATUS_MESSAGES as $code => $message) {
@@ -39,8 +36,7 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase
     /**
      * Checks the Response object is correctly converted a representation form using `to_representation()`.
      */
-    public function test_response_to_representation()
-    {
+    public function test_response_to_representation() {
         # Create FirewallAlias and Response objects to test with
         $alias = new RESTAPI\Models\FirewallAlias(data: ['name' => 'test', 'type' => 'host']);
         $response = new RESTAPI\Core\Response(message: 'Test message', response_id: 'TEST_RESPONSE_ID', data: $alias);
@@ -74,8 +70,7 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase
      * Checks that the Response object is correctly converted to its OpenAPI component representation when the
      * `to_openapi_component()` method is run.
      */
-    public function test_response_to_openapi_component()
-    {
+    public function test_response_to_openapi_component() {
         # Create a Response object to represent as an OpenAPI component.
         $response = new RESTAPI\Core\Response(message: 'Test message', response_id: 'TEST_RESPONSE_ID');
         $response->help_text = 'Example OpenAPI description for this response component.';
@@ -94,8 +89,7 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase
      * Checks that the Response object is correctly converted it its OpenAPI schema representation when the
      * `to_openapi_schema()` method is run.
      */
-    public function test_response_to_openapi_schema()
-    {
+    public function test_response_to_openapi_schema() {
         # Create a Response object to represent as an OpenAPI component.
         $response = new RESTAPI\Core\Response(message: 'Test message', response_id: 'TEST_RESPONSE_ID');
         $response->help_text = 'Example OpenAPI description for this response component.';

@@ -7,13 +7,11 @@ use RESTAPI\Models\NTPSettings;
 use RESTAPI\Models\NTPTimeServer;
 use RESTAPI\Models\Service;
 
-class APIModelsNTPSettingsTestCase extends TestCase
-{
+class APIModelsNTPSettingsTestCase extends TestCase {
     /**
      * Ensure the NTP server is enabled before starting tests.
      */
-    public function setup(): void
-    {
+    public function setup(): void {
         $ntp_settings = new NTPSettings(enable: true);
         $ntp_settings->update();
     }
@@ -21,8 +19,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that `ntpminpoll` cannot exceed the `ntpmaxpoll` value when both are numeric.
      */
-    public function test_ntpminpoll_cannot_exceed_ntpmaxpoll(): void
-    {
+    public function test_ntpminpoll_cannot_exceed_ntpmaxpoll(): void {
         $this->assert_throws_response(
             response_id: 'NTP_SERVER_NTPMINPOLL_GREATER_THAN_NTPMAXPOLL',
             code: 400,
@@ -47,8 +44,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `serverauthkey` must be 20 characters are less when `serverauthalgo` is `md5`
      */
-    public function test_serverauthkey_maximum_length_with_md5(): void
-    {
+    public function test_serverauthkey_maximum_length_with_md5(): void {
         $this->assert_throws_response(
             response_id: 'NTP_SERVER_SERVERAUTHKEY_EXCEEDS_MAXIMUM_LENGTH_FOR_MD5',
             code: 400,
@@ -77,8 +73,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `serverauthkey` must be a 40 character hex encoded value when `serverauthalgo` is `sha1`
      */
-    public function test_serverauthkey_40_char_hex_value_with_sha1(): void
-    {
+    public function test_serverauthkey_40_char_hex_value_with_sha1(): void {
         # Ensure the value must be exactly 40 characters
         $this->assert_throws_response(
             response_id: 'NTP_SERVER_SERVERAUTHKEY_SHA1_CHARACTER_REQUIREMENT_UNMET',
@@ -119,8 +114,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `serverauthkey` must be a 64 character hex encoded value when `serverauthalgo` is `sha256`
      */
-    public function test_serverauthkey_64_char_hex_value_with_sha256(): void
-    {
+    public function test_serverauthkey_64_char_hex_value_with_sha256(): void {
         # Ensure the value must be exactly 40 characters
         $this->assert_throws_response(
             response_id: 'NTP_SERVER_SERVERAUTHKEY_SHA256_CHARACTER_REQUIREMENT_UNMET',
@@ -165,8 +159,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `ntpd` service is not running when `enable` is set to `false`.
      */
-    public function test_enable_controls_ntpd_service(): void
-    {
+    public function test_enable_controls_ntpd_service(): void {
         # Disable the NTP server and ensure the ntpd.conf is missing and ntpd is not running
         $ntp_settings = new NTPSettings(enable: false);
         $ntp_settings->update();
@@ -183,8 +176,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `interface` field correctly controls which interfaces are configured to listen in ntpd.conf
      */
-    public function test_interface_controls_listening_interfaces(): void
-    {
+    public function test_interface_controls_listening_interfaces(): void {
         # Ensure specifying no interfaces allows any interface to listen
         $ntp_settings = new NTPSettings(interface: []);
         $ntp_settings->update();
@@ -205,8 +197,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `orphan` and `ntpmaxpeers` correctly control the type of service line in ntpd.conf
      */
-    public function test_orphan_and_ntpmaxpeers_control_tos(): void
-    {
+    public function test_orphan_and_ntpmaxpeers_control_tos(): void {
         # Update the orphan and ntpmaxpeers and ensure the tos line in ntpd.conf changes accordingly
         $ntp_settings = new NTPSettings(orphan: 13, ntpmaxpeers: 14);
         $ntp_settings->update();
@@ -223,8 +214,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `ntpminpoll` and `ntpmaxpoll` are correctly represented in ntpd.conf
      */
-    public function test_ntpminpoll_and_ntpmaxpoll_found_in_ntpd_conf(): void
-    {
+    public function test_ntpminpoll_and_ntpmaxpoll_found_in_ntpd_conf(): void {
         # Update the orphan and ntpmaxpeers and ensure the tos line in ntpd.conf changes accordingly
         $ntp_settings = new NTPSettings(ntpminpoll: '5', ntpmaxpoll: '14');
         $ntp_settings->update();
@@ -253,8 +243,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `dnsresolv` field correctly sets the IP type for timeservers
      */
-    public function test_dnsresolv_found_in_ntpd_conf(): void
-    {
+    public function test_dnsresolv_found_in_ntpd_conf(): void {
         # dnsresolv does not work on pool timeservers, add a normal timeserver for this test
         $timeserver = new NTPTimeServer(timeserver: 'example.com', type: 'server');
         $timeserver->create();
@@ -284,8 +273,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `logpeer` and `logsys` fields correctly set the logconfig ntpd.conf value
      */
-    public function test_logconfig_fields(): void
-    {
+    public function test_logconfig_fields(): void {
         # Set the field names and their expected value in the logconfig ntpd.conf item
         $logconfig_fields = ['logpeer' => '+peerall', 'logsys' => '+sysall'];
 
@@ -308,8 +296,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `clockstats`, `loopstats` and `peerstats` fields correctly set the statistics ntpd.conf value
      */
-    public function test_statistics_fields(): void
-    {
+    public function test_statistics_fields(): void {
         # Set the field names and their expected value in the statistics ntpd.conf item
         $statistics_fields = ['clockstats', 'loopstats', 'peerstats'];
 
@@ -332,8 +319,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `leapsec` field value is correctly written to /var/db/leap-seconds after applying.
      */
-    public function test_leap_seconds(): void
-    {
+    public function test_leap_seconds(): void {
         # Set the leapsec field and ensure the value set is present in /var/db/leap-seconds
         $ntp_settings = new NTPSettings(leapsec: 'test value');
         $ntp_settings->update();
@@ -358,8 +344,7 @@ class APIModelsNTPSettingsTestCase extends TestCase
     /**
      * Checks that the `serverauthkey` and `serverauthalgo` is correctly represented in ntpd.conf and/or ntp.keys
      */
-    public function test_serverauth(): void
-    {
+    public function test_serverauth(): void {
         # Ensure MD5 server authentication is correctly set in ntp.keys
         $ntp_settings = new NTPSettings(serverauth: true, serverauthkey: 'testkey', serverauthalgo: 'md5');
         $ntp_settings->update();

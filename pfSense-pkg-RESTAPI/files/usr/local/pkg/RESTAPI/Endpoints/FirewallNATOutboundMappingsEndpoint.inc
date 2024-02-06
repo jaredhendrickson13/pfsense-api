@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class FirewallNATOutboundMappingsEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class FirewallNATOutboundMappingsEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/firewall/nat/outbound/mappings';
         $this->model_name = 'OutboundNATMapping';

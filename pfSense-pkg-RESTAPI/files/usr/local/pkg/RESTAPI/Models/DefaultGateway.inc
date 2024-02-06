@@ -6,13 +6,11 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\RoutingApplyDispatcher;
 use RESTAPI\Fields\ForeignModelField;
 
-class DefaultGateway extends Model
-{
+class DefaultGateway extends Model {
     public ForeignModelField $defaultgw4;
     public ForeignModelField $defaultgw6;
 
-    public function __construct(mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'gateways';
         $this->update_strategy = 'merge';
@@ -47,8 +45,7 @@ class DefaultGateway extends Model
     /**
      * Apply changes to the default gateway.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

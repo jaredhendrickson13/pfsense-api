@@ -6,12 +6,10 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 
-class DHCPServerApply extends Model
-{
+class DHCPServerApply extends Model {
     public BooleanField $applied;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_applied_status';
         $this->always_apply = true;
@@ -31,16 +29,14 @@ class DHCPServerApply extends Model
      * Obtains the current applied status.
      * @return array The internal value array to be loaded by this model as the internal callable
      */
-    public function get_applied_status(): array
-    {
+    public function get_applied_status(): array {
         return ['applied' => !is_subsystem_dirty('dhcpd')];
     }
 
     /**
      * Applies changes to the DHCP server configuration.
      */
-    public function apply()
-    {
+    public function apply() {
         $retvaldhcp = 0;
         $retvaldns = 0;
 

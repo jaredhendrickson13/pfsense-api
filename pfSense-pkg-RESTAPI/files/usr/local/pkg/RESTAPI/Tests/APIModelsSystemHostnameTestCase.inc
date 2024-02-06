@@ -6,13 +6,11 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\SystemHostname;
 
-class APIModelsSystemHostnameTestCase extends TestCase
-{
+class APIModelsSystemHostnameTestCase extends TestCase {
     /**
      * Checks that the system hostname is configured after updating.
      */
-    public function test_update()
-    {
+    public function test_update() {
         # Create the SystemHostname model object to test with
         $hostname = new SystemHostname(async: false);
 

@@ -5,14 +5,12 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 
-class APICoreCommandTestCase extends TestCase
-{
+class APICoreCommandTestCase extends TestCase {
     /**
      * Checks that the Command object successfully runs the requested command and returns the correct output and
      * result code.
      */
-    public function test_command()
-    {
+    public function test_command() {
         # Run a command that doesn't exist, ensure it's output and result code are expected
         $cmd = new Command('asdf');
         $this->assert_equals($cmd->output, 'sh: asdf: not found');

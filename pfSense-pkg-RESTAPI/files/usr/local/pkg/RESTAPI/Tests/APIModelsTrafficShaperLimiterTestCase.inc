@@ -6,14 +6,12 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\TrafficShaperLimiter;
 
-class APIModelsTrafficShaperLimiterTestCase extends TestCase
-{
+class APIModelsTrafficShaperLimiterTestCase extends TestCase {
     /**
      * Checks that we can successfully create, update and delete limiters and that they are correctly represented
      * in dnctl
      */
-    public function test_crud(): void
-    {
+    public function test_crud(): void {
         # Create a limiter to test with
         $limiter = new TrafficShaperLimiter(
             name: 'test',

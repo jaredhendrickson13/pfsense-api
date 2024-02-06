@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallAlias;
 
-class APIModelsFirewallAliasTestCase extends TestCase
-{
+class APIModelsFirewallAliasTestCase extends TestCase {
     /**
      * Checks that aliases with hostnames correctly populate a pfctl table
      */
-    public function test_fqdn_alias_populates_pfctl_table()
-    {
+    public function test_fqdn_alias_populates_pfctl_table() {
         # Create an alias that includes dns.google as an alias item
         $test_alias = new FirewallAlias(
             data: [
@@ -45,8 +43,7 @@ class APIModelsFirewallAliasTestCase extends TestCase
     /**
      * Checks that prohibited alias names are rejected
      */
-    public function test_reject_prohibited_alias_names()
-    {
+    public function test_reject_prohibited_alias_names() {
         # Ensure aliases starting with `pkg_` are rejected
         $this->assert_throws_response(
             response_id: 'FILTER_NAME_VALIDATOR_CANNOT_START_WITH_PKG',
@@ -81,8 +78,7 @@ class APIModelsFirewallAliasTestCase extends TestCase
     /**
      * Checks that address entries for host aliases must be an IP, hostname or alias
      */
-    public function test_host_alias_address_validation()
-    {
+    public function test_host_alias_address_validation() {
         # Ensure an error is thrown if address is not a host
         $this->assert_throws_response(
             response_id: 'INVALID_HOST_ALIAS_ADDRESS',
@@ -99,8 +95,7 @@ class APIModelsFirewallAliasTestCase extends TestCase
     /**
      * Checks that address entries for network aliases must be a CIDR, hostname or alias
      */
-    public function test_network_alias_address_validation()
-    {
+    public function test_network_alias_address_validation() {
         $this->assert_throws_response(
             response_id: 'INVALID_NETWORK_ALIAS_ADDRESS',
             code: 400,
@@ -116,8 +111,7 @@ class APIModelsFirewallAliasTestCase extends TestCase
     /**
      * Checks that address entries for port aliases must be a port number or alias
      */
-    public function test_port_alias_address_validation()
-    {
+    public function test_port_alias_address_validation() {
         $this->assert_throws_response(
             response_id: 'INVALID_PORT_ALIAS_ADDRESS',
             code: 400,
@@ -133,8 +127,7 @@ class APIModelsFirewallAliasTestCase extends TestCase
     /**
      * Checks that there cannot be more detail entries than address entries.
      */
-    public function test_cannot_have_more_details_than_addresses()
-    {
+    public function test_cannot_have_more_details_than_addresses() {
         $this->assert_throws_response(
             response_id: 'TOO_MANY_ALIAS_DETAILS',
             code: 400,

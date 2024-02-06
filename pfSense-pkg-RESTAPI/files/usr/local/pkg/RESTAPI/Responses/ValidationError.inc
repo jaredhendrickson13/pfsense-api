@@ -13,8 +13,7 @@ use RESTAPI\Core\Response;
  * Exception class tha indicates an input validation error. This exception generally corresponds with a 400 Bad Request
  * HTTP code.
  */
-class ValidationError extends Response
-{
+class ValidationError extends Response {
     public $code = 400;
     public string $help_text = 'The client request data has one or more input validation errors.';
 

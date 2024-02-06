@@ -9,13 +9,11 @@ use RESTAPI\Models\DHCPServerBackend;
 use RESTAPI\Models\DHCPServerStaticMapping;
 use RESTAPI\Models\VirtualIP;
 
-class APIModelsDHCPServerStaticMappingTestCase extends TestCase
-{
+class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
     /**
      * Checks that the `ipaddr` field cannot be set to an IP address that is in use by an existing virtual IP.
      */
-    public function test_ipaddr_cannot_overlap_vip(): void
-    {
+    public function test_ipaddr_cannot_overlap_vip(): void {
         # Create a virtual IP to test with
         $vip = new VirtualIP(interface: 'lan', mode: 'ipalias', subnet: '192.168.1.205', subnet_bits: 24);
         $vip->create();
@@ -41,8 +39,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase
     /**
      * Checks that the `ipaddr` field cannot be set to an IP address that is in use by an existing address pool.
      */
-    public function test_ipaddr_cannot_overlap_address_pool(): void
-    {
+    public function test_ipaddr_cannot_overlap_address_pool(): void {
         # Create an address pool to test with
         $pool = new DHCPServerAddressPool(
             parent_id: 'lan',
@@ -73,8 +70,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase
     /**
      * Checks that the `ipaddr` field cannot be set to an IP address that overlaps the DHCP server's primary pool
      */
-    public function test_ipaddr_cannot_overlap_primary_pool(): void
-    {
+    public function test_ipaddr_cannot_overlap_primary_pool(): void {
         # Update the DHCP server primary pool
         $dhcp_server = new DHCPServer(id: 'lan', range_from: '192.168.1.10', range_to: '192.168.1.15');
         $dhcp_server->update();
@@ -97,8 +93,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase
     /**
      * Checks that the `maxleasetime` field cannot be assigned a value less than `defaultleasetime`.
      */
-    public function test_maxleasetime_cannot_be_less_than_defaultleasetime(): void
-    {
+    public function test_maxleasetime_cannot_be_less_than_defaultleasetime(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_STATIC_MAPPING_MAX_LEASE_TIME_LESS_THAN_DEFAULT',
             code: 400,
@@ -118,8 +113,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase
     /**
      * Checks that the `gateway` field must be assigned a value within the parent DHCP server's interface subnet.
      */
-    public function test_gateway_must_be_within_interface_subnet(): void
-    {
+    public function test_gateway_must_be_within_interface_subnet(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_STATIC_MAPPING_GATEWAY_NOT_WITHIN_SUBNET',
             code: 400,
@@ -138,8 +132,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase
     /**
      * Checks that static mappings are correctly represented in dhcpd.conf after creating, updating and deleting.
      */
-    public function test_crud_dhcpd(): void
-    {
+    public function test_crud_dhcpd(): void {
         # Switch our DHCP backend to ISC DHCP
         $dhcp_backend = new DHCPServerBackend(dhcpbackend: 'isc', async: false);
         $dhcp_backend->update();
@@ -222,8 +215,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase
     /**
      * Checks that static mappings are correctly represented in kea-dhcpv4.conf after creating, updating and deleting.
      */
-    public function test_crud_kea(): void
-    {
+    public function test_crud_kea(): void {
         # Switch our DHCP backend to Kea DHCP
         $dhcp_backend = new DHCPServerBackend(dhcpbackend: 'kea', async: false);
         $dhcp_backend->update();
@@ -290,8 +282,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase
      * @param array $option_data The entire reservation's `option-data` array.
      * @return string The 'data' value of the $options_data item with the given $name
      */
-    public function get_kea_option_by_name(string $name, array $option_data): string
-    {
+    public function get_kea_option_by_name(string $name, array $option_data): string {
         foreach ($option_data as $option) {
             if ($option['name'] === $name) {
                 return $option['data'];

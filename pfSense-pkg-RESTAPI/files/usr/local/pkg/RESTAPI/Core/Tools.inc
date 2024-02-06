@@ -26,8 +26,7 @@ require_once 'RESTAPI/autoloader.inc';
  * @param array $array The array to check.
  * @return bool `true` if the value is an associative array. `false` if it is an indexed array.
  */
-function is_assoc_array(array $array): bool
-{
+function is_assoc_array(array $array): bool {
     # Start index tracking at 0
     $index = 0;
 
@@ -51,8 +50,7 @@ function is_assoc_array(array $array): bool
  * @param bool $condition A true or false condition. If the condition is true, the $message will be printed. Otherwise
  * it will not.
  */
-function cprint(string $message, bool $condition): void
-{
+function cprint(string $message, bool $condition): void {
     if ($condition) {
         print $message;
     }
@@ -65,8 +63,7 @@ function cprint(string $message, bool $condition): void
  * @return int The bandwidth's total number of bits.
  * @throws ServerError When $bandwidthtype is not a supported option.
  */
-function bandwidth_to_bits(int $bandwidth, string $scale): int
-{
+function bandwidth_to_bits(int $bandwidth, string $scale): int {
     # Set scale factors we can use to convert various bandwidth values into total bit count
     $gigabit_scale_factor = 1024 * 1024 * 1024;
     $megabit_scale_factor = 1024 * 1024;
@@ -143,8 +140,7 @@ function http_request(
  * @param bool $shortnames Obtain the class shortnames instead of FQNs.
  * @return array An array containing the class names for each .inc class file.
  */
-function get_classes_from_namespace(string $namespace, bool $shortnames = false): array
-{
+function get_classes_from_namespace(string $namespace, bool $shortnames = false): array {
     # Variables
     $classes = [];
     $namespace = !str_starts_with($namespace, '\\') ? $namespace . '\\' : $namespace;
@@ -164,8 +160,7 @@ function get_classes_from_namespace(string $namespace, bool $shortnames = false)
 /**
  * Auto-generates OpenAPI documentation for all Endpoints and their associated Models.
  */
-function generate_documentation(): bool
-{
+function generate_documentation(): bool {
     # Variables
     $endpoint_classes = get_classes_from_namespace('\\RESTAPI\\Endpoints\\');
     $response_classes = get_classes_from_namespace('\\RESTAPI\\Responses\\');

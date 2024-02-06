@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class UsersEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class UsersEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/users';
         $this->model_name = 'User';

@@ -7,15 +7,13 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\RegexValidator;
 
-class SystemTunable extends Model
-{
+class SystemTunable extends Model {
     public StringField $tunable;
     public StringField $value;
     public StringField $descr;
     private array $sysctl_defaults;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'sysctl/item';
         $this->many = true;
@@ -40,8 +38,7 @@ class SystemTunable extends Model
     /**
      * Apply all configured sysctl tunables.
      */
-    public function apply()
-    {
+    public function apply() {
         # Setup all sysctl values
         system_setup_sysctl();
 

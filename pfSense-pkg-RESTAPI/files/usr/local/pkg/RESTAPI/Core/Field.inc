@@ -17,8 +17,7 @@ use const RESTAPI\Core\Globals\RESERVED_FIELD_NAMES;
  * assigned custom Validator objects to add custom validation to the Field. Field's must be assigned as a properties
  * Model objects.
  */
-class Field
-{
+class Field {
     use BaseTraits;
 
     /**
@@ -193,8 +192,7 @@ class Field
      * Allows the Field's current value to be obtained by invoking the field object.
      * @returns mixed The value currently set in $this->value
      */
-    final public function __invoke(): mixed
-    {
+    final public function __invoke(): mixed {
         return $this->value;
     }
 
@@ -202,8 +200,7 @@ class Field
      * Checks that values passed in during __construct are valid and do not conflict.
      * @throws ServerError When any Field properties have conflicting values.
      */
-    private function check_construct()
-    {
+    private function check_construct() {
         # Throw an error if `required` and `default` are both set
         if ($this->required and isset($this->default)) {
             throw new ServerError(
@@ -259,8 +256,7 @@ class Field
      * property assigned this Field in the parent Model.
      * @param string $name The name to assign this Field.
      */
-    public function set_names(string $name)
-    {
+    public function set_names(string $name) {
         # Throw an error if this Field name is reserved
         if (in_array($name, RESERVED_FIELD_NAMES)) {
             throw new ServerError(
@@ -292,8 +288,7 @@ class Field
      * Accepts a given array of choices and sets the `choices` and `verbose_choices` properties accordingly.
      * @param array $choices An array of incoming choices to set
      */
-    public function set_choices(array $choices): void
-    {
+    public function set_choices(array $choices): void {
         # Format choices accordingly when they are provided as an associative array
         if (is_assoc_array($choices)) {
             $this->verbose_choices = $choices;
@@ -312,8 +307,7 @@ class Field
     /**
      * Sets choices by calling the `choices_callable` method if present.
      */
-    public function set_choices_from_callable(): void
-    {
+    public function set_choices_from_callable(): void {
         # If a choices callable is assigned, run the callable to populate the choices if allowed
         if ($this->choices_callable) {
             # Set a variable we can use to dynamic invoke the callable
@@ -343,8 +337,7 @@ class Field
      * @param string $label_name The name of the label to check for (e.g. `is_ipaddrv4`)
      * @return bool Returns `true` if this Field object is assigned the $label_name, `false` if it is not.
      */
-    public function has_label(string $label_name): bool
-    {
+    public function has_label(string $label_name): bool {
         return in_array($label_name, $this->labels);
     }
 
@@ -355,8 +348,7 @@ class Field
      * where we need to validate many objects before they are created.
      * @return bool `true` if all validation succeeded.
      */
-    public function validate(?ModelSet $modelset = null): bool
-    {
+    public function validate(?ModelSet $modelset = null): bool {
         # Ensure model context exists when needed
         $this->check_model_context();
 
@@ -433,16 +425,14 @@ class Field
      * @param mixed $value The value being validated. In the event that this is a `many` field, this method will
      * receive each value of the array individually, not the array value itself.
      */
-    public function validate_extra(mixed $value)
-    {
+    public function validate_extra(mixed $value) {
     }
 
     /**
      * Ensures this field has a parent model context assigned if a parent model context is required.
      * @throws ServerError When `unique` or `conditions` are set, but no Model `context` has been assigned.
      */
-    private function check_model_context()
-    {
+    private function check_model_context() {
         # Throw an error if this field is unique but no model context was provided
         if ($this->unique and !$this->context) {
             throw new ServerError(
@@ -466,8 +456,7 @@ class Field
      * @throws ValidationError When this is not an `editable` Field, but the value given differs from the value stored
      * for the parent Model context
      */
-    private function is_value_editable(): void
-    {
+    private function is_value_editable(): void {
         # Only proceed with validation if the parent Model has an initial object set and this value is not editable
         if (is_null($this->context->initial_object) or $this->editable) {
             return;
@@ -492,8 +481,7 @@ class Field
      * @note The condition can reference a parent's Model Field by prefixing parent__ to the conditions array key.
      * @returns bool `true` if all conditions were met, `false` if any conditions failed.
      */
-    private function are_conditions_met(): bool
-    {
+    private function are_conditions_met(): bool {
         # Variables
         $conditions_met = true;
 
@@ -565,8 +553,7 @@ class Field
      * @throws ServerError When `required` and `default` are both set OR `required` and `allow_null` are both set.
      * @throws ValidationError If `required` is set but no value was assigned.
      */
-    private function check_field_required()
-    {
+    private function check_field_required() {
         # Throw an error if this field is required but no value was set.
         if ($this->required and is_null($this->value)) {
             throw new ValidationError(message: "Field `$this->name` is required.", response_id: 'FIELD_IS_REQUIRED');
@@ -586,8 +573,7 @@ class Field
      * @throws ServerError When `read_only` is set and `choices` or `default` are also set.
      * @throws ValidationError When `read_only` is set and a non-null value was requested.
      */
-    private function check_field_read_only()
-    {
+    private function check_field_read_only() {
         # Throw an error if the field is read only, but choices were defined
         if ($this->read_only and $this->choices) {
             throw new ServerError(
@@ -601,8 +587,7 @@ class Field
      * Checks the length of the value array when `many` is enabled. This ensures there are at least as many array
      * entries as specified with `many_minimum` but no more array entries than specified with `many_maximum`.
      */
-    private function check_many_value_length()
-    {
+    private function check_many_value_length() {
         # Only validate this if 'many' is enabled.
         if ($this->many and is_array($this->value)) {
             # Ensure the value contains an appropriate number of array entries
@@ -619,8 +604,7 @@ class Field
      * @returns array An array containing all individual values that need validation.
      * @throws ValidationError When `many` is enabled, but `value` is not an array.
      */
-    private function get_value_as_array(): array|null
-    {
+    private function get_value_as_array(): array|null {
         # Assume the default value if no value was set and a default was specified
         if (isset($this->default) and is_null($this->value)) {
             $this->value = $this->default;
@@ -649,8 +633,7 @@ class Field
      * `internal_name` was not specified, the `internal_name` will be assigned the same value as `name` by this method.
      * @throws ServerError When this object's `name` has not been set.
      */
-    public function check_field_names()
-    {
+    public function check_field_names() {
         # Throw an error if no `name` has been set.
         if (empty($this->name)) {
             throw new ServerError(
@@ -683,8 +666,7 @@ class Field
      * @throws ServerError When $unique is enabled but a $config_path is not assigned to the parent model $context
      * @throws ServerError When $unique is enabled, but the parent model $context does not have $many enabled
      */
-    private function check_field_unique(mixed $value, ?ModelSet $modelset = null): void
-    {
+    private function check_field_unique(mixed $value, ?ModelSet $modelset = null): void {
         # Only check this if `unique` is enabled
         if ($this->unique) {
             # Throw an error if unique is set but the model context is not a 'many' model.
@@ -725,8 +707,7 @@ class Field
      * @param mixed $value The value to check against assigned `type`.
      * @throws ValidationError If the specified value is not a supported type.
      */
-    protected function check_value_type(mixed $value)
-    {
+    protected function check_value_type(mixed $value) {
         # Don't validate type for `read_only` Fields
         if ($this->read_only) {
             return;
@@ -751,8 +732,7 @@ class Field
      * @param mixed $value The value to check against available choices.
      * @returns ValidationError When the $value is not an available choice.
      */
-    private function check_value_choice(mixed $value)
-    {
+    private function check_value_choice(mixed $value) {
         # Skip choice validation if no choices were specified and no choice callable was assigned
         if (!$this->choices and !$this->choices_callable) {
             return;
@@ -778,8 +758,7 @@ class Field
      * @return bool Returns `true` if value is empty and empty values are allowed. Returns `false` otherwise.
      * @@throws  ValidationError When the $value is empty but empty empty values are not allowed
      */
-    private function check_value_empty(mixed $value): bool
-    {
+    private function check_value_empty(mixed $value): bool {
         # Skip this validation for read_only Fields
         if ($this->read_only) {
             return true;
@@ -811,8 +790,7 @@ class Field
      * @param string $internal_value The internal config value to convert to a representation value.
      * @throws ServerError When the child Field class does not override this method.
      */
-    protected function _from_internal(string $internal_value)
-    {
+    protected function _from_internal(string $internal_value) {
         throw new ServerError(
             message: "Field '$this->name' does not have method of converting internal value to representation.",
             response_id: 'FIELD_CANNOT_REPRESENT_INTERNAL_VALUE',
@@ -826,8 +804,7 @@ class Field
      * `value` property for this object.
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function from_internal(mixed $internal_value)
-    {
+    public function from_internal(mixed $internal_value) {
         # Keep null values for non boolean values and representation only values
         if ($this->representation_only or is_null($internal_value) and $this->type !== 'boolean') {
             # Check if this field has a default, if so, use the default value
@@ -885,8 +862,7 @@ class Field
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value): array|string|null
-    {
+    protected function _to_internal(mixed $representation_value): array|string|null {
         return is_null($representation_value) ? null : strval($representation_value);
     }
 
@@ -896,8 +872,7 @@ class Field
      * the internal string value suitable for writing to the pfSense configuration.
      * @return array|string|null The internal array or string value suitable for writing the pfSense configuration.
      */
-    public function to_internal(): array|string|null
-    {
+    public function to_internal(): array|string|null {
         # Do not convert 'representation_only' Fields to internal
         if ($this->representation_only) {
             return null;
@@ -928,8 +903,7 @@ class Field
      * @returns Model Returns the single Model object related to this Field's current value or `null` if no related
      * Model was found.
      */
-    public function get_related_model(): Model|null
-    {
+    public function get_related_model(): Model|null {
         return null;
     }
 
@@ -939,8 +913,7 @@ class Field
      * $many set to true.
      * @returns ModelSet Returns a ModelSet of all related objects associated with this Fields current values.
      */
-    public function get_related_models(): ModelSet
-    {
+    public function get_related_models(): ModelSet {
         return new ModelSet();
     }
 
@@ -949,8 +922,7 @@ class Field
      * current value.
      * @return ModelSet
      */
-    public function is_referenced_by(): ModelSet
-    {
+    public function is_referenced_by(): ModelSet {
         # Use a variable to keep track of Model objects that reference this field
         $references = new ModelSet();
 
@@ -982,8 +954,7 @@ class Field
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
      */
-    public function to_openapi_property(): array
-    {
+    public function to_openapi_property(): array {
         # Assign primitive property attributes
         $openapi_property = [];
         $openapi_property['description'] = $this->help_text . '<br>' . $this->get_conditions_text();
@@ -1024,8 +995,7 @@ class Field
      * OpenAPI documentation generation.
      * @return string A descriptive string explaining the `conditions` for this Field.
      */
-    public function get_conditions_text(): string
-    {
+    public function get_conditions_text(): string {
         # Variables
         $conditions_text = '';
 
@@ -1081,8 +1051,7 @@ class Field
      * @return object The pfSense webConfigurator form input object.
      * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
      */
-    public function to_form_input(string $type = 'text', array $attributes = []): object
-    {
+    public function to_form_input(string $type = 'text', array $attributes = []): object {
         # Format the title to include an asterisk (*) if it is required.
         $title = $this->required ? ucwords($this->verbose_name) . '*' : ucwords($this->verbose_name);
 

@@ -7,8 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI;
 use RESTAPI\Responses\ValidationError;
 
-class GatewayValidator extends RESTAPI\Core\Validator
-{
+class GatewayValidator extends RESTAPI\Core\Validator {
     public bool $allow_ipv4;
     public bool $allow_ipv6;
     public bool $allow_empty;
@@ -39,8 +38,7 @@ class GatewayValidator extends RESTAPI\Core\Validator
      * @param string $field_name The field name of the value being validated. This is used for error messages.
      * @throws \RESTAPI\Responses\ValidationError When the value is not a valid gateway.
      */
-    public function validate(mixed $value, string $field_name = '')
-    {
+    public function validate(mixed $value, string $field_name = '') {
         # Allow empty values if requested
         if ($this->allow_empty and $value === '') {
             return;

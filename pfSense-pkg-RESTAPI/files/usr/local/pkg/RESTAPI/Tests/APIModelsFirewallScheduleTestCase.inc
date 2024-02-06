@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallSchedule;
 
-class APIModelsFirewallScheduleTestCase extends TestCase
-{
+class APIModelsFirewallScheduleTestCase extends TestCase {
     /**
      * Checks that the firewall schedules reports active during one of the time ranges, and inactive when not.
      */
-    public function test_schedule_shows_active(): void
-    {
+    public function test_schedule_shows_active(): void {
         # Get integers of the current month and day. Ensure there are no conflicts between tests dates and todays date
         $current_month = (int) date('m');
         $current_day = (int) date('d');

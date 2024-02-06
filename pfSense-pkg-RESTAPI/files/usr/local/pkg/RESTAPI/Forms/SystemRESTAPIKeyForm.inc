@@ -8,8 +8,7 @@ use RESTAPI\Core\Form;
 use RESTAPI\Core\Response;
 use RESTAPI\Models\RESTAPISettings;
 
-class SystemRESTAPIKeyForm extends Form
-{
+class SystemRESTAPIKeyForm extends Form {
     public string $url = '/system_restapi_key_edit.php';
     public string $model_class = 'RESTAPIKey';
     public array $title_path = ['System', 'REST API', 'Keys'];
@@ -28,8 +27,7 @@ class SystemRESTAPIKeyForm extends Form
     /**
      * Prints a warning banner when the page loads if this Form is accessed when KeyAuth is not enabled.
      */
-    public function on_load(): void
-    {
+    public function on_load(): void {
         # Print a warning at the top of the page if the user is accessing the page when KeyAuth is not enabled
         $api_settings = new RESTAPISettings();
         if (!in_array('KeyAuth', $api_settings->auth_methods->value)) {
@@ -44,8 +42,7 @@ class SystemRESTAPIKeyForm extends Form
     /**
      * Overwrite the on_save() method to include the generated API key.
      */
-    public function on_save(): void
-    {
+    public function on_save(): void {
         # Update settings with the newly provided values
         $representation_data = $this->id ? ['id' => $this->id] : [];
         $representation_data += $this->form_data_to_model_representation(form_data: $_POST, model: $this->model);

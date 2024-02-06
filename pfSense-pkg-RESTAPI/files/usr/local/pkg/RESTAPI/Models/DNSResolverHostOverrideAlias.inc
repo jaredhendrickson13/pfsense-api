@@ -9,14 +9,12 @@ use RESTAPI\Dispatchers\DNSResolverApplyDispatcher;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\HostnameValidator;
 
-class DNSResolverHostOverrideAlias extends Model
-{
+class DNSResolverHostOverrideAlias extends Model {
     public StringField $host;
     public StringField $domain;
     public StringField $descr;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->parent_model_class = 'DNSResolverHostOverride';
         $this->config_path = 'aliases/item';
@@ -52,8 +50,7 @@ class DNSResolverHostOverrideAlias extends Model
     /**
      * Applies pending DNS Resolver changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new DNSResolverApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

@@ -6,13 +6,11 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Validators\SubnetValidator;
 
-class APIValidatorsSubnetValidatorTestCase extends TestCase
-{
+class APIValidatorsSubnetValidatorTestCase extends TestCase {
     /**
      * Checks that IPv4 subnets are correctly validated
      */
-    public function test_ipv4_subnet_validation()
-    {
+    public function test_ipv4_subnet_validation() {
         # Ensure an error is thrown when the IPv4 subnet is invalid
         $this->assert_throws_response(
             response_id: 'SUBNET_VALIDATOR_FAILED',
@@ -45,8 +43,7 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase
     /**
      * Checks that IPv6 subnets are correctly validated
      */
-    public function test_ipv6_subnet_validation()
-    {
+    public function test_ipv6_subnet_validation() {
         # Ensure an error is thrown when the IPv4 subnet is invalid
         $this->assert_throws_response(
             response_id: 'SUBNET_VALIDATOR_FAILED',
@@ -79,8 +76,7 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase
     /**
      * Checks that host type aliases are valid when alias values are allowed.
      */
-    public function test_host_alias_subnet_validator()
-    {
+    public function test_host_alias_subnet_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
             data: [
@@ -111,8 +107,7 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase
     /**
      * Checks that host type aliases are valid when alias values are allowed.
      */
-    public function test_network_alias_subnet_validator()
-    {
+    public function test_network_alias_subnet_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
             data: [
@@ -143,8 +138,7 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase
     /**
      * Checks that port type aliases are always invalid.
      */
-    public function test_port_alias_subnet_validator()
-    {
+    public function test_port_alias_subnet_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
             data: [
@@ -177,8 +171,7 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase
     /**
      * Check that the SubnetValidator does not throw any errors for values that are subnet CIDRs.
      */
-    public function test_subnet_validator()
-    {
+    public function test_subnet_validator() {
         $this->assert_does_not_throw(function () {
             $test_validator = new SubnetValidator(allow_ipv4: true, allow_ipv6: true, allow_keywords: ['test']);
             $test_validator->validate('1.2.3.4/24');

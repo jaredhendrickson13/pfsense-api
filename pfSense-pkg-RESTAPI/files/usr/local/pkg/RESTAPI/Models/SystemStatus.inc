@@ -9,8 +9,7 @@ use RESTAPI\Fields\FloatField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
-class SystemStatus extends Model
-{
+class SystemStatus extends Model {
     public StringField $platform;
     public StringField $serial;
     public StringField $netgate_id;
@@ -31,8 +30,7 @@ class SystemStatus extends Model
     public FloatField $swap_usage;
     public FloatField $disk_usage;
 
-    public function __construct(mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $data = [], ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_system_status_internal';
 
@@ -166,8 +164,7 @@ class SystemStatus extends Model
      * populate the Field values for this Model.
      * @return array An array of internal system status values.
      */
-    protected function get_system_status_internal(): array
-    {
+    protected function get_system_status_internal(): array {
         return [
             'platform' => system_identify_specific_platform()['descr'],
             'serial' => system_get_serial(),
@@ -196,8 +193,7 @@ class SystemStatus extends Model
      * @param string $bios_field The kenv smbios.bios.* field name to obtain
      * @return string The BIOS vendor's name
      */
-    private function get_bios_info(string $bios_field): string
-    {
+    private function get_bios_info(string $bios_field): string {
         # Run the kenv command to obtain the requested BIOS information
         $kenv = new Command(command: "/bin/kenv -q smbios.bios.$bios_field 2>/dev/null", trim_whitespace: true);
         return $kenv->result_code === 0 ? $kenv->output : '';
@@ -208,8 +204,7 @@ class SystemStatus extends Model
      * @param bool $as_fahrenheit Obtain the system temperature in Fahrenheit instead of Celsius
      * @return float|null The current system temperature as a float OR null if the temperature could not be read.
      */
-    private function get_system_temp(bool $as_fahrenheit = false): ?float
-    {
+    private function get_system_temp(bool $as_fahrenheit = false): ?float {
         # Obtain the current system temperature in Celsius
         $temp = get_temp();
 
@@ -229,8 +224,7 @@ class SystemStatus extends Model
      * Determines approximate CPU usage using the last minute load average.
      * @return float|null The CPU usage as a whole percentage.
      */
-    private function get_cpu_usage(): ?float
-    {
+    private function get_cpu_usage(): ?float {
         # Determine the last minute load average and total number of cpu cores
         $load_avg = explode(', ', get_load_average());
         $load_avg_last_min = (float) $load_avg[0];
@@ -244,8 +238,7 @@ class SystemStatus extends Model
      * Obtains the current MBUF usage.
      * @return float|null The current MBUF usage as a whole percentage.
      */
-    private function get_mbuf_usage(): ?float
-    {
+    private function get_mbuf_usage(): ?float {
         # get_mbuf() sets values by reference so ensure we have actual variables set before calling
         $mbufs_text = null;
         $mbuf_usage = null;
@@ -260,8 +253,7 @@ class SystemStatus extends Model
      * Obtains the current disk usage for the root mountpoint.
      * @return float|null The current disk usage as a whole percentage.
      */
-    private function get_disk_usage(): ?float
-    {
+    private function get_disk_usage(): ?float {
         foreach (get_mounted_filesystems() as $fs) {
             if ($fs['mountpoint'] === '/') {
                 return (float) $fs['percent_used'];

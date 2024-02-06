@@ -11,8 +11,7 @@ require_once 'RESTAPI/autoloader.inc';
  * classes to populate HAL links for objects that are related to the API call the Endpoint is serving.
  * @link https://stateless.group/hal_specification.html
  */
-class ResourceLink
-{
+class ResourceLink {
     use BaseTraits;
 
     /**
@@ -55,8 +54,7 @@ class ResourceLink
      * Converts this object to an array representation.
      * @returns array An array representation of this HAL resource link.
      */
-    public function to_representation(): array
-    {
+    public function to_representation(): array {
         return ['href' => $this->href, 'method' => $this->method] + $this->custom_attributes;
     }
 }

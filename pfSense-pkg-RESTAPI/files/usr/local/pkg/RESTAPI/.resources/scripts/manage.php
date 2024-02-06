@@ -28,8 +28,7 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * Builds a PHP API endpoint in the pfSense webroot for each Endpoint class defined in \RESTAPI\Endpoints using the
  * Endpoint class's specified $url property.
  */
-function build_endpoints(): void
-{
+function build_endpoints(): void {
     # Print that we are starting to build endpoints
     print 'Building endpoints... ';
 
@@ -58,8 +57,7 @@ function build_endpoints(): void
  * Builds a PHP webConfigurator page in the pfSense webroot for each Form class defined in \RESTAPI\Forms using the
  * Form class's specified $url property.
  */
-function build_forms(): void
-{
+function build_forms(): void {
     # Print that we are starting to build forms
     print 'Building forms... ';
 
@@ -88,8 +86,7 @@ function build_forms(): void
  * Automatically creates pfSense privileges for each Endpoint class defined in \RESTAPI\Endpoints and each Form class
  * defined in \RESTAPI\Forms.
  */
-function build_privs(): void
-{
+function build_privs(): void {
     echo 'Building privileges... ';
 
     # Use PrivilegesCache to refresh the privileges cache file
@@ -104,8 +101,7 @@ function build_privs(): void
  * @param string|null $dispatcher_name
  * @note This function does not call the Dispatcher process asynchronously, it will wait for the process to complete.
  */
-function notify_dispatcher(string|null $dispatcher_name): void
-{
+function notify_dispatcher(string|null $dispatcher_name): void {
     # Format the fully qualified class name
     $class = "\\RESTAPI\\Dispatchers\\$dispatcher_name";
 
@@ -127,8 +123,7 @@ function notify_dispatcher(string|null $dispatcher_name): void
  * Creates cron jobs for all Dispatcher classes in \RESTAPI\Dispatchers and all Cache classes in \RESTAPI\Caches
  * that have configured schedules.
  */
-function schedule_dispatchers(): void
-{
+function schedule_dispatchers(): void {
     # Variables
     $dispatchers = get_classes_from_namespace('\\RESTAPI\\Dispatchers\\');
     $caches = get_classes_from_namespace('\\RESTAPI\\Caches\\');
@@ -159,8 +154,7 @@ function schedule_dispatchers(): void
  * Refreshes the cache file by obtaining new day for a given Cache object.
  * @param string|null $cache_name The shortname of the Cache class that should have its cache file refreshed.
  */
-function refresh_cache(string|null $cache_name): void
-{
+function refresh_cache(string|null $cache_name): void {
     # Format the fully qualified class name
     $class = "\\RESTAPI\\Caches\\$cache_name";
 
@@ -185,8 +179,7 @@ function refresh_cache(string|null $cache_name): void
  * @note Tests will attempt to create, modify and delete configurations and files as well as restart services; which
  * can be disruptive to live systems.
  */
-function run_tests(string|null $contains = ''): void
-{
+function run_tests(string|null $contains = ''): void {
     # Variables
     $test_cases = glob('/usr/local/pkg/RESTAPI/Tests/*.inc');
     $exit_code = 0;
@@ -262,8 +255,7 @@ function run_tests(string|null $contains = ''): void
  * apply the nginx changes required for this package to operate. Thus eliminating the requirement for the user
  * to run /etc/rc.restart_webgui after installation.
  */
-function restart_webgui(): void
-{
+function restart_webgui(): void {
     echo 'Initiating webConfigurator restart... ';
     (new WebGUIRestartDispatcher())->spawn_process();
     echo 'done.' . PHP_EOL;
@@ -274,8 +266,7 @@ function restart_webgui(): void
  * Creates a backup of the REST API configuration if `keep_backup` is enabled. The backup will be stored in
  * /usr/local/share/pfSense-pkg-RESTAPI/backup.json
  */
-function backup(): void
-{
+function backup(): void {
     echo 'Backing up REST API configuration... ';
     echo match (RESTAPISettings::backup_to_file()) {
         RESTAPI\Models\API_SETTINGS_BACKUP_SUCCESS => 'done.' . PHP_EOL,
@@ -287,8 +278,7 @@ function backup(): void
 /**
  * Restores the latest REST API configuration backup from /usr/local/share/pfSense-pkg-RESTAPI/backup.json
  */
-function restore(): void
-{
+function restore(): void {
     echo 'Restoring REST API configuration... ';
     echo match (RESTAPISettings::restore_from_backup()) {
         RESTAPI\Models\API_SETTINGS_RESTORE_SUCCESS => 'done.' . PHP_EOL,
@@ -302,16 +292,14 @@ function restore(): void
 /**
  * Syncs the REST API configuration to HA peers if enabled.
  */
-function sync(): void
-{
+function sync(): void {
     RESTAPISettingsSync::sync(print_status: true);
 }
 
 /**
  * Updates this package to the latest version available to this system
  */
-function update(): void
-{
+function update(): void {
     $pf_version = RESTAPI\Core\Tools\get_pfsense_version()['base'];
     echo shell_exec('/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI');
     echo shell_exec(
@@ -326,8 +314,7 @@ function update(): void
  * Reverts or updates the REST API package to a specific version.
  * @param $version string semantic version tag to revert or upgrade to.
  */
-function revert(string $version): void
-{
+function revert(string $version): void {
     # Local variables
     $pf_version = RESTAPI\Core\Tools\get_pfsense_version()['base'];
     $url =
@@ -356,8 +343,7 @@ function revert(string $version): void
 /**
  * Delete the REST API package and restart the webConfigurator to remove nginx changes.
  */
-function delete()
-{
+function delete() {
     echo shell_exec('/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI');
     echo shell_exec('/etc/rc.restart_webgui');
 }
@@ -365,8 +351,7 @@ function delete()
 /**
  * Rotates the JWT server key. Warning: This will revoke any active JWTs.
  */
-function rotate_server_key(): void
-{
+function rotate_server_key(): void {
     $pkg_index = RESTAPISettings::get_pkg_id();
     config_set_path("installedpackages/package/$pkg_index/conf/keys", []);
     echo 'Rotating REST API server key... ';
@@ -378,16 +363,14 @@ function rotate_server_key(): void
 /**
  * Prints the pfSense-pkg-RESTAPI version information.
  */
-function version(): void
-{
+function version(): void {
     echo shell_exec('/usr/local/sbin/pkg-static info pfSense-pkg-RESTAPI');
 }
 
 /**
  * Prints the pfsense-restapi help page.
  */
-function help(): void
-{
+function help(): void {
     echo 'pfsense-restapi - CLI tool for pfSense REST API management' . PHP_EOL;
     echo 'Copyright - ' . date('Y') . '© - Jared Hendrickson' . PHP_EOL;
     echo 'SYNTAX:' . PHP_EOL;

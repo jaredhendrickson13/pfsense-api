@@ -9,16 +9,14 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
-class IPsecPhase1Encryption extends Model
-{
+class IPsecPhase1Encryption extends Model {
     public StringField $encryption_algorithm_name;
     public IntegerField $encryption_algorithm_keylen;
     public StringField $hash_algorithm;
     public IntegerField $dhgroup;
     public StringField $prf_algorithm;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Obtain global p1 algorithm variables
         global $p1_ealgos;
         global $p1_halgos;
@@ -74,8 +72,7 @@ class IPsecPhase1Encryption extends Model
      * @throws ValidationError When the $encryption_algorithm_keylen is not supported by the
      * `encryption_algorithm_name` field's assigned value.
      */
-    public function validate_encryption_algorithm_keylen(int $encryption_algorithm_keylen): int
-    {
+    public function validate_encryption_algorithm_keylen(int $encryption_algorithm_keylen): int {
         # Variables
         $supported_keylens = $this->get_supported_keylens(name: $this->encryption_algorithm_name->value);
 
@@ -96,8 +93,7 @@ class IPsecPhase1Encryption extends Model
      * @param string $name The encryption algorithm name to obtain key lengths for.
      * @returns array An array of supported key lengths for this encryption algorithm.
      */
-    public static function get_supported_keylens(string $name): array
-    {
+    public static function get_supported_keylens(string $name): array {
         global $p1_ealgos;
 
         # Throw an error if an encryption algorithm does not exist with this name.
@@ -133,8 +129,7 @@ class IPsecPhase1Encryption extends Model
      * Obtains an array of encryption algorithm names that support variable key length selection.
      * @returns array An array of encryption algorithm names that support variable key length selection.
      */
-    public static function get_keylen_enabled_algos(): array
-    {
+    public static function get_keylen_enabled_algos(): array {
         global $p1_ealgos;
         $supports_keylen = [];
 
@@ -151,8 +146,7 @@ class IPsecPhase1Encryption extends Model
     /**
      * Applies pending changes to IPsec.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

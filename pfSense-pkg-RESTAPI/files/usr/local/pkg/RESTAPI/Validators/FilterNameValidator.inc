@@ -13,8 +13,7 @@ use RESTAPI\Responses\ValidationError;
  * Validates that a given string can be used as valid filter names. Filter names are any object name that can be used
  * as a filter address value. Interface and alias names are examples of filter names.
  */
-class FilterNameValidator extends RESTAPI\Core\Validator
-{
+class FilterNameValidator extends RESTAPI\Core\Validator {
     /**
      * Checks if a given name is suitable to used as a filter name. Filter names are any name that can be used by the
      * firewall filter such as interfaces and aliases.
@@ -22,8 +21,7 @@ class FilterNameValidator extends RESTAPI\Core\Validator
      * @param string $field_name The field name of the value being validated. This is used for error messages.
      * @throws \RESTAPI\Responses\ValidationError When the value is not a valid IPv4 address.
      */
-    public function validate(mixed $value, string $field_name = '')
-    {
+    public function validate(mixed $value, string $field_name = '') {
         global $pf_reserved_keywords, $reserved_table_names;
 
         # Throw an exception if this name is reserved

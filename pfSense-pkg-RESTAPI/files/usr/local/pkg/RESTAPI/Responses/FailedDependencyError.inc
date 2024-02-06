@@ -13,8 +13,7 @@ use RESTAPI\Core\Response;
  * Exception class that indicates a requested resource requires a dependency which is not installed. This exception
  * generally corresponds with a 424 Failed Dependency HTTP code.
  */
-class FailedDependencyError extends Response
-{
+class FailedDependencyError extends Response {
     public $code = 424;
     public string $help_text = 'The client has requested a resource that requires a dependency which is not installed.';
 

@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\PortForward;
 
-class APIModelsPortForwardTestCase extends TestCase
-{
+class APIModelsPortForwardTestCase extends TestCase {
     /**
      * Ensures basic port forward rules are correctly set in pfctl after creation, modification and deletion.
      */
-    public function test_basic_crud()
-    {
+    public function test_basic_crud() {
         # Create a port forward to test with
         $port_forward = new PortForward(
             data: [
@@ -77,8 +75,7 @@ class APIModelsPortForwardTestCase extends TestCase
     /**
      * Ensures the configured `natreflection` mode is properly set in the pfctl rules
      */
-    public function test_natreflection()
-    {
+    public function test_natreflection() {
         # Create a port forward to test with
         $port_forward = new PortForward(
             data: [
@@ -119,8 +116,7 @@ class APIModelsPortForwardTestCase extends TestCase
     /**
      * Checks that port forwards with `nordr` enabled are set as such in pfctl
      */
-    public function test_nordr()
-    {
+    public function test_nordr() {
         # Create a port forward to test with
         $port_forward = new PortForward(
             data: [
@@ -149,8 +145,7 @@ class APIModelsPortForwardTestCase extends TestCase
     /**
      * Checks that disabled port forwards are not present in pfctl
      */
-    public function test_disabled()
-    {
+    public function test_disabled() {
         # Create a port forward to test with
         $port_forward = new PortForward(
             data: [

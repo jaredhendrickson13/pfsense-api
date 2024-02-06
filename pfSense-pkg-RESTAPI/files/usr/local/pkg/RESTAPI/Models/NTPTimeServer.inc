@@ -7,8 +7,7 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
-class NTPTimeServer extends Model
-{
+class NTPTimeServer extends Model {
     const AUTO_POOL_SUFFIX = 'pool.ntp.org';
 
     public StringField $timeserver;
@@ -16,8 +15,7 @@ class NTPTimeServer extends Model
     public BooleanField $prefer;
     public BooleanField $noselect;
 
-    public function __construct(mixed $id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->many_minimum = 1; // Require at least one timeserver at all times
         $this->many = true;
@@ -62,8 +60,7 @@ class NTPTimeServer extends Model
      * @param string $type The incoming value to be validated
      * @return string The validated value to be assigned.
      */
-    public function validate_type(string $type): string
-    {
+    public function validate_type(string $type): string {
         # Force $type to be `pool` if it ends with the auto pool suffix (pool.ntp.org)
         if (str_ends_with($this->timeserver->value, self::AUTO_POOL_SUFFIX)) {
             $type = 'pool';
@@ -78,8 +75,7 @@ class NTPTimeServer extends Model
      * represent them in a more structured format.
      * @return array The internal values for this Model object obtained from the pfSense configuration.
      */
-    public function get_timeservers_from_internal(): array
-    {
+    public function get_timeservers_from_internal(): array {
         # Variables
         $internal_objects = [];
         $timeservers = explode(' ', $this->get_config(path: 'system/timeservers', default: ''));
@@ -125,8 +121,7 @@ class NTPTimeServer extends Model
     /**
      * Obtains the next available ID for this model.
      */
-    public function get_next_id(): int
-    {
+    public function get_next_id(): int {
         # Get the total number of timeservers in configuration
         $timeservers = $this->get_config(path: 'system/timeservers', default: '');
         $timeservers = explode(' ', $timeservers);
@@ -139,8 +134,7 @@ class NTPTimeServer extends Model
      * @param bool $no_write Only set configuration value, do not write the changes to configuration. This is used to
      * skip multiple writes from occurring when updating since we simply delete and recreate the object for updates.
      */
-    public function _create(bool $no_write = false): void
-    {
+    public function _create(bool $no_write = false): void {
         # Set config values according to this objects current field values
         $this->id = $this->get_next_id();
         $this->set_system_timeservers();
@@ -160,8 +154,7 @@ class NTPTimeServer extends Model
      * @param bool $no_write Only remove configuration values, do not write the changes to configuration. This is used to
      * skip multiple writes from occurring when updating since we simply delete and recreate the object for updates.
      */
-    public function _delete(bool $no_write = false): void
-    {
+    public function _delete(bool $no_write = false): void {
         # Set config values according to this objects current field values
         $this->set_system_timeservers(delete: true);
         $this->set_ntpd_ispool(delete: true);
@@ -178,8 +171,7 @@ class NTPTimeServer extends Model
     /**
      * Defines the steps necessary to update this timeserver in all applicable configuration areas.
      */
-    public function _update(): void
-    {
+    public function _update(): void {
         $this->_delete(no_write: true);
         $this->_create(no_write: true);
         $this->write_config("Updated $this->verbose_name via API");
@@ -188,8 +180,7 @@ class NTPTimeServer extends Model
     /**
      * Applies changes to NTP server.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         system_ntp_configure();
     }
 
@@ -198,8 +189,7 @@ class NTPTimeServer extends Model
      * the requested action.
      * @param bool $delete Forcibly remove this timeserver from system/timeservers
      */
-    private function set_system_timeservers(bool $delete = false): void
-    {
+    private function set_system_timeservers(bool $delete = false): void {
         # Variables
         $timeservers = explode(' ', $this->get_config(path: 'system/timeservers', default: ''));
 
@@ -222,8 +212,7 @@ class NTPTimeServer extends Model
      * requested action.
      * @param bool $delete Forcibly remove this timeserver from ntpd/ispool
      */
-    private function set_ntpd_ispool(bool $delete = false): void
-    {
+    private function set_ntpd_ispool(bool $delete = false): void {
         # Variables
         $pools = explode(' ', $this->get_config(path: 'ntpd/ispool', default: ''));
 
@@ -246,8 +235,7 @@ class NTPTimeServer extends Model
      * requested action.
      * @param bool $delete Forcibly remove this timeserver from ntpd/ispeer
      */
-    private function set_ntpd_ispeer(bool $delete = false): void
-    {
+    private function set_ntpd_ispeer(bool $delete = false): void {
         # Variables
         $peers = explode(' ', $this->get_config(path: 'ntpd/ispeer', default: ''));
 
@@ -270,8 +258,7 @@ class NTPTimeServer extends Model
      * requested action.
      * @param bool $delete Forcibly remove this timeserver from ntpd/prefer
      */
-    private function set_ntpd_prefer(bool $delete = false): void
-    {
+    private function set_ntpd_prefer(bool $delete = false): void {
         # Variables
         $prefers = explode(' ', $this->get_config(path: 'ntpd/prefer', default: ''));
 
@@ -294,8 +281,7 @@ class NTPTimeServer extends Model
      * requested action.
      * @param bool $delete Forcibly remove this timeserver from ntpd/noselect
      */
-    private function set_ntpd_noselect(bool $delete = false): void
-    {
+    private function set_ntpd_noselect(bool $delete = false): void {
         # Variables
         $noselects = explode(' ', $this->get_config(path: 'ntpd/noselect', default: ''));
 

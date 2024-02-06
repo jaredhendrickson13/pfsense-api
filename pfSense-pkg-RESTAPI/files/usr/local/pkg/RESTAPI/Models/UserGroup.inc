@@ -13,8 +13,7 @@ use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 
-class UserGroup extends Model
-{
+class UserGroup extends Model {
     public StringField $name;
     public IntegerField $gid;
     public StringField $scope;
@@ -22,8 +21,7 @@ class UserGroup extends Model
     public ForeignModelField $member;
     public StringField $priv;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'system/group';
         $this->many = true;
@@ -83,8 +81,7 @@ class UserGroup extends Model
      * @returns string The validated value to be assigned.
      * @throws ValidationError When `scope` is `local` and the value contains more than 16 characters.
      */
-    public function validate_name(string $name): string
-    {
+    public function validate_name(string $name): string {
         # Require the `name` to be 16 characters or less if `scope` is set to `local`
         if ($this->scope->value === 'local' and strlen($name) > 16) {
             throw new ValidationError(
@@ -102,8 +99,7 @@ class UserGroup extends Model
      * @return string The validated value to be assigned.
      * @throws ValidationError When an unknown privilege name is requested.
      */
-    public function validate_priv(string $priv): string
-    {
+    public function validate_priv(string $priv): string {
         global $priv_list;
 
         # Ensure requested privileges are valid privilege names
@@ -120,8 +116,7 @@ class UserGroup extends Model
     /**
      * Extends the _create() method so it bumps the next GID before creating the object
      */
-    public function _create()
-    {
+    public function _create() {
         # Bump the nextuid in config to one greater than this UID
         $this->set_config('system/nextgid', $this->gid->value + 1);
         parent::_create();
@@ -131,8 +126,7 @@ class UserGroup extends Model
      * Extends the _delete() method to prevent the deletion of `system` scoped user groups
      * @throws ForbiddenError When the object being deleted has its `scope` set to `system`.
      */
-    public function _delete()
-    {
+    public function _delete() {
         # Do not allow the deletion of `system` scope UserGroups
         if ($this->scope->value === 'system') {
             throw new ForbiddenError(
@@ -147,8 +141,7 @@ class UserGroup extends Model
     /**
      * Applies changes to this UserGroup on the backend.
      */
-    public function apply()
-    {
+    public function apply() {
         # Configure this group on the underlying OS
         local_group_set($this->to_internal());
 
@@ -161,16 +154,14 @@ class UserGroup extends Model
     /**
      * Applies the deletion of this UserGroup on the backend.
      */
-    public function apply_delete()
-    {
+    public function apply_delete() {
         local_group_del($this->to_internal());
     }
 
     /**
      * Applies the replacement of all existing UserGroups with a newly specified set of UserGroups.
      */
-    public function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects)
-    {
+    public function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects) {
         # Remove any existing UserGroups from the backend OS
         foreach ($initial_objects->model_objects as $initial_object) {
             local_group_del($initial_object->to_internal());

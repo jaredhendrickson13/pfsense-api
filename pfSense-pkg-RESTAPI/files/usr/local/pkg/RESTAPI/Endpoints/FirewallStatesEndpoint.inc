@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class FirewallStatesEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class FirewallStatesEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/firewall/states';
         $this->model_name = 'FirewallState';

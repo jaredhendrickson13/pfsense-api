@@ -34,8 +34,7 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * Represents an API Endpoint, encapsulating attributes essential for generating the API endpoint
  * and facilitating API calls. description is not adequate.
  */
-class Endpoint
-{
+class Endpoint {
     use BaseTraits;
 
     /**
@@ -240,8 +239,7 @@ class Endpoint
     /**
      * Sets values whenever the Endpoint object is crated.
      */
-    public function __construct()
-    {
+    public function __construct() {
         # Prevent PHP warnings in API Responses.
         error_reporting(E_ERROR);
 
@@ -271,8 +269,7 @@ class Endpoint
     /**
      * Checks for conflicting attributes during object construction.
      */
-    private function check_construct(): void
-    {
+    private function check_construct(): void {
         # Do not allow `many` Endpoints that are assigned non `many` Models
         if ($this->many and !$this->model->many) {
             throw new ServerError(
@@ -304,8 +301,7 @@ class Endpoint
     /**
      * Use the endpoint's URL to determine a default OpenAPI tag for this endpoint.
      */
-    private function set_default_tag(): void
-    {
+    private function set_default_tag(): void {
         # Only assume the default if a tag was not set
         if (!$this->tag) {
             # Set the tag for this URL according to it's root namespace (the section in URL after /api/v2/)
@@ -316,8 +312,7 @@ class Endpoint
     /**
      * Determines the appropriate default help text for each method according to the assigned Model and Endpoint properties.
      */
-    private function set_default_help_text(): void
-    {
+    private function set_default_help_text(): void {
         # Variables
         $model_verbose_name = $this->model->verbose_name;
         $model_verbose_name_plural = $this->model->verbose_name_plural;
@@ -352,8 +347,7 @@ class Endpoint
      * the `prev` and `next` link values.
      * @returns ResourceLinkSet A ResourceLinkSet containing the `prev` and `next` ResourceLinks.
      */
-    public function get_pagination_resource_links(int $limit, int $offset): ResourceLinkSet
-    {
+    public function get_pagination_resource_links(int $limit, int $offset): ResourceLinkSet {
         # Calculate the offset for the `prev` and `next` resource link values
         $prev_offset = $offset - $limit >= 0 ? $offset - $limit : 0;
         $next_offset = $offset + $limit;
@@ -376,8 +370,7 @@ class Endpoint
      * @returns string The complete pfSense privilege name needed to authorize API requests to this endpoint using
      * the specified $method.
      */
-    private function get_method_priv_name(string $method): string
-    {
+    private function get_method_priv_name(string $method): string {
         # Convert the URL and request method to a pfSense privilege name
         $priv_name_prefix = str_replace('/', '-', $this->url) . '-';
 
@@ -402,8 +395,7 @@ class Endpoint
      *      - $this->put_privileges
      *      - $this->delete_privileges
      */
-    private function get_default_privs(): void
-    {
+    private function get_default_privs(): void {
         $page_all_priv = 'page-all';
         $this->get_privileges = [$page_all_priv, $this->get_method_priv_name('GET')];
         $this->post_privileges = [$page_all_priv, $this->get_method_priv_name('POST')];
@@ -416,8 +408,7 @@ class Endpoint
      * Retrieves the necessary privileges for processing the received API call.
      * @return array An array of required privileges for the current API call.
      */
-    private function get_required_privs(): array
-    {
+    private function get_required_privs(): array {
         # Determine the privileges required for this API call
         return match ($this->request_method) {
             'GET' => $this->get_privileges,
@@ -435,8 +426,7 @@ class Endpoint
      * located at /etc/inc/priv/.
      * @returns array The pfSense priv list entry array corresponding to the privileges of this Endpoint.
      */
-    public function generate_pfsense_privs(): array
-    {
+    public function generate_pfsense_privs(): array {
         # Set an array to populate pfSense priv entries for this Endpoint
         $privs = [];
 
@@ -456,8 +446,7 @@ class Endpoint
      * Checks if authentication and authorization for this Endpoint is successful. This will attempt authentication
      * and authorization for each allowed auth method. Only one auth method needs to succeed to allow access.
      */
-    private function check_auth(): void
-    {
+    private function check_auth(): void {
         # Attempt to authenticate the remote client
         $this->client = Auth::attempt_multi_auth(
             auth_classes: $this->auth_methods,
@@ -468,8 +457,7 @@ class Endpoint
     /**
      * Checks if the API is enabled before allowing the call.
      */
-    private function check_enabled(): void
-    {
+    private function check_enabled(): void {
         if (!$this->api_config['enabled'] == 'enabled' and !$this->ignore_enabled) {
             header('Location: /');
             exit();
@@ -479,8 +467,7 @@ class Endpoint
     /**
      * Checks if the interface receiving the API call is allowed to answer API calls.
      */
-    private function check_server_ip(): void
-    {
+    private function check_server_ip(): void {
         # Variables
         $allow_ifs = $this->api_config['allowed_interfaces'];
         $whitelist = explode(',', $allow_ifs);
@@ -517,8 +504,7 @@ class Endpoint
     /**
      * Check if the HTTP method requested by the API client is supported by this view.
      */
-    private function check_request_method(): void
-    {
+    private function check_request_method(): void {
         # Always allow OPTIONS requests
         if ($this->request_method === 'OPTIONS') {
             return;
@@ -547,8 +533,7 @@ class Endpoint
      * Checks if the API client's request data was successfully received and parsed by the API. This method populates
      * the $this->request_data property according to the client's requested content-type.
      */
-    private function check_request_data(): void
-    {
+    private function check_request_data(): void {
         # Obtain the ContentHandler associated with the HTTP Content-Type header sent by the client
         $content_handler = ContentHandler::get_decode_handler();
         $this->request_data = $content_handler->decode();
@@ -559,8 +544,7 @@ class Endpoint
      * Performs validation on non-Model fields. These fields control how Models are initially obtained/constructed.
      * @throws ValidationError When one or more Endpoint releated fields fail validation.
      */
-    private function validate_endpoint_fields(): void
-    {
+    private function validate_endpoint_fields(): void {
         # Ensure the special async, limit and offset parameters are of the correct type
         if (!isset($this->request_data['async'])) {
             $this->request_data['async'] = true;
@@ -594,8 +578,7 @@ class Endpoint
     /**
      * Listens for incoming API calls from API clients and checks if the API call is allowed.
      */
-    public function listen(): void
-    {
+    public function listen(): void {
         # Variables
         $resp_data = null;
         $content_handler = new JSONContentHandler();
@@ -703,8 +686,7 @@ class Endpoint
      * Generate an endpoint for this view in the pfSense webroot.
      * @returns bool Returns true if the endpoint was successfully built, returns false otherwise.
      */
-    public function build_endpoint_url(): bool
-    {
+    public function build_endpoint_url(): bool {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
         $nq_class_name = (new \ReflectionClass($this))->getShortName();

@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class DiagnosticsCommandPromptEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class DiagnosticsCommandPromptEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/diagnostics/command_prompt';
         $this->model_name = 'CommandPrompt';

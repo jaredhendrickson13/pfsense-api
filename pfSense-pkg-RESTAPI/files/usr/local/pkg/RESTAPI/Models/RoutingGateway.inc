@@ -16,8 +16,7 @@ use RESTAPI\Validators\IPAddressValidator;
 /**
  * Defines a Model for reading, creating, updating and deleting routing gateways.
  */
-class RoutingGateway extends Model
-{
+class RoutingGateway extends Model {
     public StringField $name;
     public StringField $descr;
     public BooleanField $disabled;
@@ -42,8 +41,7 @@ class RoutingGateway extends Model
     public IntegerField $time_period;
     public IntegerField $alert_interval;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define Model attributes
         $this->config_path = 'gateways/gateway_item';
         $this->subsystem = 'staticroutes';
@@ -178,8 +176,7 @@ class RoutingGateway extends Model
      * @param bool $disabled The current $disabled value to validate.
      * @return bool The validated disabled value to set.
      */
-    public function validate_disabled(bool $disabled): bool
-    {
+    public function validate_disabled(bool $disabled): bool {
         # When disabling this gateway is requested, ensure it is not in use first
         if ($disabled) {
             # Ensure the gateway cannot be disabled while it is in use by a gateway group
@@ -230,8 +227,7 @@ class RoutingGateway extends Model
      * @param string $interface The $interface value to validate.
      * @return string The validated interface value to set.
      */
-    public function validate_interface(string $interface): string
-    {
+    public function validate_interface(string $interface): string {
         # Obtain the NetworkInterface Model object associated with our current interface value
         $if_obj = $this->interface->get_related_model();
 
@@ -266,8 +262,7 @@ class RoutingGateway extends Model
      * @param string $gateway The gateway value to validate.
      * @return string The validated gateway value to set.
      */
-    public function validate_gateway(string $gateway): string
-    {
+    public function validate_gateway(string $gateway): string {
         # Only allow IPv4 addresses if `ipprotocol` is `inet`
         if (
             $this->ipprotocol->value === 'inet' and
@@ -300,8 +295,7 @@ class RoutingGateway extends Model
      * @param int $latencyhigh The incoming `latencyhigh` value to validate.
      * @return int The validated `latencyhigh`value to set.
      */
-    public function validate_latencyhigh(int $latencyhigh): int
-    {
+    public function validate_latencyhigh(int $latencyhigh): int {
         # Do not allow the `latencylow` value to be greater than `latencyhigh`
         if ($this->latencylow->value > $latencyhigh) {
             throw new ValidationError(
@@ -318,8 +312,7 @@ class RoutingGateway extends Model
      * @param int $losshigh The incoming `losshigh` value to validate.
      * @return int The validated `losshigh`value to set.
      */
-    public function validate_losshigh(int $losshigh): int
-    {
+    public function validate_losshigh(int $losshigh): int {
         # Do not allow the `losslow` value to be greater than `losshigh`
         if ($this->losslow->value > $losshigh) {
             throw new ValidationError(
@@ -336,8 +329,7 @@ class RoutingGateway extends Model
      * @param int $loss_interval The incoming `loss_interval` value to validate.
      * @return int The validated `loss_interval`value to set.
      */
-    public function validate_loss_interval(int $loss_interval): int
-    {
+    public function validate_loss_interval(int $loss_interval): int {
         # Do not allow the `loss_interval` value to be less than `latencyhigh`
         if ($this->latencyhigh->value > $loss_interval) {
             throw new ValidationError(
@@ -354,8 +346,7 @@ class RoutingGateway extends Model
      * @param int $time_period The incoming `time_period` value to validate.
      * @return int The validated `time_period`value to set.
      */
-    public function validate_time_period(int $time_period): int
-    {
+    public function validate_time_period(int $time_period): int {
         # Require `time_period` to be greater than twice the `interval` plus the `loss_interval`
         if ($time_period <= 2 * $this->interval->value + $this->loss_interval->value) {
             throw new ValidationError(
@@ -373,8 +364,7 @@ class RoutingGateway extends Model
      * @param int $alert_interval The incoming `alert_interval` value to validate.
      * @return int The validated `alert_interval`value to set.
      */
-    public function validate_alert_interval(int $alert_interval): int
-    {
+    public function validate_alert_interval(int $alert_interval): int {
         # Require `alert_interval` to be greater than or equal to the `interval`
         if ($alert_interval <= $this->interval->value) {
             throw new ValidationError(
@@ -389,16 +379,14 @@ class RoutingGateway extends Model
     /**
      * Defines how gateways should be applied after creation and updates.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**
      * Define steps to create this RoutingGateway object internally.
      */
-    public function _create()
-    {
+    public function _create() {
         # Variables
         $internal_values = $this->to_internal();
 
@@ -421,8 +409,7 @@ class RoutingGateway extends Model
     /**
      * Define steps to update this RoutingGateway object internally.
      */
-    public function _update()
-    {
+    public function _update() {
         # Variables
         $internal_values = $this->to_internal();
 
@@ -445,8 +432,7 @@ class RoutingGateway extends Model
     /**
      * Overrides the `apply()` method for RoutingGateway deletions.
      */
-    public function _delete()
-    {
+    public function _delete() {
         # Remove the static routes for this gateway and it's monitor IP
         route_del($this->gateway->value, $this->ipprotocol->value);
         route_del($this->monitor->value, $this->ipprotocol->value);
@@ -465,8 +451,7 @@ class RoutingGateway extends Model
      * Checks if this RoutingGateway is the current default route.
      * @return bool Returns `true` if this RoutingGateway is a default route, `false` if not.
      */
-    public function is_default_gateway(): bool
-    {
+    public function is_default_gateway(): bool {
         # Loop through the gateway days until we find the gateway to delete
         foreach (return_gateways_array(true, false, true, true) as $gw) {
             # Check if this gateways 'attribute' matches the ID of this RoutingGateway

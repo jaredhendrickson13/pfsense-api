@@ -9,13 +9,11 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
-class IPsecPhase2Encryption extends Model
-{
+class IPsecPhase2Encryption extends Model {
     public StringField $name;
     public IntegerField $keylen;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, array $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, array $data = [], mixed ...$options) {
         # Obtain global p2 algorithm variables
         global $p2_ealgos;
 
@@ -50,8 +48,7 @@ class IPsecPhase2Encryption extends Model
      * @throws ValidationError When the $keylen is not supported by the
      * `name` field's assigned value.
      */
-    public function validate_keylen(int $keylen): int
-    {
+    public function validate_keylen(int $keylen): int {
         # Variables
         $supported_keylens = $this->get_supported_keylens(name: $this->name->value);
 
@@ -71,8 +68,7 @@ class IPsecPhase2Encryption extends Model
      * @param string $name The encryption algorithm name to obtain key lengths for.
      * @returns array An array of supported key lengths for this encryption algorithm.
      */
-    public static function get_supported_keylens(string $name): array
-    {
+    public static function get_supported_keylens(string $name): array {
         global $p2_ealgos;
 
         # Throw an error if an encryption algorithm does not exist with this name.
@@ -108,8 +104,7 @@ class IPsecPhase2Encryption extends Model
      * Obtains an array of encryption algorithm names that support variable key length selection.
      * @returns array An array of encryption algorithm names that support variable key length selection.
      */
-    public static function get_keylen_enabled_algos(): array
-    {
+    public static function get_keylen_enabled_algos(): array {
         global $p2_ealgos;
         $supports_keylen = [];
 
@@ -126,8 +121,7 @@ class IPsecPhase2Encryption extends Model
     /**
      * Applies pending changes to IPsec.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

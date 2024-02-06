@@ -6,16 +6,14 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Models\RESTAPISettings;
 
-class APIFieldsInterfaceFieldTestCase extends TestCase
-{
+class APIFieldsInterfaceFieldTestCase extends TestCase {
     # TODO: Needs Tests to ensure CARP interfaces and interface groups become available choices when the
     # TODO: `allow_carp_interface` and `allow_interface_groups` properties are enabled.
 
     /**
      * Checks that the InterfaceField correctly determines all interface choices.
      */
-    public function test_get_interface_choices()
-    {
+    public function test_get_interface_choices() {
         # Variables
         $api_settings = new RESTAPISettings();
 
@@ -53,8 +51,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
      * Checks that the InterfaceField's `allow_ipsec_interface` parameter allows the IPsec `enc0` interface to become
      * a choice.
      */
-    public function test_get_interface_choices_with_allow_ipsec_interface()
-    {
+    public function test_get_interface_choices_with_allow_ipsec_interface() {
         # First ensure it is not a valid choice by default
         $test_field = new InterfaceField();
         $this->assert_is_false(in_array('enc0', $test_field->choices));
@@ -69,8 +66,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
      * Checks that the InterfaceField's `allow_openvpn_interface` parameter allows the IPsec `openvpn` interface to become
      * a choice.
      */
-    public function test_get_interface_choices_with_allow_openvpn_interface()
-    {
+    public function test_get_interface_choices_with_allow_openvpn_interface() {
         # First ensure it is not a valid choice by default
         $test_field = new InterfaceField();
         $test_field->set_choices_from_callable();
@@ -86,8 +82,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
      * Checks that the InterfaceField's to_internal() method correctly translates representation values to their
      * internal values.
      */
-    public function test_to_internal()
-    {
+    public function test_to_internal() {
         # Variables
         $api_settings = new RESTAPISettings();
 
@@ -117,8 +112,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
      * Checks that the InterfaceField's from_internal() method correctly translates internal values to their
      * representation values.
      */
-    public function test_from_internal()
-    {
+    public function test_from_internal() {
         # Variables
         $api_settings = new RESTAPISettings();
 

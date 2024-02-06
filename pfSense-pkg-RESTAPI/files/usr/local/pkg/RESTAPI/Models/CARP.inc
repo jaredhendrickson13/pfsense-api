@@ -7,14 +7,12 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 
-class CARP extends Model
-{
+class CARP extends Model {
     public BooleanField $enable;
     public BooleanField $maintenance_mode;
     public StringField $interfaces;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_carp_internal';
         $this->always_apply = true;
@@ -39,8 +37,7 @@ class CARP extends Model
     /**
      * Defines how to update this object.
      */
-    public function _update()
-    {
+    public function _update() {
         # Set the maintenance mode value in config if we are enabling maintenance mode
         if ($this->maintenance_mode->value === true) {
             $this->set_config('virtualip_carp_maintenancemode', '');
@@ -57,8 +54,7 @@ class CARP extends Model
     /**
      * Applies changes to CARP on this system.
      */
-    public function apply()
-    {
+    public function apply() {
         interfaces_carp_set_maintenancemode($this->maintenance_mode->value);
         $this->setup_carp();
     }
@@ -68,8 +64,7 @@ class CARP extends Model
      * Model class.
      * @return array An array containing the internal values for this Model's Fields.
      */
-    public function get_carp_internal(): array
-    {
+    public function get_carp_internal(): array {
         return [
             'enable' => $this->is_carp_enabled(),
             'maintenance_mode' => $this->is_config_enabled('/', 'virtualip_carp_maintenancemode'),
@@ -80,16 +75,14 @@ class CARP extends Model
      * Checks if CARP is enabled on this system.
      * @return bool Returns true if CARP is enabled on this system or false if CARP is not enabled on this system.
      */
-    public static function is_carp_enabled(): bool
-    {
+    public static function is_carp_enabled(): bool {
         return (bool) get_single_sysctl('net.inet.carp.allow');
     }
 
     /**
      * Enables or disables CARP on the current system.
      */
-    public function setup_carp()
-    {
+    public function setup_carp() {
         # Don't change anything if the CARP enabled value hasn't changed
         if ($this->is_carp_enabled() === $this->enable->value) {
             return;

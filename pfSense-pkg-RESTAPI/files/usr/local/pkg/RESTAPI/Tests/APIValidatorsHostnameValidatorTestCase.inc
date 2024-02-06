@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Validators\HostnameValidator;
 
-class APIValidatorsHostnameValidatorTestCase extends TestCase
-{
+class APIValidatorsHostnameValidatorTestCase extends TestCase {
     /**
      * Checks that the HostnameValidator accepts valid hostnames, and rejects non hostname values
      */
-    public function test_validate()
-    {
+    public function test_validate() {
         $this->assert_throws_response(
             response_id: 'HOSTNAME_VALIDATOR_FAILED',
             code: 400,

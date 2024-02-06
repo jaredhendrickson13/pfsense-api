@@ -13,16 +13,14 @@ use RESTAPI\Responses\ValidationError;
 /**
  * Defines a model object for interface VLANs.
  */
-class InterfaceVLAN extends Model
-{
+class InterfaceVLAN extends Model {
     public StringField $if;
     public IntegerField $tag;
     public StringField $vlanif;
     public IntegerField $pcp;
     public StringField $descr;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set the configuration path for these objects and allow many to be stored.
         $this->config_path = 'vlans/vlan';
         $this->many = true;
@@ -71,8 +69,7 @@ class InterfaceVLAN extends Model
      * @returns string The validated $if to set.
      * @throws ValidationError When the `if` value is invalid.
      */
-    public function validate_if(string $if): string
-    {
+    public function validate_if(string $if): string {
         # Throw a validation error if the requested parent interface does not exist
         if (!does_interface_exist($if)) {
             throw new ValidationError(
@@ -90,8 +87,7 @@ class InterfaceVLAN extends Model
      * @returns int|null The validated $name to set.
      * @throws ValidationError When the `tag` value is invalid.
      */
-    public function validate_tag(int|null $tag): int
-    {
+    public function validate_tag(int|null $tag): int {
         $if = $this->if->value;
 
         # Throw a validation error if this VLAN is already present as a QinQ
@@ -110,8 +106,7 @@ class InterfaceVLAN extends Model
      * @param string $vlanif The incoming `vlanif` value. This value is immediately overwritten.
      * @returns string The full `vlanif` value.
      */
-    public function validate_vlanif(string $vlanif)
-    {
+    public function validate_vlanif(string $vlanif) {
         return $this->if->value . '.' . $this->tag->value;
     }
 
@@ -121,8 +116,7 @@ class InterfaceVLAN extends Model
      * @param int|null $tag The VLAN tag to check
      * @return bool `true` if this VLAN interface is already present as a QinQ, `false` if it is not.
      */
-    public function is_qinq(string $if, int|null $tag): bool
-    {
+    public function is_qinq(string $if, int|null $tag): bool {
         # TODO: Change this to use a ModelSet query whenever a QinQ model is added
         foreach ($this->get_config('qinqs/qinqentry', []) as $qinq) {
             if ($qinq['if'] == $if and $qinq['tag'] == $tag) {
@@ -136,16 +130,14 @@ class InterfaceVLAN extends Model
     /**
      * Set the apply method to configure VLAN interfaces after successful creation.
      */
-    public function apply_create()
-    {
+    public function apply_create() {
         interface_vlan_configure($this->to_internal());
     }
 
     /**
      * Set the apply method to configure VLAN interfaces after successful updates.
      */
-    public function apply_update()
-    {
+    public function apply_update() {
         pfSense_interface_destroy($this->initial_object->if->value . '.' . $this->initial_object->tag->value);
         interface_vlan_configure($this->to_internal());
     }
@@ -153,8 +145,7 @@ class InterfaceVLAN extends Model
     /**
      * Set the apply method to remove VLAN interfaces after successful deletion.
      */
-    public function apply_delete()
-    {
+    public function apply_delete() {
         pfSense_interface_destroy($this->initial_object->if->value . '.' . $this->initial_object->tag->value);
     }
 }

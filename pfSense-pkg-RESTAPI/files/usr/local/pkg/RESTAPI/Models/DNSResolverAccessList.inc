@@ -11,8 +11,7 @@ use RESTAPI\Fields\StringField;
 /**
  * Defines access list entries for the DNS Resolver (Unbound) service.
  */
-class DNSResolverAccessList extends Model
-{
+class DNSResolverAccessList extends Model {
     public StringField $name;
     public StringField $action;
     public StringField $description;
@@ -21,8 +20,7 @@ class DNSResolverAccessList extends Model
     /**
      * @inheritDoc
      */
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'unbound/acls';
         $this->subsystem = 'unbound';
@@ -59,8 +57,7 @@ class DNSResolverAccessList extends Model
     /**
      * Applies pending DNS Resolver changes.
      */
-    public function apply()
-    {
+    public function apply() {
         (new DNSResolverApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

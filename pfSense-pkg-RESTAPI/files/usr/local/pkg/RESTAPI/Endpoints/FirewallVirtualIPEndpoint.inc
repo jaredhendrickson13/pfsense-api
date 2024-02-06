@@ -6,10 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class FirewallVirtualIPEndpoint extends Endpoint
-{
-    public function __construct()
-    {
+class FirewallVirtualIPEndpoint extends Endpoint {
+    public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/firewall/virtual_ip';
         $this->model_name = 'VirtualIP';

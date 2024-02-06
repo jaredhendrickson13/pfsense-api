@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\CommandPrompt;
 
-class APIModelsCommandPromptTestCase extends TestCase
-{
+class APIModelsCommandPromptTestCase extends TestCase {
     /**
      * Checks that CommandPrompt correctly runs shell commands and provides the correct response.
      */
-    public function test_command_prompt()
-    {
+    public function test_command_prompt() {
         # Create a CommandPrompt model to test with
         $test_cmd = new CommandPrompt();
 

@@ -6,13 +6,11 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\TrafficShaper;
 
-class APIModelsTrafficShaperTestCase extends TestCase
-{
+class APIModelsTrafficShaperTestCase extends TestCase {
     /**
      * Checks that the `bandwidth` field cannot exceed 100 if `bandwidthtype` is `%`
      */
-    public function test_bandwidth_cannot_exceed_100_with_percent_bandwidth_type(): void
-    {
+    public function test_bandwidth_cannot_exceed_100_with_percent_bandwidth_type(): void {
         $this->assert_throws_response(
             response_id: 'TRAFFIC_SHAPER_BANDWIDTH_EXCEED_MAXIMUM_PERCENTAGE',
             code: 400,
@@ -37,8 +35,7 @@ class APIModelsTrafficShaperTestCase extends TestCase
      * Checks that the get_bandwidth_bits() method correctly obtains the TrafficShapers bandwith amount in bits OR
      * obtains the percentage amount if `bandwidthtype` is `%`.
      */
-    public function test_get_bandwidth_bits(): void
-    {
+    public function test_get_bandwidth_bits(): void {
         # Create a traffic shaper to test with
         $shaper = new TrafficShaper();
         $shaper->bandwidth->value = 1;
@@ -61,8 +58,7 @@ class APIModelsTrafficShaperTestCase extends TestCase
     /**
      * Checks that HFSC traffic shapers are correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_hfsc_shaper_found_in_pfctl(): void
-    {
+    public function test_hfsc_shaper_found_in_pfctl(): void {
         # Create a HFSC shaper to test with
         $shaper = new TrafficShaper(
             data: [
@@ -106,8 +102,7 @@ class APIModelsTrafficShaperTestCase extends TestCase
     /**
      * Checks that CBQ traffic shapers are correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_cbq_shaper_found_in_pfctl(): void
-    {
+    public function test_cbq_shaper_found_in_pfctl(): void {
         # Create a CBQ shaper to test with
         $shaper = new TrafficShaper(
             data: [
@@ -167,8 +162,7 @@ class APIModelsTrafficShaperTestCase extends TestCase
     /**
      * Checks that FAIRQ traffic shapers are correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_fairq_shaper_found_in_pfctl(): void
-    {
+    public function test_fairq_shaper_found_in_pfctl(): void {
         # Create a FAIRQ shaper to test with
         $shaper = new TrafficShaper(
             data: [
@@ -222,8 +216,7 @@ class APIModelsTrafficShaperTestCase extends TestCase
     /**
      * Checks that CODELQ traffic shapers are correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_codelq_shaper_found_in_pfctl(): void
-    {
+    public function test_codelq_shaper_found_in_pfctl(): void {
         # Create a CODELQ shaper to test with
         $shaper = new TrafficShaper(
             data: [
@@ -270,8 +263,7 @@ class APIModelsTrafficShaperTestCase extends TestCase
     /**
      * Checks that PRIQ traffic shapers are correctly represented in pfctl after creation, modification and deletion.
      */
-    public function test_priq_shaper_found_in_pfctl(): void
-    {
+    public function test_priq_shaper_found_in_pfctl(): void {
         # Create a PRIQ shaper to test with
         $shaper = new TrafficShaper(
             data: [

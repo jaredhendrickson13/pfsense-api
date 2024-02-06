@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Auth\BasicAuth;
 use RESTAPI\Core\TestCase;
 
-class APIAuthBasicAuthTestCase extends TestCase
-{
+class APIAuthBasicAuthTestCase extends TestCase {
     /**
      * Checks that the _authenticate_method() correctly determines whether a client successfully authenticates or not.
      */
-    public function test_authenticate(): void
-    {
+    public function test_authenticate(): void {
         # Simulate a client submitting valid basic auth credentials
         $_SERVER['PHP_AUTH_USER'] = 'admin';
         $_SERVER['PHP_AUTH_PW'] = 'pfsense';
@@ -28,8 +26,7 @@ class APIAuthBasicAuthTestCase extends TestCase
     /**
      * Checks that we are able to accurately determine if a user is requesting BasicAuth using the is_requested method
      */
-    public function test_is_requested(): void
-    {
+    public function test_is_requested(): void {
         # Ensure is_requested() returns false if neither a basic username or password are specified
         $_SERVER['PHP_AUTH_USER'] = null;
         $_SERVER['PHP_AUTH_PW'] = null;

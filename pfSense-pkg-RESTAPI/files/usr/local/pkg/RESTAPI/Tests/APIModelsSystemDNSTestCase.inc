@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\SystemDNS;
 
-class APIModelsSystemDNSTestCase extends TestCase
-{
+class APIModelsSystemDNSTestCase extends TestCase {
     /**
      * Checks that setting `dnslocalhost` to `local` only adds 127.0.0.1 as a DNS server in resolv.conf
      */
-    public function test_dnslocalhost_local_resolvconf()
-    {
+    public function test_dnslocalhost_local_resolvconf() {
         # Create the system DNS model object to test with
         $system_dns = new SystemDNS(async: false);
 
@@ -25,8 +23,7 @@ class APIModelsSystemDNSTestCase extends TestCase
     /**
      * Checks that setting `dnslocalhost` to `remote` only adds specific DNS servers in resolv.conf
      */
-    public function test_dnslocalhost_remote_resolvconf()
-    {
+    public function test_dnslocalhost_remote_resolvconf() {
         # Create the system DNS model object to test with
         $system_dns = new SystemDNS(async: false);
 
@@ -43,8 +40,7 @@ class APIModelsSystemDNSTestCase extends TestCase
     /**
      * Checks that setting `dnslocalhost` to `null` only adds the local and remote DNS servers in resolv.conf
      */
-    public function test_dnslocalhost_null_resolvconf()
-    {
+    public function test_dnslocalhost_null_resolvconf() {
         # Create the system DNS model object to test with
         $system_dns = new SystemDNS(async: false);
 

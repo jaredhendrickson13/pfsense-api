@@ -17,8 +17,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 
-class IPsecPhase1 extends Model
-{
+class IPsecPhase1 extends Model {
     const INADDR_ANY = ['0.0.0.0', '::'];
 
     public IntegerField $ikeid;
@@ -54,8 +53,7 @@ class IPsecPhase1 extends Model
     public IntegerField $dpd_maxfail;
     public NestedModelField $encryption;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define model attributes
         $this->config_path = 'ipsec/phase1';
         $this->many = true;
@@ -237,8 +235,7 @@ class IPsecPhase1 extends Model
      * @throws ValidationError When the `protocol` field is set to `inet`, but $remote_gateway is an IPv6 address.
      * @throws ValidationError When the `protocol` field is set to `inet6`, but $remote_gateway is an IPv4 address.
      */
-    public function validate_remote_gateway(string $remote_gateway): string
-    {
+    public function validate_remote_gateway(string $remote_gateway): string {
         # Throw a validation error if `protocol` is `inet` but $remote_gateway is an IPv6
         if ($this->protocol->value === 'inet' and $this->remote_gateway->has_label('is_ipaddrv6')) {
             throw new ValidationError(
@@ -286,8 +283,7 @@ class IPsecPhase1 extends Model
      * @throws ValidationError When the `myid_type` field is set to `user_fqdn`, but $myid_data is not an email address.
      * @throws ValidationError When the `myid_type` field is set to `dyn_dns`, but $myid_data is not an FQDN.
      */
-    public function validate_myid_data(string $myid_data): string
-    {
+    public function validate_myid_data(string $myid_data): string {
         # Throw a validation error if `myid_type` is set to `address` but $myid_data is not an IP address
         if ($this->myid_type->value === 'address' and !is_ipaddr($myid_data)) {
             throw new ValidationError(
@@ -329,8 +325,7 @@ class IPsecPhase1 extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When $peerid_type is `peeraddress` but the `remote_gateway` field is an any address.
      */
-    public function validate_peerid_type(string $peerid_type): string
-    {
+    public function validate_peerid_type(string $peerid_type): string {
         # Throw a validation error if $peerid_type is `peeraddress` but the `remote_gateway` field is an any address.
         if ($peerid_type === 'peeraddress' and in_array($this->remote_gateway->value, self::INADDR_ANY)) {
             throw new ValidationError(
@@ -351,8 +346,7 @@ class IPsecPhase1 extends Model
      * @throws ValidationError When the `peerid_type` field is set to `user_fqdn`, but $peerid_data is not an email address.
      * @throws ValidationError When the `peerid_type` field is set to `dyn_dns`, but $peerid_data is not an FQDN.
      */
-    public function validate_peerid_data(string $peerid_data): string
-    {
+    public function validate_peerid_data(string $peerid_data): string {
         # Throw a validation error if `peerid_type` is set to `address` but $peerid_data is not an IP address
         if ($this->peerid_type->value === 'address' and !is_ipaddr($peerid_data)) {
             throw new ValidationError(
@@ -394,8 +388,7 @@ class IPsecPhase1 extends Model
      * @returns int The validated value to be set.
      * @throws ValidationError When $rekey_time is greater than or equal to the `lifetime` Field's value.
      */
-    public function validate_rekey_time(int $rekey_time): int
-    {
+    public function validate_rekey_time(int $rekey_time): int {
         # Throw a validation error if $rekey_time is greater than or equal to the `lifetime` field's value
         if ($rekey_time >= $this->lifetime->value) {
             throw new ValidationError(
@@ -413,8 +406,7 @@ class IPsecPhase1 extends Model
      * @returns int The validated value to be set.
      * @throws ValidationError When $reauth_time is greater than or equal to the `lifetime` Field's value.
      */
-    public function validate_reauth_time(int $reauth_time): int
-    {
+    public function validate_reauth_time(int $reauth_time): int {
         # Throw a validation error if $reauth_time is greater than or equal to the `lifetime` field's value
         if ($reauth_time >= $this->lifetime->value) {
             throw new ValidationError(
@@ -432,8 +424,7 @@ class IPsecPhase1 extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When $startaction is not `none` but the `remote_gateway` field is 0.0.0.0 or ::.
      */
-    public function validate_startaction(string $startaction): string
-    {
+    public function validate_startaction(string $startaction): string {
         # Throw a validation error if $startaction is not 'none' but the `remote_gateway` field is set to 0.0.0.0 or ::
         if ($startaction !== 'none' and in_array($this->remote_gateway->value, self::INADDR_ANY)) {
             throw new ValidationError(
@@ -451,8 +442,7 @@ class IPsecPhase1 extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When $nattport is the same as the `ikeport` field's value.
      */
-    public function validate_nattport(string $nattport): string
-    {
+    public function validate_nattport(string $nattport): string {
         # Throw a valdiation error if $nattport is the same as the `ikeport` field's value.
         if ($nattport === $this->ikeport->value) {
             throw new ValidationError(
@@ -467,8 +457,7 @@ class IPsecPhase1 extends Model
     /**
      * Applies pending changes to IPsec.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

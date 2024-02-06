@@ -14,12 +14,10 @@ use RESTAPI\Dispatchers\RESTAPISettingsSyncDispatcher;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ServerError;
 
-class RESTAPIJWT extends Model
-{
+class RESTAPIJWT extends Model {
     public StringField $token;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set Model attributes
         $this->verbose_name = 'API JWT';
 
@@ -39,8 +37,7 @@ class RESTAPIJWT extends Model
      * @throws Exception When a sufficient source of randomness is not found for `random_bytes`.
      * @return string The API's current JWT server key
      */
-    public static function init_server_key(bool $rotate = false): string
-    {
+    public static function init_server_key(bool $rotate = false): string {
         # Obtain the API package's ID and configuration
         $pkg_id = RESTAPISettings::get_pkg_id();
         $api_config = RESTAPISettings::get_pkg_config();
@@ -73,8 +70,7 @@ class RESTAPIJWT extends Model
      * @param string $jwt The incoming JWT string to decode.
      * @return array An array of decoded JWT attributes. If the JWT could not be decoded, this array will be empty.
      */
-    public static function decode(string $jwt): array
-    {
+    public static function decode(string $jwt): array {
         # Obtain the current JWT server key
         $jwt_server_key = self::init_server_key();
 
@@ -89,8 +85,7 @@ class RESTAPIJWT extends Model
     /**
      * Generates the JWT and assigns the `token` field.
      */
-    public function _create()
-    {
+    public function _create() {
         # Initialize the JWT server key in case it is not present
         $server_key = $this->init_server_key();
 

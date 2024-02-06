@@ -6,14 +6,12 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallState;
 
-class APIModelsFirewallStateTestCase extends TestCase
-{
+class APIModelsFirewallStateTestCase extends TestCase {
     /**
      * Checks that states are generated when traffic is passed through the firewall, that we can read the states
      * correctly, and that we can successfully kill the firewall state using the delete() method.
      */
-    public function test_state_read_and_kill(): void
-    {
+    public function test_state_read_and_kill(): void {
         # Send a single ping to a test IP to register a new firewall state
         new Command('ping -t1 -c1 127.0.0.50');
 

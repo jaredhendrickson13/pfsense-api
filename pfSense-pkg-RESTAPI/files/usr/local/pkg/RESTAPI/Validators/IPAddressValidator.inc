@@ -8,8 +8,7 @@ use RESTAPI;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Responses\ValidationError;
 
-class IPAddressValidator extends RESTAPI\Core\Validator
-{
+class IPAddressValidator extends RESTAPI\Core\Validator {
     public bool $allow_ipv4;
     public bool $allow_ipv6;
     public bool $allow_ipv6_link_local;
@@ -47,8 +46,7 @@ class IPAddressValidator extends RESTAPI\Core\Validator
      * @param string $field_name The field name of the value being validated. This is used for error messages.
      * @throws \RESTAPI\Responses\ValidationError When the value is not a valid IPv4 address.
      */
-    public function validate(mixed $value, string $field_name = '')
-    {
+    public function validate(mixed $value, string $field_name = '') {
         # Non-port alias values are valid if allowed
         $alias_query = FirewallAlias::query(['name' => $value, 'type__except' => 'port']);
         if ($this->allow_alias and $alias_query->exists()) {

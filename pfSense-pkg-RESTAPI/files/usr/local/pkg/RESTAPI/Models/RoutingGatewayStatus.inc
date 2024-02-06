@@ -8,8 +8,7 @@ use RESTAPI\Fields\FloatField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 
-class RoutingGatewayStatus extends Model
-{
+class RoutingGatewayStatus extends Model {
     public ForeignModelField $name;
     public StringField $srcip;
     public StringField $monitorip;
@@ -19,8 +18,7 @@ class RoutingGatewayStatus extends Model
     public StringField $status;
     public StringField $substatus;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_gateway_statuses';
         $this->many = true;
@@ -79,8 +77,7 @@ class RoutingGatewayStatus extends Model
      * Obtains the internal gateway status values. This is this Model's internal callable.
      * @return array The array of
      */
-    protected function get_gateway_statuses(): array
-    {
+    protected function get_gateway_statuses(): array {
         # Variables
         $gw_metrics_raw = return_gateways_status(true);
         $gw_metrics = [];

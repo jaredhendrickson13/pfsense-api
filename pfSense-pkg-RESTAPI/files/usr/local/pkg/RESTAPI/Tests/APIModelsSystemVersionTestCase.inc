@@ -5,14 +5,12 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\SystemVersion;
 
-class APIModelsSystemVersionTestCase extends TestCase
-{
+class APIModelsSystemVersionTestCase extends TestCase {
     /**
      * Checks that the `get_pfsense_version()` method correctly obtains the pfSense version details by the version
      * files installed on the system.
      */
-    public function test_read()
-    {
+    public function test_read() {
         # Create a SystemVersion object and ensure its values match the version files on this system
         $system_version = new SystemVersion();
 

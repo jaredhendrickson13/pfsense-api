@@ -8,8 +8,7 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
-class FirewallScheduleTimeRange extends Model
-{
+class FirewallScheduleTimeRange extends Model {
     const SUPPORTED_MINUTES = ['00', '15', '30', '45', '59'];
 
     public IntegerField $position;
@@ -18,8 +17,7 @@ class FirewallScheduleTimeRange extends Model
     public StringField $hour;
     public StringField $rangedescr;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->parent_model_class = 'FirewallSchedule';
         $this->config_path = 'timerange';
@@ -77,8 +75,7 @@ class FirewallScheduleTimeRange extends Model
      * Adds extra validation for the entire Model.
      * @throws ValidationError When $this->day's value is not a valid day in the $this->month field's current value.
      */
-    public function validate_extra(): void
-    {
+    public function validate_extra(): void {
         # Add validation between the `month` and `day` field if both fields have values
         if ($this->month->value and $this->day->value) {
             # Throw and error if the `day` and `month` field arrays do not have the same number of items
@@ -108,8 +105,7 @@ class FirewallScheduleTimeRange extends Model
      * @returns string The validated value to be assigned.
      * @throws ValidationError When $hour is not a valid 24-hour time range (i.e. 0:00-23:59)
      */
-    public function validate_hour(string $hour): string
-    {
+    public function validate_hour(string $hour): string {
         # Separate the $hour values start and end times so they can be validated individually
         $start_time = explode('-', $hour)[0] ?: '';
         $start_time_mins = substr($start_time, offset: -2);
@@ -152,8 +148,7 @@ class FirewallScheduleTimeRange extends Model
      * @param int $day The day of the month to evaluate.
      * @return bool Returns true if $day is a valid day of the $month, otherwise false.
      */
-    public static function is_day_in_month(int $month, int $day): bool
-    {
+    public static function is_day_in_month(int $month, int $day): bool {
         # Local variables
         $month_days = [
             1 => 31,
@@ -179,8 +174,7 @@ class FirewallScheduleTimeRange extends Model
      * @param $time string incoming time string to validate.
      * @return bool Returns true if $time is a valid
      */
-    public static function is_valid_24_hour_time(string $time): bool
-    {
+    public static function is_valid_24_hour_time(string $time): bool {
         # Convert H:MM to HH:MM for the regex
         $time = substr($time, 1, 1) === ':' ? '0' . $time : $time;
 
@@ -198,8 +192,7 @@ class FirewallScheduleTimeRange extends Model
      * @param $end_time string The end time string to evaluate.
      * @return bool Returns true if the $start_time is before $end_time
      */
-    public static function is_valid_24_hour_time_range(string $start_time, string $end_time): bool
-    {
+    public static function is_valid_24_hour_time_range(string $start_time, string $end_time): bool {
         # Check if the start time is less than the end time
         if (strtotime($start_time) <= strtotime($end_time)) {
             return true;

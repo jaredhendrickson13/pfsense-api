@@ -13,8 +13,7 @@ use RESTAPI\Responses\ValidationError;
  * Defines a FilterAddressField class that extends the InterfaceField class. This Field adds validation and
  * representation for firewall filter addresses (e.g. firewall and NAT rule source and destination addresses).
  */
-class FilterAddressField extends InterfaceField
-{
+class FilterAddressField extends InterfaceField {
     const INVERT_PREFIX = '!';
     public bool $allow_ipaddr;
     public bool $allow_subnet;
@@ -193,8 +192,7 @@ class FilterAddressField extends InterfaceField
      * Ensure any value assigned to this Field is allowed by the current field settings.
      * @param mixed $value The incoming value to be validated.
      */
-    public function validate_extra(mixed $value)
-    {
+    public function validate_extra(mixed $value) {
         # Remove the invert character (!) if invert is allowed and present, so we can continue validating.
         if ($this->allow_invert and str_starts_with($value, self::INVERT_PREFIX)) {
             $value = substr($value, 1);
@@ -288,8 +286,7 @@ class FilterAddressField extends InterfaceField
      * help messages depending on this Field's current settings.
      * @return string A string representation of values that are considered valid for this Field.
      */
-    private function get_valid_opts_str(): string
-    {
+    private function get_valid_opts_str(): string {
         # Piece together our options in string format using this Field's current settings
         $opts_str = $this->allow_interface ? 'an existing interface, ' : '';
         $opts_str .= $this->allow_ipaddr ? 'an IP address, ' : '';
@@ -309,8 +306,7 @@ class FilterAddressField extends InterfaceField
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|null|string The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value): array|null|string
-    {
+    protected function _to_internal(mixed $representation_value): array|null|string {
         # pfSense stores this value internal as an array of several different Fields, initialize that array
         $internal_value = [];
         $if_ip_modifier_set = false;
@@ -353,8 +349,7 @@ class FilterAddressField extends InterfaceField
      * @param string $internal_value The internal config value to convert to a representation value.
      * @throws ServerError When the child Field class does not override this method.
      */
-    protected function _from_internal(mixed $internal_value): string
-    {
+    protected function _from_internal(mixed $internal_value): string {
         # Assign a variable to use when piecing back together our representation value
         $representation_value = '';
 

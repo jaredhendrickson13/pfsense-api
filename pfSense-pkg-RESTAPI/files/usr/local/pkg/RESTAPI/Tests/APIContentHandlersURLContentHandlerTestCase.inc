@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\ContentHandlers\URLContentHandler;
 use RESTAPI\Core\TestCase;
 
-class APIContentHandlersURLContentHandlerTestCase extends TestCase
-{
+class APIContentHandlersURLContentHandlerTestCase extends TestCase {
     /**
      * Checks that the `get_content()` method correctly obtains content from the PHP $_GET variable.
      */
-    public function test_get_content(): void
-    {
+    public function test_get_content(): void {
         # Create a handler to test with
         $handler = new URLContentHandler();
 
@@ -26,8 +24,7 @@ class APIContentHandlersURLContentHandlerTestCase extends TestCase
     /**
      * Checks that the `decode()` method correctly decodes the incoming content.
      */
-    public function test_decode(): void
-    {
+    public function test_decode(): void {
         # Create a handler to test with
         $handler = new URLContentHandler();
 
@@ -43,8 +40,7 @@ class APIContentHandlersURLContentHandlerTestCase extends TestCase
     /**
      * Checks that the `can_encode()` returns false since this is not a valid response content-type
      */
-    public function test_can_encode_returns_false(): void
-    {
+    public function test_can_encode_returns_false(): void {
         # Create a handler to test with
         $handler = new URLContentHandler();
         $this->assert_is_false($handler->can_encode());
@@ -53,8 +49,7 @@ class APIContentHandlersURLContentHandlerTestCase extends TestCase
     /**
      * Checks that the `can_decode()` returns true since this is a valid request content-type
      */
-    public function test_can_decode_returns_true(): void
-    {
+    public function test_can_decode_returns_true(): void {
         # Create a handler to test with
         $handler = new URLContentHandler();
         $this->assert_is_true($handler->can_decode());

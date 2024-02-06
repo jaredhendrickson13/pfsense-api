@@ -15,8 +15,7 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\FilterNameValidator;
 use function RESTAPI\Core\Tools\bandwidth_to_bits;
 
-class TrafficShaperQueue extends Model
-{
+class TrafficShaperQueue extends Model {
     public InterfaceField $interface;
     public BooleanField $enabled;
     public StringField $name;
@@ -46,8 +45,7 @@ class TrafficShaperQueue extends Model
     public IntegerField $linkshare_d;
     public StringField $linkshare_m2;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->parent_model_class = 'TrafficShaper';
         $this->config_path = 'queue';
@@ -242,8 +240,7 @@ class TrafficShaperQueue extends Model
      * @throws ValidationError When the parent TrafficShaper's `scheduler` is set to CODELQ. This TrafficShapers cannot
      * support child queues.
      */
-    public function validate_extra(): void
-    {
+    public function validate_extra(): void {
         # Do not allow TrafficShaperQueues to be created for CODELQ TrafficShapers
         if ($this->parent_model->scheduler->value === 'CODELQ') {
             throw new UnprocessableContentError(
@@ -265,8 +262,7 @@ class TrafficShaperQueue extends Model
      * @throws ValidationError When the parent TrafficShaper has its type set to `%` but this object specifies an
      * exact amount.
      */
-    public function validate_bandwidthtype(string $bandwidthtype): string
-    {
+    public function validate_bandwidthtype(string $bandwidthtype): string {
         # Throw an error if the parent's `bandwidthtype` is `%` but this object's is not
         # Note: This is not enforced in the pfSense webConfigurator but probably should be. The algorithm used to check
         # if a queue is over committed on bandwidth becomes inaccurate when the parent uses % but child queues use
@@ -288,8 +284,7 @@ class TrafficShaperQueue extends Model
      * @throws ValidationError When the sum of all queue bandwidth assigned to this queue's parent exceeds the
      * maximum bandwidth allowed by the parent.
      */
-    public function validated_bandwidth(int $bandwidth): int
-    {
+    public function validated_bandwidth(int $bandwidth): int {
         # Do not allow the bandwidth allowed by this queue to push the sum of all bandwidth for the interface over
         if ($this->is_bandwidth_exceeded()) {
             $our_bw = $bandwidth . $this->bandwidthtype->value;
@@ -310,8 +305,7 @@ class TrafficShaperQueue extends Model
      * @returns integer The validated value to be assigned.
      * @throws ValidationError When the parent `scheduler` is not `PRIQ` but the $priority is greater than 7.
      */
-    public function validate_priority(int $priority): int
-    {
+    public function validate_priority(int $priority): int {
         # Variables
         $parent_scheduler = $this->parent_model->scheduler->value;
 
@@ -334,8 +328,7 @@ class TrafficShaperQueue extends Model
      * @throws ValidationError When $upperlimit_m1 is not a bandwidth formatted string (i.e. 25Mb)
      * @throws ValidationError When $upperlimit_m1 is defined, but no `upperlimit_d` field value is defined.
      */
-    public function validate_upperlimit_m1(string $upperlimit_m1): string
-    {
+    public function validate_upperlimit_m1(string $upperlimit_m1): string {
         # Throw an error if this value is not a bandwidth formatted string
         if (!$this->is_bandwidth_string($upperlimit_m1)) {
             throw new ValidationError(
@@ -362,8 +355,7 @@ class TrafficShaperQueue extends Model
      * @throws ValidationError When $realtime_m1 is not a bandwidth formatted string (i.e. 25Mb)
      * @throws ValidationError When $realtime_m1 is defined, but no `realtime_d` field value is defined.
      */
-    public function validate_realtime_m1(string $realtime_m1): string
-    {
+    public function validate_realtime_m1(string $realtime_m1): string {
         # Throw an error if this value is not a bandwidth formatted string
         if (!$this->is_bandwidth_string($realtime_m1)) {
             throw new ValidationError(
@@ -390,8 +382,7 @@ class TrafficShaperQueue extends Model
      * @throws ValidationError When $linkshare_m1 is not a bandwidth formatted string (i.e. 25Mb)
      * @throws ValidationError When $linkshare_m1 is defined, but no `linkshare_d` field value is defined.
      */
-    public function validate_linkshare_m1(string $linkshare_m1): string
-    {
+    public function validate_linkshare_m1(string $linkshare_m1): string {
         # Throw an error if this value is not a bandwidth formatted string
         if (!$this->is_bandwidth_string($linkshare_m1)) {
             throw new ValidationError(
@@ -414,8 +405,7 @@ class TrafficShaperQueue extends Model
     /**
      * Reloads the firewall filter and restarts queue graphing.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
         system('rm -f /var/db/rrd/*queuedrops.rrd');
         system('rm -f /var/db/rrd/*queues.rrd');
@@ -427,8 +417,7 @@ class TrafficShaperQueue extends Model
      * @param string $value The string to validate as a bandwidth string
      * @returns bool Returns true if $bandwidth is a bandwidth formatted string, otherwise false.
      */
-    public static function is_bandwidth_string(string $value): bool
-    {
+    public static function is_bandwidth_string(string $value): bool {
         # Loop through each bandwidth type
         foreach (['Kb', 'Mb', 'Gb', 'b'] as $type) {
             if (str_ends_with($value, $type)) {
@@ -451,8 +440,7 @@ class TrafficShaperQueue extends Model
      * @return int The total number of bandwidth in bits allowed by this queue, or the 1-100 percentage value if both
      * $queue and its parent TrafficShaper are percentage based.
      */
-    public static function get_bandwidth_bits(TrafficShaperQueue $queue): int
-    {
+    public static function get_bandwidth_bits(TrafficShaperQueue $queue): int {
         # Variables
         $queue->get_parent_model();
         $parent_is_percent = $queue->parent_model->bandwidthtype->value === '%';
@@ -476,8 +464,7 @@ class TrafficShaperQueue extends Model
      * Checks if the sum of all child queue bandwidth exceeds the parent's bandwidth limit.
      * @return bool Returns true if the total bandwidth exceeds the parent's bandwidth limit. Otherwise, false.
      */
-    public function is_bandwidth_exceeded(): bool
-    {
+    public function is_bandwidth_exceeded(): bool {
         # Variables
         $parent_bandwidth_max = $this->parent_model->get_bandwidth_bits();
         $queues = TrafficShaperQueue::query(parent_id: $this->parent_id);

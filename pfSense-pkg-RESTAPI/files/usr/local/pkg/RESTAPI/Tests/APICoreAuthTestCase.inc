@@ -11,13 +11,11 @@ use RESTAPI\Models\RESTAPIKey;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\User;
 
-class APICoreAuthTestCase extends TestCase
-{
+class APICoreAuthTestCase extends TestCase {
     /**
      * Check that Auth objects are constructed with the remote client's IP address as the `ip_address` property.
      */
-    public function test_construct_obtains_ip_address_from_client(): void
-    {
+    public function test_construct_obtains_ip_address_from_client(): void {
         # Mock the client IP by assigning $_SERVER["REMOTE_ADDR"] a value directly
         $_SERVER['REMOTE_ADDR'] = '1.2.3.4';
         $auth = new Auth();
@@ -27,8 +25,7 @@ class APICoreAuthTestCase extends TestCase
     /**
      * Checks that Auth classes must have their _authenticate() method overridden or an error is thrown.
      */
-    public function test_auth_class_must_override_authenticate(): void
-    {
+    public function test_auth_class_must_override_authenticate(): void {
         $this->assert_throws_response(
             response_id: 'AUTH_CLASS_WITHOUT_OVERRIDDEN_AUTHENTICATE_METHOD',
             code: 500,
@@ -43,8 +40,7 @@ class APICoreAuthTestCase extends TestCase
     /**
      * Checks that the authenticate() method correctly identifies when a client has authenticated.
      */
-    public function test_authenticate(): void
-    {
+    public function test_authenticate(): void {
         # Since the core Auth must be overridden to authenticate, use BasicAuth to test
         $auth = new BasicAuth();
 
@@ -75,8 +71,7 @@ class APICoreAuthTestCase extends TestCase
     /**
      * Checks that the authorize() method correctly identifies when a client is authorized.
      */
-    public function test_authorize(): void
-    {
+    public function test_authorize(): void {
         # Mock successful authorization
         $auth = new Auth(required_privileges: ['page-all']);
         $auth->username = 'admin';
@@ -94,8 +89,7 @@ class APICoreAuthTestCase extends TestCase
      * Checks if the is_user_enabled() method correctly identifies whether a given user exists and if they are
      * currently enabled.
      */
-    public function test_is_user_enabled(): void
-    {
+    public function test_is_user_enabled(): void {
         # Ensure the method correctly identifies a user that exists and is not disabled
         $this->assert_is_true(Auth::is_user_enabled('admin'));
 
@@ -117,8 +111,7 @@ class APICoreAuthTestCase extends TestCase
     /**
      * Checks that authentication is logged.
      */
-    public function test_auth_is_logged(): void
-    {
+    public function test_auth_is_logged(): void {
         # Enable login protection to enable authentication logging
         $api_settings = new RESTAPISettings();
         $api_settings->login_protection->value = true;
@@ -206,8 +199,7 @@ class APICoreAuthTestCase extends TestCase
      * Checks that the get_auth_key() is correctly able to identify the key included in authorization headers with a
      * specific identifier.
      */
-    public function test_get_auth_key(): void
-    {
+    public function test_get_auth_key(): void {
         # Simulate a client sending a bearer token
         $_SERVER['HTTP_AUTHORIZATION'] = 'bearer some_auth_key_here';
 
@@ -222,8 +214,7 @@ class APICoreAuthTestCase extends TestCase
     /**
      * Checks that the ensure_class_exists() method correctly identifies Auth classes
      */
-    public function test_ensure_class_exists(): void
-    {
+    public function test_ensure_class_exists(): void {
         $this->assert_does_not_throw(
             callable: function () {
                 Auth::ensure_class_exists('BasicAuth');
@@ -244,8 +235,7 @@ class APICoreAuthTestCase extends TestCase
     /**
      * Checks that the attempt_multi_auth() correctly authenticates users using the specified Auth classes.
      */
-    public function test_attempt_multi_auth(): void
-    {
+    public function test_attempt_multi_auth(): void {
         # Ensure authentication fails when we expect it
         $this->assert_throws_response(
             response_id: 'AUTH_AUTHENTICATION_FAILED',
