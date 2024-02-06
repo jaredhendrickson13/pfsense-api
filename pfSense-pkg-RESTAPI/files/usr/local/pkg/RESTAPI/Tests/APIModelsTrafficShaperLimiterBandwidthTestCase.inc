@@ -12,7 +12,7 @@ class APIModelsTrafficShaperLimiterBandwidthTestCase extends TestCase
 {
     /**
      * Checks that we can successfully create, update and delete limiters and that they are correctly represented
-     * in ipfw
+     * in dnctl
      */
     public function test_crud(): void
     {
@@ -28,20 +28,20 @@ class APIModelsTrafficShaperLimiterBandwidthTestCase extends TestCase
         );
         $limiter->create(apply: true);
 
-        # Ensure the limiter is seen in ipfw
-        $ipfw = new Command('ipfw pipe show', trim_whitespace: true);
-        $this->assert_str_contains($ipfw->output, '20.000 Mbit/s');
+        # Ensure the limiter is seen in dnctl
+        $dnctl = new Command('dnctl pipe show', trim_whitespace: true);
+        $this->assert_str_contains($dnctl->output, '20.000 Mbit/s');
 
-        # Update the limiter with new values and ensure it is updated in ipfw
+        # Update the limiter with new values and ensure it is updated in dnctl
         $limiter->from_representation(bandwidth: [['bw' => 400, 'bwscale' => 'Kb', 'sched' => 'none']]);
         $limiter->update(apply: true);
-        $ipfw = new Command('ipfw pipe show', trim_whitespace: true);
-        $this->assert_str_contains($ipfw->output, '400.000 Kbit/s');
+        $dnctl = new Command('dnctl pipe show', trim_whitespace: true);
+        $this->assert_str_contains($dnctl->output, '400.000 Kbit/s');
 
-        # Delete the limter and ensure it is no longer seen in ipfw
+        # Delete the limter and ensure it is no longer seen in dnctl
         $limiter->delete(apply: true);
-        $ipfw = new Command('ipfw pipe show', trim_whitespace: true);
-        $this->assert_str_does_not_contain($ipfw->output, $limiter->number->value . ':');
+        $dnctl = new Command('dnctl pipe show', trim_whitespace: true);
+        $this->assert_str_does_not_contain($dnctl->output, $limiter->number->value . ':');
     }
 
     /**

@@ -81,7 +81,7 @@ class TrafficShaperLimiter extends Model
         );
         $this->number = new IntegerField(
             unique: true,
-            default: rand(1, 65535), // TODO: Use a default callable for get_next_limiter_number here
+            default: $this->get_next_number(),
             editable: false,
             read_only: true,
             help_text: 'A unique number auto-assigned to this limiter. This is only used internally by the system and ' .
@@ -346,7 +346,7 @@ class TrafficShaperLimiter extends Model
         $this->buckets = new IntegerField(
             default: null,
             allow_null: true,
-            minimum: 0,
+            minimum: 16,
             maximum: 65535,
             help_text: "The limiter's bucket size (slots).",
         );
@@ -375,12 +375,21 @@ class TrafficShaperLimiter extends Model
     }
 
     /**
-     * Extends the default _delete() method to ensure the limit is removed from ipfw afterward.
+     * Extends the default _delete() method to ensure the limit is removed from dnctl afterward.
      */
     public function _delete(): void
     {
-        # Delete the limiter from config and remove the limiter from ipfw
+        # Delete the limiter from config and remove the limiter from dnctl
         parent::_delete();
-        new Command('ipfw pipe delete ' . $this->number->value);
+        new Command('dnctl pipe delete ' . $this->number->value);
+    }
+
+    /**
+     * Obtains the next available DN pipe `number`.
+     * @return int The next available pipe `number` value.
+     */
+    protected function get_next_number(): int {
+        read_dummynet_config(); // Populates the dnpipe list used by dnqueue_find_nextnumber()
+        return dnpipe_find_nextnumber();
     }
 }

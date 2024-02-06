@@ -2,14 +2,15 @@
 
 namespace RESTAPI\Models;
 
+use RESTAPI\Core\Command;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\TrafficShaperApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\FloatField;
 use RESTAPI\Fields\IntegerField;
-use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\FilterNameValidator;
+use RESTAPI\Validators\UniqueFromForeignModelValidator;
 
 class TrafficShaperLimiterQueue extends Model
 {
@@ -59,12 +60,15 @@ class TrafficShaperLimiterQueue extends Model
         $this->name = new StringField(
             required: true,
             unique: true,
-            validators: [new FilterNameValidator()],
-            help_text: 'The unique name for this limiter.',
+            validators: [
+                new FilterNameValidator(), 
+                new UniqueFromForeignModelValidator(model: "TrafficShaperLimiter", field: "name")
+            ],
+            help_text: 'The unique name for this limiter queue.',
         );
         $this->number = new IntegerField(
             unique: true,
-            default: rand(1, 65535), // TODO: Use a default callable for get_next_limiter_number here
+            default: $this->get_next_number(),
             editable: false,
             read_only: true,
             help_text: 'A unique number auto-assigned to this limiter. This is only used internally by the system and ' .
@@ -73,7 +77,7 @@ class TrafficShaperLimiterQueue extends Model
         $this->enabled = new BooleanField(
             default: false,
             indicates_true: 'on',
-            help_text: 'Enables or disables this limiter and its child queues.',
+            help_text: 'Enables or disables this limiter queue.',
         );
         $this->mask = new StringField(
             default: 'none',
@@ -117,20 +121,14 @@ class TrafficShaperLimiterQueue extends Model
         $this->description = new StringField(
             default: '',
             allow_empty: true,
-            help_text: 'The verbose description for this limiter.',
+            help_text: 'The verbose description for this limiter queue.',
         );
         $this->aqm = new StringField(
             required: true,
             choices: ['droptail', 'codel', 'pie', 'red', 'gred'],
-            help_text: 'The Active Queue Management (AQM) algorithm to use for this limiter. AQM is the intelligent ' .
-                'drop of network packets inside the limiter, when it becomes full or gets close to becoming full, ' .
+            help_text: 'The Active Queue Management (AQM) algorithm to use for this queue. AQM is the intelligent ' .
+                'drop of network packets inside the queue, when it becomes full or gets close to becoming full, ' .
                 'with the goal of reducing network congestion.',
-        );
-        $this->sched = new StringField(
-            required: true,
-            choices: ['wf2q+', 'fifo', 'qfq', 'rr', 'prio', 'fq_codel', 'fq_pie'],
-            help_text: 'The scheduler to use for this limiter. The scheduler manages the sequence of network packets ' .
-                "in the limiter's queue.",
         );
         $this->param_codel_target = new IntegerField(
             default: 0,
@@ -248,17 +246,17 @@ class TrafficShaperLimiterQueue extends Model
             allow_null: true,
             minimum: 0,
             maximum: 1,
-            help_text: 'The amount of packet loss (in percentage) added to traffic passing through the limiter.',
+            help_text: 'The amount of packet loss (in percentage) added to traffic passing through this limiter queue.',
         );
         $this->buckets = new IntegerField(
             default: null,
             allow_null: true,
-            minimum: 0,
+            minimum: 16,
             maximum: 65535,
-            help_text: "The limiter's bucket size (slots).",
+            help_text: "The limiter queue's bucket size (slots).",
         );
 
-        parent::__construct($id, $parent_id, $data, $options);
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
@@ -267,5 +265,24 @@ class TrafficShaperLimiterQueue extends Model
     public function apply(): void
     {
         (new TrafficShaperApplyDispatcher(async: $this->async))->spawn_process();
+    }
+
+    /**
+     * Extends the default _delete() method to ensure the queue is removed from dnctl afterward.
+     */
+    public function _delete(): void
+    {
+        # Delete the limiter from config and remove the limiter from dnctl
+        parent::_delete();
+        new Command('dnctl queue delete ' . $this->number->value);
+    }
+    
+    /**
+     * Obtains the next available DN queue `number`.
+     * @return int The next available queue `number` value.
+     */
+    protected function get_next_number(): int {
+        read_dummynet_config(); // Populates the dnqueue list used by dnqueue_find_nextnumber()
+        return dnqueue_find_nextnumber();
     }
 }
