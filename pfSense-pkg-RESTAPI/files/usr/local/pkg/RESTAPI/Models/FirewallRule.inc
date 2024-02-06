@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Auth;
@@ -211,12 +211,12 @@ class FirewallRule extends Model {
         $this->dnpipe = new StringField(
             default: null,
             allow_null: true,
-            help_text: "The name of the traffic shaper limiter pipe or queue to use for incoming traffic."
+            help_text: 'The name of the traffic shaper limiter pipe or queue to use for incoming traffic.',
         );
         $this->pdnpipe = new StringField(
             default: null,
             allow_null: true,
-            help_text: "The name of the traffic shaper limiter pipe or queue to use for outgoing traffic."
+            help_text: 'The name of the traffic shaper limiter pipe or queue to use for outgoing traffic.',
         );
         $this->defaultqueue = new ForeignModelField(
             model_name: 'TrafficShaperQueue',
@@ -365,9 +365,9 @@ class FirewallRule extends Model {
         # Throw an error if $dnpipe is not an existing TrafficShaperLimiter or TrafficShaperLimiterQueue
         if (!$this->get_dnpipe_by_name($dnpipe)) {
             throw new NotFoundError(
-                message: "Field `dnpipe` must be an existing Traffic Shaper Limiter or Limiter Queue. Could not ".
+                message: 'Field `dnpipe` must be an existing Traffic Shaper Limiter or Limiter Queue. Could not ' .
                     "locate object with `name` value `$dnpipe`",
-                response_id: "FIREWALL_RULE_DNPIPE_NOT_FOUND"
+                response_id: 'FIREWALL_RULE_DNPIPE_NOT_FOUND',
             );
         }
 
@@ -386,8 +386,8 @@ class FirewallRule extends Model {
         # Throw an error if $pdnpipe has a value but `dnpipe` does not
         if ($pdnpipe and !$this->dnpipe->value) {
             throw new ValidationError(
-                message: "Field `pdnpipe` cannot be set unless `dnpipe` is also set.",
-                response_id: "FIREWALL_RULE_PDNPIPE_SET_WITHOUT_DNPIPE"
+                message: 'Field `pdnpipe` cannot be set unless `dnpipe` is also set.',
+                response_id: 'FIREWALL_RULE_PDNPIPE_SET_WITHOUT_DNPIPE',
             );
         }
 
@@ -395,9 +395,9 @@ class FirewallRule extends Model {
         $pdnpipe_obj = $this->get_dnpipe_by_name($pdnpipe);
         if (!$pdnpipe_obj) {
             throw new NotFoundError(
-                message: "Field `pdnpipe` must be an existing Traffic Shaper Limiter or Limiter Queue. Could not ".
+                message: 'Field `pdnpipe` must be an existing Traffic Shaper Limiter or Limiter Queue. Could not ' .
                     "locate object with `name` value `$pdnpipe`",
-                response_id: "FIREWALL_RULE_DNPIPE_NOT_FOUND"
+                response_id: 'FIREWALL_RULE_DNPIPE_NOT_FOUND',
             );
         }
 
@@ -405,9 +405,9 @@ class FirewallRule extends Model {
         $dnpipe_obj = $this->get_dnpipe_by_name($this->dnpipe->value);
         if (get_class($dnpipe_obj) !== get_class($pdnpipe_obj)) {
             throw new ConflictError(
-                message: "Field `pdnpipe` must be of the same limiter type as `dnpipe`. A pipe and a queue cannot be " .
-                    "used concurrently.",
-                response_id: "FIREWALL_RULE_PDNPIPE_DOES_NOT_MATCH_DNPIPE_LIMITER_TYPE"
+                message: 'Field `pdnpipe` must be of the same limiter type as `dnpipe`. A pipe and a queue cannot be ' .
+                    'used concurrently.',
+                response_id: 'FIREWALL_RULE_PDNPIPE_DOES_NOT_MATCH_DNPIPE_LIMITER_TYPE',
             );
         }
 
