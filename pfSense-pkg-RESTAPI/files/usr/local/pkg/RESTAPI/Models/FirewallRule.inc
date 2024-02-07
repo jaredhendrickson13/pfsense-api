@@ -390,12 +390,12 @@ class FirewallRule extends Model {
                 response_id: 'FIREWALL_RULE_PDNPIPE_SET_WITHOUT_DNPIPE',
             );
         }
-        
+
         # Throw an error if $pdnpipe matches the value `dnpipe` exactly
         if ($pdnpipe === $this->dnpipe->value) {
             throw new ValidationError(
-                message: "Field `pdnpipe` cannot use the same limiter as `dnpipe`.",
-                response_id: "FIREWALL_RULE_PDNPIPE_CANNOT_MATCH_DNPIPE"
+                message: 'Field `pdnpipe` cannot use the same limiter as `dnpipe`.',
+                response_id: 'FIREWALL_RULE_PDNPIPE_CANNOT_MATCH_DNPIPE',
             );
         }
 

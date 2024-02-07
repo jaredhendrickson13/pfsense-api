@@ -608,25 +608,23 @@ class APIModelsFirewallRuleTestCase extends TestCase {
     }
 
     /**
-     * Checks that both the dnpipe and pdnpipe fields must be the name of an existing TrafficShaperLimiter or 
+     * Checks that both the dnpipe and pdnpipe fields must be the name of an existing TrafficShaperLimiter or
      * TrafficShaperLimiterQueue.
      */
     public function test_dnpipe_and_pdnpipe_must_be_pipe_or_queue_name(): void {
         # Create a TrafficShaperLimiter object to test with
         $limiter = new TrafficShaperLimiter(
-            name: "test_limiter",
+            name: 'test_limiter',
             enabled: true,
-            aqm: "droptail",
-            sched: "wf2q+",
-            bandwidth: [
-                ["bw" => 20, "bwscale" => "Mb"]
-            ]
+            aqm: 'droptail',
+            sched: 'wf2q+',
+            bandwidth: [['bw' => 20, 'bwscale' => 'Mb']],
         );
         $limiter->create();
-        
+
         # Ensure an error is thrown if dnpipe is not an existing limiter name
         $this->assert_throws_response(
-            response_id: "FIREWALL_RULE_DNPIPE_NOT_FOUND",
+            response_id: 'FIREWALL_RULE_DNPIPE_NOT_FOUND',
             code: 404,
             callable: function () {
                 $rule = new FirewallRule(
@@ -635,15 +633,15 @@ class APIModelsFirewallRuleTestCase extends TestCase {
                     ipprotocol: 'inet',
                     source: 'any',
                     destination: 'any',
-                    dnpipe: "does not exist!",
+                    dnpipe: 'does not exist!',
                     async: false,
                 );
                 $rule->validate();
-            }
+            },
         );
         # Ensure an error is thrown if pdnpipe is not an existing limiter name
         $this->assert_throws_response(
-            response_id: "FIREWALL_RULE_PDNPIPE_NOT_FOUND",
+            response_id: 'FIREWALL_RULE_PDNPIPE_NOT_FOUND',
             code: 404,
             callable: function () use ($limiter) {
                 $rule = new FirewallRule(
@@ -653,17 +651,17 @@ class APIModelsFirewallRuleTestCase extends TestCase {
                     source: 'any',
                     destination: 'any',
                     dnpipe: $limiter->name->value,
-                    pdnpipe: "does not exist!",
+                    pdnpipe: 'does not exist!',
                     async: false,
                 );
                 $rule->validate();
-            }
+            },
         );
-        
+
         # Delete the limiter
         $limiter->delete(apply: true);
     }
-    
+
     /**
      * Checks that a firewall rule cannot be created with a TrafficShaperLimiter AND a TrafficShaperLimiterQueue as
      * the dnpipe and pdnpipe fields. Both must be of the same class.
@@ -671,26 +669,24 @@ class APIModelsFirewallRuleTestCase extends TestCase {
     public function test_dnpipe_and_pdnpipe_limiter_types_must_match(): void {
         # Create a TrafficShaperLimiter and TrafficShaperLimiterQueue object to test with
         $limiter = new TrafficShaperLimiter(
-            name: "test_limiter",
+            name: 'test_limiter',
             enabled: true,
-            aqm: "droptail",
-            sched: "wf2q+",
-            bandwidth: [
-                ["bw" => 20, "bwscale" => "Mb"]
-            ]
+            aqm: 'droptail',
+            sched: 'wf2q+',
+            bandwidth: [['bw' => 20, 'bwscale' => 'Mb']],
         );
         $limiter->create();
         $queue = new TrafficShaperLimiterQueue(
-            parent_id: $limiter->id, 
-            name: "test_queue", 
-            enabled: true, 
-            aqm: "droptail"
+            parent_id: $limiter->id,
+            name: 'test_queue',
+            enabled: true,
+            aqm: 'droptail',
         );
         $queue->create(apply: true);
 
         # Ensure an error is thrown when we try to use both a limiter and queue
         $this->assert_throws_response(
-            response_id: "FIREWALL_RULE_PDNPIPE_DOES_NOT_MATCH_DNPIPE_LIMITER_TYPE",
+            response_id: 'FIREWALL_RULE_PDNPIPE_DOES_NOT_MATCH_DNPIPE_LIMITER_TYPE',
             code: 409,
             callable: function () use ($limiter, $queue) {
                 $rule = new FirewallRule(
@@ -704,20 +700,20 @@ class APIModelsFirewallRuleTestCase extends TestCase {
                     async: false,
                 );
                 $rule->validate();
-            }
+            },
         );
-        
+
         # Delete the limiter and queue
         $queue->delete(apply: true);
         $limiter->delete(apply: true);
     }
-    
+
     /**
      * Checks that the pdnpipe cannot be set unless dnpipe is already set
      */
     public function test_pdnpipe_cannot_be_set_without_dnpipe(): void {
         $this->assert_throws_response(
-            response_id: "FIREWALL_RULE_PDNPIPE_SET_WITHOUT_DNPIPE",
+            response_id: 'FIREWALL_RULE_PDNPIPE_SET_WITHOUT_DNPIPE',
             code: 400,
             callable: function () {
                 $rule = new FirewallRule(
@@ -727,11 +723,11 @@ class APIModelsFirewallRuleTestCase extends TestCase {
                     source: 'any',
                     destination: 'any',
                     dnpipe: null,
-                    pdnpipe: "dnpipe should be set!",
+                    pdnpipe: 'dnpipe should be set!',
                     async: false,
                 );
                 $rule->validate();
-            }
+            },
         );
     }
 
@@ -741,19 +737,17 @@ class APIModelsFirewallRuleTestCase extends TestCase {
     public function test_pdnpipe_cannot_match_dnpipe(): void {
         # Create a limiter to test with
         $limiter = new TrafficShaperLimiter(
-            name: "test_limiter", 
-            enabled: true, 
-            aqm: "droptail", 
-            sched: "wf2q+",
-            bandwidth: [
-                ["bw" => 20, "bwscale" => "Mb"]
-            ]
+            name: 'test_limiter',
+            enabled: true,
+            aqm: 'droptail',
+            sched: 'wf2q+',
+            bandwidth: [['bw' => 20, 'bwscale' => 'Mb']],
         );
         $limiter->create();
-        
+
         # Ensure an error is thrown if dnpipe and pdnpipe both try to use the same limiter
         $this->assert_throws_response(
-            response_id: "FIREWALL_RULE_PDNPIPE_CANNOT_MATCH_DNPIPE",
+            response_id: 'FIREWALL_RULE_PDNPIPE_CANNOT_MATCH_DNPIPE',
             code: 400,
             callable: function () use ($limiter) {
                 $rule = new FirewallRule(
@@ -767,24 +761,22 @@ class APIModelsFirewallRuleTestCase extends TestCase {
                     async: false,
                 );
                 $rule->validate();
-            }
+            },
         );
     }
-    
+
     /**
      * Checks that a rule with a TrafficShaperLimiter object assigned to dnpipe is correctly represented in pfctl.
      */
     public function test_dnpipe_as_limiter_in_pfctl(): void {
         # Create a limiter and rule to test with
         $limiter = new TrafficShaperLimiter(
-            name: "test_limiter",
+            name: 'test_limiter',
             enabled: true,
-            aqm: "droptail",
-            sched: "wf2q+",
-            bandwidth: [
-                ["bw" => 20, "bwscale" => "Mb"]
-            ],
-            async: false
+            aqm: 'droptail',
+            sched: 'wf2q+',
+            bandwidth: [['bw' => 20, 'bwscale' => 'Mb']],
+            async: false,
         );
         $limiter->create(apply: true);
         $rule = new FirewallRule(
@@ -795,18 +787,18 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             source: 'any',
             destination: 'any',
             dnpipe: $limiter->name->value,
-            descr: "",
+            descr: '',
             async: false,
         );
         $rule->create(apply: true);
-        
+
         # Check pfctl rules and ensure the dnpipe is correctly represented
-        $pfctl = new Command("pfctl -sr");
+        $pfctl = new Command('pfctl -sr');
         $this->assert_str_contains(
-            $pfctl->output, 
-            "ridentifier {$rule->tracker->value} dnpipe {$limiter->number->value}"
+            $pfctl->output,
+            "ridentifier {$rule->tracker->value} dnpipe {$limiter->number->value}",
         );
-        
+
         # Delete the limiter and rule
         $rule->delete(apply: true);
         $limiter->delete(apply: true);
@@ -818,22 +810,20 @@ class APIModelsFirewallRuleTestCase extends TestCase {
     public function test_dnpipe_as_queue_in_pfctl(): void {
         # Create a limiter and rule to test with
         $limiter = new TrafficShaperLimiter(
-            name: "test_limiter",
+            name: 'test_limiter',
             enabled: true,
-            aqm: "droptail",
-            sched: "wf2q+",
-            bandwidth: [
-                ["bw" => 20, "bwscale" => "Mb"]
-            ],
-            async: false
+            aqm: 'droptail',
+            sched: 'wf2q+',
+            bandwidth: [['bw' => 20, 'bwscale' => 'Mb']],
+            async: false,
         );
         $limiter->create(apply: true);
         $queue = new TrafficShaperLimiterQueue(
             parent_id: $limiter->id,
-            name: "test_queue",
+            name: 'test_queue',
             enabled: true,
-            aqm: "droptail",
-            async: false
+            aqm: 'droptail',
+            async: false,
         );
         $queue->create(apply: true);
         $rule = new FirewallRule(
@@ -844,16 +834,16 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             source: 'any',
             destination: 'any',
             dnpipe: $queue->name->value,
-            descr: "",
+            descr: '',
             async: false,
         );
         $rule->create(apply: true);
 
         # Check pfctl rules and ensure the dnpipe is correctly represented
-        $pfctl = new Command("pfctl -sr");
+        $pfctl = new Command('pfctl -sr');
         $this->assert_str_contains(
             $pfctl->output,
-            "ridentifier {$rule->tracker->value} dnqueue {$queue->number->value}"
+            "ridentifier {$rule->tracker->value} dnqueue {$queue->number->value}",
         );
 
         # Delete the limiter and rule
@@ -867,25 +857,21 @@ class APIModelsFirewallRuleTestCase extends TestCase {
     public function test_pdnpipe_in_pfctl(): void {
         # Create a limiter and rule to test with
         $limiter1 = new TrafficShaperLimiter(
-            name: "test_limiter1",
+            name: 'test_limiter1',
             enabled: true,
-            aqm: "droptail",
-            sched: "wf2q+",
-            bandwidth: [
-                ["bw" => 20, "bwscale" => "Mb"]
-            ],
-            async: false
+            aqm: 'droptail',
+            sched: 'wf2q+',
+            bandwidth: [['bw' => 20, 'bwscale' => 'Mb']],
+            async: false,
         );
         $limiter1->create(apply: true);
         $limiter2 = new TrafficShaperLimiter(
-            name: "test_limite2",
+            name: 'test_limite2',
             enabled: true,
-            aqm: "droptail",
-            sched: "wf2q+",
-            bandwidth: [
-                ["bw" => 20, "bwscale" => "Mb"]
-            ],
-            async: false
+            aqm: 'droptail',
+            sched: 'wf2q+',
+            bandwidth: [['bw' => 20, 'bwscale' => 'Mb']],
+            async: false,
         );
         $limiter2->create(apply: true);
         $rule = new FirewallRule(
@@ -897,16 +883,16 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             destination: 'any',
             dnpipe: $limiter1->name->value,
             pdnpipe: $limiter2->name->value,
-            descr: "",
+            descr: '',
             async: false,
         );
         $rule->create(apply: true);
 
         # Check pfctl rules and ensure the dnpipe is correctly represented
-        $pfctl = new Command("pfctl -sr");
+        $pfctl = new Command('pfctl -sr');
         $this->assert_str_contains(
             $pfctl->output,
-            "ridentifier {$rule->tracker->value} dnpipe({$limiter1->number->value}, {$limiter2->number->value})"
+            "ridentifier {$rule->tracker->value} dnpipe({$limiter1->number->value}, {$limiter2->number->value})",
         );
 
         # Delete the limiter and rule
