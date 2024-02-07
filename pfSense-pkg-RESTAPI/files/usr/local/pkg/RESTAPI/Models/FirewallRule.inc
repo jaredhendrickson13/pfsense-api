@@ -390,6 +390,14 @@ class FirewallRule extends Model {
                 response_id: 'FIREWALL_RULE_PDNPIPE_SET_WITHOUT_DNPIPE',
             );
         }
+        
+        # Throw an error if $pdnpipe matches the value `dnpipe` exactly
+        if ($pdnpipe === $this->dnpipe->value) {
+            throw new ValidationError(
+                message: "Field `pdnpipe` cannot use the same limiter as `dnpipe`.",
+                response_id: "FIREWALL_RULE_PDNPIPE_CANNOT_MATCH_DNPIPE"
+            );
+        }
 
         # Throw an error if $pdnpipe is not an existing TrafficShaperLimiter or TrafficShaperLimiterQueue
         $pdnpipe_obj = $this->get_dnpipe_by_name($pdnpipe);
@@ -397,7 +405,7 @@ class FirewallRule extends Model {
             throw new NotFoundError(
                 message: 'Field `pdnpipe` must be an existing Traffic Shaper Limiter or Limiter Queue. Could not ' .
                     "locate object with `name` value `$pdnpipe`",
-                response_id: 'FIREWALL_RULE_DNPIPE_NOT_FOUND',
+                response_id: 'FIREWALL_RULE_PDNPIPE_NOT_FOUND',
             );
         }
 
@@ -475,7 +483,7 @@ class FirewallRule extends Model {
         }
 
         # Check if any existing TrafficShaper limiters have child queues with a name that matches $dnpipe;
-        foreach ($limiters as $limiter) {
+        foreach ($limiters->model_objects as $limiter) {
             $queue_q = TrafficShaperLimiterQueue::query(parent_id: $limiter->id, name: $name);
             if ($queue_q->exists()) {
                 return $queue_q->first();
