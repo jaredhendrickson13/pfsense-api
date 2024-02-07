@@ -763,7 +763,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
                 $rule->validate();
             },
         );
-        
+
         # Delete the limiter
         $limiter->delete(apply: true);
     }
