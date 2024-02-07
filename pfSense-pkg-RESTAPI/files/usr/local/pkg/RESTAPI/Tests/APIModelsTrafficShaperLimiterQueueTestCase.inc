@@ -62,6 +62,6 @@ class APIModelsTrafficShaperLimiterQueueTestCase extends TestCase {
         $queue->delete(apply: true);
         $dnctl = new Command('dnctl queue show', trim_whitespace: true);
         $this->assert_is_empty($dnctl->output);
-        $limiter->delete();
+        $limiter->delete(apply: true);
     }
 }

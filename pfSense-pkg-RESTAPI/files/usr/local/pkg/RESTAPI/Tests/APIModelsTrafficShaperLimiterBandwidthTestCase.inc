@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Command;
+use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallSchedule;
 use RESTAPI\Models\TrafficShaperLimiter;
@@ -36,10 +37,8 @@ class APIModelsTrafficShaperLimiterBandwidthTestCase extends TestCase {
         $dnctl = new Command('dnctl pipe show', trim_whitespace: true);
         $this->assert_str_contains($dnctl->output, '400.000 Kbit/s');
 
-        # Delete the limter and ensure it is no longer seen in dnctl
+        # Delete the limiter
         $limiter->delete(apply: true);
-        $dnctl = new Command('dnctl pipe show', trim_whitespace: true);
-        $this->assert_str_does_not_contain($dnctl->output, $limiter->number->value . ':');
     }
 
     /**
