@@ -851,6 +851,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
 
         # Delete the limiter and rule
         $rule->delete(apply: true);
+        $queue->delete(apply: true);
         $limiter->delete(apply: true);
     }
 
@@ -900,7 +901,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
 
         # Delete the limiter and rule
         $rule->delete(apply: true);
-        $limiter1->delete(apply: true);
         $limiter2->delete(apply: true);
+        $limiter1->delete(apply: true);
     }
 }
