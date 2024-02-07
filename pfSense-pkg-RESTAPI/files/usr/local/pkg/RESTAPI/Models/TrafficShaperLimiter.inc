@@ -351,7 +351,6 @@ class TrafficShaperLimiter extends Model {
         $this->bandwidth = new NestedModelField(
             model_class: 'TrafficShaperLimiterBandwidth',
             default: [],
-            allow_empty: true,
             help_text: 'The bandwidth profiles for this limiter.',
         );
         $this->queue = new NestedModelField(
