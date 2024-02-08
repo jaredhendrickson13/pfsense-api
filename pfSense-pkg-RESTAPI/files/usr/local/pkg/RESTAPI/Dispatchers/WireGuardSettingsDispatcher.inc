@@ -2,6 +2,8 @@
 
 namespace RESTAPI\Dispatchers;
 
+require_once("RESTAPI/autoloader.inc");
+
 use RESTAPI\Core\Dispatcher;
 
 class WireGuardSettingsDispatcher extends Dispatcher
@@ -14,6 +16,10 @@ class WireGuardSettingsDispatcher extends Dispatcher
      */
     public function process(...$arguments): void
     {
+        # TODO: Allow Models to pass $package_includes to the Dispatcher and import these automatically
+        require_once("wireguard/includes/wg_service.inc");
+        require_once("wireguard/includes/wg.inc");
+        
         # Enable or disable WireGuard
         wg_toggle_wireguard();
 
