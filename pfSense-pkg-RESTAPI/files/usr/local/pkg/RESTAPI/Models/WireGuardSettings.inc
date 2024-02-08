@@ -3,6 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
@@ -82,14 +83,7 @@ class WireGuardSettings extends Model
      */
     public function apply(): void
     {
-        # Enable or disable WireGuard
-        wg_toggle_wireguard();
-        
-        # Apply changes to tunnels if WireGuard is running
-        if (wg_is_service_running()) {
-            $tunnels_to_apply = wg_apply_list_get('tunnels');
-            wg_tunnel_sync(tunnel_names: $tunnels_to_apply, restart_services: true, resolve_endpoints: true);
-        }
+        (new WireGuardSettingsDispatcher(async: $this->async))->spawn_process();
     }
 
 }
