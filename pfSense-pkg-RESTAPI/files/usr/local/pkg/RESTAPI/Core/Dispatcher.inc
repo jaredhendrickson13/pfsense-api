@@ -4,6 +4,8 @@ namespace RESTAPI\Core;
 
 use ReflectionClass;
 use RESTAPI\Models\CronJob;
+use RESTAPI\Responses\FailedDependencyError;
+use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ServiceUnavailableError;
 
@@ -83,6 +85,17 @@ class Dispatcher {
      * The shell command that will be used to call this Dispatcher on a schedule.
      */
     protected string $schedule_command = '';
+    /**
+     * @var array $required_packages
+     * The pfSense packages required to run this Dispatcher. This must use the full pfSense package name including the
+     * pfSense-pkg- prefix.
+     */
+    protected array $required_packages = [];
+    /**
+     * @var array $package_includes
+     * Assigns PHP files to include that are specific to one or more of the assigned $packages.
+     */
+    protected array $package_includes = [];
 
     /**
      * Constructs the Dispatcher object.
@@ -103,6 +116,38 @@ class Dispatcher {
 
         # Set the schedule command for this Dispatcher
         $this->schedule_command = "/usr/local/pkg/RESTAPI/.resources/scripts/manage.php notifydispatcher $this->short_name";
+
+        # Ensure required packages are present and required files are included
+        $this->check_required_packages();
+    }
+
+    /**
+     * Checks if the required pfSense packages for this Dispatcher are installed and their required dependencies are
+     * imported.
+     * @throws FailedDependencyError When the Dispatcher requires a pfSense package that is not installed.
+     * @throws FailedDependencyError When a package requires a PHP include file that could not be found.
+     */
+    private function check_required_packages(): void {
+        # Loop through each required package and ensure it is present on the system.
+        foreach ($this->required_packages as $pkg) {
+            # Return an error if the package is not installed
+            if (!is_pkg_installed($pkg)) {
+                throw new FailedDependencyError(
+                    message: "The requested action requires the '$pkg' package but it is not installed.",
+                    response_id: 'DISPATCHER_MISSING_REQUIRED_PACKAGE',
+                );
+            }
+        }
+
+        # Loop through each package dependency and add it.
+        foreach ($this->package_includes as $include) {
+            if (!include_once $include) {
+                throw new FailedDependencyError(
+                    message: "Dispatcher requires include file $include but it could not be found in the PHP path.",
+                    response_id: 'DISPATCHER_WITH_FAILED_INCLUDE',
+                );
+            }
+        }
     }
 
     /**
