@@ -4,6 +4,8 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
+use RESTAPI\Models\Package;
 
 class APICoreDispatcherTestCase extends TestCase {
     /**
@@ -140,5 +142,33 @@ class APICoreDispatcherTestCase extends TestCase {
 
         # Delete the CronJob
         $dispatcher_cron_job->delete();
+    }
+
+    /**
+     * Checks that Dispatchers with $required_packages must have the listed packages installed before use.
+     */
+    public function check_required_packages(): void {
+        # Ensure an error is thrown if a Dispatcher is constructed without all required packages installed
+        $this->assert_throws_response(
+            response_id: "DISPATCHER_MISSING_REQUIRED_PACKAGE",
+            code: 424,
+            callable: function () {
+                # Use the WireGuardSettingsDispatcher to test this as it requires pfSense-pkg-WireGuard.
+                new WireGuardSettingsDispatcher();
+            }
+        );
+
+        # Install the required package and ensure the error is no longer thrown when constructed
+        $package = new Package(name: "pfSense-pkg-WireGuard");
+        $package->create();
+        $this->assert_does_not_throw(
+            callable: function () {
+                # Use the WireGuardSettingsDispatcher to test this as it requires pfSense-pkg-WireGuard.
+                new WireGuardSettingsDispatcher();
+            }
+        );
+
+        # Remove the installed package
+        $package->delete();
     }
 }
