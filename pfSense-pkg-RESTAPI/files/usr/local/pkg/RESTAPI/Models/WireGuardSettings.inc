@@ -7,6 +7,7 @@ use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\ConflictError;
 
 class WireGuardSettings extends Model
 {
@@ -76,6 +77,26 @@ class WireGuardSettings extends Model
         );
         
         parent::__construct($id, $parent_id, $data, ...$options);
+    }
+
+    /**
+     * Adds extra validation to the `enable` field.
+     * @param bool $enable The incoming value to be validated.
+     * @return bool The validated value to be assigned.
+     * @throws ConflictError When `enable` is set to `false` but there are WireGuard tunnels in use by one or more
+     * pfSense interfaces.
+     */
+    public function validate_enable(bool $enable): bool {
+        # Throw an error if $enable is false but there are one or more pfSense interfaces using a WireGuard tunnel
+        if (!$enable and NetworkInterface::query(if__startswith: "tun_wg")->exists()) {
+            throw new ConflictError(
+                message: "Field `enable` cannot be set to `false` when WireGuard tunnels are in use by an existing ".
+                    "pfSense interface.",
+                response_id: "WIREGUARD_SETTINGS_CANNOT_DISABLE_WITH_ACTIVE_TUNNELS"
+            );
+        }
+
+        return $enable;
     }
     
     /**
