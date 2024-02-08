@@ -55,7 +55,17 @@ class Service extends Model {
      * @return array An array of available pfSense services and their current statuses.
      */
     public static function get_services(): array {
-        return get_services();
+        # Variables
+        $services = get_services();
+
+        # Loop through each service and set the proper values
+        foreach ($services as $id => $service) {
+            # Ensure the $enabled and $status values are always present
+            $services[$id]["enabled"] = is_service_enabled($service["name"]);
+            $services[$id]["status"] = is_service_running($service["name"]);
+        }
+
+        return $services;
     }
 
     /**
