@@ -20,7 +20,7 @@ class WireGuardSettings extends Model
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
     {
         # Set model attributes
-        $this->config_path = "installedpackages/wireguard/config";
+        $this->config_path = "installedpackages/wireguard/config/0"; // pfSense parses path as indexed array?
         $this->subsystem = "wireguard";
         $this->verbose_name = "WireGuard Settings";
         $this->packages = ["pfSense-pkg-WireGuard"];
