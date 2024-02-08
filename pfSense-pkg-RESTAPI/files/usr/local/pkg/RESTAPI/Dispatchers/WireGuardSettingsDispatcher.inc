@@ -8,18 +8,18 @@ use RESTAPI\Core\Dispatcher;
 
 class WireGuardSettingsDispatcher extends Dispatcher
 {
-    # Only allow one dispatcher process to run at a time
-    public int $max_concurrency = 1;
+    public int $max_concurrency = 1; // Only allow one dispatcher process to run at a time
+    protected array $required_packages = ["pfSense-pkg-WireGuard"];
+    protected array $package_includes = [
+        "wireguard/includes/wg.inc",
+        "wireguard/includes/wg_service.inc",
+    ];
     
     /**
      * Starts/stops the WireGuard service and applies changes to tunnels.
      */
     public function process(...$arguments): void
     {
-        # TODO: Allow Models to pass $package_includes to the Dispatcher and import these automatically
-        require_once("wireguard/includes/wg_service.inc");
-        require_once("wireguard/includes/wg.inc");
-        
         # Enable or disable WireGuard
         wg_toggle_wireguard();
 
