@@ -2,6 +2,8 @@
 
 namespace RESTAPI\Models;
 
+require_once("RESTAPI/autoloader.inc");
+
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
 use RESTAPI\Fields\BooleanField;

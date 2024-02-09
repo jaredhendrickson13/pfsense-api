@@ -2,6 +2,9 @@
 
 namespace RESTAPI\Tests;
 
+require_once("RESTAPI/autoloader.inc");
+
+use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\Package;
 use RESTAPI\Models\Service;
@@ -25,6 +28,22 @@ class APIModelsWireGuardSettingsTestCase extends TestCase
     {
         $pkg = Package::query(name: "pfSense-pkg-WireGuard")->first();
         $pkg->delete();
+    }
+
+    /**
+     * Checks that the `enable` field correctly enables the WireGuard service when `true` and stops the service
+     * when `false`
+     */
+    public function test_enable_controls_service(): void {
+        # Enable WireGuard and ensure the service is running
+        $wg = new WireGuardSettings(enable: true, async: false);
+        $wg->update(apply: true);
+        $this->assert_is_true(Service::query(name: "wireguard", status: true)->exists());
+
+        # Disable WireGuard and ensure the service is stopped
+        $wg->enable->value = false;
+        $wg->update(apply: true);
+        $this->assert_is_true(Service::query(name: "wireguard", status: false)->exists());
     }
 
     /**
@@ -68,23 +87,5 @@ class APIModelsWireGuardSettingsTestCase extends TestCase
         $wg->del_config("interfaces/opt1");
         $wg->enable->value = false;
         $wg->update(apply: true);
-    }
-
-    /**
-     * Checks that the `enable` field correctly starts the WireGuard service when `true` and stops the service
-     * when `false`
-     */
-    public function test_enable_controls_service_status(): void {
-        # Enable WireGuard and ensure the service is running
-        $wg = new WireGuardSettings(enable: true, async: false);
-        $wg->update(apply: true);
-        $wg->reload_config();
-        $this->assert_is_true(Service::query(name: "wireguard", status: true)->exists());
-
-        # Disable WireGuard and ensure the service is stopped
-        $wg->enable->value = false;
-        $wg->update(apply: true);
-        sleep(3);
-        $this->assert_is_false(Service::query(name: "wireguard", status: true)->exists());
     }
 }
