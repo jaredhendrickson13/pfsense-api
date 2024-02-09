@@ -8,6 +8,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
+use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
@@ -21,6 +22,7 @@ class WireGuardTunnel extends Model {
     public StringField $publickey;
     public StringField $privatekey;
     public IntegerField $mtu;
+    public NestedModelField $addresses;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
@@ -34,7 +36,7 @@ class WireGuardTunnel extends Model {
         # Set model fields
         $this->name = new StringField(
             unique: true,
-            default: next_wg_if(),
+            default: "tun_wg0",
             editable: false,
             read_only: true,
             help_text: 'The name of the WireGuard interface. This value is automatically assigned by the system and ' .
@@ -68,6 +70,13 @@ class WireGuardTunnel extends Model {
             default: 1420,
             help_text: 'The MTU for this WireGuard tunnel interface. This value is ignored if this tunnel is ' .
                 'assigned as a pfSense interface.',
+        );
+        $this->addresses = new NestedModelField(
+            model_class: "WireGuardTunnelAddress",
+            default: [],
+            allow_empty: true,
+            help_text: "The IPv4 or IPv6 addresses to assign this WireGuard tunnel interface. This field is ignored ".
+                "if this tunnel interface is assigned to an existing pfSense interface object."
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
