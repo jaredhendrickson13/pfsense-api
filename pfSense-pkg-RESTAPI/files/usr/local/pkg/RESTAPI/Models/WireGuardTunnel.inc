@@ -34,7 +34,7 @@ class WireGuardTunnel extends Model {
         # Set model fields
         $this->name = new StringField(
             unique: true,
-            default: 'tun_wg0', // TODO: change this to a callable that gets the next available wg interface name
+            default: next_wg_if(),
             editable: false,
             read_only: true,
             help_text: 'The name of the WireGuard interface. This value is automatically assigned by the system and ' .
@@ -47,19 +47,22 @@ class WireGuardTunnel extends Model {
             help_text: 'Enables or disables this tunnels and any associated peers.',
         );
         $this->listenport = new PortField(
+            unique: true,
             default: '51820',
             allow_alias: false,
             allow_range: false,
             help_text: 'The port WireGuard will listen on for this tunnel.',
         );
         $this->publickey = new StringField(
-            required: true,
-            help_text: 'The public key for this tunnel. This value and `privatekey` must be a matching keypair.',
+            required: false,
+            read_only: true,
+            help_text: 'The public key for this tunnel. This value is automatically derived from the `privatekey` '.
+                "value and cannot be set manually.",
         );
         $this->privatekey = new StringField(
             required: true,
             write_only: true,
-            help_text: 'The private key for this tunnel. This value and `publickey` must be a matching keypair.',
+            help_text: 'The private key for this tunnel.',
         );
         $this->mtu = new IntegerField(
             default: 1420,
