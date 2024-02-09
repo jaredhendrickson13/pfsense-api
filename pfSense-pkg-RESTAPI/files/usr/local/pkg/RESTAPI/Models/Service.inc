@@ -61,8 +61,8 @@ class Service extends Model {
         # Loop through each service and set the proper values
         foreach ($services as $id => $service) {
             # Ensure the $enabled and $status values are always present
-            $services[$id]["enabled"] = is_service_enabled($service["name"]);
-            $services[$id]["status"] = is_service_running($service["name"]);
+            $services[$id]['enabled'] = is_service_enabled($service['name']);
+            $services[$id]['status'] = is_service_running($service['name']);
         }
 
         return $services;

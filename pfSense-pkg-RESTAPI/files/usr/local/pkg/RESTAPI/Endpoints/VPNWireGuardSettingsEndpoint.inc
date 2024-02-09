@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Endpoints;
 
-require_once('RESTAPI/autoloader.inc');
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 

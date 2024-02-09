@@ -2,24 +2,19 @@
 
 namespace RESTAPI\Dispatchers;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Dispatcher;
 
-class WireGuardSettingsDispatcher extends Dispatcher
-{
+class WireGuardSettingsDispatcher extends Dispatcher {
     public int $max_concurrency = 1; // Only allow one dispatcher process to run at a time
-    protected array $required_packages = ["pfSense-pkg-WireGuard"];
-    protected array $package_includes = [
-        "wireguard/includes/wg.inc",
-        "wireguard/includes/wg_service.inc",
-    ];
-    
+    protected array $required_packages = ['pfSense-pkg-WireGuard'];
+    protected array $package_includes = ['wireguard/includes/wg.inc', 'wireguard/includes/wg_service.inc'];
+
     /**
      * Starts/stops the WireGuard service and applies changes to tunnels.
      */
-    public function process(...$arguments): void
-    {
+    public function process(...$arguments): void {
         # Enable or disable WireGuard
         wg_toggle_wireguard();
 

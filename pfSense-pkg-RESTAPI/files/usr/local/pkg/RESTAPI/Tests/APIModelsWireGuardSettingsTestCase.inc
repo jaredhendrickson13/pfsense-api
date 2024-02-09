@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Tests;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
@@ -10,23 +10,20 @@ use RESTAPI\Models\Package;
 use RESTAPI\Models\Service;
 use RESTAPI\Models\WireGuardSettings;
 
-class APIModelsWireGuardSettingsTestCase extends TestCase
-{
+class APIModelsWireGuardSettingsTestCase extends TestCase {
     /**
      * Ensure the WireGuard package is installed before running tests.
      */
-    public function setup(): void
-    {
-        $pkg = new Package(name: "pfSense-pkg-WireGuard");
+    public function setup(): void {
+        $pkg = new Package(name: 'pfSense-pkg-WireGuard');
         $pkg->create();
     }
 
     /**
      * Ensure the WireGuard package is removed after running tests.
      */
-    public function teardown(): void
-    {
-        $pkg = Package::query(name: "pfSense-pkg-WireGuard")->first();
+    public function teardown(): void {
+        $pkg = Package::query(name: 'pfSense-pkg-WireGuard')->first();
         $pkg->delete();
     }
 
@@ -38,12 +35,12 @@ class APIModelsWireGuardSettingsTestCase extends TestCase
         # Enable WireGuard and ensure the service is running
         $wg = new WireGuardSettings(enable: true, async: false);
         $wg->update(apply: true);
-        $this->assert_is_true(Service::query(name: "wireguard", status: true)->exists());
+        $this->assert_is_true(Service::query(name: 'wireguard', status: true)->exists());
 
         # Disable WireGuard and ensure the service is stopped
         $wg->enable->value = false;
         $wg->update(apply: true);
-        $this->assert_is_true(Service::query(name: "wireguard", status: false)->exists());
+        $this->assert_is_true(Service::query(name: 'wireguard', status: false)->exists());
     }
 
     /**
@@ -61,7 +58,7 @@ class APIModelsWireGuardSettingsTestCase extends TestCase
                 $wg->update(apply: true);
                 $wg->enable->value = false;
                 $wg->update(apply: true);
-            }
+            },
         );
 
         # Enable WireGuard
@@ -70,21 +67,21 @@ class APIModelsWireGuardSettingsTestCase extends TestCase
 
         # Mock an interface assigned a WireGuard tunnel
         # TODO: Replace this with a WireGuardTunnel model call when developed
-        $wg->set_config("interfaces/opt1", ["if" => "tun_wg0"]);
+        $wg->set_config('interfaces/opt1', ['if' => 'tun_wg0']);
 
         # Ensure WireGuard cannot be disabled while a tunnel is assigned to a pfSense interface
         $this->assert_throws_response(
-            response_id: "WIREGUARD_SETTINGS_CANNOT_DISABLE_WITH_ACTIVE_TUNNELS",
+            response_id: 'WIREGUARD_SETTINGS_CANNOT_DISABLE_WITH_ACTIVE_TUNNELS',
             code: 409,
             callable: function () use ($wg) {
                 # Try to disable WireGuard and ensure an error is thrown
                 $wg->enable->value = false;
                 $wg->validate();
-            }
+            },
         );
 
         # Unset the interface assignment and disable WireGuard
-        $wg->del_config("interfaces/opt1");
+        $wg->del_config('interfaces/opt1');
         $wg->enable->value = false;
         $wg->update(apply: true);
     }

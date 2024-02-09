@@ -150,22 +150,22 @@ class APICoreDispatcherTestCase extends TestCase {
     public function check_required_packages(): void {
         # Ensure an error is thrown if a Dispatcher is constructed without all required packages installed
         $this->assert_throws_response(
-            response_id: "DISPATCHER_MISSING_REQUIRED_PACKAGE",
+            response_id: 'DISPATCHER_MISSING_REQUIRED_PACKAGE',
             code: 424,
             callable: function () {
                 # Use the WireGuardSettingsDispatcher to test this as it requires pfSense-pkg-WireGuard.
                 new WireGuardSettingsDispatcher();
-            }
+            },
         );
 
         # Install the required package and ensure the error is no longer thrown when constructed
-        $package = new Package(name: "pfSense-pkg-WireGuard");
+        $package = new Package(name: 'pfSense-pkg-WireGuard');
         $package->create();
         $this->assert_does_not_throw(
             callable: function () {
                 # Use the WireGuardSettingsDispatcher to test this as it requires pfSense-pkg-WireGuard.
                 new WireGuardSettingsDispatcher();
-            }
+            },
         );
 
         # Remove the installed package
