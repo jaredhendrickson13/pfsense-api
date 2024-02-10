@@ -36,7 +36,7 @@ class WireGuardTunnel extends Model {
         # Set model fields
         $this->name = new StringField(
             unique: true,
-            default: 'tun_wg0',
+            default_callable: 'get_next_tunnel_name',
             editable: false,
             read_only: true,
             help_text: 'The name of the WireGuard interface. This value is automatically assigned by the system and ' .
@@ -126,6 +126,14 @@ class WireGuardTunnel extends Model {
 
         # Ensure this key is always clamped
         return wg_is_key_clamped($privatekey) ? $privatekey : wg_clamp_key($privatekey);
+    }
+
+    /**
+     * Obtains the next available WireGuard tunnel interface name.
+     * @return string The next available WireGuard tunnel interface name (i.e. tun_wg0)
+     */
+    protected function get_next_tunnel_name(): string {
+        return next_wg_if();
     }
 
     /**
