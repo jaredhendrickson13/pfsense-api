@@ -79,7 +79,7 @@ class Field {
      * @param bool $unique
      *      If true, $value must be unique among all parent Model objects (only for parent Models with $many set to true).
      * @param mixed $default
-     *      The default $value for this field if none is assigned. The default specified here should be static. If the 
+     *      The default $value for this field if none is assigned. The default specified here should be static. If the
      *      default for this field is dynamic in nature, use a $default_callable instead.
      * @param string $default_callable
      *      Defines a callable method that should be called to populate the default value for this field. It is
@@ -329,7 +329,7 @@ class Field {
      * @return bool Returns true if this field has a default or default_callable assigned, returns false otherwise.
      */
     final protected function has_default(): bool {
-        return (isset($this->default) or $this->default_callable);
+        return isset($this->default) or $this->default_callable;
     }
 
     /**
@@ -344,7 +344,7 @@ class Field {
         if ($this->default_callable) {
             return $this->get_default_from_callable();
         }
-        
+
         return null;
     }
 
@@ -373,7 +373,7 @@ class Field {
                 response_id: 'FIELD_DEFAULT_CALLABLE_NOT_FOUND',
             );
         }
-        
+
         return null;
     }
 
@@ -1008,7 +1008,7 @@ class Field {
         $openapi_property['readOnly'] = $this->read_only;
         $openapi_property['writeOnly'] = $this->write_only;
 
-        # Set the default if defined. Note: We purposefully do not include defaults via a default_callable here as 
+        # Set the default if defined. Note: We purposefully do not include defaults via a default_callable here as
         # they may be dynamic and make the documented default inaccurate.
         if ($this->default) {
             $openapi_property['default'] = $this->default;

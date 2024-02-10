@@ -18,7 +18,7 @@ class BooleanField extends RESTAPI\Core\Field {
     public mixed $indicates_true;
 
     /**
-     * @var mixed $indicates_false The internal value that indicates a `false` boolean. This will typically be null, 
+     * @var mixed $indicates_false The internal value that indicates a `false` boolean. This will typically be null,
      * 'off', 'no', 'disabled', etc.
      */
     public mixed $indicates_false;

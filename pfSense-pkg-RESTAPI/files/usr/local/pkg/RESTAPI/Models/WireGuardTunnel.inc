@@ -36,7 +36,7 @@ class WireGuardTunnel extends Model {
         # Set model fields
         $this->name = new StringField(
             unique: true,
-            default: "tun_wg0",
+            default: 'tun_wg0',
             editable: false,
             read_only: true,
             help_text: 'The name of the WireGuard interface. This value is automatically assigned by the system and ' .
@@ -58,8 +58,8 @@ class WireGuardTunnel extends Model {
         $this->publickey = new StringField(
             required: false,
             read_only: true,
-            help_text: 'The public key for this tunnel. This value is automatically derived from the `privatekey` '.
-                "value and cannot be set manually.",
+            help_text: 'The public key for this tunnel. This value is automatically derived from the `privatekey` ' .
+                'value and cannot be set manually.',
         );
         $this->privatekey = new StringField(
             required: true,
@@ -72,11 +72,11 @@ class WireGuardTunnel extends Model {
                 'assigned as a pfSense interface.',
         );
         $this->addresses = new NestedModelField(
-            model_class: "WireGuardTunnelAddress",
+            model_class: 'WireGuardTunnelAddress',
             default: [],
             allow_empty: true,
-            help_text: "The IPv4 or IPv6 addresses to assign this WireGuard tunnel interface. This field is ignored ".
-                "if this tunnel interface is assigned to an existing pfSense interface object."
+            help_text: 'The IPv4 or IPv6 addresses to assign this WireGuard tunnel interface. This field is ignored ' .
+                'if this tunnel interface is assigned to an existing pfSense interface object.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);

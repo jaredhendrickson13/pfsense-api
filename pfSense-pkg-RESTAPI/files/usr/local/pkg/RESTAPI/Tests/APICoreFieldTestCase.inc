@@ -565,14 +565,14 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
             },
         );
     }
-    
+
     /**
      * Checks that a Field's default property is dynamically populated by default_callable if set.
      */
     public function test_default_callable_populates_default(): void {
         # Call the Field object's __invoke method as the default_callable to test (which returns the field's value)
-        $field = new Field(default_callable: "__invoke");
-        $field->value = "test";
+        $field = new Field(default_callable: '__invoke');
+        $field->value = 'test';
         $this->assert_equals($field->get_default(), $field->value);
     }
 }
