@@ -92,7 +92,7 @@ class NestedModelField extends Field {
      * Validates the incoming value using the assigned Model's `validate()` method.
      * @throws ValidationError If any Response error occurred when validating the nested Model object
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value): void {
         # Create a new Model object for this value and validate it. Remove any assigned IDs
         unset($value['id']);
         unset($value['parent_id']);
@@ -115,8 +115,6 @@ class NestedModelField extends Field {
                 response_id: $resp->response_id,
             );
         }
-
-        return $model;
     }
 
     /**
@@ -167,7 +165,7 @@ class NestedModelField extends Field {
      * Converts any nested Model objects from their internal values to their representation values.
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function from_internal(mixed $internal_value) {
+    public function from_internal(mixed $internal_value): void {
         # Create the nested Model object
         $model = new $this->model_class();
 
@@ -196,7 +194,7 @@ class NestedModelField extends Field {
      * Sorts the nested Model data use the nested Model's `sort_option` and `sort_by_field` setting. This method
      * closely resembles the Model->sort() method, but does not require values to be set in config beforehand.
      */
-    public function sort() {
+    public function sort(): void {
         # Only sort this Field's values if this is a `many` field and it has a value
         if ($this->many and $this->value) {
             # Do not sort if there is no `sort_option` or `sort_by_field` set for this nested Model

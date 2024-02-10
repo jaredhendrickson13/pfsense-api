@@ -157,7 +157,7 @@ class SpecialNetworkField extends InterfaceField {
      * Ensure any value assigned to this Field is allowed by the current field settings.
      * @param mixed $value The incoming value to be validated.
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value): void {
         # Allow this value if it is an IPv4 address and this Field allows IP address values
         if ($this->allow_ipaddr and is_ipaddrv4($value)) {
             $this->labels[] = 'is_ipaddrv4';
@@ -220,7 +220,7 @@ class SpecialNetworkField extends InterfaceField {
 
             # Allow this value if the interface exists
             if (in_array($value, array_keys($this->get_interface_choices()))) {
-                return $value;
+                return;
             }
         }
 

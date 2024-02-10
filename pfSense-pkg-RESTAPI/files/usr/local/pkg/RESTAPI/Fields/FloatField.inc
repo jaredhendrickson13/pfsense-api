@@ -11,15 +11,15 @@ use RESTAPI;
  * float type Model Fields.
  */
 class FloatField extends RESTAPI\Core\Field {
-    public int $minimum;
-    public int $maximum;
-
     /**
      * Defines the FloatField object and sets its options.
      * @param bool $required If `true`, this field is required to have a value at all times.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
+     * @param string $default_callable Defines a callable method that should be called to populate the default value
+     * for this field. It is strongly encouraged to use a default callable when the default is variable and may change
+     * dynamically.
      * @param array $choices An array of value choices this Field can be assigned. This can either be an indexed array
      * of the exact choice values, or an associative array where the array key is the exact choice value and the array
      * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
@@ -71,6 +71,7 @@ class FloatField extends RESTAPI\Core\Field {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
+        string $default_callable = '',
         array $choices = [],
         string $choices_callable = '',
         bool $allow_null = false,
@@ -81,8 +82,8 @@ class FloatField extends RESTAPI\Core\Field {
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
-        int $minimum = 0,
-        int $maximum = 99999999999999,
+        public int $minimum = 0,
+        public int $maximum = 99999999999999,
         string|null $delimiter = ',',
         string $verbose_name = '',
         string $verbose_name_plural = '',
@@ -93,13 +94,12 @@ class FloatField extends RESTAPI\Core\Field {
         array $validators = [],
         string $help_text = '',
     ) {
-        $this->minimum = $minimum;
-        $this->maximum = $maximum;
         parent::__construct(
             type: 'double', // gettype() identifies floats as doubles
             required: $required,
             unique: $unique,
             default: $default,
+            default_callable: $default_callable,
             choices: $choices,
             choices_callable: $choices_callable,
             allow_null: $allow_null,

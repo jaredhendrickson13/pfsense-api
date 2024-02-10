@@ -28,6 +28,9 @@ class InterfaceField extends StringField {
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
+     * @param string $default_callable Defines a callable method that should be called to populate the default value
+     * for this field. It is strongly encouraged to use a default callable when the default is variable and may change
+     * dynamically.
      * @param array $interface_query Set query parameters to limit the scope of NetworkInterface lookups for this field.
      * Leave as an empty array to include all NetworkInterface objects in lookups.
      * @param bool $allow_interface_groups If `true`, all existing interface groups will be included as valid choices.
@@ -77,6 +80,7 @@ class InterfaceField extends StringField {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
+        string $default_callable = '',
         public array $interface_query = [],
         public bool $allow_interface_groups = false,
         public bool $allow_ipsec_interface = false,
@@ -109,6 +113,7 @@ class InterfaceField extends StringField {
             required: $required,
             unique: $unique,
             default: $default,
+            default_callable: $default_callable,
             choices_callable: 'get_interface_choices',
             allow_empty: $allow_empty,
             allow_null: $allow_null,

@@ -12,7 +12,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a Field cannot contain a `default` value if the Field is `required`.
      */
-    public function test_no_default_when_field_is_required() {
+    public function test_no_default_when_field_is_required(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT',
             code: 500,
@@ -23,9 +23,35 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     }
 
     /**
+     * Checks that a Field cannot contain a `default_callable` value if the Field is `required`.
+     */
+    public function test_no_default_callable_when_field_is_required(): void {
+        $this->assert_throws_response(
+            response_id: 'FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT',
+            code: 500,
+            callable: function () {
+                $test_field = new Field(required: true, default_callable: 'test');
+            },
+        );
+    }
+
+    /**
+     * Checks that a Field cannot contain a `default_callable` and a `default`.
+     */
+    public function test_no_default_and_default_callable(): void {
+        $this->assert_throws_response(
+            response_id: 'FIELD_WITH_DEFAULT_AND_DEFAULT_CALLABLE',
+            code: 500,
+            callable: function () {
+                $test_field = new Field(default: 'test', default_callable: 'test');
+            },
+        );
+    }
+
+    /**
      * Checks that a Field cannot contain be `read_only` if the Field is `required`.
      */
-    public function test_no_read_only_when_field_is_required() {
+    public function test_no_read_only_when_field_is_required(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY',
             code: 500,
@@ -38,7 +64,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a Field cannot `allow_null` if the Field is `required`.
      */
-    public function test_no_allow_null_when_field_is_required() {
+    public function test_no_allow_null_when_field_is_required(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL',
             code: 500,
@@ -51,7 +77,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures an error is thrown when a Field object has a `default` value that is not specified as a `choice`.
      */
-    public function test_no_field_with_read_only_and_write_only() {
+    public function test_no_field_with_read_only_and_write_only(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_WITH_READ_ONLY_AND_WRITE_ONLY',
             code: 500,
@@ -64,7 +90,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a Field object cannot have its `many_minimum` value set to a value higher than `many_maximum`.
      */
-    public function test_no_many_minimum_greater_than_many_maximum() {
+    public function test_no_many_minimum_greater_than_many_maximum(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM',
             code: 500,
@@ -77,7 +103,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures Field properties are properly set when the Field object is created.
      */
-    public function test_field_construction() {
+    public function test_field_construction(): void {
         # Values
         $type = 'string';
         $validators = [new RESTAPI\Core\Validator()];
@@ -129,7 +155,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a unique Field is required to have a parent Model context assigned.
      */
-    public function test_context_required_with_unique() {
+    public function test_context_required_with_unique(): void {
         # Ensure an error raised when a Field is `unique`, but no parent model context assigned during validation.
         $this->assert_throws_response(
             response_id: 'FIELD_UNIQUE_WITH_NO_CONTEXT',
@@ -144,7 +170,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that Fields must have names assigned.
      */
-    public function test_field_requires_name() {
+    public function test_field_requires_name(): void {
         # Ensure the field has a name when it's validated.
         $this->assert_throws_response(
             response_id: 'FIELD_UNNAMED',
@@ -159,7 +185,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that Field names cannot contain double underscores. Double underscores are reserved for queries.
      */
-    public function test_field_name_cannot_contain_double_underscore() {
+    public function test_field_name_cannot_contain_double_underscore(): void {
         # Ensure an error is thrown for a Field name with double underscoress
         $this->assert_throws_response(
             response_id: 'FIELD_NAME_WITH_DOUBLE_UNDERSCORE_NOT_ALLOWED',
@@ -175,7 +201,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a Field actually requires a value when the Field is `required`.
      */
-    public function test_require_value_when_field_is_required() {
+    public function test_require_value_when_field_is_required(): void {
         # Ensure required Fields must have a value set
         $this->assert_throws_response(
             response_id: 'FIELD_IS_REQUIRED',
@@ -189,9 +215,9 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     }
 
     /**
-     * Checks that a Field that is not required must have a default value.
+     * Checks that a Field that is not required must have a default or default_callable value.
      */
-    public function test_require_default_when_field_is_not_required() {
+    public function test_require_default_when_field_is_not_required(): void {
         # Ensure required Fields must have a value set
         $this->assert_throws_response(
             response_id: 'FIELD_NEEDS_DEFAULT',
@@ -207,7 +233,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the field cannot contain `choices` when it is `read_only`.
      */
-    public function test_no_choices_when_field_is_read_only() {
+    public function test_no_choices_when_field_is_read_only(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_NO_CHOICES_WITH_READ_ONLY',
             code: 500,
@@ -222,7 +248,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a validation error occurs if there are less array entries than the `many_minimum` requires.
      */
-    public function test_field_many_minimum() {
+    public function test_field_many_minimum(): void {
         $this->assert_throws_response(
             response_id: 'LENGTH_VALIDATOR_MINIMUM_CONSTRAINT',
             code: 400,
@@ -243,7 +269,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a validation error occurs if there are more array entries than the `many_maximum` allows.
      */
-    public function test_field_many_maximum() {
+    public function test_field_many_maximum(): void {
         $this->assert_throws_response(
             response_id: 'LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT',
             code: 400,
@@ -264,7 +290,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the `many_minimum` value is automatically changed to `0` when `allow_empty` is `true`.
      */
-    public function test_field_many_minimum_set_according_to_allow_empty() {
+    public function test_field_many_minimum_set_according_to_allow_empty(): void {
         # Ensure that the `many_minimum` value is automatically changed to 0 when `allow_empty` is enabled
         $test_field = new Field(type: 'string', required: true, allow_empty: true, many: true, many_minimum: 3);
         $this->assert_equals($test_field->many_minimum, 0);
@@ -273,7 +299,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the field's parent model context is a `many` model if the field is `unique`.
      */
-    public function test_context_has_many_when_field_is_unique() {
+    public function test_context_has_many_when_field_is_unique(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_UNIQUE_WITHOUT_MANY_MODEL_CONTEXT',
             code: 500,
@@ -295,7 +321,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a Field with `conditions` is set to `null` when any of its conditions are not met.
      */
-    public function test_unmet_conditions_assign_null() {
+    public function test_unmet_conditions_assign_null(): void {
         # Create a Test Model and assign its values
         $test_model = new RESTAPI\Models\Test();
         $test_model->test_bool->value = false;
@@ -310,7 +336,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a conditional Field is properly validated if all it's conditions are met.
      */
-    public function test_met_conditions_allow_validation() {
+    public function test_met_conditions_allow_validation(): void {
         # Create a Test Model and assign its values
         $test_model = new RESTAPI\Models\Test();
         $test_model->test_bool->value = true;
@@ -328,7 +354,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
      * Checks that `unique` Fields successfully require the field to be unique from all other objects in the
      * parent Model context's `config_path`.
      */
-    public function test_field_unique_constraint() {
+    public function test_field_unique_constraint(): void {
         # Create a test object
         $test_model = new RESTAPI\Models\Test();
         $test_model->test_string_unique->value = 'This must be unique';
@@ -352,7 +378,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that an error is thrown if a value is set with a type that doesn't match this field.
      */
-    public function test_field_type_constraint() {
+    public function test_field_type_constraint(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_INVALID_TYPE',
             code: 400,
@@ -368,7 +394,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that empty values are not allowed unless `allow_empty` is set.
      */
-    public function test_no_empty_values_without_allow_empty() {
+    public function test_no_empty_values_without_allow_empty(): void {
         # Check for string
         $this->assert_throws_response(
             response_id: 'FIELD_EMPTY_NOT_ALLOWED',
@@ -397,7 +423,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Check that null values are allowed if `allow_null` is set.
      */
-    public function test_allow_null_values_with_allow_null() {
+    public function test_allow_null_values_with_allow_null(): void {
         $test_field = new Field(type: 'string', required: false, allow_null: true);
         $test_field->name = 'test_field';
         $test_field->value = null;
@@ -407,7 +433,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that assigned Validators are run against the Field value during validation.
      */
-    function test_validators_check_values() {
+    function test_validators_check_values(): void {
         # Check against single value
         $this->assert_throws_response(
             response_id: 'LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT',
@@ -446,7 +472,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
      * Checks that the default to_internal() methods converts values to proper types AND joins `many` enabled Fields
      * back into strings using the specified `delimiter`.
      */
-    public function test_default_to_internal_conversion() {
+    public function test_default_to_internal_conversion(): void {
         # Check for single values
         $test_field = new Field(type: 'integer', required: true);
         $test_field->name = 'test_field';
@@ -470,7 +496,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the default from_internal() method throws an error for not being able to represent the field.
      */
-    public function test_default_from_internal_conversion() {
+    public function test_default_from_internal_conversion(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_CANNOT_REPRESENT_INTERNAL_VALUE',
             code: 500,
@@ -485,7 +511,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the `to_openapi_property` correctly converts this Field to an OpenAPI property.
      */
-    public function test_field_to_openapi_property() {
+    public function test_field_to_openapi_property(): void {
         # Ensure the `help_text` value is added as the OpenAPI property's `description`
         $test_field = new Field(type: 'string', help_text: 'test');
         $this->assert_is_true(
@@ -529,7 +555,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that reserved names cannot be assigned to Field objects.
      */
-    public function test_field_cannot_use_reserved_name() {
+    public function test_field_cannot_use_reserved_name(): void {
         $this->assert_throws_response(
             response_id: 'FIELD_CANNOT_USE_RESERVED_NAME',
             code: 500,
@@ -538,5 +564,15 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
                 $field->set_names('_links');
             },
         );
+    }
+    
+    /**
+     * Checks that a Field's default property is dynamically populated by default_callable if set.
+     */
+    public function test_default_callable_populates_default(): void {
+        # Call the Field object's __invoke method as the default_callable to test (which returns the field's value)
+        $field = new Field(default_callable: "__invoke");
+        $field->value = "test";
+        $this->assert_equals($field->get_default(), $field->value);
     }
 }

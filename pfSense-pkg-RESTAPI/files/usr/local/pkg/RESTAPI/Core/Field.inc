@@ -52,7 +52,7 @@ class Field {
 
     /**
      * Sets the name of this Field object. Automatically set by the parent Model object to the Model's property name for this Field.
-     * Do not attempt to modify this name outside of the parent Model class.
+     * Do not attempt to modify this name outside the parent Model class.
      *
      * @var string $name
      */
@@ -74,83 +74,65 @@ class Field {
      *      - If $allow_null is true, $value can also be `null`.
      *      - If $many is true, $value must be an array of the specified type.
      *      Format must be recognized by the PHP `gettype()` function.
-     *
+     * @param bool $required
+     *      Make this a required field. If false, a valid $default, $default_callable or $allow_null must be set.
      * @param bool $unique
      *      If true, $value must be unique among all parent Model objects (only for parent Models with $many set to true).
-
-     * @param bool $many
-     *      If true, $value must be an array of the specified type, with individual values validated separately.
-
-     * @param int $many_minimum
-     *      Minimum number of values required for Fields with $many enabled.
-
-     * @param int $many_maximum
-     *      Maximum number of values allowed for Fields with $many enabled.
-
-     * @param string|null $delimiter
-     *      Specifies the delimiter used to store this value in internal pfSense. Set to `null` for array storage.
-
+     * @param mixed $default
+     *      The default $value for this field if none is assigned. The default specified here should be static. If the 
+     *      default for this field is dynamic in nature, use a $default_callable instead.
+     * @param string $default_callable
+     *      Defines a callable method that should be called to populate the default value for this field. It is
+     *      strongly encouraged to use a default callable when the default is variable and may change dynamically.
      * @param array $choices
      *      Defines explicit value choices for $value. Can be a linear array or associative array with verbose descriptions.
      *      After construction, verbose choices move to $verbose_choices.
-
+     * @param string $choices_callable
      * @param bool $allow_empty
      *      If true, accepts empty values in $value (only for string type Fields and empty arrays for $many enabled Fields).
-
      * @param bool $allow_null
      *      If true, accepts null values in $value.
-
      * @param bool $editable
      *      If false, $value cannot be changed after initial set.
-
-     * @param bool $required
-     *      If false, a valid $default must be set, indicating $value is not required.
-
-     * @param mixed $default
-     *      Default $value if none is assigned.
-
      * @param bool $read_only
      *      If true, marks this Field as read-only to remote clients.
-
      * @param bool $write_only
      *      If true, marks this Field as write-only, excluding it from API Responses.
-
      * @param bool $sensitive
      *      If true, marks this Field as 'sensitive', masking its value in web form input Fields.
-
      * @param bool $representation_only
      *      If true, excludes this Field when writing the parent Model object to configuration.
-
+     * @param bool $many
+     *      If true, $value must be an array of the specified type, with individual values validated separately.
+     * @param int $many_minimum
+     *      Minimum number of values required for Fields with $many enabled.
+     * @param int $many_maximum
+     *      Maximum number of values allowed for Fields with $many enabled.
+     * @param string|null $delimiter
+     *      Specifies the delimiter used to store this value in internal pfSense. Set to `null` for array storage.
      * @param string $verbose_name
      *      Human-friendly name used for input field names in associated \RESTAPI\Core\Form classes.
-
      * @param string $verbose_name_plural
      *      Plural form of $verbose_name. Defaults to appending 's' or 'es' to $verbose_name.
-
      * @param string $internal_name
      *      Name of this Field as shown in the pfSense configuration or internal callable.
-
      * @param string $internal_namespace
      *      If $internal_value is nested, set to the associative array's key.
-
      * @param array $referenced_by
      *      Array specifying Models and Fields referencing this Field's parent Model using this Field's value.
-
      * @param array $conditions
      *      Array of conditions for inclusion based on other Fields in the parent Model context.
-
      * @param array $validators
      *      Array of \RESTAPI\Core\Validator objects for validating this field.
-
      * @param string $help_text
      *      Help text used to describe this Field in OpenAPI documentation and associated \RESTAPI\Core\Form input Fields.
      */
-
     public function __construct(
         public string $type = '',
         public bool $required = false,
         public bool $unique = false,
         public mixed $default = null,
+        public string $default_callable = '',
         public array $choices = [],
         public string $choices_callable = '',
         public bool $allow_empty = false,
@@ -190,6 +172,8 @@ class Field {
 
     /**
      * Allows the Field's current value to be obtained by invoking the field object.
+     * @note This doesn't work in the context of a Model object because you cannot invoke a class property that is
+     * assigned an invocable object.
      * @returns mixed The value currently set in $this->value
      */
     final public function __invoke(): mixed {
@@ -200,12 +184,20 @@ class Field {
      * Checks that values passed in during __construct are valid and do not conflict.
      * @throws ServerError When any Field properties have conflicting values.
      */
-    private function check_construct() {
+    private function check_construct(): void {
         # Throw an error if `required` and `default` are both set
-        if ($this->required and isset($this->default)) {
+        if ($this->required and $this->has_default()) {
             throw new ServerError(
                 message: 'Required Fields cannot have a default.',
                 response_id: 'FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT',
+            );
+        }
+
+        # Throw an error if `default` and `default_callable` are both set
+        if (isset($this->default) and $this->default_callable) {
+            throw new ServerError(
+                message: 'Required Fields cannot have a default and default_callable.',
+                response_id: 'FIELD_WITH_DEFAULT_AND_DEFAULT_CALLABLE',
             );
         }
 
@@ -256,7 +248,7 @@ class Field {
      * property assigned this Field in the parent Model.
      * @param string $name The name to assign this Field.
      */
-    public function set_names(string $name) {
+    public function set_names(string $name): void {
         # Throw an error if this Field name is reserved
         if (in_array($name, RESERVED_FIELD_NAMES)) {
             throw new ServerError(
@@ -306,6 +298,7 @@ class Field {
 
     /**
      * Sets choices by calling the `choices_callable` method if present.
+     * @throws ServerError When the choices_callable could not be found in either this Field object or its parent Model
      */
     public function set_choices_from_callable(): void {
         # If a choices callable is assigned, run the callable to populate the choices if allowed
@@ -329,6 +322,59 @@ class Field {
                 );
             }
         }
+    }
+
+    /**
+     * Checks if this field has a default or default_callable assigned.
+     * @return bool Returns true if this field has a default or default_callable assigned, returns false otherwise.
+     */
+    final protected function has_default(): bool {
+        return (isset($this->default) or $this->default_callable);
+    }
+
+    /**
+     * Obtains the default value for this field.
+     * @return mixed When the $default property is set, its value will be returned. If the $default_callable is set,
+     * the return value of that callable will be returned. If no default has been specified, null will be returned.
+     */
+    final public function get_default(): mixed {
+        if (isset($this->default)) {
+            return $this->default;
+        }
+        if ($this->default_callable) {
+            return $this->get_default_from_callable();
+        }
+        
+        return null;
+    }
+
+    /**
+     * Obtains this Field's default value by calling the `default_callable` method if defined.
+     * @return mixed The return value of the default_callable if defined. Otherwise, returns null.
+     * @throws ServerError When the default_callable could not be found in either this Field object or its parent Model
+     */
+    private function get_default_from_callable(): mixed {
+        # Only do this if a default_callable is assigned
+        if ($this->default_callable) {
+            # Set a variable we can use to dynamic invoke the callable
+            $callable = $this->default_callable;
+
+            # First check if the parent Model context has a callable with this name. If so, run it and assign choices
+            if ($this->context and in_array($callable, get_class_methods($this->context))) {
+                return $this->context->$callable();
+            }
+            # Next, check if this Field object has a callable with this name. If so, run it and assign choices
+            if (in_array($callable, get_class_methods($this))) {
+                return $this->$callable();
+            }
+            # Otherwise, throw an error because we could not find a callable with this name
+            throw new ServerError(
+                message: "Could not find default callable method `$callable` in Field object nor its parent Model.",
+                response_id: 'FIELD_DEFAULT_CALLABLE_NOT_FOUND',
+            );
+        }
+        
+        return null;
     }
 
     /**
@@ -425,14 +471,14 @@ class Field {
      * @param mixed $value The value being validated. In the event that this is a `many` field, this method will
      * receive each value of the array individually, not the array value itself.
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value): void {
     }
 
     /**
      * Ensures this field has a parent model context assigned if a parent model context is required.
      * @throws ServerError When `unique` or `conditions` are set, but no Model `context` has been assigned.
      */
-    private function check_model_context() {
+    private function check_model_context(): void {
         # Throw an error if this field is unique but no model context was provided
         if ($this->unique and !$this->context) {
             throw new ServerError(
@@ -553,14 +599,14 @@ class Field {
      * @throws ServerError When `required` and `default` are both set OR `required` and `allow_null` are both set.
      * @throws ValidationError If `required` is set but no value was assigned.
      */
-    private function check_field_required() {
+    private function check_field_required(): void {
         # Throw an error if this field is required but no value was set.
         if ($this->required and is_null($this->value)) {
             throw new ValidationError(message: "Field `$this->name` is required.", response_id: 'FIELD_IS_REQUIRED');
         }
 
         # Throw an error if field is not required but no default was specified and `allow_null` is not set.
-        if (!$this->required and !isset($this->default) and !$this->allow_null) {
+        if (!$this->required and !$this->has_default() and !$this->allow_null) {
             throw new ServerError(
                 message: "Field `$this->name` must have a default or allow null values if not required.",
                 response_id: 'FIELD_NEEDS_DEFAULT',
@@ -573,7 +619,7 @@ class Field {
      * @throws ServerError When `read_only` is set and `choices` or `default` are also set.
      * @throws ValidationError When `read_only` is set and a non-null value was requested.
      */
-    private function check_field_read_only() {
+    private function check_field_read_only(): void {
         # Throw an error if the field is read only, but choices were defined
         if ($this->read_only and $this->choices) {
             throw new ServerError(
@@ -587,7 +633,7 @@ class Field {
      * Checks the length of the value array when `many` is enabled. This ensures there are at least as many array
      * entries as specified with `many_minimum` but no more array entries than specified with `many_maximum`.
      */
-    private function check_many_value_length() {
+    private function check_many_value_length(): void {
         # Only validate this if 'many' is enabled.
         if ($this->many and is_array($this->value)) {
             # Ensure the value contains an appropriate number of array entries
@@ -606,8 +652,8 @@ class Field {
      */
     private function get_value_as_array(): array|null {
         # Assume the default value if no value was set and a default was specified
-        if (isset($this->default) and is_null($this->value)) {
-            $this->value = $this->default;
+        if ($this->has_default() and is_null($this->value)) {
+            $this->value = $this->get_default();
         }
 
         # Check if many is enabled
@@ -633,7 +679,7 @@ class Field {
      * `internal_name` was not specified, the `internal_name` will be assigned the same value as `name` by this method.
      * @throws ServerError When this object's `name` has not been set.
      */
-    public function check_field_names() {
+    public function check_field_names(): void {
         # Throw an error if no `name` has been set.
         if (empty($this->name)) {
             throw new ServerError(
@@ -732,7 +778,7 @@ class Field {
      * @param mixed $value The value to check against available choices.
      * @returns ValidationError When the $value is not an available choice.
      */
-    private function check_value_choice(mixed $value) {
+    private function check_value_choice(mixed $value): void {
         # Skip choice validation if no choices were specified and no choice callable was assigned
         if (!$this->choices and !$this->choices_callable) {
             return;
@@ -804,8 +850,8 @@ class Field {
      * `value` property for this object.
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function from_internal(mixed $internal_value) {
-        # Keep null values for non boolean values and representation only values
+    public function from_internal(mixed $internal_value): void {
+        # Keep null values for non-boolean values and representation only values
         if ($this->representation_only or is_null($internal_value) and $this->type !== 'boolean') {
             # Check if this field has a default, if so, use the default value
             if ($this->default and $this->are_conditions_met()) {
@@ -962,7 +1008,8 @@ class Field {
         $openapi_property['readOnly'] = $this->read_only;
         $openapi_property['writeOnly'] = $this->write_only;
 
-        # Set the default if defined
+        # Set the default if defined. Note: We purposefully do not include defaults via a default_callable here as 
+        # they may be dynamic and make the documented default inaccurate.
         if ($this->default) {
             $openapi_property['default'] = $this->default;
         }

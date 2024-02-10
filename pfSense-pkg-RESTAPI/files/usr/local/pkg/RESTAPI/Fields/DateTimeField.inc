@@ -15,16 +15,15 @@ use RESTAPI\Responses\ValidationError;
  * datetime Model Fields.
  */
 class DateTimeField extends Field {
-    public string $datetime_format;
-    public bool $auto_add_now;
-    public bool $auto_update_now;
-
     /**
      * Defines the DateTimeField object and sets its options.
      * @param bool $required If `true`, this field is required to have a value at all times.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
+     * @param string $default_callable Defines a callable method that should be called to populate the default value
+     * for this field. It is strongly encouraged to use a default callable when the default is variable and may change
+     * dynamically.
      * @param array $choices An array of value choices this Field can be assigned. This can either be an indexed array
      * of the exact choice values, or an associative array where the array key is the exact choice value and the array
      * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
@@ -81,11 +80,12 @@ class DateTimeField extends Field {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
+        string $default_callable = '',
         array $choices = [],
         string $choices_callable = '',
-        string $datetime_format = 'm/d/Y',
-        bool $auto_add_now = false,
-        bool $auto_update_now = false,
+        public string $datetime_format = 'm/d/Y',
+        public bool $auto_add_now = false,
+        public bool $auto_update_now = false,
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $editable = true,
@@ -105,11 +105,6 @@ class DateTimeField extends Field {
         array $validators = [],
         string $help_text = '',
     ) {
-        # Assign properties unique to this field
-        $this->datetime_format = $datetime_format;
-        $this->auto_add_now = $auto_add_now;
-        $this->auto_update_now = $auto_update_now;
-
         # Do not allow $auto_update_now and $many at the same time. The resulting array would just be redundant values.
         if ($auto_update_now and $many) {
             throw new ServerError(
@@ -124,6 +119,7 @@ class DateTimeField extends Field {
             required: $required,
             unique: $unique,
             default: $default,
+            default_callable: $default_callable,
             choices: $choices,
             choices_callable: $choices_callable,
             allow_empty: $allow_empty,
@@ -201,7 +197,7 @@ class DateTimeField extends Field {
      * Add extra validation to DateTimeFields to ensure the value matches the DateTime format.
      * @param mixed $value The incoming
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value): void {
         # Check to ensure that the datetime value matches this Field's DateTime format.
         if (!$this->is_valid_datetime($value, $this->datetime_format)) {
             throw new ValidationError(

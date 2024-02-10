@@ -11,15 +11,15 @@ use RESTAPI\Responses\ServerError;
  * Defines a UnixTimeField class that extends the Core Field method.
  */
 class UnixTimeField extends IntegerField {
-    public bool $auto_add_now;
-    public bool $auto_update_now;
-
     /**
      * Defines the UnixTimeField object and sets its options.
      * @param bool $required If `true`, this field is required to have a value at all times.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
+     * @param string $default_callable Defines a callable method that should be called to populate the default value
+     * for this field. It is strongly encouraged to use a default callable when the default is variable and may change
+     * dynamically.
      * @param array $choices An array of value choices this Field can be assigned. This can either be an indexed array
      * of the exact choice values, or an associative array where the array key is the exact choice value and the array
      * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
@@ -75,6 +75,7 @@ class UnixTimeField extends IntegerField {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
+        string $default_callable = '',
         array $choices = [],
         string $choices_callable = '',
         bool $allow_null = false,
@@ -87,8 +88,8 @@ class UnixTimeField extends IntegerField {
         int $many_maximum = 128,
         int $minimum = 0,
         int $maximum = 99999999999999,
-        bool $auto_add_now = true,
-        bool $auto_update_now = false,
+        public bool $auto_add_now = true,
+        public bool $auto_update_now = false,
         ?string $delimiter = ',',
         string $verbose_name = '',
         string $verbose_name_plural = '',
@@ -99,10 +100,6 @@ class UnixTimeField extends IntegerField {
         array $validators = [],
         string $help_text = '',
     ) {
-        # Assign properties unique to this field
-        $this->auto_add_now = $auto_add_now;
-        $this->auto_update_now = $auto_update_now;
-
         # Do not allow $auto_update_now and $many at the same time. The resulting array would just be redundant values.
         if ($auto_update_now and $many) {
             throw new ServerError(
@@ -116,6 +113,7 @@ class UnixTimeField extends IntegerField {
             required: $required,
             unique: $unique,
             default: $default,
+            default_callable: $default_callable,
             choices: $choices,
             choices_callable: $choices_callable,
             allow_null: $allow_null,

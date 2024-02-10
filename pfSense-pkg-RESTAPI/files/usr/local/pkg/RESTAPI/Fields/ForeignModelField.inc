@@ -47,6 +47,9 @@ class ForeignModelField extends Field {
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
+     * @param string $default_callable Defines a callable method that should be called to populate the default value
+     * for this field. It is strongly encouraged to use a default callable when the default is variable and may change
+     * dynamically.
      * @param array $choices An array of value choices this Field can be assigned. This can either be an indexed array
      * of the exact choice values, or an associative array where the array key is the exact choice value and the array
      * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
@@ -103,6 +106,7 @@ class ForeignModelField extends Field {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
+        string $default_callable = '',
         array $choices = [],
         string $choices_callable = '',
         bool $allow_empty = false,
@@ -137,6 +141,7 @@ class ForeignModelField extends Field {
             required: $required,
             unique: $unique,
             default: $default,
+            default_callable: $default_callable,
             choices: $choices,
             choices_callable: $choices_callable,
             allow_empty: $allow_empty,

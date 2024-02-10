@@ -15,17 +15,6 @@ use RESTAPI\Responses\ValidationError;
  */
 class FilterAddressField extends InterfaceField {
     const INVERT_PREFIX = '!';
-    public bool $allow_ipaddr;
-    public bool $allow_subnet;
-    public bool $allow_interface;
-    public bool $allow_interface_ip;
-    public bool $allow_alias;
-    public bool $allow_self;
-    public bool $allow_any;
-    public bool $allow_invert;
-    public bool $allow_pppoe;
-    public bool $allow_l2tp;
-    public string $internal_value_key;
 
     /**
      * Defines the FilterAddressField object and sets its options.
@@ -33,9 +22,9 @@ class FilterAddressField extends InterfaceField {
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
-     * execute to populate choices for this field. This callable must be a method assigned on this Field object OR the
-     * parent Model object that returns an array of valid choices in the same format as $choices. This is helpful when
-     * choices are dynamic and must be populated at runtime instead of pre-determined sets of values.
+     * @param string $default_callable Defines a callable method that should be called to populate the default value
+     * for this field. It is strongly encouraged to use a default callable when the default is variable and may change
+     * dynamically.
      * @param bool $allow_ipaddr Allow this field's value to be a valid IP address
      * @param bool $allow_subnet Allow this field's value to be a valid subnet CIDR
      * @param bool $allow_alias Allow this field's value to be an existing host or network firewall alias
@@ -101,17 +90,18 @@ class FilterAddressField extends InterfaceField {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
-        bool $allow_ipaddr = true,
-        bool $allow_subnet = true,
-        bool $allow_alias = true,
-        bool $allow_interface = true,
-        bool $allow_interface_ip = true,
-        bool $allow_interface_groups = true,
-        bool $allow_any = true,
-        bool $allow_invert = true,
-        bool $allow_self = true,
-        bool $allow_l2tp = true,
-        bool $allow_pppoe = true,
+        string $default_callable = '',
+        public bool $allow_ipaddr = true,
+        public bool $allow_subnet = true,
+        public bool $allow_alias = true,
+        public bool $allow_interface = true,
+        public bool $allow_interface_ip = true,
+        public bool $allow_interface_groups = true,
+        public bool $allow_any = true,
+        public bool $allow_invert = true,
+        public bool $allow_self = true,
+        public bool $allow_l2tp = true,
+        public bool $allow_pppoe = true,
         bool $allow_empty = false,
         bool $allow_null = false,
         array $interface_query = [],
@@ -127,30 +117,18 @@ class FilterAddressField extends InterfaceField {
         string $verbose_name_plural = '',
         string $internal_name = '',
         string $internal_namespace = '',
-        string $internal_value_key = 'address',
+        public string $internal_value_key = 'address',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
         string $help_text = '',
     ) {
-        # Assign properties specific to this Field class
-        $this->allow_ipaddr = $allow_ipaddr;
-        $this->allow_subnet = $allow_subnet;
-        $this->allow_alias = $allow_alias;
-        $this->allow_interface = $allow_interface;
-        $this->allow_interface_ip = $allow_interface_ip;
-        $this->allow_any = $allow_any;
-        $this->allow_invert = $allow_invert;
-        $this->allow_self = $allow_self;
-        $this->allow_l2tp = $allow_l2tp;
-        $this->allow_pppoe = $allow_pppoe;
-        $this->internal_value_key = $internal_value_key;
-
         # Construct the parent object for this field
         parent::__construct(
             required: $required,
             unique: $unique,
             default: $default,
+            default_callable: $default_callable,
             interface_query: $interface_query,
             allow_interface_groups: $allow_interface_groups,
             allow_empty: $allow_empty,
@@ -192,7 +170,7 @@ class FilterAddressField extends InterfaceField {
      * Ensure any value assigned to this Field is allowed by the current field settings.
      * @param mixed $value The incoming value to be validated.
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value): void {
         # Remove the invert character (!) if invert is allowed and present, so we can continue validating.
         if ($this->allow_invert and str_starts_with($value, self::INVERT_PREFIX)) {
             $value = substr($value, 1);

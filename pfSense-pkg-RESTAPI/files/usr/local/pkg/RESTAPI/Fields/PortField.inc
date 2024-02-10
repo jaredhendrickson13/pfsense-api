@@ -145,7 +145,7 @@ class PortField extends Field {
     /**
      * Adds extra validation to determine if this value should be accepted given the current Field settings.
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value): void {
         # Allow this value if it is an existing port alias name and alias values are allowed
         if ($this->allow_alias and FirewallAlias::query(['type' => 'port', 'name' => $value])->exists()) {
             $this->labels[] = 'is_alias';

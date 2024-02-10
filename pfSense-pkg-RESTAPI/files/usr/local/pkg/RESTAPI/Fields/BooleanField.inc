@@ -11,7 +11,16 @@ use RESTAPI;
  * boolean Model Fields.
  */
 class BooleanField extends RESTAPI\Core\Field {
+    /**
+     * @var mixed $indicates_true The internal value that indicates a `true` boolean. This will typically be an empty
+     * string, 'on', 'yes', 'enabled', etc.
+     */
     public mixed $indicates_true;
+
+    /**
+     * @var mixed $indicates_false The internal value that indicates a `false` boolean. This will typically be null, 
+     * 'off', 'no', 'disabled', etc.
+     */
     public mixed $indicates_false;
 
     /**
@@ -20,6 +29,9 @@ class BooleanField extends RESTAPI\Core\Field {
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
+     * @param string $default_callable Defines a callable method that should be called to populate the default value
+     * for this field. It is strongly encouraged to use a default callable when the default is variable and may change
+     * dynamically.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
@@ -60,6 +72,7 @@ class BooleanField extends RESTAPI\Core\Field {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
+        string $default_callable = '',
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $editable = true,
@@ -84,6 +97,7 @@ class BooleanField extends RESTAPI\Core\Field {
             required: $required,
             unique: $unique,
             default: $default,
+            default_callable: $default_callable,
             allow_empty: $allow_empty,
             allow_null: $allow_null,
             editable: $editable,
