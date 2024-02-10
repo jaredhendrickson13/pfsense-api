@@ -116,9 +116,6 @@ class Dispatcher {
 
         # Set the schedule command for this Dispatcher
         $this->schedule_command = "/usr/local/pkg/RESTAPI/.resources/scripts/manage.php notifydispatcher $this->short_name";
-
-        # Ensure required packages are present and required files are included
-        $this->check_required_packages();
     }
 
     /**
@@ -204,6 +201,9 @@ class Dispatcher {
      * @throws ServiceUnavailableError When the maximum number of processes allowed by $max_concurrency is exceeded.
      */
     public function spawn_process(mixed ...$arguments): int {
+        # Ensure required packages are present and required files are included
+        $this->check_required_packages();
+        
         # Before we spawn a new process, ensure we don't have too many concurrent processes running now
         if ($this->max_concurrency and count($this->get_running_processes()) >= $this->max_concurrency) {
             throw new ServiceUnavailableError(

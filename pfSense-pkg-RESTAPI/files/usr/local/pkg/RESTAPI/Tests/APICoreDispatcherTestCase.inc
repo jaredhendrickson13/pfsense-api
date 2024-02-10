@@ -164,7 +164,8 @@ class APICoreDispatcherTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () {
                 # Use the WireGuardSettingsDispatcher to test this as it requires pfSense-pkg-WireGuard.
-                new WireGuardSettingsDispatcher();
+                $dispatcher = new WireGuardSettingsDispatcher();
+                $dispatcher->spawn_process();
             },
         );
 
