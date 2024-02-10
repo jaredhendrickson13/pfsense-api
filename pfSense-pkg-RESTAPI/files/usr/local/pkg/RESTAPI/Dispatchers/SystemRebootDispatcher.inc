@@ -12,7 +12,7 @@ class SystemRebootDispatcher extends Dispatcher {
     /**
      * Schedules a reboot in 15 seconds
      */
-    public function process(mixed ...$arguments): void {
+    protected function _process(mixed ...$arguments): void {
         new Command('shutdown -r +15s');
     }
 }

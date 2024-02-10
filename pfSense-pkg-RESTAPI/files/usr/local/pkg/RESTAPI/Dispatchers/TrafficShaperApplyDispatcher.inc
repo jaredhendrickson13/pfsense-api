@@ -14,7 +14,7 @@ class TrafficShaperApplyDispatcher extends Dispatcher {
     /**
      * Reloads the traffic shaper services.
      */
-    public function process(mixed ...$arguments): void {
+    protected function _process(mixed ...$arguments): void {
         # Reload filter services
         filter_configure_sync();
 

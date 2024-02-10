@@ -14,7 +14,7 @@ class WireGuardSettingsDispatcher extends Dispatcher {
     /**
      * Starts/stops the WireGuard service and applies changes to tunnels.
      */
-    public function process(...$arguments): void {
+    protected function _process(mixed ...$arguments): void {
         # Enable or disable WireGuard
         wg_toggle_wireguard();
 

@@ -11,7 +11,7 @@ class InterfaceApplyDispatcher extends Dispatcher {
     /**
      * Applies pending interface changes.
      */
-    public function process(mixed ...$arguments): void {
+    protected function _process(mixed ...$arguments): void {
         # Local variables
         global $g;
         unlink_if_exists("{$g['tmp_path']}/config.cache");

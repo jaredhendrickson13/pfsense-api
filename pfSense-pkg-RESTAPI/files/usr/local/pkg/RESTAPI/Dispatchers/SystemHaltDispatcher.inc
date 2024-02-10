@@ -12,7 +12,7 @@ class SystemHaltDispatcher extends Dispatcher {
     /**
      * Schedules a shutdown in 15 seconds
      */
-    public function process(mixed ...$arguments): void {
+    protected function _process(mixed ...$arguments): void {
         new Command('shutdown -h +15s');
     }
 }

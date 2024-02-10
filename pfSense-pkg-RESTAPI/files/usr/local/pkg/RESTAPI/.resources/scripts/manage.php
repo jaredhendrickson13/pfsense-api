@@ -107,9 +107,9 @@ function notify_dispatcher(string|null $dispatcher_name): void {
 
     # Ensure this Dispatcher class exists
     if (class_exists($class)) {
-        # Start the Dispatcher process
+        # Start the Dispatcher process asynchronously.
         echo "Running $class process... ";
-        $dispatcher = new $class();
+        $dispatcher = new $class(async: false);
         $dispatcher->process();
         echo 'done.' . PHP_EOL;
         exit(0);

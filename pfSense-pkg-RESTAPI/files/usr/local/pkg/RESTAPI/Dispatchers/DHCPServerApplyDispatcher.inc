@@ -12,7 +12,7 @@ class DHCPServerApplyDispatcher extends Dispatcher {
     /**
      * Reloads the DHCP server and associated services.
      */
-    public function process(mixed ...$arguments): void {
+    protected function _process(mixed ...$arguments): void {
         $retvaldhcp = 0;
         $retvaldns = 0;
 

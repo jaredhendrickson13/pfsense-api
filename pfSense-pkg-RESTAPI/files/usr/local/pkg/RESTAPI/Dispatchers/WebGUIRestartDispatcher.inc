@@ -12,7 +12,7 @@ class WebGUIRestartDispatcher extends Dispatcher {
     /**
      * Restarts the web GUI.
      */
-    public function process(mixed ...$arguments): void {
+    protected function _process(mixed ...$arguments): void {
         # Wait a second to prevent prematurely killing API calls
         sleep(3);
         new Command('/etc/rc.restart_webgui');

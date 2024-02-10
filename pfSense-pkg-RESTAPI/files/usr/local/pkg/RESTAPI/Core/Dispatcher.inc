@@ -195,8 +195,10 @@ class Dispatcher {
     }
 
     /**
-     * Spawns a new process for this Dispatcher.
-     * @param mixed ...$arguments Optional arguments to pass to the `process()` method.
+     * Spawns a new process for this Dispatcher. If this Dispatcher has the $async property enabled, this will spawn
+     * the _process() method in the background. Otherwise, this behaves similar to the process() method by calling the 
+     * _process() method synchronously, but this method enforces the $max_concurrency property unlike process(). 
+     * @param mixed ...$arguments Optional arguments to pass to the `_process()` method.
      * @return int The PID of the spawned process.
      * @throws ServiceUnavailableError When the maximum number of processes allowed by $max_concurrency is exceeded.
      */
@@ -252,11 +254,23 @@ class Dispatcher {
     }
 
     /**
+     * Runs the _process() directly. This method is essentially a wrapper for _process() that checks for required
+     * packages before starting. In almost every situation you should call spwan_process() instead of this method.
+     */
+    public function process(mixed ...$arguments): void {
+        # Ensure required packages are present and required files are included
+        $this->check_required_packages();
+        
+        # Call the protected _process() method to start the process synchronously.
+        $this->_process(...$arguments);
+    }
+
+    /**
      * Defines what should be done when the Dispatch process is spawned. In most cases, this will restart some service
      * or perform computations that may take a long time. It is up to the child Dispatcher class to decide what is
      * done here.
      */
-    public function process(mixed ...$arguments): void {
+    protected function _process(mixed ...$arguments): void {
         # Emulate a long running process for testing purposes
         sleep(30);
     }
