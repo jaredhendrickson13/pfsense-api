@@ -22,7 +22,7 @@ class WireGuardTunnelAddress extends Model {
         $this->verbose_name = 'WireGuard Tunnel Address';
         $this->packages = ['pfSense-pkg-WireGuard'];
         $this->package_includes = ['wireguard/includes/wg_service.inc', 'wireguard/includes/wg.inc'];
-        $this->unique_together_fields = ["address", "mask"];
+        $this->unique_together_fields = ['address', 'mask'];
 
         # Set model fields
         $this->address = new StringField(
@@ -49,20 +49,20 @@ class WireGuardTunnelAddress extends Model {
      * Adds extra validation to this entire model object.
      * @throws ConflictError When this Model's address and mask are currently in use elsewhere on the system.
      */
-    public function validate_extra(): void
-    {
+    public function validate_extra(): void {
         # Check for conflicts with this address and mask
         $conflicts = where_is_ipaddr_configured(
-            ipaddr: $this->address->value, 
-            check_localip: true, 
+            ipaddr: $this->address->value,
+            check_localip: true,
             check_subnets: true,
-            cidrprefix: $this->mask->value);
-        
+            cidrprefix: $this->mask->value,
+        );
+
         # Throw an error if there are conflicts
         if ($conflicts) {
             throw new ConflictError(
                 message: "This tunnel's `address` and `mask` is already in use on this system.",
-                response_id: "WIREGUARD_TUNNEL_ADDRESS_AND_MASK_ALREADY_IN_USE"
+                response_id: 'WIREGUARD_TUNNEL_ADDRESS_AND_MASK_ALREADY_IN_USE',
             );
         }
     }

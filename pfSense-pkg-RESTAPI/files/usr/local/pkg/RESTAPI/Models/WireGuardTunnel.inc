@@ -87,7 +87,7 @@ class WireGuardTunnel extends Model {
      */
     public function validate_extra(): void {
         # Ensure the `publickey` field is always assigned the public key for `privatekey` value
-        $this->publickey->value = wg_gen_publickey($this->privatekey->value)["pubkey"];
+        $this->publickey->value = wg_gen_publickey($this->privatekey->value)['pubkey'];
     }
 
     /**

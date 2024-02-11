@@ -196,8 +196,8 @@ class Dispatcher {
 
     /**
      * Spawns a new process for this Dispatcher. If this Dispatcher has the $async property enabled, this will spawn
-     * the _process() method in the background. Otherwise, this behaves similar to the process() method by calling the 
-     * _process() method synchronously, but this method enforces the $max_concurrency property unlike process(). 
+     * the _process() method in the background. Otherwise, this behaves similar to the process() method by calling the
+     * _process() method synchronously, but this method enforces the $max_concurrency property unlike process().
      * @param mixed ...$arguments Optional arguments to pass to the `_process()` method.
      * @return int The PID of the spawned process.
      * @throws ServiceUnavailableError When the maximum number of processes allowed by $max_concurrency is exceeded.
@@ -205,7 +205,7 @@ class Dispatcher {
     public function spawn_process(mixed ...$arguments): int {
         # Ensure required packages are present and required files are included
         $this->check_required_packages();
-        
+
         # Before we spawn a new process, ensure we don't have too many concurrent processes running now
         if ($this->max_concurrency and count($this->get_running_processes()) >= $this->max_concurrency) {
             throw new ServiceUnavailableError(
@@ -260,7 +260,7 @@ class Dispatcher {
     public function process(mixed ...$arguments): void {
         # Ensure required packages are present and required files are included
         $this->check_required_packages();
-        
+
         # Call the protected _process() method to start the process synchronously.
         $this->_process(...$arguments);
     }
