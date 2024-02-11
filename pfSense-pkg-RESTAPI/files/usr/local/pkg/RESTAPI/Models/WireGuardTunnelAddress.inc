@@ -42,7 +42,7 @@ class WireGuardTunnelAddress extends Model {
             help_text: 'A description for this WireGuard tunnel address entry.',
         );
 
-        parent::__construct($id, $parent_id, $data, $options);
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
