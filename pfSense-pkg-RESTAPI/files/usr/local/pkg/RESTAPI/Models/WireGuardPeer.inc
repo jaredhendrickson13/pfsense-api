@@ -3,12 +3,14 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 
 class WireGuardPeer extends Model
@@ -61,18 +63,61 @@ class WireGuardPeer extends Model
         $this->persistentkeepalive = new IntegerField(
             default: null,
             allow_null: true,
+            maximum: 65535,
             help_text: "The interval (in seconds) for Keep Alive packets sent to this peer. Set to `null` to disable."
         );
         $this->publickey = new StringField(
             required: true,
+            unique: true,
             help_text: "The public key for this peer."
         );
         $this->presharedkey = new StringField(
             default: "",
             allow_null: true,
+            write_only: true,
             help_text: "The pre-shared key for this tunnel."
+        );
+        $this->allowedips = new NestedModelField(
+            model_class: "WireGuardPeerAllowedIP",
+            default: [],
+            allow_empty: true,
+            help_text: "The allowed IP/subnets for this WireGuard peer."
         );
         
         parent::__construct($id, $parent_id, $data, ...$options);
+    }
+
+    /**
+     * Adds extra validation to the `presharedkey` field.
+     * @param string $presharedkey The incoming value to be validated.
+     * @return string The validated value to be assigned.
+     * @throws ValidationError When $presharedkey is not a valid WireGuard pre-shared key
+     */
+    public function validate_presharedkey(string $presharedkey): string {
+        # Throw an error if this value is not a valid WireGuard key
+        if (!wg_is_valid_key($presharedkey)) {
+            throw new ValidationError(
+                message: "Field `presharedkey` must be a valid WireGuard pre-shared key.",
+                response_id: "WIREGUARD_PEER_PRESHAREDKEY_INVALID"
+            );
+        }
+
+        return $presharedkey;
+    }
+
+    /**
+     * Serialize changes before applying.
+     */
+    public function pre_apply(): void
+    {
+        wg_apply_list_add('tunnels', [$this->tun->value]);
+    }
+
+    /**
+     * Applies changes to WireGuard tunnels/peers.
+     */
+    public function apply(): void
+    {
+        (new WireGuardSettingsDispatcher(async: $this->async))->spawn_process();
     }
 }
