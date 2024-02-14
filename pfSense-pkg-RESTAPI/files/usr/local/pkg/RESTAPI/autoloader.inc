@@ -1,15 +1,6 @@
 <?php
 
-# Include third-party libraries and built-in pfSense libraries required for this package
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/JWT.php';
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/JWK.php';
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/Key.php';
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/CachedKeySet.php';
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php';
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/ExpiredException.php';
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/SignatureInvalidException.php';
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/BeforeValidException.php';
-require_once 'RESTAPI/.resources/includes/firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php';
+# Include built-in pfSense libraries required for this package
 require_once 'config.inc';
 require_once 'diag_arp.inc';
 require_once 'util.inc';
@@ -25,6 +16,20 @@ require_once 'certs.inc';
 require_once 'pkg-utils.inc';
 require_once 'firewall_virtual_ip.inc';
 require_once 'includes/functions.inc.php';
+
+# Check if the php-jwt dependency has already been installed. This is necessary to concurrently run v1 and v2 on the
+# same system since both packages install this dependency, which creates conflicts.
+# TODO: Look into the feasibility of making php-jwt its own pfSense package that both packages can share
+$jwt_path_prefix = (!is_dir("/etc/inc/firebase/php-jwt/src")) ? "RESTAPI/.resources/includes/" : "";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWT.php";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWK.php";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/Key.php";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/CachedKeySet.php";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/ExpiredException.php";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/SignatureInvalidException.php";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/BeforeValidException.php";
+require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php";
 
 # Ensure the RESTAPI BaseTraits is imported before any other libraries
 require_once 'RESTAPI/Core/BaseTraits.inc';
