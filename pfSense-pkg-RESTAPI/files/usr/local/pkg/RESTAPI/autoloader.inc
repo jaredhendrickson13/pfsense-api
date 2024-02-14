@@ -20,7 +20,7 @@ require_once 'includes/functions.inc.php';
 # Check if the php-jwt dependency has already been installed. This is necessary to concurrently run v1 and v2 on the
 # same system since both packages install this dependency, which creates conflicts.
 # TODO: Look into the feasibility of making php-jwt its own pfSense package that both packages can share
-$jwt_path_prefix = (!is_dir("/etc/inc/firebase/php-jwt/src")) ? "RESTAPI/.resources/includes/" : "";
+$jwt_path_prefix = !is_dir('/etc/inc/firebase/php-jwt/src') ? 'RESTAPI/.resources/includes/' : '';
 require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWT.php";
 require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWK.php";
 require_once "{$jwt_path_prefix}firebase/php-jwt/src/Key.php";

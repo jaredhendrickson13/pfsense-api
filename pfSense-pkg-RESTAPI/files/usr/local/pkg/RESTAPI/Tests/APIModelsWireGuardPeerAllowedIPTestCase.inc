@@ -10,8 +10,7 @@ use RESTAPI\Models\WireGuardPeerAllowedIP;
 use RESTAPI\Models\WireGuardSettings;
 use RESTAPI\Models\WireGuardTunnel;
 
-class APIModelsWireGuardPeerAllowedIPTestCase extends TestCase
-{
+class APIModelsWireGuardPeerAllowedIPTestCase extends TestCase {
     /**
      * Ensure the WireGuard package is installed and enabled before running tests.
      */
@@ -44,32 +43,27 @@ class APIModelsWireGuardPeerAllowedIPTestCase extends TestCase
             enabled: true,
             tun: $tunnel->name->value,
             persistentkeepalive: 200,
-            publickey: "KG0BA4UyPilHH5qnXCfr6Lw8ynecOPor88tljLy3AHk=",
-            presharedkey: "zppaKHpHl5tvjbwuYh8uTc8lfyzfLYg3IBrwn9yCFsc=",
-            async: false
+            publickey: 'KG0BA4UyPilHH5qnXCfr6Lw8ynecOPor88tljLy3AHk=',
+            presharedkey: 'zppaKHpHl5tvjbwuYh8uTc8lfyzfLYg3IBrwn9yCFsc=',
+            async: false,
         );
         $peer->create(apply: true);
 
         # Create a WireGuardPeerAllowedIP and ensure it is shown in 'wg showconf'
-        $allowed_ip = new WireGuardPeerAllowedIP(
-            parent_id: $peer->id,
-            address: "1.2.3.0",
-            mask: 24,
-            async: false
-        );
+        $allowed_ip = new WireGuardPeerAllowedIP(parent_id: $peer->id, address: '1.2.3.0', mask: 24, async: false);
         $allowed_ip->create(apply: true);
-        $wg_show = new Command("wg showconf ".$peer->tun->value);
-        $this->assert_str_contains($wg_show->output, "AllowedIPs = 1.2.3.0/24");
+        $wg_show = new Command('wg showconf ' . $peer->tun->value);
+        $this->assert_str_contains($wg_show->output, 'AllowedIPs = 1.2.3.0/24');
 
         # Update the allowed IP and ensure the updated value is shown in 'wg showconf'
-        $allowed_ip->from_representation(address: "3.2.1.0", mask: 25);
+        $allowed_ip->from_representation(address: '3.2.1.0', mask: 25);
         $allowed_ip->update(apply: true);
-        $wg_show = new Command("wg showconf ".$peer->tun->value);
-        $this->assert_str_contains($wg_show->output, "AllowedIPs = 3.2.1.0/25");
+        $wg_show = new Command('wg showconf ' . $peer->tun->value);
+        $this->assert_str_contains($wg_show->output, 'AllowedIPs = 3.2.1.0/25');
 
         # Delete the allowed IP and ensure it is no longer present in 'wg showconf'
         $allowed_ip->delete(apply: true);
-        $wg_show = new Command("wg showconf ".$peer->tun->value);
-        $this->assert_str_does_not_contain($wg_show->output, "AllowedIPs");
+        $wg_show = new Command('wg showconf ' . $peer->tun->value);
+        $this->assert_str_does_not_contain($wg_show->output, 'AllowedIPs');
     }
 }
