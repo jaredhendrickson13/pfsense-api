@@ -10,6 +10,7 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\ConflictError;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
@@ -535,8 +536,8 @@ class OpenVPNServer extends Model
         );
         $this->username_as_common_name = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
+            indicates_true: "enabled",
+            indicates_false: "disabled",
             conditions: ["mode" => ["server_user", "server_tls_user"]],
             help_text: "Enables or disable the username of the client being used in place of the certificate common ".
                 "name for purposes such as determining Client Specific Overrides."
@@ -560,6 +561,24 @@ class OpenVPNServer extends Model
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
+    }
+
+    /**
+     * Adds extra validation to the `disable` field.
+     * @param bool $disable The incoming value to validate.
+     * @return bool The validated value to be assigned.
+     * @throws ConflictError When $disable is true, but this OpenVPNServer is in use by an existing interface.
+     */
+    public function validate_disable(bool $disable): bool {
+        # Do not allow this OpenVPN server to be disabled if it's in use by an interface
+        if ($disable and openvpn_inuse($this->vpnid->value, 'server')) {
+            throw new ConflictError(
+                message: "Field `disable` cannot be set to `true` while this OpenVPNServer is in use.",
+                response_id: "OPENVPN_SERVER_CANNOT_BE_DISABLED_WHILE_IN_USE"
+            );
+        }
+        
+        return $disable;
     }
 
     /**
@@ -609,5 +628,20 @@ class OpenVPNServer extends Model
      */
     protected function get_avialable_digest_choices(): array {
         return openvpn_get_digestlist();
+    }
+    
+    /**
+     * Overrides the parent _delete() method to ensure this OpenVPNServer is not in use before deletion.
+     */
+    public function _delete(): void
+    {
+        # Do not allow this OpenVPN server to be deleted if it's in use by an interface
+        if (openvpn_inuse($this->vpnid->value, 'server')) {
+            throw new ConflictError(
+                message: "OpenVPNServer cannot be deleted while it is in use.",
+                response_id: "OPENVPN_SERVER_CANNOT_BE_DELETED_WHILE_IN_USE"
+            );
+        }
+        parent::_delete();
     }
 }
