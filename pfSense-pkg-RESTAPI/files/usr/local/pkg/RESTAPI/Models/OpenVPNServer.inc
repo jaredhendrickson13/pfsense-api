@@ -11,12 +11,16 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
+use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 
 class OpenVPNServer extends Model
 {
+    const STATIC_KEY_PREFIX = "-----BEGIN OpenVPN Static key V1-----";
+    const STATIC_KEY_SUFFIX = "-----END OpenVPN Static key V1-----";
+    
     public IntegerField $vpnid;
     public StringField $description;
     public BooleanField $disable;
@@ -37,6 +41,7 @@ class OpenVPNServer extends Model
     public StringField $data_ciphers;
     public StringField $data_ciphers_fallback;
     public StringField $digest;
+    public BooleanField $strictusercn;
     public BooleanField $remote_cert_tls;
     public StringField $tunnel_network;
     public StringField $tunnel_networkv6;
@@ -122,6 +127,7 @@ class OpenVPNServer extends Model
             model_name: "AuthServer",
             model_field: "name",
             default: "Local Database",
+            many: true,
             conditions: ["mode" => ["server_user", "server_tls_user"]],
             help_text: "The name of the authentication server to use as the authentication ".
                 "backend for this OpenVPN server"
@@ -141,6 +147,7 @@ class OpenVPNServer extends Model
         $this->interface = new InterfaceField(
             required: true,
             allow_carp_interface: true,
+            allow_localhost_interface: true,
             conditions: ["!protocol" => ["UDP", "TCP"]],
             help_text: "The interface or Virtual IP address where OpenVPN will receive client connections."
         );
@@ -220,13 +227,21 @@ class OpenVPNServer extends Model
         );
         $this->digest = new StringField(
             required: true,
-            choices_callable: "openvpn_get_digestlist",
+            choices_callable: "get_available_digest_choices",
             help_text: "The algorithm used to authenticate data channel packets, and control channel packets ".
                 "if a TLS Key is present."
         );
+        $this->strictusercn = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["mode" => ["server_user", "server_tls_user"]],
+            help_text: "Enables or disables enforcing a match between the common name of the client certificate ".
+                "and the username given at login."
+        );
         $this->remote_cert_tls = new BooleanField(
             default: true,
-            help_text: "Enable or disable requiring hosts to have a client certificate to connect."
+            help_text: "Enables or disables requiring hosts to have a client certificate to connect."
         );
         $this->tunnel_network = new StringField(
             default: "",
@@ -564,6 +579,50 @@ class OpenVPNServer extends Model
     }
 
     /**
+     * Adds extra validation to this entire Model object.
+     * @throws ValidationError When the sum of all items assigned to the `authmode` field exceeds 254 characters.
+     * @throws ValidationError When the sum of all items assigned to the `data_ciphers` field exceeds 254 characters.
+     * @throws ValidationError When `protocol` is set to `tap`, but no `tunnel_network`, `tunnel_networkv6` or 
+     * `serverbridge_interface` value(s) have been assigned.
+     */
+    public function validate_extra(): void
+    {
+        # Do not allow the entirety of the authscript options string to exceed 254 characters
+        $authscript_opt = openvpn_authscript_string(
+            authmode: $this->authmode->to_internal(), 
+            strictusercn: ($this->strictusercn->value) ? "true" : "false", 
+            mode_id: $this->vpnid->value,
+            local_port: $this->local_port->value
+        );
+        if (strlen($authscript_opt) > 254) {
+            throw new ValidationError(
+                message: "Field `authmode` has too many items or their names are too long. Either reduce the number ".
+                    "of items or shorten the names of the corresponding authentication servers",
+                response_id: "OPENVPN_SERVER_AUTHMODE_CONTAINS_TOO_MANY_CHARS_FOR_AUTHSCRIPT"
+            );
+        }
+        
+        # Do not allow the entirety of the data-ciphers options string to exceed 254 characters
+        $data_ciphers_opt = "data-ciphers " . $this->data_ciphers->to_internal();
+        if (strlen($data_ciphers_opt) > 254) {
+            throw new ValidationError(
+                message: "Field `data_ciphers` has too many items. The sum of all item characters exceeds OpenVPN ".
+                    "character limits.",
+                response_id: "OPENVPN_SERVER_DATA_CIPHERS_CONTAINS_TOO_MANY_CHARS"
+            );
+        }
+
+        # When `tap` mode is used, require a bridge interface or tunnel network
+        if ($this->protocol->value === "tap" and !$this->tunnel_network->value and !$this->tunnel_networkv6->value and !$this->serverbridge_interface->value) {
+            throw new ValidationError(
+                message: "A `tunnel_network`, `tunnel_networkv6` or `serverbridge_interface` value mst be provided ".
+                    "if `mode` is set to `tap`.",
+                response_id: "OPENVPN_SERVER_TAP_MODE_REQUIRES_TUNNEL_NETWORK_OR_BRIDGE_INTERFACE"
+            );
+        }
+    }
+
+    /**
      * Adds extra validation to the `disable` field.
      * @param bool $disable The incoming value to validate.
      * @return bool The validated value to be assigned.
@@ -579,6 +638,114 @@ class OpenVPNServer extends Model
         }
         
         return $disable;
+    }
+
+    /**
+     * Adds extra validation to the `interface` field.
+     * @param string $interface The incoming value to be validated.
+     * @return string The validated value to be assigned.
+     * @throws ValidationError When the `protocol` field is an IPv4 protocol, but the $interface has no IPv4 address
+     * @throws ValidationError When the `protocol` field is an IPv6 protocol, but the $interface has no IPv6 address
+     *     
+     */
+    public function validate_interface(string $interface): string {
+        # Shortname variable for related NetworkInterface object
+        $if_obj = $this->interface->get_related_model();
+        
+        # Require the interface to have an IPv4 address if `protocol` is set to an IPv4 protocol
+        if (in_array($this->protocol->value, ["UDP4", "TCP4"]) and !$if_obj->get_current_ipv4()) {
+            throw new ValidationError(
+                message: "Field `interface` must be an interface with an IPv4 address while ".
+                    "`protocol` is `UDP4` or `TCP4`.",
+                response_id: "OPENVPN_SERVER_INTERFACE_HAS_NO_IPV4_ASSIGNMENT"
+            );
+        }
+
+        # Require the interface to have an IPv6 address if `protocol` is set to an IPv6 protocol
+        if (in_array($this->protocol->value, ["UDP6", "TCP6"]) and !$if_obj->get_current_ipv4()) {
+            throw new ValidationError(
+                message: "Field `interface` must be an interface with an IPv6 address while ".
+                    "`protocol` is `UDP6` or `TCP6`.",
+                response_id: "OPENVPN_SERVER_INTERFACE_HAS_NO_IPV4_ASSIGNMENT"
+            );
+        }
+        
+        return $interface;
+    }
+
+    /**
+     * Adds extra validation to the `tls` field.
+     * @param string $tls The incoming value to be validated.
+     * @return string The validated value to be assigned.
+     * @throws ValidationError When $tls is not a valid OpenVPN static key.
+     */
+    public function validate_tls(string $tls): string {
+        # Ensure this TLS key begins with the OpenVPN key prefix and suffix
+        if (!str_contains($tls, self::STATIC_KEY_PREFIX) and !str_contains($tls, self::STATIC_KEY_SUFFIX)) {
+            throw new ValidationError(
+                message: "Field `tls` must be a valid OpenVPN TLS key.",
+                response_id: "OPENVPN_SERVER_TLS_INVALID_KEY"
+            );
+        }
+        
+        return $tls;
+    }
+
+    /**
+     * Adds extra validation to the `tunnel_network` field.
+     * @param string $tunnel_network The incoming value to validate.
+     * @return string The validated value to be assigned.
+     */
+    public function validate_tunnel_network(string $tunnel_network): string {
+        # Force the subnet to use the full network address CIDR value (i.e. 10.1.2.3/24 becomes 10.1.2.0/24)
+        return openvpn_tunnel_network_fix($tunnel_network);
+    }
+
+    /**
+     * Adds extra validation to the `tunnel_networkv6` field.
+     * @param string $tunnel_networkv6 The incoming value to validate.
+     * @return string The validated value to be assigned.
+     */
+    public function validate_tunnel_networkv6(string $tunnel_networkv6): string {
+        # Force the subnet to use the full network address CIDR value (i.e. 1234::2/24 becomes 1234::/24)
+        return openvpn_tunnel_network_fix($tunnel_networkv6);
+    }
+
+    /**
+     * Adds extra validation to the `serverbridge_dhcp` field.
+     * @param bool $serverbridge_dhcp The incoming value to be validated.
+     * @return bool The validated value to be assigned.
+     * @throws ConflictError When $serverbridge_dhcp is true, but a `tunnel_network` is already assigned.
+     */
+    public function validate_serverbridge_dhcp(bool $serverbridge_dhcp): bool {
+        # Do not allow both `serverbridge_dhcp` and `tunnel_network` values to be assigned.
+        if ($serverbridge_dhcp and $this->tunnel_network->value) {
+            throw new ConflictError(
+                message: "Field `serverbridge_dhcp` cannot be true while a `tunnel_network` is also assigned.",
+                response_id: "OPENVPN_SERVER_BRIDGE_DHCP_CANNOT_BE_ENABLED_WITH_TUNNEL_NETWORK"
+            );
+        }
+        
+        return $serverbridge_dhcp;
+    }
+
+    /**
+     * Adds extra validation to the `serverbridge_dhcp_end` field.
+     * @param string $serverbridge_dhcp_end The incoming value to be validated.
+     * @return string The validated value to be assigned.
+     * @throws ValidationError When the $serverbridge_dhcp_end is an IP preceding the `serverbridge_dhcp_start` value.
+     */
+    public function validate_serverbridge_dhcp_end(string $serverbridge_dhcp_end): string {
+        # Do not allow the DHCP end IP to be less than the start IP
+        if (ip_greater_than($this->serverbridge_dhcp_start->value, $this->serverbridge_dhcp_end->value)) {
+            throw new ValidationError(
+                message: "Field `serverbridge_dhcp_end` must be an IPv4 address that is greater ".
+                    "than `serverbridge_dhcp_start`.",
+                response_id: "OPENVPN_SERVER_BRiDGE_DHCP_END_MUST_BE_IP_GREATER_THAN_DHCP_START"
+            );
+        }
+        
+        return $serverbridge_dhcp_end;
     }
 
     /**
@@ -626,7 +793,7 @@ class OpenVPNServer extends Model
      * Obtains the available `digest` options for this system.
      * @return array An array of available digest algorithms for this system.
      */
-    protected function get_avialable_digest_choices(): array {
+    protected function get_available_digest_choices(): array {
         return openvpn_get_digestlist();
     }
     
