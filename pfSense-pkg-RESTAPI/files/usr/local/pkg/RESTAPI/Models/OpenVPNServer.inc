@@ -35,6 +35,7 @@ class OpenVPNServer extends Model
     public StringField $tlsauth_keydir;
     public ForeignModelField $caref;
     public ForeignModelField $certref;
+    # TODO: public ForeignModelField $crlref;
     public IntegerField $cert_depth;
     public StringField $dh_length;
     public StringField $ecdh_curve;
@@ -810,5 +811,29 @@ class OpenVPNServer extends Model
             );
         }
         parent::_delete();
+    }
+    
+    /**
+     * Applies changes to this OpenVPN Server.
+     */
+    public function apply(): void
+    {
+        # Delete the old OpenVPN interface if the device mode changed
+        if ($this->initial_object->dev_mode->value !== $this->dev_mode->value) {
+            openvpn_delete('server', $this->initial_object->to_internal());
+        }
+        
+        # Apply changes to this OpenVPN server and restart services.
+        openvpn_resync('server', $this->to_internal());
+        openvpn_resync_csc_all();
+        services_unbound_configure(false);
+    }
+    
+    /**
+     * Applies the deletion of this OpenVPN server
+     */
+    public function apply_delete(): void
+    {
+        openvpn_delete('server', $this->to_internal());
     }
 }
