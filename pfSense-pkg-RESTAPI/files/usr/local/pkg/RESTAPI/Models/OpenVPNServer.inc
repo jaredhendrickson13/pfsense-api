@@ -255,7 +255,7 @@ class OpenVPNServer extends Model {
             default: false,
             indicates_true: 'yes',
             indicates_false: '',
-            conditions: ['dev_mode' => 'tun'],
+            conditions: ['dev_mode' => 'tap'],
             help_text: 'Enables or disables clients on the bridge to obtain DHCP.',
         );
         $this->serverbridge_interface = new InterfaceField(
@@ -609,7 +609,7 @@ class OpenVPNServer extends Model {
 
         # When `tap` mode is used, require a bridge interface or tunnel network
         if (
-            $this->protocol->value === 'tap' and
+            $this->dev_mode->value === 'tap' and
             !$this->tunnel_network->value and
             !$this->tunnel_networkv6->value and
             !$this->serverbridge_interface->value
@@ -666,7 +666,7 @@ class OpenVPNServer extends Model {
             throw new ValidationError(
                 message: 'Field `interface` must be an interface with an IPv6 address while ' .
                     '`protocol` is `UDP6` or `TCP6`.',
-                response_id: 'OPENVPN_SERVER_INTERFACE_HAS_NO_IPV4_ASSIGNMENT',
+                response_id: 'OPENVPN_SERVER_INTERFACE_HAS_NO_IPV6_ASSIGNMENT',
             );
         }
 
@@ -741,7 +741,7 @@ class OpenVPNServer extends Model {
             throw new ValidationError(
                 message: 'Field `serverbridge_dhcp_end` must be an IPv4 address that is greater ' .
                     'than `serverbridge_dhcp_start`.',
-                response_id: 'OPENVPN_SERVER_BRiDGE_DHCP_END_MUST_BE_IP_GREATER_THAN_DHCP_START',
+                response_id: 'OPENVPN_SERVER_BRIDGE_DHCP_END_MUST_BE_IP_GREATER_THAN_DHCP_START',
             );
         }
 
@@ -752,7 +752,7 @@ class OpenVPNServer extends Model {
      * Obtains the next available VPN ID.
      * @return integer The next available ID number.
      */
-    protected function get_next_vpn_id(): int {
+    public function get_next_vpn_id(): int {
         return openvpn_vpnid_next();
     }
 
@@ -760,7 +760,7 @@ class OpenVPNServer extends Model {
      * Obtains the `dh_length` field choices.
      * @return array An array of current `dh_length` choices for this system
      */
-    protected function get_dh_length_choices(): array {
+    public function get_dh_length_choices(): array {
         # Variables
         global $openvpn_dh_lengths;
         $choices = [];
@@ -777,7 +777,7 @@ class OpenVPNServer extends Model {
      * Obtains the current `ecdh_curve` field choices.
      * @return array An array of the current `ecdh_curve` field choices.
      */
-    protected function get_ecdh_curve_choices(): array {
+    public function get_ecdh_curve_choices(): array {
         return openvpn_get_curvelist();
     }
 
@@ -785,7 +785,7 @@ class OpenVPNServer extends Model {
      * Obtains the available cipher options for this system.
      * @return array An array of available cipher options for this system.
      */
-    protected function get_available_cipher_choices(): array {
+    public function get_available_cipher_choices(): array {
         return openvpn_get_cipherlist();
     }
 
@@ -793,7 +793,7 @@ class OpenVPNServer extends Model {
      * Obtains the available `digest` options for this system.
      * @return array An array of available digest algorithms for this system.
      */
-    protected function get_available_digest_choices(): array {
+    public function get_available_digest_choices(): array {
         return openvpn_get_digestlist();
     }
 
@@ -816,7 +816,7 @@ class OpenVPNServer extends Model {
      */
     public function apply(): void {
         # Delete the old OpenVPN interface if the device mode changed
-        if ($this->initial_object->dev_mode->value !== $this->dev_mode->value) {
+        if ($this->initial_object and $this->initial_object->dev_mode->value !== $this->dev_mode->value) {
             openvpn_delete('server', $this->initial_object->to_internal());
         }
 
