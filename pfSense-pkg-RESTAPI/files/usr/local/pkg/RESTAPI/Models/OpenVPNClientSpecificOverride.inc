@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
@@ -13,8 +13,7 @@ use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 
-class OpenVPNClientSpecificOverride extends Model
-{
+class OpenVPNClientSpecificOverride extends Model {
     public StringField $common_name;
     public BooleanField $disable;
     public BooleanField $block;
@@ -43,26 +42,25 @@ class OpenVPNClientSpecificOverride extends Model
     public StringField $wins_server2;
     public StringField $custom_options;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->many = true;
         $this->config_path = 'openvpn/openvpn-csc';
         $this->always_apply = true;
-        
+
         # Set model fields
         $this->common_name = new StringField(
             required: true,
-            help_text: "The X.509 common name for the client certificate, or the username for VPNs utilizing ".
-                "password authentication."
+            help_text: 'The X.509 common name for the client certificate, or the username for VPNs utilizing ' .
+                'password authentication.',
         );
         $this->disable = new BooleanField(default: false, help_text: 'Disables this client specific override.');
         $this->block = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
-            help_text: "Enables or disables the client from connecting to this server. Do not use this option ".
-                "to permanently disable a client due to a compromised key or password. Use a CRL instead."
+            indicates_true: 'yes',
+            indicates_false: '',
+            help_text: 'Enables or disables the client from connecting to this server. Do not use this option ' .
+                'to permanently disable a client due to a compromised key or password. Use a CRL instead.',
         );
         $this->description = new StringField(
             default: '',
@@ -70,14 +68,14 @@ class OpenVPNClientSpecificOverride extends Model
             help_text: 'The description for this client specific override.',
         );
         $this->server_list = new ForeignModelField(
-            model_name: "OpenVPNServer",
-            model_field: "vpnif",
-            model_field_internal: "vpnid",
+            model_name: 'OpenVPNServer',
+            model_field: 'vpnif',
+            model_field_internal: 'vpnid',
             default: [],
             allow_empty: true,
             many: true,
-            help_text: "The OpenVPN servers that will utilize this override. When no servers are specified, the ".
-                "override will apply to all servers."
+            help_text: 'The OpenVPN servers that will utilize this override. When no servers are specified, the ' .
+                'override will apply to all servers.',
         );
         $this->tunnel_network = new StringField(
             default: '',
@@ -110,7 +108,7 @@ class OpenVPNClientSpecificOverride extends Model
             allow_empty: true,
             many: true,
             validators: [new SubnetValidator(allow_ipv4: true, allow_ipv6: false, allow_alias: true)],
-            help_text: 'The IPv4 client-side networks that will be routed to this client specifically using iroute, '.
+            help_text: 'The IPv4 client-side networks that will be routed to this client specifically using iroute, ' .
                 'so that a site-to-site VPN can be established.',
         );
         $this->remote_networkv6 = new StringField(
@@ -118,7 +116,7 @@ class OpenVPNClientSpecificOverride extends Model
             allow_empty: true,
             many: true,
             validators: [new SubnetValidator(allow_ipv4: false, allow_ipv6: true, allow_alias: true)],
-            help_text: 'The IPv6 client-side networks that will be routed to this client specifically using iroute, '.
+            help_text: 'The IPv6 client-side networks that will be routed to this client specifically using iroute, ' .
                 'so that a site-to-site VPN can be established.',
         );
         $this->gwredir = new BooleanField(
@@ -129,16 +127,16 @@ class OpenVPNClientSpecificOverride extends Model
         );
         $this->push_reset = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
-            help_text: "Enables or disables preventing this client from receiving any server-defined client settings."
+            indicates_true: 'yes',
+            indicates_false: '',
+            help_text: 'Enables or disables preventing this client from receiving any server-defined client settings.',
         );
         $this->remove_route = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
-            help_text: "Enables or disables preventing this client from receiving any server-defined routes ".
-                "without removing any other options."
+            indicates_true: 'yes',
+            indicates_false: '',
+            help_text: 'Enables or disables preventing this client from receiving any server-defined routes ' .
+                'without removing any other options.',
         );
         $this->dns_domain = new StringField(
             default: '',
@@ -223,7 +221,7 @@ class OpenVPNClientSpecificOverride extends Model
             delimiter: ';',
             help_text: 'Additional OpenVPN options to add for this client.',
         );
-        
+
         parent::__construct($id, $parent_id, $data, ...$options);
     }
 }
