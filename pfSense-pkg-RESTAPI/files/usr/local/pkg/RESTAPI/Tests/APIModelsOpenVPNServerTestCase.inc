@@ -413,4 +413,13 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
         $ifconfig = new Command("ifconfig ovpns{$ovpns->vpnid->value}");
         $this->assert_equals($ifconfig->result_code, 1);
     }
+
+    /**
+     * Checks that the `from_internal_vpnif()` method correctly obtains the VPN interface name.
+     */
+    public function test_from_internal_vpnif(): void {
+        $ovpns = new OpenVPNServer();
+        $ovpns->vpnid->value = $ovpns->get_next_vpn_id();
+        $this->assert_equals($ovpns->from_internal_vpnif(), $ovpns::INTERFACE_PREFIX.$ovpns->vpnid->value);
+    }
 }

@@ -17,10 +17,12 @@ use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 
 class OpenVPNServer extends Model {
+    const INTERFACE_PREFIX = "ovpns";
     const STATIC_KEY_PREFIX = '-----BEGIN OpenVPN Static key V1-----';
     const STATIC_KEY_SUFFIX = '-----END OpenVPN Static key V1-----';
 
     public IntegerField $vpnid;
+    public StringField $vpnif;
     public StringField $description;
     public BooleanField $disable;
     public StringField $mode;
@@ -107,6 +109,15 @@ class OpenVPNServer extends Model {
             read_only: true,
             help_text: 'The unique ID for this OpenVPN server. This value is assigned by the ' .
                 'system and cannot be changed.',
+        );
+        $this->vpnif = new StringField(
+            unique: true,
+            default: null, // populated by from_internal_vpnif
+            editable: false,
+            read_only: true,
+            representation_only: true,
+            help_text: "The VPN interface name for this OpenVPN server. This value is assigned by the system and ".
+                "cannot be changed."
         );
         $this->description = new StringField(
             default: '',
@@ -620,6 +631,17 @@ class OpenVPNServer extends Model {
                 response_id: 'OPENVPN_SERVER_TAP_MODE_REQUIRES_TUNNEL_NETWORK_OR_BRIDGE_INTERFACE',
             );
         }
+
+        # Ensure the vpnif field value is populated
+        $this->vpnif->value = self::INTERFACE_PREFIX.$this->vpnid->value;
+    }
+
+    /**
+     * Populate the `vpnif` field value from internal since this is not a stored value.
+     * @return string The `vpnif` value's internal value
+     */
+    public function from_internal_vpnif(): string {
+        return self::INTERFACE_PREFIX.$this->vpnid->value;
     }
 
     /**
