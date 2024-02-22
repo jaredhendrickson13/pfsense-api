@@ -59,7 +59,7 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
     }
 
     /**
-     * Remove the CA used for testing after tests complete.
+     * Remove the CA and cert used for testing after tests complete.
      */
     public function teardown(): void {
         $ca = CertificateAuthority::query(refid: $this->ca_refid)->first();
