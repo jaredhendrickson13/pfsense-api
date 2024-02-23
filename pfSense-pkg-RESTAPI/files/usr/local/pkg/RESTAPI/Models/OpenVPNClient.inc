@@ -34,6 +34,8 @@ class OpenVPNClient extends Model {
     public StringField $proxy_addr;
     public PortField $proxy_port;
     public StringField $proxy_authtype;
+    public StringField $proxy_user;
+    public StringField $proxy_passwd;
     public StringField $auth_user;
     public StringField $auth_pass;
     public BooleanField $auth_retry_none;
@@ -42,40 +44,33 @@ class OpenVPNClient extends Model {
     public StringField $tlsauth_keydir;
     public ForeignModelField $caref;
     public ForeignModelField $certref;
-    # TODO: public ForeignModelField $crlref;
     public StringField $data_ciphers;
     public StringField $data_ciphers_fallback;
     public StringField $digest;
+    public BooleanField $remote_cert_tls;
     public StringField $tunnel_network;
     public StringField $tunnel_networkv6;
     public StringField $remote_network;
     public StringField $remote_networkv6;
-    public IntegerField $maxclients;
+    public IntegerField $use_shaper;
     public StringField $allow_compression;
     public BooleanField $passtos;
-    public BooleanField $client2client;
-    public BooleanField $duplicate_cn;
-    public IntegerField $connlimit;
-    public BooleanField $dynamic_ip;
+    public BooleanField $route_no_pull;
+    public BooleanField $route_no_exec;
+    public BooleanField $dns_add;
     public StringField $topology;
     public IntegerField $inactive_seconds;
     public StringField $ping_method;
     public IntegerField $keepalive_interval;
     public IntegerField $keepalive_timeout;
     public IntegerField $ping_seconds;
-    public BooleanField $ping_push;
     public StringField $ping_action;
     public IntegerField $ping_action_seconds;
-    public BooleanField $ping_action_push;
-    public StringField $dns_domain;
-    public StringField $dns_client1;
-    public StringField $dns_client2;
-    public StringField $dns_client3;
-    public StringField $dns_client4;
-    public BooleanField $push_blockoutsidedns;
-    public BooleanField $push_register_dns;
     public StringField $custom_options;
+    public BooleanField $udp_fast_io;
+    public StringField $exit_notify;
     public IntegerField $sndrcvbuf;
+    public StringField $create_gw;
     public IntegerField $verbosity_level;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
@@ -160,6 +155,17 @@ class OpenVPNClient extends Model {
             choices: ["none", "basic", "ntlm"],
             help_text: "The type of authentication used by the proxy server."
         );
+        $this->proxy_user = new StringField(
+            required: true,
+            conditions: ["!proxy_authtype" => "none"],
+            help_text: "The username to use for authentication to the remote proxy."
+        );
+        $this->proxy_passwd = new StringField(
+            required: true,
+            write_only: true,
+            conditions: ["!proxy_authtype" => "none"],
+            help_text: "The username to use for authentication to the remote proxy."
+        );
         $this->auth_user = new StringField(
             default: null,
             allow_null: true,
@@ -210,7 +216,8 @@ class OpenVPNClient extends Model {
         $this->certref = new ForeignModelField(
             model_name: 'Certificate',
             model_field: 'refid',
-            required: true,
+            default: null,
+            allow_null: true,
             help_text: 'The `refid` of the certificate object to assume as the OpenVPN client certificate.',
         );
         $this->data_ciphers = new StringField(
@@ -231,6 +238,10 @@ class OpenVPNClient extends Model {
             choices_callable: 'get_available_digest_choices',
             help_text: 'The algorithm used to authenticate data channel packets, and control channel packets ' .
                 'if a TLS Key is present.',
+        );
+        $this->remote_cert_tls = new BooleanField(
+            default: true,
+            help_text: 'Enables or disables requiring hosts to have a client certificate to connect.',
         );
         $this->tunnel_network = new StringField(
             default: '',
@@ -264,10 +275,12 @@ class OpenVPNClient extends Model {
                 'one or more CIDR ranges or host/network type aliases. If this is a site-to-site VPN, enter the ' .
                 'remote LAN/s here. May be left empty for non site-to-site VPN.',
         );
-        $this->maxclients = new IntegerField(
+        $this->use_shaper = new IntegerField(
             default: null,
             allow_null: true,
-            help_text: 'the maximum number of clients allowed to concurrently connect to this client.',
+            minimum: 100,
+            maximum: 100000000,
+            help_text: 'Maximum outgoing bandwidth (in bytes per second) for this tunnel. Use `null` no limit.',
         );
         $this->allow_compression = new StringField(
             default: 'no',
@@ -276,6 +289,12 @@ class OpenVPNClient extends Model {
                 'throughput but may allow an attacker to extract secrets if they can control compressed plaintext ' .
                 'traversing the VPN (e.g. HTTP)',
         );
+        $this->topology = new StringField(
+            default: 'subnet',
+            choices: ['subnet', 'net30'],
+            conditions: ['dev_mode' => 'tun'],
+            help_text: 'The method used to supply a virtual adapter IP address to clients when using TUN mode on IPv4.',
+        );
         $this->passtos = new BooleanField(
             default: false,
             indicates_true: 'yes',
@@ -283,34 +302,23 @@ class OpenVPNClient extends Model {
             help_text: 'Enables or disables setting the TOS IP header value of tunnel packets to match the ' .
                 'encapsulated packet value.',
         );
-        $this->client2client = new BooleanField(
+        $this->route_no_pull = new BooleanField(
             default: false,
-            indicates_true: 'yes',
-            indicates_false: '',
-            help_text: 'Enables or disables allowing communication between clients connected to this client.',
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables the servers ability to add routes to the client's routing table."
         );
-        $this->duplicate_cn = new BooleanField(
+        $this->route_no_exec = new BooleanField(
             default: false,
-            help_text: 'Enables or disable allowing the same user to connect multiple times.',
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables adding/removing routes automatically."
         );
-        $this->connlimit = new IntegerField(
-            default: null,
-            allow_null: true,
-            conditions: ['duplicate_cn' => true],
-            help_text: 'The number of concurrent connections a single user can have.',
-        );
-        $this->dynamic_ip = new BooleanField(
+        $this->dns_add = new BooleanField(
             default: false,
-            indicates_true: 'yes',
-            indicates_false: '',
-            help_text: 'Enables or disables allowing connected clients to retain their connections if ' .
-                'their IP address changes.',
-        );
-        $this->topology = new StringField(
-            default: 'subnet',
-            choices: ['subnet', 'net30'],
-            conditions: ['dev_mode' => 'tun'],
-            help_text: 'The method used to supply a virtual adapter IP address to clients when using TUN mode on IPv4.',
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables using the DNS server(s) provided by the OpenVPN server."
         );
         $this->inactive_seconds = new IntegerField(
             default: 300,
@@ -337,13 +345,6 @@ class OpenVPNClient extends Model {
             help_text: 'The number of seconds to accept no packets before sending a ping to the ' .
                 'remote peer over the TCP/UDP control channel.',
         );
-        $this->ping_push = new BooleanField(
-            default: false,
-            indicates_true: 'yes',
-            indicates_false: '',
-            conditions: ['ping_method' => 'ping'],
-            help_text: 'Enables or disables push ping to the VPN client.',
-        );
         $this->ping_action = new StringField(
             default: 'ping_restart',
             choices: ['ping_restart', 'ping_exit'],
@@ -356,70 +357,23 @@ class OpenVPNClient extends Model {
             help_text: 'The number of seconds that must elapse before the ping is considered a timeout and the ' .
                 'configured `ping_action` is performed.',
         );
-        $this->ping_action_push = new BooleanField(
-            default: false,
-            indicates_true: 'yes',
-            indicates_false: '',
-            conditions: ['ping_method' => 'ping'],
-            help_text: 'Enables or disables pushing the ping action to the VPN client.',
-        );
-        $this->dns_domain = new StringField(
-            default: '',
-            allow_empty: true,
-            conditions: ['mode' => ['client_user', 'client_tls_user']],
-            validators: [new HostnameValidator(allow_hostname: true, allow_domain: true, allow_fqdn: true)],
-            help_text: 'The default domain to provide to clients.',
-        );
-        $this->dns_client1 = new StringField(
-            default: '',
-            allow_empty: true,
-            conditions: ['mode' => ['client_user', 'client_tls_user']],
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true)],
-            help_text: 'The primary DNS client to provide to clients.',
-        );
-        $this->dns_client2 = new StringField(
-            default: '',
-            allow_empty: true,
-            conditions: ['mode' => ['client_user', 'client_tls_user']],
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true)],
-            help_text: 'The secondary DNS client to provide to clients.',
-        );
-        $this->dns_client3 = new StringField(
-            default: '',
-            allow_empty: true,
-            conditions: ['mode' => ['client_user', 'client_tls_user']],
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true)],
-            help_text: 'The tertiary DNS client to provide to clients.',
-        );
-        $this->dns_client4 = new StringField(
-            default: '',
-            allow_empty: true,
-            conditions: ['mode' => ['client_user', 'client_tls_user']],
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true)],
-            help_text: 'The quaternary DNS client to provide to clients.',
-        );
-        $this->push_blockoutsidedns = new BooleanField(
-            default: false,
-            indicates_true: 'yes',
-            indicates_false: '',
-            conditions: ['mode' => ['client_user', 'client_tls_user']],
-            help_text: "Enables or disables blocking Windows 10 clients' access to DNS clients except across OpenVPN " .
-                'while connected, forcing clients to use only VPN DNS clients.',
-        );
-        $this->push_register_dns = new BooleanField(
-            default: false,
-            indicates_true: 'yes',
-            indicates_false: '',
-            conditions: ['mode' => ['client_user', 'client_tls_user']],
-            help_text: 'Enables or disables running `net stop dnscache`, `net start dnscache`, `ipconfig /flushdns` ' .
-                'and `ipconfig /registerdns` on connection initiation for Windows clients.',
-        );
         $this->custom_options = new StringField(
             default: [],
             allow_empty: true,
             many: true,
             delimiter: ';',
             help_text: 'Additional options to add to the OpenVPN client configuration.',
+        );
+        $this->udp_fast_io = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables fast I/O operations with UDP writes to tun/tap (Experimental)."
+        );
+        $this->exit_notify = new StringField(
+            default: "none",
+            choices: ["1", "2", "3", "4", "5", "none"],
+            help_text: "The number of times this client will attempt to send an exit notifications."
         );
         $this->sndrcvbuf = new IntegerField(
             default: null,

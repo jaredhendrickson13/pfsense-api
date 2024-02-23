@@ -353,7 +353,7 @@ class OpenVPNServer extends Model {
         $this->maxclients = new IntegerField(
             default: null,
             allow_null: true,
-            help_text: 'the maximum number of clients allowed to concurrently connect to this server.',
+            help_text: 'The maximum number of clients allowed to concurrently connect to this server.',
         );
         $this->allow_compression = new StringField(
             default: 'no',
