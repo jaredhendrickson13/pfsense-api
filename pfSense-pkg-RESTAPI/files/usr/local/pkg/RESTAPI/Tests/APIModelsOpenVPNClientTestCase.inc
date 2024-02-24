@@ -10,8 +10,7 @@ use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\OpenVPNClient;
 use RESTAPI\Models\OpenVPNServer;
 
-class APIModelsOpenVPNClientTestCase extends TestCase
-{
+class APIModelsOpenVPNClientTestCase extends TestCase {
     /**
      * Setup the test environment before starting tests.
      */
@@ -88,7 +87,7 @@ class APIModelsOpenVPNClientTestCase extends TestCase
     public function test_from_internal_vpnif(): void {
         $ovpns = new OpenVPNClient();
         $ovpns->vpnid->value = $ovpns->get_next_vpn_id();
-        $this->assert_equals($ovpns->from_internal_vpnif(), $ovpns::INTERFACE_PREFIX.$ovpns->vpnid->value);
+        $this->assert_equals($ovpns->from_internal_vpnif(), $ovpns::INTERFACE_PREFIX . $ovpns->vpnid->value);
     }
 
     /**

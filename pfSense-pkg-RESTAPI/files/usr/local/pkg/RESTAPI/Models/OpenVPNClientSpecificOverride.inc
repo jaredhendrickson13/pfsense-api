@@ -228,8 +228,7 @@ class OpenVPNClientSpecificOverride extends Model {
     /**
      * Applies changes to this client specific override.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         # Delete the previous CSO if set
         if ($this->initial_object) {
             openvpn_delete_csc($this->initial_object->to_internal());
@@ -243,8 +242,7 @@ class OpenVPNClientSpecificOverride extends Model {
     /**
      * Applies the deletion of this client specific override.
      */
-    public function apply_delete(): void
-    {
+    public function apply_delete(): void {
         openvpn_delete_csc($this->to_internal());
         services_unbound_configure(false);
     }

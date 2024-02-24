@@ -17,7 +17,7 @@ use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 
 class OpenVPNServer extends Model {
-    const INTERFACE_PREFIX = "ovpns";
+    const INTERFACE_PREFIX = 'ovpns';
     const STATIC_KEY_PREFIX = '-----BEGIN OpenVPN Static key V1-----';
     const STATIC_KEY_SUFFIX = '-----END OpenVPN Static key V1-----';
 
@@ -116,8 +116,8 @@ class OpenVPNServer extends Model {
             editable: false,
             read_only: true,
             representation_only: true,
-            help_text: "The VPN interface name for this OpenVPN server. This value is assigned by the system and ".
-                "cannot be changed."
+            help_text: 'The VPN interface name for this OpenVPN server. This value is assigned by the system and ' .
+                'cannot be changed.',
         );
         $this->description = new StringField(
             default: '',
@@ -633,7 +633,7 @@ class OpenVPNServer extends Model {
         }
 
         # Ensure the vpnif field value is populated
-        $this->vpnif->value = self::INTERFACE_PREFIX.$this->vpnid->value;
+        $this->vpnif->value = self::INTERFACE_PREFIX . $this->vpnid->value;
     }
 
     /**
@@ -641,7 +641,7 @@ class OpenVPNServer extends Model {
      * @return string The `vpnif` value's internal value
      */
     public function from_internal_vpnif(): string {
-        return self::INTERFACE_PREFIX.$this->vpnid->value;
+        return self::INTERFACE_PREFIX . $this->vpnid->value;
     }
 
     /**

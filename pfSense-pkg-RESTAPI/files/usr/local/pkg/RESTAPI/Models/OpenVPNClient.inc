@@ -17,7 +17,7 @@ use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 
 class OpenVPNClient extends Model {
-    const INTERFACE_PREFIX = "ovpnc";
+    const INTERFACE_PREFIX = 'ovpnc';
     const STATIC_KEY_PREFIX = '-----BEGIN OpenVPN Static key V1-----';
     const STATIC_KEY_SUFFIX = '-----END OpenVPN Static key V1-----';
 
@@ -94,8 +94,8 @@ class OpenVPNClient extends Model {
             editable: false,
             read_only: true,
             representation_only: true,
-            help_text: "The VPN interface name for this OpenVPN client. This value is assigned by the system and ".
-                "cannot be changed."
+            help_text: 'The VPN interface name for this OpenVPN client. This value is assigned by the system and ' .
+                'cannot be changed.',
         );
         $this->description = new StringField(
             default: '',
@@ -103,11 +103,7 @@ class OpenVPNClient extends Model {
             help_text: 'The description for this OpenVPN client.',
         );
         $this->disable = new BooleanField(default: false, help_text: 'Disables this OpenVPN client.');
-        $this->mode = new StringField(
-            required: true,
-            choices: ['p2p_tls'],
-            help_text: 'The OpenVPN client mode.',
-        );
+        $this->mode = new StringField(required: true, choices: ['p2p_tls'], help_text: 'The OpenVPN client mode.');
         $this->dev_mode = new StringField(
             required: true,
             choices: ['tun', 'tap'],
@@ -130,7 +126,7 @@ class OpenVPNClient extends Model {
         $this->server_addr = new StringField(
             required: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true)],
-            help_text: "The IP address or hostname of the OpenVPN server this client will connect to."
+            help_text: 'The IP address or hostname of the OpenVPN server this client will connect to.',
         );
         $this->local_port = new PortField(
             default: null,
@@ -143,46 +139,46 @@ class OpenVPNClient extends Model {
             default: null,
             allow_null: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true)],
-            help_text: "The address for an HTTP Proxy this client can use to connect to a remote server."
+            help_text: 'The address for an HTTP Proxy this client can use to connect to a remote server.',
         );
         $this->proxy_port = new PortField(
             default: null,
             allow_null: true,
-            help_text: "The port used by the HTTP Proxy."
+            help_text: 'The port used by the HTTP Proxy.',
         );
         $this->proxy_authtype = new StringField(
-            default: "none",
-            choices: ["none", "basic", "ntlm"],
-            help_text: "The type of authentication used by the proxy server."
+            default: 'none',
+            choices: ['none', 'basic', 'ntlm'],
+            help_text: 'The type of authentication used by the proxy server.',
         );
         $this->proxy_user = new StringField(
             required: true,
-            conditions: ["!proxy_authtype" => "none"],
-            help_text: "The username to use for authentication to the remote proxy."
+            conditions: ['!proxy_authtype' => 'none'],
+            help_text: 'The username to use for authentication to the remote proxy.',
         );
         $this->proxy_passwd = new StringField(
             required: true,
             write_only: true,
-            conditions: ["!proxy_authtype" => "none"],
-            help_text: "The username to use for authentication to the remote proxy."
+            conditions: ['!proxy_authtype' => 'none'],
+            help_text: 'The username to use for authentication to the remote proxy.',
         );
         $this->auth_user = new StringField(
             default: null,
             allow_null: true,
-            help_text: "The username used to authenticate with the OpenVPN server."
+            help_text: 'The username used to authenticate with the OpenVPN server.',
         );
         $this->auth_pass = new StringField(
             default: null,
             allow_null: true,
-            conditions: ["!auth_user" => null],
-            help_text: "The password used to authenticate with the OpenVPN server."
+            conditions: ['!auth_user' => null],
+            help_text: 'The password used to authenticate with the OpenVPN server.',
         );
         $this->auth_retry_none = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
-            internal_name: "auth-retry-none",
-            help_text: "Disables retrying authentication if an authentication failed error is received from the server"
+            indicates_true: 'yes',
+            indicates_false: '',
+            internal_name: 'auth-retry-none',
+            help_text: 'Disables retrying authentication if an authentication failed error is received from the server',
         );
         $this->tls = new Base64Field(
             default: null,
@@ -304,21 +300,21 @@ class OpenVPNClient extends Model {
         );
         $this->route_no_pull = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
-            help_text: "Enables or disables the servers ability to add routes to the client's routing table."
+            indicates_true: 'yes',
+            indicates_false: '',
+            help_text: "Enables or disables the servers ability to add routes to the client's routing table.",
         );
         $this->route_no_exec = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
-            help_text: "Enables or disables adding/removing routes automatically."
+            indicates_true: 'yes',
+            indicates_false: '',
+            help_text: 'Enables or disables adding/removing routes automatically.',
         );
         $this->dns_add = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
-            help_text: "Enables or disables using the DNS server(s) provided by the OpenVPN server."
+            indicates_true: 'yes',
+            indicates_false: '',
+            help_text: 'Enables or disables using the DNS server(s) provided by the OpenVPN server.',
         );
         $this->inactive_seconds = new IntegerField(
             default: 300,
@@ -366,14 +362,14 @@ class OpenVPNClient extends Model {
         );
         $this->udp_fast_io = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            indicates_false: "",
-            help_text: "Enables or disables fast I/O operations with UDP writes to tun/tap (Experimental)."
+            indicates_true: 'yes',
+            indicates_false: '',
+            help_text: 'Enables or disables fast I/O operations with UDP writes to tun/tap (Experimental).',
         );
         $this->exit_notify = new StringField(
-            default: "none",
-            choices: ["1", "2", "3", "4", "5", "none"],
-            help_text: "The number of times this client will attempt to send an exit notifications."
+            default: 'none',
+            choices: ['1', '2', '3', '4', '5', 'none'],
+            help_text: 'The number of times this client will attempt to send an exit notifications.',
         );
         $this->sndrcvbuf = new IntegerField(
             default: null,
@@ -406,7 +402,7 @@ class OpenVPNClient extends Model {
         }
 
         # Ensure the vpnif field value is populated
-        $this->vpnif->value = self::INTERFACE_PREFIX.$this->vpnid->value;
+        $this->vpnif->value = self::INTERFACE_PREFIX . $this->vpnid->value;
     }
 
     /**
@@ -414,7 +410,7 @@ class OpenVPNClient extends Model {
      * @return string The `vpnif` value's internal value
      */
     public function from_internal_vpnif(): string {
-        return self::INTERFACE_PREFIX.$this->vpnid->value;
+        return self::INTERFACE_PREFIX . $this->vpnid->value;
     }
 
     /**

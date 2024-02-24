@@ -420,6 +420,6 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
     public function test_from_internal_vpnif(): void {
         $ovpns = new OpenVPNServer();
         $ovpns->vpnid->value = $ovpns->get_next_vpn_id();
-        $this->assert_equals($ovpns->from_internal_vpnif(), $ovpns::INTERFACE_PREFIX.$ovpns->vpnid->value);
+        $this->assert_equals($ovpns->from_internal_vpnif(), $ovpns::INTERFACE_PREFIX . $ovpns->vpnid->value);
     }
 }
