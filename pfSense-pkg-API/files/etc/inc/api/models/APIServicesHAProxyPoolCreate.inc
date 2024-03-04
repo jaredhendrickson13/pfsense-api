@@ -116,7 +116,7 @@ class APIServicesHAProxyPoolCreate extends APIModel {
             $this->validated_data['name'] = $this->initial_data['name'];
         }
 
-        if (isset($this->initial_data['external_ref_tag']) {
+        if (isset($this->initial_data['external_ref_tag'])) {
             if (ctype_alnum($this->initial_data['external_ref_tag'])) {
                 $this->validated_data['external_ref_tag'] = $this->initial_data['external_ref_tag'];
             } else {
