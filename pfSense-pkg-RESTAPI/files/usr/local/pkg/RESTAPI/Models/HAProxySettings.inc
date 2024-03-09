@@ -135,7 +135,11 @@ class HAProxySettings extends Model
             validators: [new HostnameValidator()],
             help_text: "The hostname field to include in the syslog header. Leave empty to use the system hostname."
         );
-        # $this->dns_resolvers = new NestedModelField();
+        $this->dns_resolvers = new NestedModelField(
+            model_class: "HAProxyDNSResolver",
+            default: [],
+            help_text: "The DNS resolvers HAProxy will use for DNS queries."
+        );
         $this->resolver_retries = new IntegerField(
             default: 3,
             help_text: "The number of queries to send to resolve a server name before giving up."
@@ -148,7 +152,11 @@ class HAProxySettings extends Model
             default: "1s",
             help_text: "The interval between two successive name resolution when the last answer was valid."
         );
-        # $this->email_mailers = new NestedModelField();
+        $this->email_mailers = new NestedModelField(
+            model_class: "HAProxyEmailMailer",
+            default: [],
+            help_text: "The email servers HAProxy will use to send SMTP alerts."
+        );
         $this->email_level = new StringField(
             default: "",
             choices: ["", "emerg", "alert", "crit", "err", "warning", "notice", "info", "debug"],
