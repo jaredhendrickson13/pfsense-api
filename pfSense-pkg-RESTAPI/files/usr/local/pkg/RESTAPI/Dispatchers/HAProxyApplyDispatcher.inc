@@ -6,7 +6,7 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Dispatcher;
 
-class HAProxySettingsApplyDispatcher extends Dispatcher {
+class HAProxyApplyDispatcher extends Dispatcher {
     public int $max_concurrency = 1; // Only allow one HAProxy process to run at a time
     protected array $required_packages = ['pfSense-pkg-haproxy'];
     protected array $package_includes = ["haproxy/haproxy.inc", "haproxy/haproxy_utils.inc"];
@@ -16,6 +16,10 @@ class HAProxySettingsApplyDispatcher extends Dispatcher {
      */
     protected function _process(mixed ...$arguments): void {
         $msg = null; // Needs a variable to pass into haproxy_check_and_run()
-        haproxy_check_and_run($msg, true);
+        $result = haproxy_check_and_run($msg, true);
+        
+        if ($result) {
+            unlink_if_exists("/var/run/haproxy.conf.dirty");
+        }
     }
 }

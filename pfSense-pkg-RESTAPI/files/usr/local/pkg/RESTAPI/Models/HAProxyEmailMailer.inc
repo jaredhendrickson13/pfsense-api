@@ -3,7 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
-use RESTAPI\Dispatchers\HAProxySettingsApplyDispatcher;
+use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
@@ -26,6 +26,7 @@ class HAProxyEmailMailer extends Model
         # Set model fields
         $this->name = new StringField(
             required: true,
+            unique: true,
             allow_empty: true,
             help_text: "The descriptive name for this mail server."
         );
@@ -48,6 +49,6 @@ class HAProxyEmailMailer extends Model
      * Applies changes to the HAProxy configuration.
      */
     public function apply(): void {
-        (new HAProxySettingsApplyDispatcher(async: $this->async))->spawn_process();
+        (new HAProxyApply(async: $this->async))->apply();
     }
 }

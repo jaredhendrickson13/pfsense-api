@@ -3,7 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
-use RESTAPI\Dispatchers\HAProxySettingsApplyDispatcher;
+use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
@@ -204,11 +204,11 @@ class HAProxySettings extends Model
         
         parent::__construct($id, $parent_id, $data, ...$options);
     }
-    
+
     /**
      * Applies changes to the HAProxy configuration.
      */
     public function apply(): void {
-        (new HAProxySettingsApplyDispatcher(async: $this->async))->spawn_process();
+        (new HAProxyApply(async: $this->async))->apply();
     }
 }
