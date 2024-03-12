@@ -21,7 +21,7 @@ class HAProxySettings extends Model
     public IntegerField $maxconn;
     public IntegerField $nbthread;
     public BooleanField $terminate_on_reload;
-    public StringField $hardstopafter;
+    public StringField $hard_stop_after;
     public ForeignModelField $carpdev;
     public PortField $localstatsport;
     public IntegerField $localstats_refreshtime;
@@ -70,7 +70,7 @@ class HAProxySettings extends Model
             default: false,
             help_text: "Enables or disables an immediate stop of old process on reload. (closes existing connections)"
         );
-        $this->hardstopafter = new StringField(
+        $this->hard_stop_after = new StringField(
             default: "15m",
             help_text: "The maximum time allowed to perform a clean soft-stop. This can be represented as different ".
                 "time values such as 30s, 15m, 3h or 1d."
@@ -209,6 +209,7 @@ class HAProxySettings extends Model
      * Applies changes to the HAProxy configuration.
      */
     public function apply(): void {
-        (new HAProxyApply(async: $this->async))->apply();
+        touch("/var/run/haproxy.conf.dirty");
+        (new HAProxyApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
