@@ -3,6 +3,8 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Fields\BooleanField;
+use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\RegexValidator;
@@ -12,7 +14,11 @@ class HAProxyBackend extends Model
     public StringField $name;
     public NestedModelField $servers;
     public StringField $balance;
-    
+    public IntegerField $balance_urilen;
+    public IntegerField $balance_uridepth;
+    public BooleanField $balance_uriwhole;
+    public NestedModelField $acls;
+
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
     {
         # Set model attributes
@@ -33,6 +39,37 @@ class HAProxyBackend extends Model
             default: [],
             allow_empty: true,
             help_text: "The pool of servers this backend will use."
+        );
+        $this->balance = new StringField(
+            default: "",
+            choices: ["", "roundrobin", "static-rr", "leastconn", "source", "uri"],
+            help_text: "The load balancing option to use for servers assigned to this backend."
+        );
+        $this->balance_urilen = new IntegerField(
+            default: null,
+            allow_null: true,
+            conditions: ["balance" => "uri"],
+            help_text: "The number of URI characters the algorithm should consider when hashing."
+        );
+        $this->balance_uridepth = new IntegerField(
+            default: null,
+            allow_null: true,
+            conditions: ["balance" => "uri"],
+            help_text: "The maximum directory depth to be used to compute the hash. One level is counted for each ".
+                "slash in the request."
+        );
+        $this->balance_uriwhole = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["balance" => "uri"],
+            help_text: "Enables or disables allowing the use of whole URIs, including URL parameters."
+        );
+        $this->acls = new NestedModelField(
+            model_class: "HAProxyBackendACL",
+            default: [],
+            allow_empty: true,
+            help_text: "The ACLs to apply to this backend."
         );
         
         
