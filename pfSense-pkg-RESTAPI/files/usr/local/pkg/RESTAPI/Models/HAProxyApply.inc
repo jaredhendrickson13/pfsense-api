@@ -6,25 +6,23 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 
-class HAProxyApply extends Model
-{
+class HAProxyApply extends Model {
     public BooleanField $applied;
-    
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
-        $this->internal_callable = "get_applied_status";
+        $this->internal_callable = 'get_applied_status';
         $this->always_apply = true;
         $this->many = false;
-        
+
         # Set model fields
         $this->applied = new BooleanField(
             read_only: true,
             indicates_true: true,
             indicates_false: false,
-            help_text: "Indicates whether all HAProxy configuration changes have been applied."
+            help_text: 'Indicates whether all HAProxy configuration changes have been applied.',
         );
-        
+
         parent::__construct($id, $parent_id, $data, $options);
     }
 
@@ -33,19 +31,20 @@ class HAProxyApply extends Model
      * @return array An array containing the internal values for this Model's fields.
      */
     protected function get_applied_status(): array {
-        return ["applied" => !is_file("/var/run/haproxy.conf.dirty")];
+        return ['applied' => !is_file('/var/run/haproxy.conf.dirty')];
     }
 
     /**
      * Overrides the default _create method to do nothing. We only want to apply.
      */
-    public function _create(){}
+    public function _create() {
+    }
 
     /**
      * Applies changes to the HAProxy configuration.
      */
     public function apply(): void {
-        touch("/var/run/haproxy.conf.dirty");
+        touch('/var/run/haproxy.conf.dirty');
         (new HAProxyApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

@@ -16,7 +16,7 @@ jobs:
         include:
           - freebsd_version: FreeBSD-14.0-CURRENT
             pfsense_version: 2.7.2
-        
+
     steps:
       - uses: actions/checkout@v3
       - name: Setup FreeBSD build VM

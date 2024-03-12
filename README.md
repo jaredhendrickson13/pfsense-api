@@ -23,7 +23,7 @@ configuration, authentication, and usage of the pfSense REST API.
 
 > [!WARNING]
 > This package may work on other architectures such as arm64 and aarch64, but compatibility is untested and therefor not
-guaranteed.
+> guaranteed.
 
 ## Installation
 
@@ -95,20 +95,19 @@ endpoint. This endpoint will always require the use of the Local Database authen
 example:
 
 1. Request a JWT
-    ```bash
-    curl -u admin:pfsense -X POST https://pfsense.example.com/api/v2/auth/jwt
-    ```
+   ```bash
+   curl -u admin:pfsense -X POST https://pfsense.example.com/api/v2/auth/jwt
+   ```
 2. Use the obtained JWT for API calls:
-    ```bash
-    curl -H "Authorization: Bearer xxxxx.xxxxxx.xxxxxx" -X GET https://pfsense.example.com/api/v2/diagnostics/arp_table
-    ```
+   ```bash
+   curl -H "Authorization: Bearer xxxxx.xxxxxx.xxxxxx" -X GET https://pfsense.example.com/api/v2/diagnostics/arp_table
+   ```
 
 - To configure the JWT expiration time, navigate to 'System > REST API' within the webConfigurator and configure the JWT
   Expiration value. Alternatively, you can use the /api/v2/system/restapi/settings endpoint to update the `jwt_exp`
   value.
 
 </details>
-
 
 <details>
     <summary>Key</summary>
@@ -148,9 +147,9 @@ is `application/json`, but other supported types include:
 
 - Parses the request body as a JSON formatted string:
 
-    ```bash
-    curl -u admin:pfsense -H "Content-Type: application/json" -d '{"name": "sshd", "action": "restart"}' -X POST https://pfsense.example.com/api/v2/status/service
-    ```
+  ```bash
+  curl -u admin:pfsense -H "Content-Type: application/json" -d '{"name": "sshd", "action": "restart"}' -X POST https://pfsense.example.com/api/v2/status/service
+  ```
 
 </details>
 
@@ -159,14 +158,13 @@ is `application/json`, but other supported types include:
 
 - Parses the request body as URL encoded parameters:
 
-    ```bash
-    curl -u admin:pfsense -H "Content-Type: application/x-www-form-urlencoded" -X POST https://pfsense.example.com/api/v2/status/service?name=sshd&action=restart
-    ```
+  ```bash
+  curl -u admin:pfsense -H "Content-Type: application/x-www-form-urlencoded" -X POST https://pfsense.example.com/api/v2/status/service?name=sshd&action=restart
+  ```
 
 </details>
 
-> [!IMPORTANT]
-> `application/x-www-form-urlencoded` is suitable for GET or DELETE requests with string, integer, or boolean
+> [!IMPORTANT] > `application/x-www-form-urlencoded` is suitable for GET or DELETE requests with string, integer, or boolean
 > data types.
 
 ## Queries
@@ -186,8 +184,8 @@ query filter is specified.
 
 - Name: `exact`
 - Examples:
-    - `https://pfsense.example.com/api/v2/examples?fieldname=example`
-    - `https://pfsense.example.com/api/v2/examples?fieldname__exact=example`
+  - `https://pfsense.example.com/api/v2/examples?fieldname=example`
+  - `https://pfsense.example.com/api/v2/examples?fieldname__exact=example`
 
 ### Starts With
 
@@ -251,9 +249,9 @@ fields.
 ### Pagination
 
 Pagination comes built-in and is a fantastic tool to help manage the number of objects fetched from the
-API at a time, giving you greater control over your application's performance during integration. To make use of 
-pagination, just toss in the `limit` query parameter to specify how many objects you want in one go, and add the `offset` 
-query parameter to specify where in the dataset you'd like to start fetching objects. Pagination is only performed 
+API at a time, giving you greater control over your application's performance during integration. To make use of
+pagination, just toss in the `limit` query parameter to specify how many objects you want in one go, and add the `offset`
+query parameter to specify where in the dataset you'd like to start fetching objects. Pagination is only performed
 when one of these query parameters is provided. Make navigating through your data a breeze!
 
 > [!NOTE]
@@ -261,8 +259,8 @@ when one of these query parameters is provided. Make navigating through your dat
 
 ## HATEOAS
 
-The REST API designed to effortlessly incorporate HATEOAS using HAL (Hypertext Application Language) standards, 
-complemented by a few custom enhancements. As you receive a response, you'll find handy links to related resources, 
+The REST API designed to effortlessly incorporate HATEOAS using HAL (Hypertext Application Language) standards,
+complemented by a few custom enhancements. As you receive a response, you'll find handy links to related resources,
 making navigation a breeze and granting swift access to additional, relevant information. This reduces the need for
 applications to hardcode URLs for related items.
 
@@ -272,8 +270,8 @@ applications to hardcode URLs for related items.
 > response schemas.
 
 > [!WARNING]
-> Depending on the size of your pfSense instance's configuration, enabling HATEOAS can dramatically increase the size 
-> of API responses and may increase API response times. 
+> Depending on the size of your pfSense instance's configuration, enabling HATEOAS can dramatically increase the size
+> of API responses and may increase API response times.
 
 ### Link types
 
@@ -315,7 +313,6 @@ route.
 #### pfsense:service:ACTION
 
 Provides links to start, stop, and/or restart services associated with the API response.
-
 
 ## Limitations
 

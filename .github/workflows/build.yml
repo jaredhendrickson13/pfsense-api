@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - 'master'
+      - "master"
 
 # Commit SHAs may differ when trigger via pull request vs workflow_dispatch, ensure the correct commit is referenced.
 env:
   commit_id: "${{ github.event.pull_request.head.sha || github.sha }}"
   build_version: "0.0_0-dev-${{ github.event.pull_request.head.sha || github.sha }}"
-  
+
 jobs:
   build:
     runs-on: self-hosted

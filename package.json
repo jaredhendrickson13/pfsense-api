@@ -1,2 +1,5 @@
-{"devDependencies":{"@prettier/plugin-php":"^0.22.1"}}
-
+{
+  "devDependencies": {
+    "@prettier/plugin-php": "^0.22.1"
+  }
+}
