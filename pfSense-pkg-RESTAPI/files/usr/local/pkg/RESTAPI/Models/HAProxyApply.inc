@@ -23,7 +23,7 @@ class HAProxyApply extends Model {
             help_text: 'Indicates whether all HAProxy configuration changes have been applied.',
         );
 
-        parent::__construct($id, $parent_id, $data, $options);
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
@@ -44,7 +44,6 @@ class HAProxyApply extends Model {
      * Applies changes to the HAProxy configuration.
      */
     public function apply(): void {
-        touch('/var/run/haproxy.conf.dirty');
         (new HAProxyApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

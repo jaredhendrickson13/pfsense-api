@@ -222,10 +222,16 @@ class HAProxySettings extends Model {
     }
 
     /**
+     * Ensures haproxy is marked as dirty before applying.
+     */
+    public function pre_apply(): void {
+        touch('/var/run/haproxy.conf.dirty');
+    }
+
+    /**
      * Applies changes to the HAProxy configuration.
      */
     public function apply(): void {
-        touch('/var/run/haproxy.conf.dirty');
         (new HAProxyApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
