@@ -7,6 +7,7 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\RegexValidator;
 
 class HAProxyBackend extends Model
@@ -22,6 +23,13 @@ class HAProxyBackend extends Model
     public IntegerField $server_timeout;
     public IntegerField $retries;
     public StringField $check_type;
+    public IntegerField $checkinter;
+    public BooleanField $log_health_checks;
+    public StringField $httpcheck_method;
+    public StringField $monitor_uri;
+    public StringField $monitor_httpversion;
+    public StringField $monitor_username;
+    public StringField $monitor_domain;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
     {
@@ -95,9 +103,50 @@ class HAProxyBackend extends Model
             choices: ['none', 'Basic', 'HTTP', 'LDAP', 'MySQL', 'PostgreSQL', 'Redis', 'SMTP', 'ESMTP', 'SSL'],
             help_text: "The health check method to use when checking the health of backend servers."
         );
-        
-        
-        
+        $this->checkinter = new IntegerField(
+            default: null,
+            allow_null: true,
+            conditions: ["!check_type" => "none"],
+            help_text: "The interval (in milliseconds) in which health checks will be performed."
+        );
+        $this->log_health_checks = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["!check_type" => "none"],
+            help_text: "Enables or disables logging changes to the health check status"
+        );
+        $this->httpcheck_method = new StringField(
+            default: "OPTIONS",
+            choices: ["OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE", "TRACE"],
+            conditions: ["check_type" => "HTTP"],
+            help_text: "The HTTP method to use for HTTP health checks."
+        );
+        $this->monitor_uri = new StringField(
+            default: "/",
+            allow_empty: true,
+            conditions: ["check_type" => "HTTP"],
+            help_text: "The URL to use for HTTP health checks."
+        );
+        $this->monitor_httpversion = new StringField(
+            default: "HTTP/1.0",
+            allow_empty: true,
+            conditions: ["check_type" => "HTTP"],
+            help_text: "The HTTP version to use for HTTP health checks."
+        );
+        $this->monitor_username = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["check_type" => ["MySQL", "PostgreSQL"]],
+            help_text: "The username to use for MySQL or PostgreSQL health checks."
+        );
+        $this->monitor_domain = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["check_type" => ["SMTP", "ESMTP"]],
+            validators: [new HostnameValidator(allow_hostname: true, allow_domain: true, allow_fqdn: true)],
+            help_text: "The domain to use for SMTP or ESMTP health checks."
+        );
         
         parent::__construct($id, $parent_id, $data, ...$options);
     }
