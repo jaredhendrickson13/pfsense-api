@@ -18,6 +18,10 @@ class HAProxyBackend extends Model
     public IntegerField $balance_uridepth;
     public BooleanField $balance_uriwhole;
     public NestedModelField $acls;
+    public IntegerField $connection_timeout;
+    public IntegerField $server_timeout;
+    public IntegerField $retries;
+    public StringField $check_type;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
     {
@@ -71,6 +75,28 @@ class HAProxyBackend extends Model
             allow_empty: true,
             help_text: "The ACLs to apply to this backend."
         );
+        $this->connection_timeout = new IntegerField(
+            default: 30000,
+            allow_null: true,
+            help_text: "The amount of time (in milliseconds) to wait before giving up on connections."
+        );
+        $this->server_timeout = new IntegerField(
+            default: 30000,
+            allow_null: true,
+            help_text: "The amount of time (in milliseconds) to wait for data transferred to or from the server."
+        );
+        $this->retries = new IntegerField(
+            default: null,
+            allow_null: true,
+            help_text: "The number of retry attempts to allow after a connection failure to the server."
+        );
+        $this->check_type = new StringField(
+            default: "none",
+            choices: ['none', 'Basic', 'HTTP', 'LDAP', 'MySQL', 'PostgreSQL', 'Redis', 'SMTP', 'ESMTP', 'SSL'],
+            help_text: "The health check method to use when checking the health of backend servers."
+        );
+        
+        
         
         
         parent::__construct($id, $parent_id, $data, ...$options);
