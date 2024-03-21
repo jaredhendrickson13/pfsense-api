@@ -65,6 +65,7 @@ class HAProxyBackend extends Model {
     public StringField $stats_desc;
     public IntegerField $stats_refresh;
     public IntegerField $strict_transport_security;
+    public NestedModelField $errorfiles;
     public BooleanField $cookie_attribute_secure;
     public StringField $advanced;
     public StringField $advanced_backend;
@@ -402,6 +403,12 @@ class HAProxyBackend extends Model {
             default: 10,
             conditions: ['stats_enabled' => true],
             help_text: 'The interval (in seconds) in which the stats page is refreshed.',
+        );
+        $this->errorfiles = new NestedModelField(
+            model_class: 'HAProxyBackendErrorFile',
+            default: [],
+            allow_empty: true,
+            help_text: "The HAProxy error file mappings to use for this backend."
         );
         $this->strict_transport_security = new IntegerField(
             default: null,
