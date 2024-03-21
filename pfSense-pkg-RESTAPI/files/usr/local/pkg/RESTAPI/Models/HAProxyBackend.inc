@@ -3,10 +3,14 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
+use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\NestedModelField;
+use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\RegexValidator;
 
@@ -30,6 +34,45 @@ class HAProxyBackend extends Model
     public StringField $monitor_httpversion;
     public StringField $monitor_username;
     public StringField $monitor_domain;
+    public BooleanField $agent_checks;
+    public PortField $agent_port;
+    public IntegerField $agent_inter;
+    public BooleanField $persist_cookie_enabled;
+    public StringField $persist_cookie_name;
+    public StringField $persist_cookie_mode;
+    public BooleanField $persist_cookie_cachable;
+    public BooleanField $persist_cookie_postonly;
+    public BooleanField $persist_cookie_httponly;
+    public BooleanField $persist_cookie_secure;
+    public IntegerField $haproxy_cookie_maxidle;
+    public IntegerField $haproxy_cookie_maxlife;
+    public StringField $haproxy_cookie_domains;
+    public StringField $haproxy_cookie_dynamic_cookie_key;
+    public StringField $persist_sticky_type;
+    public StringField $persist_stick_expire;
+    public StringField $persist_stick_tablesize;
+    public StringField $persist_stick_cookiename;
+    public IntegerField $persist_stick_length;
+    public StringField $email_level;
+    public StringField $email_to;
+    public BooleanField $stats_enabled;
+    public StringField $stats_uri;
+    public StringField $stats_scope;
+    public StringField $stats_realm;
+    public StringField $stats_username;
+    public StringField $stats_password;
+    public StringField $stats_admin;
+    public StringField $stats_node;
+    public StringField $stats_desc;
+    public IntegerField $stats_refresh;
+    public IntegerField $strict_transport_security;
+    public BooleanField $cookie_attribute_secure;
+    public StringField $advanced;
+    public StringField $advanced_backend;
+    public BooleanField $transparent_clientip;
+    public InterfaceField $transparent_interface;
+    
+    
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
     {
@@ -147,7 +190,273 @@ class HAProxyBackend extends Model
             validators: [new HostnameValidator(allow_hostname: true, allow_domain: true, allow_fqdn: true)],
             help_text: "The domain to use for SMTP or ESMTP health checks."
         );
+        $this->agent_checks = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables using a TCP connection to read an ASCII string of the form."
+        );
+        $this->agent_port = new PortField(
+            required: true,
+            allow_alias: false,
+            allow_range: false,
+            conditions: ["agent_checks" => true]
+        );
+        $this->agent_inter = new IntegerField(
+            default: 2000,
+            allow_null: true,
+            conditions: ["agent_checks" => true],
+            help_text: "The interval (in milliseconds) between agent checks."
+        );
+        $this->persist_cookie_enabled = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables cookie based persistence."
+        );
+        $this->persist_cookie_name = new StringField(
+            required: true,
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "The string name to track in Set-Cookie and Cookie HTTP headers."
+        );
+        $this->persist_cookie_mode = new StringField(
+            default: "passive",
+            choices: [
+                "passive",
+                "passive-silent",
+                "reset",
+                "set",
+                "set-silent",
+                "insert-only",
+                "insert-only-silent",
+                "session-prefix",
+                "passive-session-prefix"
+            ],
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "The mode HAProxy uses to insert/prefix/replace or examine cookie and set-cookie headers."
+        );
+        $this->persist_cookie_cachable = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "Enables or disables allowing shared caches to cache the server response."
+        );
+        $this->persist_cookie_postonly = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "Enables or disables only inserting cookies on POST requests."
+        );
+        $this->persist_cookie_httponly = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "Enables or disables preventing the use of cookies with non-HTTP components."
+        );
+        $this->persist_cookie_secure = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "Enables or disables prevention of cookie usage over non-secure channels."
+        );
+        $this->haproxy_cookie_maxidle = new IntegerField(
+            default: null,
+            allow_null: true,
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "The max-idle time to allow. This option only applies to insert mode cookies."
+        );
+        $this->haproxy_cookie_maxlife = new IntegerField(
+            default: null,
+            allow_null: true,
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "The max-life time to allow. This option only applies to insert mode cookies."
+        );
+        $this->haproxy_cookie_domains = new StringField(
+            default: [],
+            allow_empty: true,
+            many: true,
+            delimiter: " ",
+            conditions: ["persist_cookie_enabled" => true],
+            validators: [new HostnameValidator(allow_hostname: true, allow_domain: true, allow_fqdn: true)],
+            help_text: "The domains to set the cookies for."
+        );
+        $this->haproxy_cookie_dynamic_cookie_key = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["persist_cookie_enabled" => true],
+            help_text: "The dynamic cookie secret key. This is will be used to generate dynamic cookies ".
+                "for this backend."
+        );
+        $this->persist_sticky_type = new StringField(
+            default: "none",
+            choices: [
+                "none",
+                "stick_sslsessionid",
+                "stick_sourceipv4",
+                "stick_sourceipv6",
+                "stick_cookie_value",
+                "stick_rdp_cookie"
+            ],
+            help_text: "The sticky table mode to use for this backend. These options are used to make sure subsequent ".
+                "requests from a single client go to the same backend."
+        );
+        $this->persist_stick_expire = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["!persist_sticky_type" => "none"],
+            help_text: "The maximum duration of an entry in the stick-table since it was last created, ".
+                "refreshed or matched."
+        );
+        $this->persist_stick_tablesize = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["!persist_sticky_type" => "none"],
+            help_text: "The maximum number of entries allowed in the table. This value directly impacts memory usage."
+        );
+        $this->persist_stick_cookiename = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["persist_sticky_type" => ["stick_cookie_value", "stick_rdp_cookie"]],
+            help_text: "The cookie name to use for stick table."
+        );
+        $this->persist_stick_length = new IntegerField(
+            default: null,
+            allow_null: true,
+            conditions: ["persist_sticky_type" => ["stick_cookie_value", "stick_rdp_cookie"]],
+            help_text: "The maximum number of characters allowed in a string type stick table"
+        );
+        $this->email_level = new StringField(
+            default: '',
+            choices: ['', 'dontlog', 'emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug'],
+            allow_empty: true,
+            help_text: 'The maximum log level to send emails for. Leave empty to disable sending email alerts. If '.
+                "left empty, the value set in the global settings will be used.",
+        );
+        $this->email_to = new StringField(
+            default: '',
+            allow_empty: true,
+            validators: [new EmailAddressValidator()],
+            help_text: "The email address to send emails to. If left empty, the value set in the ".
+                "global settings will be used."
+        );
+        $this->stats_enabled = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables the HAProxy statistics page for this backend."
+        );
+        $this->stats_uri = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["stats_enabled" => true],
+            help_text: "The statistics URL for this backend."
+        );
+        $this->stats_scope = new StringField(
+            default: [],
+            allow_empty: true,
+            many: true,
+            delimiter: ",",
+            conditions: ["stats_enabled" => true],
+            help_text: "The frontends and backends stats to be shown, leave empty to show all."
+        );
+        $this->stats_realm = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["stats_enabled" => true],
+            help_text: "The realm that is shown when authentication is requested by HAProxy."
+        );
+        $this->stats_username = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["stats_enabled" => true],
+            help_text: "The stats page username"
+        );
+        $this->stats_password = new StringField(
+            default: "",
+            allow_empty: true,
+            write_only: true,
+            conditions: ["stats_enabled" => true],
+            help_text: "The stats page password."
+        );
+        $this->stats_admin = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["stats_enabled" => true],
+            help_text: "The admin to make use of the options disable/enable/softstop/softstart/killsessions ".
+                "from the stats page."
+        );
+        $this->stats_node = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["stats_enabled" => true],
+            help_text: "The short name displayed in stats and helps differentiate which server in the ".
+                "cluster is actually serving clients."
+        );
+        $this->stats_desc = new StringField(
+            default: "",
+            allow_empty: true,
+            conditions: ["stats_enabled" => true],
+            help_text: "The verbose description for this node."
+        );
+        $this->stats_refresh = new IntegerField(
+            default: 10,
+            conditions: ["stats_enabled" => true],
+            help_text: "The interval (in seconds) in which the stats page is refreshed."
+        );
+        $this->strict_transport_security = new IntegerField(
+            default: null,
+            allow_null: true,
+            minimum: 1,
+            maximum: 1000000000,
+            help_text: "The HSTS validity period for this backend. Leave empty to disable HSTS."
+        );
+        $this->cookie_attribute_secure = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables assigning the secure attributes on cookies for this backend."
+        );
+        $this->advanced = new StringField(
+            default: "",
+            allow_empty: true,
+            help_text: "The per server pass thru to apply to each server line."
+        );
+        $this->advanced_backend = new StringField(
+            default: "",
+            allow_empty: true,
+            help_text: "The backend pass thru to apply to the backend section."
+        );
+        $this->transparent_clientip = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            help_text: "Enables or disables using the client-IP to connect to backend servers."
+        );
+        $this->transparent_interface = new InterfaceField(
+            default: null,
+            allow_null: true,
+            conditions: ["transparent_clientip" => true],
+            help_text: "The interface that will connect to the backend server."
+        );
         
         parent::__construct($id, $parent_id, $data, ...$options);
+    }
+
+    /**
+     * Ensures haproxy is marked as dirty before applying.
+     */
+    public function pre_apply(): void {
+        touch('/var/run/haproxy.conf.dirty');
+    }
+
+    /**
+     * Applies changes to the HAProxy configuration.
+     */
+    public function apply(): void {
+        (new HAProxyApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
