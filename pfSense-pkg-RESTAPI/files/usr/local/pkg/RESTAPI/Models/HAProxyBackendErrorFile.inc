@@ -7,35 +7,33 @@ use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 
-class HAProxyBackendErrorFile extends Model
-{
+class HAProxyBackendErrorFile extends Model {
     public IntegerField $errorcode;
     public ForeignModelField $errorfile;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->parent_model_class = 'HAProxyBackend';
-        $this->config_path = "errorfiles/item";
+        $this->config_path = 'errorfiles/item';
         $this->packages = ['pfSense-pkg-haproxy'];
         $this->package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
         $this->many = true;
-        
+
         # Set model fields
         $this->errorcode = new IntegerField(
             required: true,
             unique: true,
             minimum: 100,
             maximum: 511,
-            help_text: "The HTTP status code that will trigger this error file to be used."
+            help_text: 'The HTTP status code that will trigger this error file to be used.',
         );
         $this->errorfile = new ForeignModelField(
             model_name: 'HAProxyFile',
             model_field: 'name',
             required: true,
-            help_text: 'The HAProxy error file object that should be used for the assigned HTTP status code.'
+            help_text: 'The HAProxy error file object that should be used for the assigned HTTP status code.',
         );
-        
+
         parent::__construct($id, $parent_id, $data, ...$options);
     }
 

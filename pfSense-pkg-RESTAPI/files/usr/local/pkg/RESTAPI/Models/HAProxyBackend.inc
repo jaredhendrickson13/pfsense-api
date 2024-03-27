@@ -415,7 +415,7 @@ class HAProxyBackend extends Model {
             model_class: 'HAProxyBackendErrorFile',
             default: [],
             allow_empty: true,
-            help_text: "The HAProxy error file mappings to use for this backend."
+            help_text: 'The HAProxy error file mappings to use for this backend.',
         );
         $this->strict_transport_security = new IntegerField(
             default: null,
