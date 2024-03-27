@@ -22,6 +22,7 @@ class HAProxyBackend extends Model {
     public IntegerField $balance_uridepth;
     public BooleanField $balance_uriwhole;
     public NestedModelField $acls;
+    public NestedModelField $actions;
     public IntegerField $connection_timeout;
     public IntegerField $server_timeout;
     public IntegerField $retries;
@@ -122,6 +123,12 @@ class HAProxyBackend extends Model {
             default: [],
             allow_empty: true,
             help_text: 'The ACLs to apply to this backend.',
+        );
+        $this->actions = new NestedModelField(
+            model_class: 'HAProxyBackendAction',
+            default: [],
+            allow_empty: true,
+            help_text: 'The actions to apply to this backend.',
         );
         $this->connection_timeout = new IntegerField(
             default: 30000,
