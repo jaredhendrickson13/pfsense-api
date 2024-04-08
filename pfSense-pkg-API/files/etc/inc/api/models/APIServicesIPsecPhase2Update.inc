@@ -490,7 +490,7 @@ class APIServicesIPsecPhase2Update extends APIModel {
                 $this->errors[] = APIResponse\get(2252);
             }
         }
-        else {
+        elseif($this->__is_hash_algo_required()) {
             $this->errors[] = APIResponse\get(2251);
         }
     }
@@ -596,5 +596,15 @@ class APIServicesIPsecPhase2Update extends APIModel {
         elseif ($this->initial_data["keepalive"] === false) {
             $this->validated_data["keepalive"] = "disabled";
         }
+    }
+
+    private function __is_hash_algo_required() {
+        foreach ($this->validated_data["encryption-algorithm-option"] as $enc_conf) {
+            if ($enc_conf["name"] === "aes") {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

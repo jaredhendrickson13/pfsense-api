@@ -352,6 +352,19 @@ function sort_nat_rules($top=false, $data=null, $field=null) {
             $sort_arr[] = $fre;
         }
     }
+
+
+    switch($field) {
+        case "onetoone":
+            config_set_path("nat/onetoone", $sort_arr);
+            break;
+        case "outbound":
+            config_set_path("nat/outbound/rule", $sort_arr);
+            break;
+        default:
+            config_set_path("nat/rule", $sort_arr);
+    }
+
     if (!empty($sort_arr)) {
         $acl = $sort_arr;
     } else {
