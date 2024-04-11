@@ -1115,9 +1115,9 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
 
     private function __validate_disabled() {
         # Check for our optional `disabled` payload value
-        if (($this->initial_data["disable"] === true) and (empty($this->validated_data["disable"]))) {
+        if ($this->initial_data["disable"] === true) {
             $this->validated_data["disable"] = "";
-        } elseif (($this->initial_data["disable"] === false) and (!empty($this->validated_data["disable"]))) {
+        } elseif ($this->initial_data["disable"] === false) {
             unset($this->validated_data["disable"]);
         }
     }
