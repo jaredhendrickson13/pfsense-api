@@ -20,6 +20,7 @@ class HAProxyFrontend extends Model
     public IntegerField $max_connections;
     public StringField $type;
     public NestedModelField $ha_acls;
+    public NestedModelField $a_actionitems;
     public ForeignModelField $backend_serverpool;
     public BooleanField $socket_stats;
     public BooleanField $dontlognull;
@@ -28,6 +29,7 @@ class HAProxyFrontend extends Model
     public BooleanField $log_detailed;
     public NestedModelField $a_errorfiles;
     public IntegerField $client_timeout;
+    public BooleanField $forwardfor;
     public StringField $httpclose;
     public StringField $advanced_bind;
     public Base64Field $advanced;
@@ -79,6 +81,12 @@ class HAProxyFrontend extends Model
             default: [],
             allow_empty: true,
             help_text: "The ACLs to apply to this frontend."
+        );
+        $this->a_actionitems = new NestedModelField(
+            model_class: 'HAProxyFrontendAction',
+            default: [],
+            allow_empty: true,
+            help_text: "The actions to take when an ACL match is found."
         );
         $this->backend_serverpool = new ForeignModelField(
             model_name: 'HAProxyBackend',
@@ -132,6 +140,13 @@ class HAProxyFrontend extends Model
             allow_null: true,
             help_text: "The amount of time (in milliseconds) to wait for data from the client."
         );
+        $this->forwardfor = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["type" => "http"],
+            help_text: "Enables or disables the HTTP X-Forwarded-For header which contains the client's IP address."
+        );
         $this->httpclose = new StringField(
             default: "http-keep-alive",
             choices: [
@@ -153,15 +168,6 @@ class HAProxyFrontend extends Model
             allow_null: true,
             help_text: "Custom configuration to pass to this frontend."
         );
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         parent::__construct($id, $parent_id, $data, ...$options);
     }
