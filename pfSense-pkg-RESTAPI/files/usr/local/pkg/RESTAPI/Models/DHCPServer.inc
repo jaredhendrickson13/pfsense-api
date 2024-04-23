@@ -8,6 +8,7 @@ use RESTAPI;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
+use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
@@ -223,8 +224,32 @@ class DHCPServer extends Model {
             allow_empty: true,
             help_text: 'Static mappings applied to this DHCP server.',
         );
+        
+        # Ensure all interfaces have DHCP server objects initialized
+        $this->init_interfaces();
 
         parent::__construct($id, $parent_id, $data, ...$options);
+    }
+
+    /**
+     * Initializes configurations objects for defined interface that have not yet configured the DHCP server
+     */
+    private function init_interfaces(): void {
+        # Variables
+        $ifs_using_dhcpd = array_keys($this->get_config(path: $this->config_path, default: []));
+        
+        # Loop through each defined interface
+        foreach (NetworkInterface::read_all()->model_objects as $if) {
+            # Skip this interface if it is not a static interface or the subnet value is greater than or equal to 31
+            if ($if->typev4->value !== "static" or $if->subnet->value >= 31) {
+                continue;
+            }
+            
+            # Otherwise, make this interface eligible for a DHCP server
+            if (!in_array($if->id, $ifs_using_dhcpd)) {
+                $this->set_config(path: "$this->config_path/$if->id", value: []);
+            }
+        }
     }
 
     /**
