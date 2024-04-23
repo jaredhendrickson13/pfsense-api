@@ -264,12 +264,12 @@ function generate_documentation(): bool {
                     '<h3>Description:</h3>' .
                     "$help_text<br>" .
                     '<h3>Details:</h3>' .
-                    "**Assigned model**: $endpoint->model_name<br>" .
+                    "**Associated model**: $endpoint->model_name<br>" .
                     "**Parent model**: $parent_model_class<br>" .
                     "**Requires authentication**: $requires_auth_str<br>" .
                     "**Supported authentication modes:** [ $auth_method_str ]<br>" .
                     "**Allowed privileges**: [ $priv_options_str ]<br>" .
-                    "**Requires packages**: [ $required_packages_str ]",
+                    "**Required packages**: [ $required_packages_str ]",
             ];
 
             # Nest this endpoint under its assigned or assumed tag

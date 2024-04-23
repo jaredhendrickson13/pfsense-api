@@ -18,6 +18,7 @@ class RESTAPISettingsSync extends Model {
         # Set model attributes
         $this->internal_callable = 'void';
         $this->many = false;
+        $this->verbose_name = 'REST API Settings Sync';
 
         # Set model fields
         $this->sync_data = new StringField(

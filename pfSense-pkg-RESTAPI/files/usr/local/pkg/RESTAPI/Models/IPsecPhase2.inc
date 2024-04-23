@@ -51,6 +51,7 @@ class IPsecPhase2 extends Model {
         $this->config_path = 'ipsec/phase2';
         $this->subsystem = 'ipsec';
         $this->many = true;
+        $this->verbose_name = 'IPsec Phase 2';
 
         # Set model fields
         $this->uniqid = new UIDField(

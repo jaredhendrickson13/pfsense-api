@@ -18,6 +18,7 @@ class RESTAPIVersion extends Model {
         # Set model attributes
         $this->internal_callable = 'get_api_version_details';
         $this->cache_class = 'RESTAPIVersionReleasesCache';
+        $this->verbose_name = 'REST API Version';
 
         # Set model Fields
         $this->current_version = new StringField(

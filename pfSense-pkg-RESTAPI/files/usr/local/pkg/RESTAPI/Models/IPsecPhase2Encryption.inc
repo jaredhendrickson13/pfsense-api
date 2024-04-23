@@ -23,6 +23,7 @@ class IPsecPhase2Encryption extends Model {
         $this->subsystem = 'ipsec';
         $this->many = true;
         $this->many_minimum = 1;
+        $this->verbose_name = 'IPsec Phase 2 Encryption';
 
         # Set model fields
         $this->name = new StringField(

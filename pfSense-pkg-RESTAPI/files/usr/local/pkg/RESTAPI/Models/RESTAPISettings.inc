@@ -46,6 +46,7 @@ class RESTAPISettings extends Model {
         $this->id = $this->get_pkg_id();
         $this->config_path = "installedpackages/package/$this->id/conf";
         $this->always_apply = true;
+        $this->verbose_name = 'REST API Settings';
 
         # Set Fields for this Model
         $this->enabled = new BooleanField(

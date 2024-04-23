@@ -19,7 +19,7 @@ class RESTAPIJWT extends Model {
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set Model attributes
-        $this->verbose_name = 'API JWT';
+        $this->verbose_name = 'REST API JWT';
 
         # Set Model Fields
         $this->token = new StringField(

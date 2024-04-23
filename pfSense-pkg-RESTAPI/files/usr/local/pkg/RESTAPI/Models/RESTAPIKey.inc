@@ -29,6 +29,7 @@ class RESTAPIKey extends Model {
         $this->many = true;
         $this->always_apply = true;
         $this->verbose_name = 'REST API Key';
+        $this->verbose_name_plural = 'REST API Keys';
 
         # Set Model Fields
         $this->username = new StringField(
