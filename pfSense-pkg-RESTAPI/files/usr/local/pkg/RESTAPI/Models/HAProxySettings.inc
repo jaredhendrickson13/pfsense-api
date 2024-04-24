@@ -67,6 +67,7 @@ class HAProxySettings extends Model {
         );
         $this->hard_stop_after = new StringField(
             default: '15m',
+            allow_empty: true,
             help_text: 'The maximum time allowed to perform a clean soft-stop. This can be represented as different ' .
                 'time values such as 30s, 15m, 3h or 1d.',
         );
@@ -154,6 +155,7 @@ class HAProxySettings extends Model {
         $this->dns_resolvers = new NestedModelField(
             model_class: 'HAProxyDNSResolver',
             default: [],
+            allow_empty: true,
             help_text: 'The DNS resolvers HAProxy will use for DNS queries.',
         );
         $this->resolver_retries = new IntegerField(
@@ -171,6 +173,7 @@ class HAProxySettings extends Model {
         $this->email_mailers = new NestedModelField(
             model_class: 'HAProxyEmailMailer',
             default: [],
+            allow_empty: true,
             help_text: 'The email servers HAProxy will use to send SMTP alerts.',
         );
         $this->email_level = new StringField(

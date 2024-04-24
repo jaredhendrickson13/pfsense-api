@@ -29,17 +29,17 @@ class APIModelsHAProxySettingsTestCase extends TestCase {
      * Checks that the `enable` field correctly controls the HAProxy service's enablement.
      */
     public function test_enable(): void {
-        # Disable HAProxy and ensure the service is no longer enabled/running
-        $haproxy_settings = new HAProxySettings(enable: false, async: false);
-        $haproxy_settings->update(apply: true);
-        $pid = (int) file_get_contents('/var/run/haproxy.pid');
-        $this->assert_is_false(posix_kill($pid, signal: 0)); // signal 0 does not actually kill the process
-
         # Enable HAProxy and ensure the service is enabled/running
         $haproxy_settings = new HAProxySettings(enable: true, async: false);
         $haproxy_settings->update(apply: true);
         $pid = (int) file_get_contents('/var/run/haproxy.pid');
         $this->assert_is_true(posix_kill($pid, signal: 0)); // signal 0 does not actually kill the process
+
+        # Disable HAProxy and ensure the service is no longer enabled/running
+        $haproxy_settings = new HAProxySettings(enable: false, async: false);
+        $haproxy_settings->update(apply: true);
+        $pid = (int) file_get_contents('/var/run/haproxy.pid');
+        $this->assert_is_false(posix_kill($pid, signal: 0)); // signal 0 does not actually kill the process
     }
 
     /**
@@ -106,12 +106,22 @@ class APIModelsHAProxySettingsTestCase extends TestCase {
      * Checks that the `localstats_refreshtime` field correctly sets the `stats refresh` option in haproxy.cfg
      */
     public function test_localstats_refreshtime(): void {
-        $haproxy_settings = new HAProxySettings(enable: true, localstats_refreshtime: 20, async: false);
+        $haproxy_settings = new HAProxySettings(
+            enable: true, 
+            localstats_refreshtime: 20, 
+            localstatsport: "45454", 
+            async: false
+        );
         $haproxy_settings->update(apply: true);
         $haproxy_cfg = new Command('cat /var/etc/haproxy/haproxy.cfg', trim_whitespace: true);
         $this->assert_str_contains($haproxy_cfg->output, 'stats refresh 20');
 
-        $haproxy_settings = new HAProxySettings(enable: true, localstats_refreshtime: 10, async: false);
+        $haproxy_settings = new HAProxySettings(
+            enable: true,
+            localstats_refreshtime: 10,
+            localstatsport: "45454",
+            async: false
+        );
         $haproxy_settings->update(apply: true);
         $haproxy_cfg = new Command('cat /var/etc/haproxy/haproxy.cfg', trim_whitespace: true);
         $this->assert_str_contains($haproxy_cfg->output, 'stats refresh 10');
