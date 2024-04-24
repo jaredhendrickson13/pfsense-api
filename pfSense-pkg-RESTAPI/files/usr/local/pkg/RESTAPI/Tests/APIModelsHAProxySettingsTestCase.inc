@@ -107,10 +107,10 @@ class APIModelsHAProxySettingsTestCase extends TestCase {
      */
     public function test_localstats_refreshtime(): void {
         $haproxy_settings = new HAProxySettings(
-            enable: true, 
-            localstats_refreshtime: 20, 
-            localstatsport: "45454", 
-            async: false
+            enable: true,
+            localstats_refreshtime: 20,
+            localstatsport: '45454',
+            async: false,
         );
         $haproxy_settings->update(apply: true);
         $haproxy_cfg = new Command('cat /var/etc/haproxy/haproxy.cfg', trim_whitespace: true);
@@ -119,8 +119,8 @@ class APIModelsHAProxySettingsTestCase extends TestCase {
         $haproxy_settings = new HAProxySettings(
             enable: true,
             localstats_refreshtime: 10,
-            localstatsport: "45454",
-            async: false
+            localstatsport: '45454',
+            async: false,
         );
         $haproxy_settings->update(apply: true);
         $haproxy_cfg = new Command('cat /var/etc/haproxy/haproxy.cfg', trim_whitespace: true);
