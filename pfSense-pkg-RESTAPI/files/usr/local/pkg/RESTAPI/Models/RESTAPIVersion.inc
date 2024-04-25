@@ -3,16 +3,22 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
+use RESTAPI\Core\Command;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\NotFoundError;
+use RESTAPI\Responses\ServerError;
 
 class RESTAPIVersion extends Model {
+    const REPO_URL = "https://github.com/jaredhendrickson13/pfsense-api";
+    
     public StringField $current_version;
     public StringField $latest_version;
     public StringField $latest_version_release_date;
     public BooleanField $update_available;
     public StringField $install_version;
+    public StringField $available_versions;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
@@ -44,6 +50,13 @@ class RESTAPIVersion extends Model {
             write_only: true,
             help_text: 'Set the API version to update or rollback to.',
         );
+        $this->available_versions = new StringField(
+            default: [],
+            read_only: true,
+            many: true,
+            delimiter: null,
+            help_text: 'All available versions of the REST API package for this system.',
+        );
 
         parent::__construct($id, $parent_id, $data, ...$options);
     }
@@ -58,8 +71,31 @@ class RESTAPIVersion extends Model {
             'latest_version' => $this->get_latest_api_version(),
             'latest_version_release_date' => $this->get_latest_api_release_date(),
             'update_available' => $this->is_update_available(),
-            'install_version' => array_keys($this->get_all_available_versions()),
+            'available_versions' => array_keys($this->get_all_available_versions()),
         ];
+    }
+
+    /**
+     * Updates the REST API package to the requested version.
+     */
+    public function _update(): void
+    {
+        # Default the result to true in case nothing needs to be done
+        $result = true;
+        
+        # Only attempt an update if an install version is provided
+        if ($this->install_version->value) {
+            $result = $this->install_version($this->install_version->value);
+            $this->from_internal();
+        }
+
+        # Notify the user of installation failures
+        if ($result === false) {
+            throw new ServerError(
+                message: "The REST API package failed to install the requested version. Check logs for more info.",
+                response_id: "RESTAPI_VERSION_INSTALLATION_FAILED",
+            );
+        }
     }
 
     /**
@@ -164,5 +200,38 @@ class RESTAPIVersion extends Model {
             }
         }
         return $versions;
+    }
+
+    /**
+     * Installs the specified version of the REST API package.
+     * @param string $tag The tag of the version to install.
+     * @return bool|null `true` if the version was successfully installed. `false` if the version failed to install. 
+     * `null` if the version is not available.
+     */
+    public function install_version(string $tag): ?bool {
+        # Variables
+        $pf_version = (new SystemVersion())->base->value;
+        $install_url = escapeshellarg(self::REPO_URL."/releases/download/$tag/pfSense-$pf_version-pkg-RESTAPI.pkg");
+
+        # Don't perform any changes if we are already running the requested version
+        if ($this->current_version->value === $tag) {
+            return true;
+        }
+        
+        # Ensure this version is available to this host
+        if (in_array($tag, array_keys($this->get_all_available_versions()))) {
+            # Remove the current REST API package and install the target version
+            $delete = new Command("pkg-static delete -y pfSense-pkg-RESTAPI");
+            $add = new Command("pkg-static add $install_url");
+            
+            # If an error occurred either deleting or adding the package, return false
+            if ($delete->result_code !== 0 or $add->result_code !== 0) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        return null;
     }
 }
