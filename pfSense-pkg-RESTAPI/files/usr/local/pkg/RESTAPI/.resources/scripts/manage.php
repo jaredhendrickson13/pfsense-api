@@ -302,15 +302,14 @@ function sync(): void {
  */
 function update(): void {
     # Obtain package version info
-    echo "Searching for available updates... ";
+    echo 'Searching for available updates... ';
     $restapi_version = new RESTAPIVersion();
-    
+
     # Only update if there is an available update
     if ($restapi_version->update_available->value) {
-        echo "done.".PHP_EOL;
+        echo 'done.' . PHP_EOL;
         revert($restapi_version->get_latest_api_version());
-    }
-    else {
+    } else {
         echo ' No updates available.' . PHP_EOL;
     }
 }
@@ -324,16 +323,14 @@ function revert(string $tag): void {
     echo "Installing REST API package version '$tag'... ";
     $restapi_version = new RESTAPIVersion();
     $result = $restapi_version->install_version($tag);
-    
+
     # Notify the user of the installation results
     if ($result) {
-        echo "done.".PHP_EOL;
-    }
-    elseif ($result === false) {
-        echo "failed." . PHP_EOL;
-    }
-    else {
-        echo "version could not be found." . PHP_EOL;
+        echo 'done.' . PHP_EOL;
+    } elseif ($result === false) {
+        echo 'failed.' . PHP_EOL;
+    } else {
+        echo 'version could not be found.' . PHP_EOL;
     }
 }
 

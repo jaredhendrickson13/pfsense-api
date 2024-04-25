@@ -6,9 +6,8 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\CertificateAuthority;
 use RESTAPI\Models\CertificateRevocationList;
 
-class APIModelsCertificateRevocationListTestCase extends TestCase
-{
- const EXAMPLE_CRT = "-----BEGIN CERTIFICATE-----
+class APIModelsCertificateRevocationListTestCase extends TestCase {
+    const EXAMPLE_CRT = "-----BEGIN CERTIFICATE-----
 MIIDnzCCAoegAwIBAgIUd9R9uoNKE2GoxgJPwzRn67WV4bgwDQYJKoZIhvcNAQEL
 BQAwXzELMAkGA1UEBhMCVVMxDTALBgNVBAgMBFV0YWgxFzAVBgNVBAcMDlNhbHQg
 TGFrZSBDaXR5MRIwEAYDVQQKDAlBY21lIEluYy4xFDASBgNVBAMMC2V4YW1wbGUu
@@ -71,7 +70,6 @@ sJ2heugpAOP3tLQrMgGw6M9XBPjVBsnErVgRu11OJnUttL7kUgWcrTlaOYhPqvYx
 O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
 -----END X509 CRL-----";
 
-    
     /*
      * Ensures CRLs can be created and deleted
      */
@@ -79,14 +77,14 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
         # Create a Certificate Authority to test with
         $ca = new CertificateAuthority(descr: 'test_ca', crt: self::EXAMPLE_CRT, prv: self::EXAMPLE_PRV);
         $ca->create();
-        
+
         # Create internal and existing CRLs
         $internal_crl = new CertificateRevocationList(
             descr: 'test_internal_ca',
             caref: $ca->refid->value,
             method: 'internal',
             lifetime: 730,
-            serial: 1
+            serial: 1,
         );
         $internal_crl->create();
 
@@ -94,10 +92,10 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
             descr: 'test_existing_ca',
             caref: $ca->refid->value,
             method: 'existing',
-            text: self::EXAMPLE_CRL
+            text: self::EXAMPLE_CRL,
         );
         $existing_crl->create();
-        
+
         # Ensure we can now read two different CRLs
         $this->assert_equals(count(CertificateRevocationList::read_all()->model_objects), 2);
 
@@ -105,7 +103,7 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
         $existing_crl->delete();
         $internal_crl->delete();
         $ca->delete();
-        
+
         # Ensure there are no more CRLs
         $this->assert_equals(count(CertificateRevocationList::read_all()->model_objects), 0);
     }
