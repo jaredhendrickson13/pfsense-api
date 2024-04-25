@@ -21,6 +21,7 @@ use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
 use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\RESTAPISettingsSync;
+use RESTAPI\Models\RESTAPIVersion;
 use function RESTAPI\Core\Tools\cprint;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
@@ -300,43 +301,39 @@ function sync(): void {
  * Updates this package to the latest version available to this system
  */
 function update(): void {
-    $pf_version = RESTAPI\Core\Tools\get_pfsense_version()['base'];
-    echo shell_exec('/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI');
-    echo shell_exec(
-        '/usr/local/sbin/pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-RESTAPI/releases/latest/download/pfSense-' .
-            $pf_version .
-            '-pkg-REST API.pkg',
-    );
-    echo shell_exec('/etc/rc.restart_webgui');
+    # Obtain package version info
+    echo "Searching for available updates... ";
+    $restapi_version = new RESTAPIVersion();
+    
+    # Only update if there is an available update
+    if ($restapi_version->update_available->value) {
+        echo "done.".PHP_EOL;
+        revert($restapi_version->get_latest_api_version());
+    }
+    else {
+        echo ' No updates available.' . PHP_EOL;
+    }
 }
 
 /**
  * Reverts or updates the REST API package to a specific version.
- * @param $version string semantic version tag to revert or upgrade to.
+ * @param $tag string semantic version tag to revert or upgrade to.
  */
-function revert(string $version): void {
-    # Local variables
-    $pf_version = RESTAPI\Core\Tools\get_pfsense_version()['base'];
-    $url =
-        'https://github.com/jaredhendrickson13/pfsense-RESTAPI/releases/download/' .
-        urlencode($version) .
-        '/pfSense-' .
-        $pf_version .
-        '-pkg-REST API.pkg';
-    echo 'Locating pfSense-pkg-RESTAPI-' . $version . ' at ' . $url . '... ';
-
-    # Check our URL for the existence of this version
-    $headers = @get_headers($url);
-
-    # If this release exists, remove the existing package and install the requested one. Otherwise return error
-    if ($headers && strpos($headers[0], '302')) {
-        echo 'done.' . PHP_EOL;
-        echo shell_exec('/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI');
-        echo shell_exec('/usr/local/sbin/pkg-static -C /dev/null add ' . escapeshellarg($url));
-        echo shell_exec('/etc/rc.restart_webgui');
-    } else {
-        echo 'no package found.' . PHP_EOL;
-        exit(1);
+function revert(string $tag): void {
+    # Start the version installation process
+    echo "Installing REST API package version '$tag'... ";
+    $restapi_version = new RESTAPIVersion();
+    $result = $restapi_version->install_version($tag);
+    
+    # Notify the user of the installation results
+    if ($result) {
+        echo "done.".PHP_EOL;
+    }
+    elseif ($result === false) {
+        echo "failed." . PHP_EOL;
+    }
+    else {
+        echo "version could not be found." . PHP_EOL;
     }
 }
 
@@ -454,7 +451,7 @@ elseif ($argv[1] == 'update') {
 }
 # REVERT COMMAND
 elseif ($argv[1] == 'revert') {
-    revert($argv[2]);
+    revert($argv[2] ?? '');
 }
 # DELETE COMMAND
 elseif ($argv[1] == 'delete') {
