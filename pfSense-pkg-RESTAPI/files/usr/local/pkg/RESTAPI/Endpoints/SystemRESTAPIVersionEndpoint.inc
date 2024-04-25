@@ -11,7 +11,7 @@ class SystemRESTAPIVersionEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/system/restapi/version';
         $this->model_name = 'RESTAPIVersion';
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'PATCH'];
 
         # Construct the parent Endpoint object
         parent::__construct();
