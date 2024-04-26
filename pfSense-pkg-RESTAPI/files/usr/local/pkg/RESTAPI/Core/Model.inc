@@ -329,7 +329,7 @@ class Model {
             $this->placement = $options['placement'];
             unset($options['placement']);
         }
-        
+
         # Obtain a default $client Auth object for this Model object to use if one was not provided
         $this->client = $options['client'] ?: $this->get_default_client();
         unset($options['client']);
@@ -1668,14 +1668,14 @@ class Model {
 
     /**
      * For $many enabled models, this method will place this object in a specific location in the list of stored
-     * objects. This is primarily used to 
+     * objects. This is primarily used to
      */
     protected function set_placement(): void {
         # Only perform this action for $many enabled Models with a $config_path and $placement assigned
         if (!$this->many or is_null($this->placement) or !$this->config_path) {
             return;
         }
-        
+
         # Do not allow the placement to be set if this object does not have an ID
         if (!isset($this->id)) {
             throw new ServerError(
@@ -1683,25 +1683,24 @@ class Model {
                 response_id: 'MODEL_REQUIRES_ID_TO_SET_PLACEMENT',
             );
         }
-        
+
         # Obtain the current internal objects for this Model
         $objects = $this->get_config(path: $this->get_config_path(), default: []);
-        
+
         # Skip placement if the requested placement value does not exist in the current internal objects
         $this->placement = min($this->placement, count($objects));
-        
+
         # Remove the object from the original index and insert it to the new index
         $object = array_splice($objects, $this->id, length: 1);
         array_splice($objects, $this->placement, length: 0, replacement: $object);
-        
+
         # Ensure the object is in the correct index now
         if ($objects[$this->placement] === $object[0]) {
             # Set the new internal objects to the config and assign this object's new ID
             $this->set_config(path: $this->get_config_path(), value: $objects);
             $this->id = $this->placement;
             $this->placement = null;
-        } 
-        else {
+        } else {
             throw new ServerError(
                 message: 'Failed to set placement for Model object.',
                 response_id: 'MODEL_FAILED_TO_SET_PLACEMENT',
