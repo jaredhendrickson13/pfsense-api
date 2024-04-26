@@ -5,6 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI;
 use RESTAPI\Caches\RESTAPIVersionReleasesCache;
 use RESTAPI\Core\Model;
+use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\Test;
 
 class APICoreModelTestCase extends RESTAPI\Core\TestCase {
@@ -59,7 +60,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     public function test_model_default_verbose_name() {
         # Create a normal Model object and a FirewallAlias Model object for testing
         $test_model = new Test();
-        $test_fw_alias = new RESTAPI\Models\FirewallAlias();
+        $test_fw_alias = new FirewallAlias();
 
         # Ensure their default names are correct
         $this->assert_equals($test_model->verbose_name, 'Test');
@@ -613,5 +614,41 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $model->cache_class = '';
         $model->__construct();
         $this->assert_equals($model->cache, null);
+    }
+    
+    /**
+     * Checks that the Model's $placement property correctly sets the placement of the Model object in the pfSense
+     * configuration during creation and updates.
+     */
+    public function test_set_placement(): void {
+        # Create three FirewallAlias models in order
+        $alias_0 = new FirewallAlias(name: "test0", type: "host");
+        $alias_0->create();
+        $alias_1 = new FirewallAlias(name: "test1", type: "host");
+        $alias_1->create();
+        $alias_2 = new FirewallAlias(name: "test2", type: "host");
+        $alias_2->create();
+        
+        # Create another FirewallAlias model but set it's placement to 1
+        $alias_3 = new FirewallAlias(name: "test3", type: "host", placement: 1);
+        $alias_3->create();
+        
+        # Ensure the alias with ID 1 is now $alias_4 instead of $alias_1 due to the placement
+        $this->assert_equals($alias_3->id, 1);
+        $this->assert_equals(FirewallAlias::query(id: 1)->first()->name->value, $alias_3->name->value);
+        
+        # Update $alias_4 to set it's position to 4
+        $alias_3->placement = 3;
+        $alias_3->update();
+
+        # Ensure the alias with ID 3 is now $alias_3
+        $this->assert_equals($alias_3->id, 3);
+        $this->assert_equals(FirewallAlias::query(id: 3)->first()->name->value, $alias_3->name->value);
+        
+        # Delete all the aliases
+        $alias_0->delete();
+        $alias_1->delete();
+        $alias_2->delete();
+        $alias_3->delete();
     }
 }
