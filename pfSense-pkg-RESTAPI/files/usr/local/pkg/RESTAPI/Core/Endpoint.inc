@@ -632,6 +632,7 @@ class Endpoint {
                 # POST request cannot include an ID, strip the ID if present
                 unset($this->request_data['id']);
                 $this->model->from_representation(data: $this->request_data);
+                $this->model->placement = $this->request_data['placement'] ?? null;
                 $resp_data = $this->model->create(apply: $this->request_data['apply'] === true);
             }
             # For PUT requests on many Endpoints, replace all existing objects for the assigned Model
@@ -644,6 +645,7 @@ class Endpoint {
             # For PATCH requests on non-many Endpoints, update a single object for the assigned Model
             elseif ($this->request_method === 'PATCH' and !$this->many) {
                 $this->model->from_representation(data: $this->request_data);
+                $this->model->placement = $this->request_data['placement'] ?? null;
                 $resp_data = $this->model->update(apply: $this->request_data['apply'] === true);
             }
             # For DELETE requests on non-many Endpoints, delete a single object for the assigned Model

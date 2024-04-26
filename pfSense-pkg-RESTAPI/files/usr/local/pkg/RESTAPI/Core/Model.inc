@@ -186,6 +186,13 @@ class Model {
     public string $internal_callable = '';
 
     /**
+     * @var int|null $placement
+     * Set the config index where this object should be written to. This allows objects to be moved or placed into any
+     * arbitrary index in the config. This property is only applicable if the $config_path and $many properties are set.
+     */
+    public int|null $placement = null;
+
+    /**
      * @var int|null $sort_option
      * For $many enabled Models, this property can be used to set the PHP sort option used when writing Model objects to
      * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
@@ -317,6 +324,12 @@ class Model {
         $this->async = isset($options['async']) ? $options['async'] : true;
         unset($options['async']);
 
+        # Set the placement index if given and is a positive integer
+        if (is_integer($options['placement']) and $options['placement'] >= 0) {
+            $this->placement = $options['placement'];
+            unset($options['placement']);
+        }
+        
         # Obtain a default $client Auth object for this Model object to use if one was not provided
         $this->client = $options['client'] ?: $this->get_default_client();
         unset($options['client']);
@@ -1654,6 +1667,49 @@ class Model {
     }
 
     /**
+     * For $many enabled models, this method will place this object in a specific location in the list of stored
+     * objects. This is primarily used to 
+     */
+    protected function set_placement(): void {
+        # Only perform this action for $many enabled Models with a $config_path and $placement assigned
+        if (!$this->many or is_null($this->placement) or !$this->config_path) {
+            return;
+        }
+        
+        # Do not allow the placement to be set if this object does not have an ID
+        if (!isset($this->id)) {
+            throw new ServerError(
+                message: 'Model `id` is required to set placement.',
+                response_id: 'MODEL_REQUIRES_ID_TO_SET_PLACEMENT',
+            );
+        }
+        
+        # Obtain the current internal objects for this Model
+        $objects = $this->get_config(path: $this->get_config_path(), default: []);
+        
+        # Skip placement if the requested placement value does not exist in the current internal objects
+        $this->placement = min($this->placement, count($objects));
+        
+        # Remove the object from the original index and insert it to the new index
+        $object = array_splice($objects, $this->id, length: 1);
+        array_splice($objects, $this->placement, length: 0, replacement: $object);
+        
+        # Ensure the object is in the correct index now
+        if ($objects[$this->placement] === $object[0]) {
+            # Set the new internal objects to the config and assign this object's new ID
+            $this->set_config(path: $this->get_config_path(), value: $objects);
+            $this->id = $this->placement;
+            $this->placement = null;
+        } 
+        else {
+            throw new ServerError(
+                message: 'Failed to set placement for Model object.',
+                response_id: 'MODEL_FAILED_TO_SET_PLACEMENT',
+            );
+        }
+    }
+
+    /**
      * Performs a query on all Model objects for this Model. This is essentially a shorthand way of calling
      * `query()`. This method is only applicable to `many` Models.
      * @param array $query_params An array of query parameters.
@@ -1720,6 +1776,7 @@ class Model {
         if ($this->config_path and $this->many) {
             # Write the new object to the internal config
             $this->set_config(path: "{$this->get_config_path()}/$this->id", value: $this->to_internal());
+            $this->set_placement();
             $this->sort();
             $this->write_config("Added $this->verbose_name via API");
             return;
@@ -1797,7 +1854,8 @@ class Model {
                 );
             }
 
-            # Sort an write the changes to the object in config.
+            # Sort and write the changes to the object in config.
+            $this->set_placement();
             $this->sort();
             $this->write_config("Modified $this->verbose_name via API");
             return;
