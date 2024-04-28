@@ -637,10 +637,11 @@ class Endpoint {
             }
             # For PUT requests on many Endpoints, replace all existing objects for the assigned Model
             elseif ($this->request_method === 'PUT' and $this->many) {
-                $resp_data = $this->model->replace_all(
-                    data: $this->request_data,
-                    apply: $this->request_data['apply'] === true,
-                );
+                # Remove magic parameters
+                unset($this->request_data["async"]);
+                unset($this->request_data["limit"]);
+                unset($this->request_data["offset"]);
+                $resp_data = $this->model->replace_all(data: $this->request_data,);
             }
             # For PATCH requests on non-many Endpoints, update a single object for the assigned Model
             elseif ($this->request_method === 'PATCH' and !$this->many) {
