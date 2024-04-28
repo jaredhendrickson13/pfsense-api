@@ -447,6 +447,12 @@ class Endpoint {
      * and authorization for each allowed auth method. Only one auth method needs to succeed to allow access.
      */
     private function check_auth(): void {
+        # Only require auth if the Endpoint is configured to do so or this is an OPTIONS request
+        if (!$this->requires_auth or $this->request_method === 'OPTIONS') {
+            $this->client = new Auth();
+            return;
+        }
+        
         # Attempt to authenticate the remote client
         $this->client = Auth::attempt_multi_auth(
             auth_classes: $this->auth_methods,
@@ -577,8 +583,9 @@ class Endpoint {
 
     /**
      * Listens for incoming API calls from API clients and checks if the API call is allowed.
+     * @return string The serialized API response to send back to the client.
      */
-    public function listen(): void {
+    public function listen(): string {
         # Variables
         $resp_data = null;
         $content_handler = new JSONContentHandler();
@@ -587,7 +594,7 @@ class Endpoint {
         try {
             # Ensure API is enabled and the receiving interface is allowed to answer API calls.
             $this->check_server_ip();
-
+            
             # Checks client authentication and authorization if required
             if ($this->requires_auth) {
                 $this->check_auth();
@@ -680,9 +687,7 @@ class Endpoint {
 
         # Format the HTTP response as JSON and set response code
         http_response_code($response->code);
-        echo $content_handler->encode($response->to_representation()) . PHP_EOL;
-        session_destroy();
-        exit();
+        return $content_handler->encode($response->to_representation()) . PHP_EOL;
     }
 
     /**
@@ -698,9 +703,11 @@ class Endpoint {
         $code =
             "<?php\nrequire_once('RESTAPI/Endpoints/" .
             $nq_class_name .
-            ".inc');\n(new " .
+            ".inc');\necho (new " .
             $fq_class_name .
-            "())->listen();\n";
+            "())->listen();\n" .
+            "session_destroy();\n" .
+            "exit();\n";
 
         # Create directories and files corresponding with class
         if ($this->url) {
