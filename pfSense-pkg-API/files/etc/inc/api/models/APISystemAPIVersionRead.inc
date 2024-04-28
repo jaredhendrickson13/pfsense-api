@@ -98,6 +98,11 @@ class APISystemAPIVersionRead extends APIModel {
 
         # Loop through each version and populate our version data
         foreach ($releases as $release) {
+            # Skip this release if $release or $pkg_config are not arrays. This is a safety check to fix #438.
+            if (!is_array($release) or !is_array($pkg_config)) {
+                continue;
+            }
+            
             # Check if this release is a pre-release, if so, only include it if allow_pre_release is enabled
             if ($release["prerelease"] === false or isset($pkg_config["allow_pre_release"])) {
                 # Loop through the assets of each release and check if our version of pfSense is supported
