@@ -21,6 +21,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
   - pfSense CE 2.7.1 (amd64)
   - pfSense CE 2.7.2 (amd64)
   - pfSense Plus 23.09 (community supported)
+  - pfSense Plus 24.03 (community supported)
 
   Don't see your version listed? Check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases).
   Older versions of this package may support older versions of pfSense.
