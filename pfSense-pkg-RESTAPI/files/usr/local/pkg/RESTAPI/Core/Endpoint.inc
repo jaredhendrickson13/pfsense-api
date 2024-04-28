@@ -701,11 +701,9 @@ class Endpoint {
 
         # Specify the PHP code to write to the Endpoints index.php file
         $code =
-            "<?php\nrequire_once('RESTAPI/Endpoints/" .
-            $nq_class_name .
-            ".inc');\necho (new " .
-            $fq_class_name .
-            "())->listen();\n" .
+            "<?php\n" .
+            "require_once('RESTAPI/Endpoints/$nq_class_name.inc');\n" .
+            "echo (new $fq_class_name())->listen();\n" .
             "session_destroy();\n" .
             "exit();\n";
 
