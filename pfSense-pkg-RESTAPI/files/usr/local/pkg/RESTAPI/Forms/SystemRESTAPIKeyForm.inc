@@ -16,7 +16,7 @@ class SystemRESTAPIKeyForm extends Form {
         ['Settings', false, '/system_restapi_settings.php'],
         ['Keys', true, '/system_restapi_key.php'],
         ['Updates', false, '/system_restapi_updates.php'],
-        ['Documentation', false, '/api/v2/documentation/'],
+        ['Documentation', false, '/api/v2/documentation'],
     ];
     public array $sections = [
         'Key Settings' => [

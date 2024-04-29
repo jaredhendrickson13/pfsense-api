@@ -433,7 +433,7 @@ function generate_documentation(): bool {
     }
 
     return (bool) file_put_contents(
-        filename: '/usr/local/www/api/v2/schema.json',
+        filename: '/usr/local/pkg/RESTAPI/.resources/schema.json',
         data: json_encode($openapi_config) . PHP_EOL,
     );
 }
