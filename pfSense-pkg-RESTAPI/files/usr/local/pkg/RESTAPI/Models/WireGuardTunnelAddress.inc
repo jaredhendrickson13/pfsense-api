@@ -3,7 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
-use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
+use RESTAPI\Dispatchers\WireGuardApplyDispatcher;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
@@ -78,6 +78,6 @@ class WireGuardTunnelAddress extends Model {
      * Applies pending changes to WireGuard tunnels.
      */
     public function apply(): void {
-        (new WireGuardSettingsDispatcher(async: $this->async))->spawn_process();
+        (new WireGuardApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

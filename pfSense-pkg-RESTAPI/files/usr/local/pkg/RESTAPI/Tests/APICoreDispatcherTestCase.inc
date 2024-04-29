@@ -4,7 +4,7 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\TestCase;
-use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
+use RESTAPI\Dispatchers\WireGuardApplyDispatcher;
 use RESTAPI\Models\Package;
 
 class APICoreDispatcherTestCase extends TestCase {
@@ -153,8 +153,8 @@ class APICoreDispatcherTestCase extends TestCase {
             response_id: 'DISPATCHER_MISSING_REQUIRED_PACKAGE',
             code: 424,
             callable: function () {
-                # Use the WireGuardSettingsDispatcher to test this as it requires pfSense-pkg-WireGuard.
-                new WireGuardSettingsDispatcher();
+                # Use the WireGuardApplyDispatcher to test this as it requires pfSense-pkg-WireGuard.
+                new WireGuardApplyDispatcher();
             },
         );
 
@@ -163,8 +163,8 @@ class APICoreDispatcherTestCase extends TestCase {
         $package->create();
         $this->assert_does_not_throw(
             callable: function () {
-                # Use the WireGuardSettingsDispatcher to test this as it requires pfSense-pkg-WireGuard.
-                $dispatcher = new WireGuardSettingsDispatcher();
+                # Use the WireGuardApplyDispatcher to test this as it requires pfSense-pkg-WireGuard.
+                $dispatcher = new WireGuardApplyDispatcher();
                 $dispatcher->spawn_process();
             },
         );

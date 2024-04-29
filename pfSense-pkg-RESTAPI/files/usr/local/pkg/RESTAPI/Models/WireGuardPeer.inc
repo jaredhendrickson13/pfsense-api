@@ -3,7 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
-use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
+use RESTAPI\Dispatchers\WireGuardApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
@@ -110,6 +110,6 @@ class WireGuardPeer extends Model {
      * Applies changes to WireGuard tunnels/peers.
      */
     public function apply(): void {
-        (new WireGuardSettingsDispatcher(async: $this->async))->spawn_process();
+        (new WireGuardApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

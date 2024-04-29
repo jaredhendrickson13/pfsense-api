@@ -5,7 +5,7 @@ namespace RESTAPI\Models;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Model;
-use RESTAPI\Dispatchers\WireGuardSettingsDispatcher;
+use RESTAPI\Dispatchers\WireGuardApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
@@ -147,6 +147,6 @@ class WireGuardTunnel extends Model {
      * Applies pending changes to WireGuard tunnels
      */
     public function apply(): void {
-        (new WireGuardSettingsDispatcher(async: $this->async))->spawn_process();
+        (new WireGuardApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
