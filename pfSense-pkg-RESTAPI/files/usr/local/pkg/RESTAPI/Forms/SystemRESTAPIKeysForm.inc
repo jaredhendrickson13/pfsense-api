@@ -19,7 +19,7 @@ class SystemRESTAPIKeysForm extends Form {
         ['Settings', false, '/system_restapi_settings.php'],
         ['Keys', true, '/system_restapi_key.php'],
         ['Updates', false, '/system_restapi_updates.php'],
-        ['Documentation', false, '/openapi/'],
+        ['Documentation', false, '/api/v2/documentation/'],
     ];
 
     /**

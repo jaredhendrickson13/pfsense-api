@@ -509,7 +509,7 @@ class Endpoint {
         # Throw a forbidden error if this API call was made to a non-API enabled interface
         throw new ForbiddenError(
             message: 'The requested action is not allowed by admin policy',
-            response_id: 'NOT_ALLOWED',
+            response_id: 'ENDPOINT_ACTION_NOT_ALLOWED',
         );
     }
 
@@ -526,7 +526,7 @@ class Endpoint {
         if (!in_array($this->request_method, $this->request_method_options)) {
             throw new MethodNotAllowedError(
                 message: "Resource at $this->url does not support the requested HTTP method '$this->request_method'",
-                response_id: 'METHOD_NOT_ALLOWED',
+                response_id: 'ENDPOINT_METHOD_NOT_ALLOWED',
             );
         }
 
