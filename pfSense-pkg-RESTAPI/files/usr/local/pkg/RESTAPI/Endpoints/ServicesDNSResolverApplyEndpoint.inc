@@ -12,6 +12,8 @@ class ServicesDNSResolverApplyEndpoint extends Endpoint {
         $this->url = '/api/v2/services/dns_resolver/apply';
         $this->model_name = 'DNSResolverApply';
         $this->request_method_options = ['GET', 'POST'];
+        $this->get_help_text = 'Read pending DNS Resolver change status.';
+        $this->post_help_text = 'Apply pending DNS Resolver changes.';
 
         # Construct the parent Endpoint object
         parent::__construct();
