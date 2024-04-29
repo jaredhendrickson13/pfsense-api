@@ -162,6 +162,13 @@ class Endpoint {
     public bool $ignore_enabled = false;
 
     /**
+     * @var ResourceLinkSet|null $resource_link_set 
+     * A ResourceLinkSet containing ResourceLinks that should always be included in
+     * the root _links for this response. 
+     */
+    public ResourceLinkSet|null $resource_link_set = null;
+
+    /**
      * @var array $get_privileges
      * Assigns pfSense privileges that should allow GET requests to this Endpoint.
      * This property is dynamically populated.
@@ -248,6 +255,9 @@ class Endpoint {
 
         # Fetch request method whenever the object is first created.
         $this->request_method = strtoupper($_SERVER['REQUEST_METHOD']);
+        
+        # Assign the default $resource_links value if not specified by a child class
+        $this->resource_link_set = ($this->resource_link_set) ?: new ResourceLinkSet();
 
         # Initialize the assigned model
         $model_class = 'RESTAPI\\Models\\' . $this->model_name;
@@ -345,23 +355,19 @@ class Endpoint {
      * the `prev` and `next` link values.
      * @param int $offset The starting point in the dataset requested for pagination. This will be used to determine
      * the `prev` and `next` link values.
-     * @returns ResourceLinkSet A ResourceLinkSet containing the `prev` and `next` ResourceLinks.
      */
-    public function get_pagination_resource_links(int $limit, int $offset): ResourceLinkSet {
+    public function get_pagination_resource_links(int $limit, int $offset): void {
         # Calculate the offset for the `prev` and `next` resource link values
-        $prev_offset = $offset - $limit >= 0 ? $offset - $limit : 0;
+        $prev_offset = max($offset - $limit, 0);
         $next_offset = $offset + $limit;
 
         # Format the URLs using the calculate offsets
         $prev_url = $this->url . "?offset=$prev_offset&limit=$limit";
         $next_url = $this->url . "?offset=$next_offset&limit=$limit";
 
-        # Construct ResourceLinks objects containing the `next` and `prev` links
-        $prev_link = new ResourceLink(rel: 'prev', href: $prev_url, use_namespace: false);
-        $next_link = new ResourceLink(rel: 'next', href: $next_url, use_namespace: false);
-
-        # Return a ResourceLinkSet with our `next` and `prev` links
-        return new ResourceLinkSet([$prev_link, $next_link]);
+        # Include the pagination links to our $resource_link_set property
+        $this->resource_link_set->resource_links[] = new ResourceLink(rel: 'prev', href: $prev_url, use_namespace: false);
+        $this->resource_link_set->resource_links[] = new ResourceLink(rel: 'next', href: $next_url, use_namespace: false);
     }
 
     /**
@@ -582,14 +588,13 @@ class Endpoint {
     }
 
     /**
-     * Listens for incoming API calls from API clients and checks if the API call is allowed.
+     * Processes the API request and returns the serialized API response to send back to the client.
      * @return string The serialized API response to send back to the client.
      */
-    public function listen(): string {
+    public function process_request(): string {
         # Variables
         $resp_data = null;
         $content_handler = new JSONContentHandler();
-        $links = new ResourceLinkSet();
 
         try {
             # Ensure API is enabled and the receiving interface is allowed to answer API calls.
@@ -616,55 +621,31 @@ class Endpoint {
                 $this->model->async = $this->request_data['async'];
             }
 
-            # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
-            if ($this->request_method === 'GET' and !$this->many) {
-                $this->model->from_representation(data: $this->request_data);
-                $resp_data = $this->model->read();
-            }
-            # For GET requests on many Endpoints, obtain all objects from the assigned Model.
-            elseif ($this->request_method === 'GET' and $this->many) {
-                $resp_data = $this->model->query(
-                    query_params: $this->request_data,
-                    excluded: ['async', 'limit', 'offset'],
-                    limit: $this->request_data['limit'],
-                    offset: $this->request_data['offset'],
-                );
-                $links = $this->get_pagination_resource_links(
-                    limit: $this->request_data['limit'],
-                    offset: $this->request_data['offset'],
-                );
-            }
-            # For POST requests on non-many Endpoints, create a single object for the assigned Model
-            elseif ($this->request_method === 'POST' and !$this->many) {
-                # POST request cannot include an ID, strip the ID if present
-                unset($this->request_data['id']);
-                $this->model->from_representation(data: $this->request_data);
-                $this->model->placement = $this->request_data['placement'] ?? null;
-                $resp_data = $this->model->create(apply: $this->request_data['apply'] === true);
-            }
-            # For PUT requests on many Endpoints, replace all existing objects for the assigned Model
-            elseif ($this->request_method === 'PUT' and $this->many) {
-                # Remove magic parameters
-                unset($this->request_data["async"]);
-                unset($this->request_data["limit"]);
-                unset($this->request_data["offset"]);
-                $resp_data = $this->model->replace_all(data: $this->request_data,);
-            }
-            # For PATCH requests on non-many Endpoints, update a single object for the assigned Model
-            elseif ($this->request_method === 'PATCH' and !$this->many) {
-                $this->model->from_representation(data: $this->request_data);
-                $this->model->placement = $this->request_data['placement'] ?? null;
-                $resp_data = $this->model->update(apply: $this->request_data['apply'] === true);
-            }
-            # For DELETE requests on non-many Endpoints, delete a single object for the assigned Model
-            elseif ($this->request_method === 'DELETE' and !$this->many) {
-                $this->model->from_representation(data: $this->request_data);
-                $resp_data = $this->model->delete(apply: $this->request_data['apply'] === true);
-            }
-            # Return the available request methods in a response header
-            elseif ($this->request_method === 'OPTIONS') {
-                header('access-control-allow-methods: ' . implode(', ', $this->request_method_options));
-                header('Allow: ' . implode(', ', $this->request_method_options));
+            # Perform the appropriate action based on the request method
+            switch ($this->request_method) {
+                case 'GET':
+                    $resp_data = $this->get();
+                    break;
+                case 'POST':
+                    $resp_data = $this->post();
+                    break;
+                case 'PUT':
+                    $resp_data = $this->put();
+                    break;
+                case 'PATCH':
+                    $resp_data = $this->patch();
+                    break;
+                case 'DELETE':
+                    $resp_data = $this->delete();
+                    break;
+                case 'OPTIONS':
+                    $this->options();
+                    break;
+                default:
+                    throw new MethodNotAllowedError(
+                        message: "Unknown HTTP method '$this->request_method'",
+                        response_id: 'ENDPOINT_REQUEST_METHOD_UNKNOWN',
+                    );
             }
 
             # Create our success API response object if no errors were thrown
@@ -672,7 +653,7 @@ class Endpoint {
                 message: '',
                 response_id: 'SUCCESS',
                 data: $resp_data ?: new ModelSet(),
-                _links: $links,
+                _links: $this->resource_link_set,
             );
         } catch (Response $response) {
         } catch (Exception | Error $error) {
@@ -682,12 +663,80 @@ class Endpoint {
             );
         }
 
-        # Add API required response headers, these will override any custom headers
-        header('Referer: no-referrer');
-
         # Format the HTTP response as JSON and set response code
         http_response_code($response->code);
         return $content_handler->encode($response->to_representation()) . PHP_EOL;
+    }
+
+    /**
+     * Obtains the object data for GET requests to this Endpoint.
+     */
+    public function get(): Model|ModelSet {
+        # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
+        if ($this->many) {
+            $this->get_pagination_resource_links(
+                limit: $this->request_data['limit'],
+                offset: $this->request_data['offset'],
+            );
+            return $this->model->query(
+                query_params: $this->request_data,
+                excluded: ['async', 'limit', 'offset'],
+                limit: $this->request_data['limit'],
+                offset: $this->request_data['offset'],
+            );
+        }
+        # For GET requests on many Endpoints, obtain all objects from the assigned Model.
+        else {
+            $this->model->from_representation(data: $this->request_data);
+            return $this->model->read();
+        }
+    }
+
+    /**
+     * Creates a new object for the assigned Model using the data submitted in a POST request.
+     */
+    public function post(): Model|ModelSet {
+        # POST request cannot include an ID, strip the ID if present
+        unset($this->request_data['id']);
+        $this->model->from_representation(data: $this->request_data);
+        $this->model->placement = $this->request_data['placement'] ?? null;
+        return $this->model->create(apply: $this->request_data['apply'] === true);
+    }
+    
+    /**
+     * Replaces all existing objects for the assigned Model using the data submitted in a PUT request.
+     */
+    public function put(): Model|ModelSet {
+        # Remove magic parameters
+        unset($this->request_data["async"]);
+        unset($this->request_data["limit"]);
+        unset($this->request_data["offset"]);
+        return $this->model->replace_all(data: $this->request_data,);
+    }
+    
+    /**
+     * Updates an existing object for the assigned Model using the data submitted in a PATCH request.
+     */
+    public function patch(): Model|ModelSet {
+        $this->model->from_representation(data: $this->request_data);
+        $this->model->placement = $this->request_data['placement'] ?? null;
+        return $this->model->update(apply: $this->request_data['apply'] === true);
+    }
+    
+    /**
+     * Deletes an existing object for the assigned Model using the data submitted in a DELETE request.
+     */
+    public function delete(): Model|ModelSet {
+        $this->model->from_representation(data: $this->request_data);
+        return $this->model->delete(apply: $this->request_data['apply'] === true);
+    }
+
+    /**
+     * Populates associated headers whenever an OPTIONS request is received.
+     */
+    final public function options(): void {
+        header('access-control-allow-methods: ' . implode(', ', $this->request_method_options));
+        header('Allow: ' . implode(', ', $this->request_method_options));
     }
 
     /**
@@ -703,7 +752,8 @@ class Endpoint {
         $code =
             "<?php\n" .
             "require_once('RESTAPI/Endpoints/$nq_class_name.inc');\n" .
-            "echo (new $fq_class_name())->listen();\n" .
+            "echo (new $fq_class_name())->process_request();\n" .
+            "header('Referer: no-referrer');\n" .
             "session_destroy();\n" .
             "exit();\n";
 
