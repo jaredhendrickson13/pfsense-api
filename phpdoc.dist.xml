@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor configVersion="3.0">
+    <title>pfSense-pkg-RESTAPI Development Documentation</title>
+    <paths>
+        <output>build/docs</output>
+    </paths>
+    <!--Zero or more repetitions:-->
+    <version number="3.0">
+        <!--Optional:-->
+        <folder>latest</folder>
+        <!--Zero or more repetitions:-->
+        <api format="php">
+            <source dsn=".">
+                <!--1 or more repetitions:-->
+                <path>pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/</path>
+            </source>
+            <!--Optional:-->
+            <output>api</output>
+            <!--Optional:-->
+            <ignore hidden="true" symlinks="true">
+                <!--1 or more repetitions:-->
+                <path>Tests/*</path>
+            </ignore>
+            <!--Optional:-->
+            <extensions>
+                <!--1 or more repetitions:-->
+                <extension>php</extension>
+                <extension>inc</extension>
+            </extensions>
+            <!--Optional:-->
+            <visibility>public</visibility>
+            <visibility>protected</visibility>
+            <visibility>private</visibility>
+            <!--Optional:-->
+            <include-source>true</include-source>
+            <!--Optional:-->
+            <markers>
+                <!--1 or more repetitions:-->
+                <marker>TODO</marker>
+                <marker>FIXME</marker>
+            </markers>
+        </api>
+    </version>
+</phpdocumentor>
