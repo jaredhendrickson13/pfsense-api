@@ -246,7 +246,7 @@ function run_tests(string|null $contains = ''): void {
     }
 
     echo '---------------------------------------------------------' . PHP_EOL;
-    echo "Ran all Tests: $succeed_count/$test_count Tests passed. $skipped_count Tests skipped." . PHP_EOL;
+    echo "Ran all tests: $succeed_count/$test_count tests passed. $skipped_count tests skipped." . PHP_EOL;
     exit($exit_code);
 }
 
