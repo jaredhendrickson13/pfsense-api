@@ -14,7 +14,7 @@
             </source>
             <output>api</output>
             <ignore hidden="true" symlinks="true">
-                <path>Tests/*</path>
+                <path>pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/Tests/</path>
             </ignore>
             <extensions>
                 <extension>php</extension>
