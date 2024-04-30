@@ -23,5 +23,7 @@ class WireGuardApplyDispatcher extends Dispatcher {
             $tunnels_to_apply = wg_apply_list_get('tunnels');
             wg_tunnel_sync(tunnel_names: $tunnels_to_apply, restart_services: true, resolve_endpoints: true);
         }
+        
+        clear_subsystem_dirty('wireguard');
     }
 }
