@@ -802,7 +802,7 @@ class Field {
      * Checks if a given `value` is an empty array or string and checks if empty values are allowed.
      * @param mixed $value The value to check for emptiness.
      * @return bool Returns `true` if value is empty and empty values are allowed. Returns `false` otherwise.
-     * @@throws  ValidationError When the $value is empty but empty empty values are not allowed
+     * @throws  ValidationError When the $value is empty but empty empty values are not allowed
      */
     private function check_value_empty(mixed $value): bool {
         # Skip this validation for read_only Fields
