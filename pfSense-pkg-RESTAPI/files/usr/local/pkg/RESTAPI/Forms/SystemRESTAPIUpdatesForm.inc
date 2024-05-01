@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Form;
 
+/**
+ * Defines the Form for viewing or applying REST API updates in the pfSense webConfigurator at /system_restapi_updates.php.
+ */
 class SystemRESTAPIUpdatesForm extends Form {
     public string $url = '/system_restapi_updates.php';
     public string $model_class = 'RESTAPIVersion';

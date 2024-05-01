@@ -7,6 +7,9 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Form;
 use RESTAPI\Models\RESTAPISettings;
 
+/**
+ * Defines the Form for viewing and deleting REST API keys in the pfSense webConfigurator at /system_restapi_key.php.
+ */
 class SystemRESTAPIKeysForm extends Form {
     public string $url = '/system_restapi_key.php';
     public string $many_sub_url = '/system_restapi_key_edit.php';

@@ -7,6 +7,9 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Form;
 use RESTAPI\Models\RESTAPIJWT;
 
+/**
+ * Defines the Form for configuring REST API settings in the pfSense webConfigurator at /system_restapi_settings.php.
+ */
 class SystemRESTAPISettingsForm extends Form {
     public string $url = '/system_restapi_settings.php';
     public string $model_class = 'RESTAPISettings';

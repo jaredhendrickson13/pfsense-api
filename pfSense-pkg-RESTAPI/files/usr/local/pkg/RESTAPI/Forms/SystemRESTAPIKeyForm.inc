@@ -8,6 +8,9 @@ use RESTAPI\Core\Form;
 use RESTAPI\Core\Response;
 use RESTAPI\Models\RESTAPISettings;
 
+/**
+ * Defines the Form for creating and editing REST API keys in the pfSense webConfigurator at /system_restapi_key_edit.php.
+ */
 class SystemRESTAPIKeyForm extends Form {
     public string $url = '/system_restapi_key_edit.php';
     public string $model_class = 'RESTAPIKey';
