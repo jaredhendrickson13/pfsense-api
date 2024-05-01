@@ -6,7 +6,7 @@ use RESTAPI\Core\Validator;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a validator class that determines if a given field value is a valid email address.
+ * Defines a Validator that determines if a given value is a valid email address.
  */
 class EmailAddressValidator extends Validator {
     /**

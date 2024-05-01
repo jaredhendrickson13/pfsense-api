@@ -8,6 +8,9 @@ use RESTAPI;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Validator that checks if a given value is within a specified numeric range.
+ */
 class NumericRangeValidator extends RESTAPI\Core\Validator {
     public int|float $minimum;
     public int|float $maximum;

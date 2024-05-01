@@ -5,9 +5,13 @@ namespace RESTAPI\Validators;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
+use RESTAPI\Core\Validator;
 use RESTAPI\Responses\ValidationError;
 
-class GatewayValidator extends RESTAPI\Core\Validator {
+/**
+ * Defines a Validator that determines if a given value is a valid Gateway object name
+ */
+class GatewayValidator extends Validator {
     public bool $allow_ipv4;
     public bool $allow_ipv6;
     public bool $allow_empty;
@@ -36,9 +40,9 @@ class GatewayValidator extends RESTAPI\Core\Validator {
      * Checks if a given value is a valid IP address.
      * @param mixed $value The value to validate.
      * @param string $field_name The field name of the value being validated. This is used for error messages.
-     * @throws \RESTAPI\Responses\ValidationError When the value is not a valid gateway.
+     * @throws ValidationError When the value is not a valid gateway.
      */
-    public function validate(mixed $value, string $field_name = '') {
+    public function validate(mixed $value, string $field_name = ''): void {
         # Allow empty values if requested
         if ($this->allow_empty and $value === '') {
             return;

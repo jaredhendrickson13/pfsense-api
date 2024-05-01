@@ -8,6 +8,9 @@ use RESTAPI;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Validator that checks if a given value is a valid IPv4 or IPv6 address.
+ */
 class IPAddressValidator extends RESTAPI\Core\Validator {
     public bool $allow_ipv4;
     public bool $allow_ipv6;

@@ -7,6 +7,9 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Validator that checks if a given value is a valid hostname, domain or FQDN.
+ */
 class HostnameValidator extends RESTAPI\Core\Validator {
     public bool $allow_hostname;
     public bool $allow_domain;
@@ -39,7 +42,7 @@ class HostnameValidator extends RESTAPI\Core\Validator {
      * @param string $field_name The field name of the value being validated. This is used for error messages.
      * @throws ValidationError When the value is not a valid hostname
      */
-    public function validate(mixed $value, string $field_name = '') {
+    public function validate(mixed $value, string $field_name = ''): void {
         # Allow this value if it matches an allowed keyword exactly
         if (in_array($value, $this->allow_keywords)) {
             return;

@@ -5,13 +5,14 @@ namespace RESTAPI\Validators;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
+use RESTAPI\Core\Validator;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Creates a validator object used to check if a given value is a valid IPv4 or IPv6 subnet CIDR
+ * Defines a Validator that checks if a given value is a valid subnet CIDR.
  */
-class SubnetValidator extends RESTAPI\Core\Validator {
+class SubnetValidator extends Validator {
     public bool $allow_ipv4;
     public bool $allow_ipv6;
     public bool $allow_alias;
@@ -38,9 +39,9 @@ class SubnetValidator extends RESTAPI\Core\Validator {
      * Checks if a given value is a valid subnet CIDR.
      * @param mixed $value The value to validate.
      * @param string $field_name The field name of the value being validated. This is used for error messages.
-     * @throws \RESTAPI\Responses\ValidationError When the value is not a valid subnet CIDR.
+     * @throws ValidationError When the value is not a valid subnet CIDR.
      */
-    public function validate(mixed $value, string $field_name = '') {
+    public function validate(mixed $value, string $field_name = ''): void {
         # Non-port alias values are valid if allowed
         $alias_query = FirewallAlias::query(['name' => $value, 'type__except' => 'port']);
         if ($this->allow_alias and $alias_query->exists()) {

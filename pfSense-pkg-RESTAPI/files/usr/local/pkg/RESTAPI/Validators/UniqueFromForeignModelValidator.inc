@@ -29,7 +29,7 @@ class UniqueFromForeignModelValidator extends Validator {
      * Checks if the value passed into this Validator matches the '$foreign_model_field_name' of any existing object
      * of the $foreign_model_name class
      */
-    public function validate(mixed $value, string $field_name = '') {
+    public function validate(mixed $value, string $field_name = ''): void {
         # Create the foreign model object
         $foreign_model_fqn = $this->foreign_model_fqn;
         $foreign_model_field_name = $this->foreign_model_field_name;

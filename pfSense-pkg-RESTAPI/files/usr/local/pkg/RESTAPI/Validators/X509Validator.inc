@@ -8,7 +8,7 @@ use RESTAPI\Core\Validator;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a Validator that determines if a given string is an X509 encoded object
+ * Defines a Validator that determines if a given string is an X509 encoded object.
  */
 class X509Validator extends Validator {
     const CRT_BEGIN = 'BEGIN CERTIFICATE';

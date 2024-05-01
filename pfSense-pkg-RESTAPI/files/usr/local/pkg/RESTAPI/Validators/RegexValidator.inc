@@ -5,6 +5,9 @@ namespace RESTAPI\Validators;
 use RESTAPI\Core\Validator;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Validator that checks if a given value matches a specified regex pattern.
+ */
 class RegexValidator extends Validator {
     /**
      * Constructs the Validator object.

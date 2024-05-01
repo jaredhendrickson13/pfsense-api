@@ -8,6 +8,10 @@ use RESTAPI;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Validator that checks if a given value is within a specified length range. This can be used to check both
+ * array and string lengths.
+ */
 class LengthValidator extends RESTAPI\Core\Validator {
     public int $minimum;
     public int $maximum;
@@ -27,9 +31,9 @@ class LengthValidator extends RESTAPI\Core\Validator {
      * @param string $field_name The field name of the value being validated. This is used for error messages.
      * @throws ValidationError When the value is less than the minimum length requirement OR is greather than
      * the maximum length requirement.
-     * @throws \RESTAPI\Responses\ServerError When the value was not a string or an array.
+     * @throws ServerError When the value was not a string or an array.
      */
-    public function validate(mixed $value, string $field_name = '') {
+    public function validate(mixed $value, string $field_name = ''): void {
         # Perform specific validation for string values
         if (is_string($value)) {
             # Throw an error if the string contains less characters than the specified minimum
