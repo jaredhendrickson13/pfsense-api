@@ -32,8 +32,9 @@ jobs:
         uses: actions/configure-pages@v5.0.0
       - name: Build documentation
         run: |
-          sudo apt install docker.io
-          sudo docker run --rm -v ${PWD}:/data phpdoc/phpdoc:3
+          wget https://phpdoc.org/phpDocumentor.phar
+          chmod +x phpDocumentor.phar
+          ./phpDocumentor.phar
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3.0.1
         with:
