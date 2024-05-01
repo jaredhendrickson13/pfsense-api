@@ -4,6 +4,9 @@ namespace RESTAPI\Auth;
 
 use RESTAPI\Core\Auth;
 
+/**
+ * Defines an Auth class that allows for Basic authentication against the pfSense local user database.
+ */
 class BasicAuth extends Auth {
     const WWW_AUTHENTICATE_HEADER = 'WWW-Authenticate: Basic realm="Login for pfSense REST API"';
 

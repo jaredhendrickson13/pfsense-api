@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Dispatcher;
 
+/**
+ * Defines a Dispatcher for applying changes to the HAProxy settings.
+ */
 class HAProxyApplyDispatcher extends Dispatcher {
     public int $max_concurrency = 1; // Only allow one HAProxy process to run at a time
     protected array $required_packages = ['pfSense-pkg-haproxy'];

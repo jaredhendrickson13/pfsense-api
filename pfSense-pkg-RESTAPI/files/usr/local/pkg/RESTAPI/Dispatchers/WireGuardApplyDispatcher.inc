@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Dispatcher;
 
+/**
+ * Defines a Dispatcher for applying changes to the WireGuard configuration.
+ */
 class WireGuardApplyDispatcher extends Dispatcher {
     public int $max_concurrency = 1; // Only allow one dispatcher process to run at a time
     protected array $required_packages = ['pfSense-pkg-WireGuard'];

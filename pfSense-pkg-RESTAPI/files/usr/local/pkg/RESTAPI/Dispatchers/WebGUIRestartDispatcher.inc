@@ -5,6 +5,9 @@ namespace RESTAPI\Dispatchers;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\Dispatcher;
 
+/**
+ * Defines a Dispatcher for restarting the web GUI.
+ */
 class WebGUIRestartDispatcher extends Dispatcher {
     # Don't limit the number of Web GUI restarts that can run at a time.
     public int $max_concurrency = 0;

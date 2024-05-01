@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a single StaticRoute Model object at 
+ * /api/v2/routing/static_routes.
+ */
 class RoutingStaticRouteEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

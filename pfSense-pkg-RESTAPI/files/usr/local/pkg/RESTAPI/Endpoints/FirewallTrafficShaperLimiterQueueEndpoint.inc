@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a singular TrafficShaperLimiterQueue Model objects at 
+ * /api/v2/firewall/traffic_shaper/limiter/queue.
+ */
 class FirewallTrafficShaperLimiterQueueEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

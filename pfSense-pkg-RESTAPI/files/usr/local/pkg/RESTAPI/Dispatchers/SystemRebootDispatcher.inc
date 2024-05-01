@@ -5,6 +5,9 @@ namespace RESTAPI\Dispatchers;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\Dispatcher;
 
+/**
+ * Defines a Dispatcher for rebooting the system.
+ */
 class SystemRebootDispatcher extends Dispatcher {
     # Only allow one reboot at a time
     public int $max_concurrency = 1;

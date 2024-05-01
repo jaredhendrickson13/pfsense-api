@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with singular CommandPrompt Model objects at /api/v2/diagnostics/command_prompt.
+ */
 class DiagnosticsCommandPromptEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

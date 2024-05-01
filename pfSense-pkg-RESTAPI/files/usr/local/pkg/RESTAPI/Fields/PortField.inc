@@ -11,8 +11,8 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a PortField class that extends the Core Field method. This Field adds validation and representation for
- * TCP/UDP port values and ranges.
+ * Defines a Field object for validating and storing TCP/UDP port values in the pfSense configuration. This includes
+ * options for port aliases and port ranges.
  */
 class PortField extends Field {
     const REPR_RANGE_CHAR = ':';

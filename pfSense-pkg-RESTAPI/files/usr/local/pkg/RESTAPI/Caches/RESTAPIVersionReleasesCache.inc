@@ -8,7 +8,7 @@ use RESTAPI\Core\Cache;
 use RESTAPI\Core\Command;
 
 /**
- * Defines a Dispatcher that can be used to update the available pfSense-pkg-RESTAPI releases cache. This Dispatcher
+ * Defines a Cache that can be used to update the available pfSense-pkg-RESTAPI releases cache. This Cache
  * runs on a schedule to periodically update the releases cache in the background.
  */
 class RESTAPIVersionReleasesCache extends Cache {

@@ -7,8 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI;
 
 /**
- * Defines a UIDField class that extends the Core Field method. This field will automatically populate a unique ID that
- * is immutable.
+ * Defines a Field that contains a unique ID. This field will automatically populate a unique ID that is immutable.
  */
 class UIDField extends RESTAPI\Core\Field {
     /**

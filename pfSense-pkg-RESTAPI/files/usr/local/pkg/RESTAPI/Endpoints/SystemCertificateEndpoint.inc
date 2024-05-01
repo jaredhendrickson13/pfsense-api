@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a single Certificate Model object at 
+ * /api/v2/system/certificate.
+ */
 class SystemCertificateEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

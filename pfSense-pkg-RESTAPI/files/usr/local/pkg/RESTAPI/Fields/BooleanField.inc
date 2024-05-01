@@ -7,8 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI;
 
 /**
- * Defines a BooleanField class that extends the Core Field method. This Field adds validation and representation for
- * boolean Model Fields.
+ * Defines a Field object for storing boolean values in the pfSense configuration.
  */
 class BooleanField extends RESTAPI\Core\Field {
     /**

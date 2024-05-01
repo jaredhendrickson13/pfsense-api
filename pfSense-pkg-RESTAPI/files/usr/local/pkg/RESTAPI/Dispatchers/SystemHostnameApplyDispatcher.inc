@@ -5,6 +5,9 @@ namespace RESTAPI\Dispatchers;
 use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\Model;
 
+/**
+ * Defines a Dispatcher for applying changes to the system hostname configuration.
+ */
 class SystemHostnameApplyDispatcher extends Dispatcher {
     # Only allow the system hostname services to be applied one at a time
     public int $max_concurrency = 1;

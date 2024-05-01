@@ -6,7 +6,11 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
-class VPNIPsecPhase1SEndpoint extends Endpoint {
+/**
+ * Defines an Endpoint for interacting with many IPsecPhase1 Model objects at 
+ * /api/v2/vpn/ipsec/phase1s.
+ */
+class VPNIPsecPhase1sEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/vpn/ipsec/phase1s';

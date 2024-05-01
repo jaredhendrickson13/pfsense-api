@@ -7,8 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI;
 
 /**
- * Defines a FloatField class that extends the Core Field method. This Field adds validation and representation for
- * float type Model Fields.
+ * Defines a Field object for validating and storing a floating point number.
  */
 class FloatField extends RESTAPI\Core\Field {
     /**

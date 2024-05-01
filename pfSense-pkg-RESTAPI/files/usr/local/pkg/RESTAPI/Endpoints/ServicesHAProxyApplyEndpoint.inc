@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with the HAProxyApply Model object at 
+ * /api/v2/services/haproxy/apply.
+ */
 class ServicesHAProxyApplyEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

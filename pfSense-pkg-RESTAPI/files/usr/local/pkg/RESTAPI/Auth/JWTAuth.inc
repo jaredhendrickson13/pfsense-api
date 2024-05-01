@@ -5,6 +5,9 @@ namespace RESTAPI\Auth;
 use RESTAPI\Core\Auth;
 use RESTAPI\Models\RESTAPIJWT;
 
+/**
+ * Defines an Auth class that allows for JWT authentication against the pfSense REST API.
+ */
 class JWTAuth extends Auth {
     /**
      * @var string|null $verbose_name The human-readable name for this Auth class.

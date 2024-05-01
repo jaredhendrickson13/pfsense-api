@@ -4,6 +4,9 @@ namespace RESTAPI\Dispatchers;
 
 use RESTAPI\Core\Dispatcher;
 
+/**
+ * Defines a Dispatcher for applying changes to the DNS Resolver configuration.
+ */
 class DNSResolverApplyDispatcher extends Dispatcher {
     # Only allow one Unbound reload to occur at a time
     public int $max_concurrency = 1;

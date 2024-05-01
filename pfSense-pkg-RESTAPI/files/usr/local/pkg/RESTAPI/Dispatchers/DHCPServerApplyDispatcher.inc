@@ -5,6 +5,9 @@ namespace RESTAPI\Dispatchers;
 use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\Model;
 
+/**
+ * Defines a Dispatcher for applying changes to the DHCP server configuration.
+ */
 class DHCPServerApplyDispatcher extends Dispatcher {
     # Only allow one DHCP server reload to occur at a time
     public int $max_concurrency = 1;

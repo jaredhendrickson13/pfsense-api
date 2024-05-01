@@ -8,7 +8,7 @@ use RESTAPI;
 use RESTAPI\Responses\ServerError;
 
 /**
- * Defines a UnixTimeField class that extends the Core Field method.
+ * Defines a Field object for validating and storing Unix timestamp values.
  */
 class UnixTimeField extends IntegerField {
     /**

@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a single User Model object at 
+ * /api/v2/user.
+ */
 class UserEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

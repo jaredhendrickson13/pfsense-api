@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a single WireGuardPeerAllowedIP Model object at 
+ * /api/v2/vpn/wireguard/peer/allowed_ip.
+ */
 class VPNWireGuardPeerAllowedIPEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

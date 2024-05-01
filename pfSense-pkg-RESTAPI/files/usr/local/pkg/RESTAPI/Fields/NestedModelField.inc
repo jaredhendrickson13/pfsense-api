@@ -9,6 +9,10 @@ use RESTAPI\Core\Response;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Field object for storing nested Model objects in the pfSense configuration. This field allows certain
+ * Model objects to be stored as field values for another Model object.
+ */
 class NestedModelField extends Field {
     public string $model_class;
     private string $model_class_short;

@@ -9,8 +9,8 @@ use RESTAPI\Core\Field;
 use RESTAPI\Responses\ServerError;
 
 /**
- * Defines a Base64Field class that extends the Core Field method. This Field adds validation and representation for
- * Base64 encoded Model Fields.
+ * Defines a Field for storing Base64 encoded strings in the pfSense configuration. This field will store string values
+ * internally as Base64 encoded strings, but represent them as plain text strings.
  */
 class Base64Field extends Field {
     /**

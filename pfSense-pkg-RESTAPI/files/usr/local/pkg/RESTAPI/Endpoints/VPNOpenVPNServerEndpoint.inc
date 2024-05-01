@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a single OpenVPNServer Model object at 
+ * /api/v2/vpn/openvpn/server.
+ */
 class VPNOpenVPNServerEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

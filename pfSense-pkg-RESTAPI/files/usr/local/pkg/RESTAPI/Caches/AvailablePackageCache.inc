@@ -8,7 +8,7 @@ use RESTAPI\Core\Cache;
 use function RESTAPI\Dispatchers\get_pkg_info;
 
 /**
- * Defines a Cache for available package information obtained from the external package repos.
+ * Defines a Cache for available pfSense package information obtained from the pfSense package repos.
  */
 class AvailablePackageCache extends Cache {
     public int $timeout = 120;

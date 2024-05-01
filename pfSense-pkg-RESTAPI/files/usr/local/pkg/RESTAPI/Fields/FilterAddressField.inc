@@ -10,8 +10,8 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a FilterAddressField class that extends the InterfaceField class. This Field adds validation and
- * representation for firewall filter addresses (e.g. firewall and NAT rule source and destination addresses).
+ * Defines a Field class that adds validation and representation for firewall filter addresses (e.g. firewall and 
+ * NAT rule source and destination addresses).
  */
 class FilterAddressField extends InterfaceField {
     const INVERT_PREFIX = '!';

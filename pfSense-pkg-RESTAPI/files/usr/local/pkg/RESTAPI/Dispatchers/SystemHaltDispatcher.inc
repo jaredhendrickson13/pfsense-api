@@ -5,6 +5,9 @@ namespace RESTAPI\Dispatchers;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\Dispatcher;
 
+/**
+ * Defines a Dispatcher for shutting down the system.
+ */
 class SystemHaltDispatcher extends Dispatcher {
     # Only allow one shutdown at a time
     public int $max_concurrency = 1;

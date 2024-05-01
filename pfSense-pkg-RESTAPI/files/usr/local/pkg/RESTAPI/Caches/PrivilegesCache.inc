@@ -8,8 +8,8 @@ use RESTAPI\Core\Cache;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
- * Defines a class that is responsible for obtaining the privileges for REST API Endpoints and Forms and caching them
- * to a centralized location where it can be read by /etc/inc/priv/restapi.priv.inc
+ * Defines a Cache that is responsible for obtaining the privileges for REST API Endpoints and Forms and caching them
+ * to a centralized location where it can be read by /etc/inc/priv/restapi.priv.inc.
  */
 class PrivilegesCache extends Cache {
     /**

@@ -4,6 +4,9 @@ namespace RESTAPI\Dispatchers;
 
 use RESTAPI\Core\Dispatcher;
 
+/**
+ * Defines a Dispatcher for applying changes to the IPsec configuration.
+ */
 class IPsecApplyDispatcher extends Dispatcher {
     public int $timeout = 120;
     protected function _process(mixed ...$arguments): void {

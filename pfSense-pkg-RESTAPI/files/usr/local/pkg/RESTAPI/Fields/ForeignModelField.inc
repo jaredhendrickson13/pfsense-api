@@ -12,9 +12,8 @@ use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
 
 /**
- * Defines a ForeignModelField class that extends the Core Field method. This Field adds validation and representation
- * Fields that relate to a different Model object field. For example, a ForeignModelField can be used to relate a static
- * route to its parent Gateway model object.
+ * Defines a Field  that adds validation and representation for Fields that relate to a different Model object field. 
+ * For example, a ForeignModelField can be used to relate a static route to its parent Gateway model object.
  */
 class ForeignModelField extends Field {
     /**

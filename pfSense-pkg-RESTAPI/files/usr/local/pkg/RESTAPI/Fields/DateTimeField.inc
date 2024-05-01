@@ -11,8 +11,7 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a DateTimeField class that extends the Core Field method. This Field adds validation and representation for
- * datetime Model Fields.
+ * Defines a Field object for storing and validating DateTime values.
  */
 class DateTimeField extends Field {
     /**

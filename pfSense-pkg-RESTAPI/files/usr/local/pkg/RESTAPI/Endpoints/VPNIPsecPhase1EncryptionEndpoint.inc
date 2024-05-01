@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a single IPsecPhase1Encryption Model objects at 
+ * /api/v2/vpn/ipsec/phase1/encryption.
+ */
 class VPNIPsecPhase1EncryptionEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

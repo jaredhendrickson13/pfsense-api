@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a singular ServiceWatchdog Model objects at 
+ * /api/v2/services/service_watchdog.
+ */
 class ServicesServiceWatchdogEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with the RESTAPISettings Model object at 
+ * /api/v2/system/restapi/settings.
+ */
 class SystemRESTAPISettingsEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

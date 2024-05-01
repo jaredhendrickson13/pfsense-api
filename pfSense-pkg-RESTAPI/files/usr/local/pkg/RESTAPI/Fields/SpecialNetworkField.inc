@@ -11,9 +11,9 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a SpecialNetworkField class that extends the InterfaceField class. This Field adds validation and
- * representation for address and network Fields that support special networks like interfaces, aliases, etc.
- * This is similar to FilterAddressField except the values do not get nested into arrays internally.
+ * Defines a Field that adds validation and representation for address and network Fields that support special 
+ * networks like interfaces, aliases, etc. This is similar to FilterAddressField except the values do not get 
+ * nested into arrays internally.
  */
 class SpecialNetworkField extends InterfaceField {
     /**

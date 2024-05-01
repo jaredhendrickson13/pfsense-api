@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a singular FirewallState Model object at /api/v2/firewall/state.
+ */
 class FirewallStateEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

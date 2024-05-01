@@ -8,8 +8,7 @@ use RESTAPI;
 use RESTAPI\Core\Field;
 
 /**
- * Defines a IntegerField class that extends the Core Field method. This Field adds validation and representation for
- * integer type Model Fields.
+ * Defines a Field object for validating and storing integer values in the pfSense configuration.
  */
 class IntegerField extends Field {
     /**

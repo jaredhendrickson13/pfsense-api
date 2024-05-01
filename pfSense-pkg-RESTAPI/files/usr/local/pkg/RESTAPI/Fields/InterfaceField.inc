@@ -12,8 +12,8 @@ use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Responses\NotFoundError;
 
 /**
- * Defines an InterfaceField class that extends the Core Field method. This Field adds validation and representation for
- * Fields that accept interface IDs and/or names as input.
+ * Defines an Field object for storing interface values in the pfSense configuration. This field will also be responsible
+ * for representing the interface according to the REST API `represent_interfaces_as` setting.
  */
 class InterfaceField extends StringField {
     /**

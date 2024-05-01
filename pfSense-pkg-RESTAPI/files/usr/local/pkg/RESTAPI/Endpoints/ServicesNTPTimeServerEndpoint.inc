@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a singular NTPTimeServer Model object at 
+ * /api/v2/services/ntp/time_server.
+ */
 class ServicesNTPTimeServerEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

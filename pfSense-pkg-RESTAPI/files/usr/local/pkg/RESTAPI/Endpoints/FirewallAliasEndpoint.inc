@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with many FirewallAlias Model objects at /api/v2/firewall/aliases.
+ */
 class FirewallAliasEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

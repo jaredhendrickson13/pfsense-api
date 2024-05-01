@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with a singular OutboundNATMapping Model objects at 
+ * /api/v2/firewall/nat/outbound/mapping.
+ */
 class FirewallNATOutboundMappingEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

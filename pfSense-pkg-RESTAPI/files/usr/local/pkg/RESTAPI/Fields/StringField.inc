@@ -8,8 +8,7 @@ use RESTAPI;
 use RESTAPI\Core\Field;
 
 /**
- * Defines a StringField class that extends the Core Field method. This Field adds validation and representation for
- * string Model Fields.
+ * Defines a Field object for validating and storing string values.
  */
 class StringField extends Field {
     /**

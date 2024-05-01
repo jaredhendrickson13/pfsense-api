@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with multiple CronJob Model objects at 
+ * /api/v2/services/cron/jobs.
+ */
 class ServicesCronJobsEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes

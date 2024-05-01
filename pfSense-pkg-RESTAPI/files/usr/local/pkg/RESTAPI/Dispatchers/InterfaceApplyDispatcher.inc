@@ -4,6 +4,9 @@ namespace RESTAPI\Dispatchers;
 
 use RESTAPI\Core\Dispatcher;
 
+/**
+ * Defines a Dispatcher for applying changes to interface configurations.
+ */
 class InterfaceApplyDispatcher extends Dispatcher {
     # Do not limit the number concurrent filter reloads that can run
     public int $max_concurrency = 1;

@@ -6,6 +6,10 @@ use JsonException;
 use RESTAPI\Core\ContentHandler;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a ContentHandler for URL encoded data. This handler is responsible for decoding URL encoded data for the 
+ * REST API and corresponds with the 'application/x-www-form-urlencoded' MIME type.
+ */
 class URLContentHandler extends ContentHandler {
     public string $mime_type = 'application/x-www-form-urlencoded';
 

@@ -6,6 +6,10 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
+/**
+ * Defines an Endpoint for interacting with the DefaultGateway Model object at 
+ * /api/v2/routing/gateway/default.
+ */
 class RoutingGatewayDefaultEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes
