@@ -56,8 +56,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: ["lint_php"]
     steps:
+      - uses: actions/checkout@v4
       - name: Check phpdoc build
         run: |
-          wget https://phpdoc.org/phpDocumentor.phar
-          chmod +x phpDocumentor.phar
-          ./phpDocumentor.phar
+          wget https://phpdoc.org/phpDocumentor.phar -O phpdoc
+          chmod +x ./phpdoc
+          ./phpdoc
