@@ -34,7 +34,7 @@ class Auth {
     use BaseTraits;
 
     /**
-     * @var array $api_settings The current REST API settings config. This contains the settings internal values.
+     * @@var array $api_settings The current REST API settings config. This contains the settings internal values.
      */
     private array $api_settings;
 
