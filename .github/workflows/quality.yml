@@ -58,6 +58,6 @@ jobs:
     steps:
       - name: Check phpdoc build
         run: |
-          wget https://phpdoc.org/phpDocumentor.phar -O phpdoc
-          chmod +x ./phpdoc
-          ./phpdoc
+          wget https://phpdoc.org/phpDocumentor.phar
+          chmod +x phpDocumentor.phar
+          ./phpDocumentor.phar
