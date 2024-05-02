@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpdocumentor configVersion="3.0">
     <title>pfSense-pkg-RESTAPI</title>
+    <setting name="template.color" value="blue"/>
     <paths>
         <output>.phpdoc/build</output>
         <cache>.phpdoc/cache</cache>
