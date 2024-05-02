@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a singular DNSResolverHostOverride Model object at 
+ * Defines an Endpoint for interacting with a singular DNSResolverHostOverride Model object at
  * /api/v2/services/dns_resolver/host_override.
  */
 class ServicesDNSResolverHostOverrideEndpoint extends Endpoint {

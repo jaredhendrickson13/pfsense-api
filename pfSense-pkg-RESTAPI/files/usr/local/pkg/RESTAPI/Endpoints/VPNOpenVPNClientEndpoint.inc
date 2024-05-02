@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a single OpenVPNClient Model objects at 
+ * Defines an Endpoint for interacting with a single OpenVPNClient Model objects at
  * /api/v2/vpn/openvpn/client.
  */
 class VPNOpenVPNClientEndpoint extends Endpoint {

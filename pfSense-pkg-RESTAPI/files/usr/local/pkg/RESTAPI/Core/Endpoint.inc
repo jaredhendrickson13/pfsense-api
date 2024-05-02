@@ -162,9 +162,9 @@ class Endpoint {
     public bool $ignore_enabled = false;
 
     /**
-     * @var ResourceLinkSet|null $resource_link_set 
+     * @var ResourceLinkSet|null $resource_link_set
      * A ResourceLinkSet containing ResourceLinks that should always be included in
-     * the root _links for this response. 
+     * the root _links for this response.
      */
     public ResourceLinkSet|null $resource_link_set = null;
 
@@ -255,9 +255,9 @@ class Endpoint {
 
         # Fetch request method whenever the object is first created.
         $this->request_method = strtoupper($_SERVER['REQUEST_METHOD']);
-        
+
         # Assign the default $resource_links value if not specified by a child class
-        $this->resource_link_set = ($this->resource_link_set) ?: new ResourceLinkSet();
+        $this->resource_link_set = $this->resource_link_set ?: new ResourceLinkSet();
 
         # Initialize the assigned model
         $model_class = 'RESTAPI\\Models\\' . $this->model_name;
@@ -366,8 +366,16 @@ class Endpoint {
         $next_url = $this->url . "?offset=$next_offset&limit=$limit";
 
         # Include the pagination links to our $resource_link_set property
-        $this->resource_link_set->resource_links[] = new ResourceLink(rel: 'prev', href: $prev_url, use_namespace: false);
-        $this->resource_link_set->resource_links[] = new ResourceLink(rel: 'next', href: $next_url, use_namespace: false);
+        $this->resource_link_set->resource_links[] = new ResourceLink(
+            rel: 'prev',
+            href: $prev_url,
+            use_namespace: false,
+        );
+        $this->resource_link_set->resource_links[] = new ResourceLink(
+            rel: 'next',
+            href: $next_url,
+            use_namespace: false,
+        );
     }
 
     /**
@@ -458,7 +466,7 @@ class Endpoint {
             $this->client = new Auth();
             return;
         }
-        
+
         # Attempt to authenticate the remote client
         $this->client = Auth::attempt_multi_auth(
             auth_classes: $this->auth_methods,
@@ -599,7 +607,7 @@ class Endpoint {
         try {
             # Ensure API is enabled and the receiving interface is allowed to answer API calls.
             $this->check_server_ip();
-            
+
             # Checks client authentication and authorization if required
             if ($this->requires_auth) {
                 $this->check_auth();
@@ -702,18 +710,18 @@ class Endpoint {
         $this->model->placement = $this->request_data['placement'] ?? null;
         return $this->model->create(apply: $this->request_data['apply'] === true);
     }
-    
+
     /**
      * Replaces all existing objects for the assigned Model using the data submitted in a PUT request.
      */
     public function put(): Model|ModelSet {
         # Remove magic parameters
-        unset($this->request_data["async"]);
-        unset($this->request_data["limit"]);
-        unset($this->request_data["offset"]);
-        return $this->model->replace_all(data: $this->request_data,);
+        unset($this->request_data['async']);
+        unset($this->request_data['limit']);
+        unset($this->request_data['offset']);
+        return $this->model->replace_all(data: $this->request_data);
     }
-    
+
     /**
      * Updates an existing object for the assigned Model using the data submitted in a PATCH request.
      */
@@ -722,7 +730,7 @@ class Endpoint {
         $this->model->placement = $this->request_data['placement'] ?? null;
         return $this->model->update(apply: $this->request_data['apply'] === true);
     }
-    
+
     /**
      * Deletes an existing object for the assigned Model using the data submitted in a DELETE request.
      */

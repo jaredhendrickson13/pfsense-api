@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a singular DHCPServerBackend Model object at 
+ * Defines an Endpoint for interacting with a singular DHCPServerBackend Model object at
  * /api/v2/services/dhcp_server/backend.
  */
 class ServicesDHCPServerEndpoint extends Endpoint {

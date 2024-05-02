@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a singular InterfaceVLAN Model object at 
+ * Defines an Endpoint for interacting with a singular InterfaceVLAN Model object at
  * /api/v2/interface/vlan.
  */
 class InterfaceVLANEndpoint extends Endpoint {

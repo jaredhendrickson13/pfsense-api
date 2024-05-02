@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with multiple NTPTimeServer Model objects at 
+ * Defines an Endpoint for interacting with multiple NTPTimeServer Model objects at
  * /api/v2/services/ntp/time_servers.
  */
 class ServicesNTPTimeServersEndpoint extends Endpoint {

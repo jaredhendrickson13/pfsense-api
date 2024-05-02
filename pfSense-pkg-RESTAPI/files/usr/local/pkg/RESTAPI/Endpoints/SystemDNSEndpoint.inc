@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with the SystemDNS Model object at 
+ * Defines an Endpoint for interacting with the SystemDNS Model object at
  * /api/v2/system/dns.
  */
 class SystemDNSEndpoint extends Endpoint {

@@ -6,8 +6,8 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Models\RESTAPIKey;
 
 /**
- * Defines an Auth class that allows for API key authentication against the pfSense REST API. Key auth is better 
- * suited to distribute to systems as they are revocable and will only allow API authentication; not webConfigurator 
+ * Defines an Auth class that allows for API key authentication against the pfSense REST API. Key auth is better
+ * suited to distribute to systems as they are revocable and will only allow API authentication; not webConfigurator
  * or SSH authentication (like the local database credentials).
  */
 class KeyAuth extends Auth {

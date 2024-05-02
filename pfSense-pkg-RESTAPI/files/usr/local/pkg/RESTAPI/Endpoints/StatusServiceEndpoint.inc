@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a Service Model object at 
+ * Defines an Endpoint for interacting with a Service Model object at
  * /api/v2/status/service.
  */
 class StatusServiceEndpoint extends Endpoint {

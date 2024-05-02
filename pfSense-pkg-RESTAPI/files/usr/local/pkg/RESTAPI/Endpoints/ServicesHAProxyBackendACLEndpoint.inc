@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a singular HAProxyBackendACL Model object at 
+ * Defines an Endpoint for interacting with a singular HAProxyBackendACL Model object at
  * /api/v2/services/haproxy/backend/acl.
  */
 class ServicesHAProxyBackendACLEndpoint extends Endpoint {

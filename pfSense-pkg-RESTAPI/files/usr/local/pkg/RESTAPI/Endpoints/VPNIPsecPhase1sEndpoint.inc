@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with many IPsecPhase1 Model objects at 
+ * Defines an Endpoint for interacting with many IPsecPhase1 Model objects at
  * /api/v2/vpn/ipsec/phase1s.
  */
 class VPNIPsecPhase1sEndpoint extends Endpoint {

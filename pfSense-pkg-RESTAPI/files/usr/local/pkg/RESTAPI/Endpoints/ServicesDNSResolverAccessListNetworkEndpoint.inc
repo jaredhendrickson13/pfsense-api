@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a singular DNSResolverAccessListNetwork Model object at 
+ * Defines an Endpoint for interacting with a singular DNSResolverAccessListNetwork Model object at
  * /api/v2/services/dns_resolver/access_list/network.
  */
 class ServicesDNSResolverAccessListNetworkEndpoint extends Endpoint {

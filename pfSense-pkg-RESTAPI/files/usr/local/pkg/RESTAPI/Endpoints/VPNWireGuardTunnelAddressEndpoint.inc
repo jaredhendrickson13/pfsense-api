@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a single WireGuardTunnelAddress Model object at 
+ * Defines an Endpoint for interacting with a single WireGuardTunnelAddress Model object at
  * /api/v2/vpn/wireguard/tunnel/address.
  */
 class VPNWireGuardTunnelAddressEndpoint extends Endpoint {

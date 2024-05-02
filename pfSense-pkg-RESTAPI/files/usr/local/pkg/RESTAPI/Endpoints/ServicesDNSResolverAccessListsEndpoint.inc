@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with multiple DNSResolverAccessList Model objects at 
+ * Defines an Endpoint for interacting with multiple DNSResolverAccessList Model objects at
  * /api/v2/services/dns_resolver/access_lists.
  */
 class ServicesDNSResolverAccessListsEndpoint extends Endpoint {

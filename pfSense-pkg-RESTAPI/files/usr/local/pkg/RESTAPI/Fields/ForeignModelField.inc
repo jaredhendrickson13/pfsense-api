@@ -12,7 +12,7 @@ use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
 
 /**
- * Defines a Field  that adds validation and representation for Fields that relate to a different Model object field. 
+ * Defines a Field  that adds validation and representation for Fields that relate to a different Model object field.
  * For example, a ForeignModelField can be used to relate a static route to its parent Gateway model object.
  */
 class ForeignModelField extends Field {

@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with the NTPSettings Model object at 
+ * Defines an Endpoint for interacting with the NTPSettings Model object at
  * /api/v2/services/ntp/settings.
  */
 class ServicesNTPSettingsEndpoint extends Endpoint {

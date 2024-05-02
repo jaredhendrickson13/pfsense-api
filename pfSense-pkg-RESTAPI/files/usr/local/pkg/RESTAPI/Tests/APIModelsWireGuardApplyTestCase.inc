@@ -2,7 +2,6 @@
 
 namespace RESTAPI\Tests;
 
-
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\DNSResolverApply;
 use RESTAPI\Models\DNSResolverHostOverride;
@@ -11,8 +10,7 @@ use RESTAPI\Models\WireGuardApply;
 use RESTAPI\Models\WireGuardPeer;
 use RESTAPI\Models\WireGuardSettings;
 
-class APIModelsWireGuardApplyTestCase extends TestCase
-{
+class APIModelsWireGuardApplyTestCase extends TestCase {
     /**
      * Ensure the WireGuard package is installed and enabled before running tests.
      */
@@ -33,19 +31,18 @@ class APIModelsWireGuardApplyTestCase extends TestCase
         $pkg = Package::query(name: 'pfSense-pkg-WireGuard')->first();
         $pkg->delete();
     }
-    
+
     /**
      * Ensure the Model is correctly able to apply changes to the WireGuard configuration and determine if there
      * are any pending changes.
      */
     public function test_apply(): void {
-
         # Make a change to the WireGuard configuration and ensure we can see that there are pending changes
         $peers = new WireGuardPeer();
         $peers->replace_all(data: []);
         $wg_apply = new WireGuardApply(async: false);
         $this->assert_is_false($wg_apply->applied->value);
-        
+
         # Apply the change and ensure that the applied status is now true
         $wg_apply->apply();
         $wg_apply = new WireGuardApply(async: true);

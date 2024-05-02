@@ -8,7 +8,7 @@ use RESTAPI\Dispatchers\WireGuardApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 
 /**
- * Defines a Model that provides details on pending WireGuard changes and allows DNS Resolver changes 
+ * Defines a Model that provides details on pending WireGuard changes and allows DNS Resolver changes
  * to be applied.
  */
 class WireGuardApply extends Model {

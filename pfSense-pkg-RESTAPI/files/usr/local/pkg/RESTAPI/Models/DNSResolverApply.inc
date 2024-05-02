@@ -8,7 +8,7 @@ use RESTAPI\Dispatchers\DNSResolverApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 
 /**
- * Defines a Model that provides details on pending DNS Resolver changes and allows DNS Resolver routing changes 
+ * Defines a Model that provides details on pending DNS Resolver changes and allows DNS Resolver routing changes
  * to be applied.
  */
 class DNSResolverApply extends Model {

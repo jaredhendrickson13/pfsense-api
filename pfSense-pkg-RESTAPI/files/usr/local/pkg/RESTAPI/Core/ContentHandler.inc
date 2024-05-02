@@ -168,7 +168,7 @@ class ContentHandler {
         # Variables
         $handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
         $mime_type = self::get_decode_mime_type();
-        
+
         # Default to application/x-www-form-urlencoded if the Content-Type header is empty
         if (empty($mime_type)) {
             $mime_type = 'application/x-www-form-urlencoded';

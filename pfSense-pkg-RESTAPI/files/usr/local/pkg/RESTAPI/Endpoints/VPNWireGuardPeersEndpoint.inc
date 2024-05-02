@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with many WireGuardPeer Model objects at 
+ * Defines an Endpoint for interacting with many WireGuardPeer Model objects at
  * /api/v2/vpn/wireguard/peers.
  */
 class VPNWireGuardPeersEndpoint extends Endpoint {

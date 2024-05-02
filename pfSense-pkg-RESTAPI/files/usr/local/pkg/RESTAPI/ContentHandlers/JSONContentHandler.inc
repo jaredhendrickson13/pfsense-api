@@ -7,7 +7,7 @@ use RESTAPI\Core\ContentHandler;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a ContentHandler for JSON data. This handler is responsible for encoding and decoding JSON data for the 
+ * Defines a ContentHandler for JSON data. This handler is responsible for encoding and decoding JSON data for the
  * REST API and corresponds with the 'application/json' MIME type.
  */
 class JSONContentHandler extends ContentHandler {

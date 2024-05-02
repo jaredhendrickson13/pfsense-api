@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a singular DHCPServerAddressPool Model object at 
+ * Defines an Endpoint for interacting with a singular DHCPServerAddressPool Model object at
  * /api/v2/services/dhcp_server/address_pool.
  */
 class ServicesDHCPServerAddressPoolEndpoint extends Endpoint {

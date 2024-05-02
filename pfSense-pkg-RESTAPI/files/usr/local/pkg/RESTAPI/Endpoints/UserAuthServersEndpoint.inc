@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with many AuthServer Model objects at 
+ * Defines an Endpoint for interacting with many AuthServer Model objects at
  * /api/v2/user/auth_servers.
  */
 class UserAuthServersEndpoint extends Endpoint {

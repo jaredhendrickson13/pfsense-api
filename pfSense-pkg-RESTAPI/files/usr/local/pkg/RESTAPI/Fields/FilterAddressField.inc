@@ -10,7 +10,7 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a Field class that adds validation and representation for firewall filter addresses (e.g. firewall and 
+ * Defines a Field class that adds validation and representation for firewall filter addresses (e.g. firewall and
  * NAT rule source and destination addresses).
  */
 class FilterAddressField extends InterfaceField {

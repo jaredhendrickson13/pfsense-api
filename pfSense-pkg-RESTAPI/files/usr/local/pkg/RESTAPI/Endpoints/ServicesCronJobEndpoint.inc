@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a singular CronJob Model object at 
+ * Defines an Endpoint for interacting with a singular CronJob Model object at
  * /api/v2/services/cron/job.
  */
 class ServicesCronJobEndpoint extends Endpoint {

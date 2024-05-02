@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with the InterfaceApply Model object at 
+ * Defines an Endpoint for interacting with the InterfaceApply Model object at
  * /api/v2/interface/apply.
  */
 class InterfaceApplyEndpoint extends Endpoint {

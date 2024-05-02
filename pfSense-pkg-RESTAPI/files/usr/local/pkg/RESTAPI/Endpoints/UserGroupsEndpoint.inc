@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with many UserGroup Model objects at 
+ * Defines an Endpoint for interacting with many UserGroup Model objects at
  * /api/v2/user/groups.
  */
 class UserGroupsEndpoint extends Endpoint {

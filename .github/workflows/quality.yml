@@ -51,7 +51,7 @@ jobs:
           pip install -r requirements.txt
       - name: Run pylint
         run: pylint $(git ls-files '*.py')
-  
+
   check_phpdoc:
     runs-on: ubuntu-latest
     needs: ["lint_php"]

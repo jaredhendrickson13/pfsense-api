@@ -7,7 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with many TrafficShaperLimiter Model objects at 
+ * Defines an Endpoint for interacting with many TrafficShaperLimiter Model objects at
  * /api/v2/firewall/traffic_shaper/limiters.
  */
 class FirewallTrafficShaperLimitersEndpoint extends Endpoint {
