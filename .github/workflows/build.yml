@@ -50,6 +50,11 @@ jobs:
   lint_openapi:
     runs-on: self-hosted
     needs: [build]
+    strategy:
+      matrix:
+        include:
+          - freebsd_version: FreeBSD-14.0-CURRENT
+            freebsd_id: freebsd14
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
