@@ -53,7 +53,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - freebsd_version: FreeBSD-14.0-CURRENT
+          - pfsense_version: pfSense-2.7.2-RELEASE
             freebsd_id: freebsd14
     steps:
       - uses: actions/checkout@v4
