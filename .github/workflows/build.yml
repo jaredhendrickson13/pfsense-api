@@ -47,55 +47,9 @@ jobs:
           name: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
 
-  unit_tests:
-    runs-on: self-hosted
-    needs: [build]
-
-    strategy:
-      matrix:
-        include:
-          - pfsense_version: pfSense-2.7.2-RELEASE
-            freebsd_id: freebsd14
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
-          path: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
-
-      - name: Setup pfSense VM
-        run: |
-          /usr/local/bin/VBoxManage controlvm ${{ matrix.pfsense_version }} poweroff || true
-          /usr/local/bin/VBoxManage snapshot ${{ matrix.pfsense_version }} restore initial
-          /usr/local/bin/VBoxManage startvm ${{ matrix.pfsense_version }} --type headless
-          sleep 5
-
-      # This is only necessary until GitHub Actions allows an easier way to get a URL to download the artifact within pfSense
-      - name: Copy pfSense-pkg-RESTAPI build to pfSense
-        run: |
-          pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
-          pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
-          scp -o StrictHostKeyChecking=no pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg/pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg admin@${{ matrix.pfsense_version }}.jaredhendrickson.com:/tmp/
-
-      - name: Install pfSense-pkg-RESTAPI on pfSense
-        run: |
-          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com "pkg -C /dev/null add /tmp/pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg"
-          sleep 5
-
-      - name: Run pfSense-pkg-RESTAPI unit Tests
-        run: |
-          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-restapi runtests'
-
-      - name: Teardown pfSense VM
-        if: "${{ always() }}"
-        run: |
-          /usr/local/bin/VBoxManage controlvm ${{ matrix.pfsense_version }} poweroff || true
-          /usr/local/bin/VBoxManage snapshot ${{ matrix.pfsense_version }} restore initial
-
   lint_openapi:
     runs-on: self-hosted
+    needs: [build]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
@@ -140,3 +94,50 @@ jobs:
         uses: vaibhav-jain/spectral-action/@v2.6
         with:
           file_path: openapi-${{ env.build_version }}.json
+
+  unit_tests:
+    runs-on: self-hosted
+    needs: [lint_openapi]
+
+    strategy:
+      matrix:
+        include:
+          - pfsense_version: pfSense-2.7.2-RELEASE
+            freebsd_id: freebsd14
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
+          path: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
+
+      - name: Setup pfSense VM
+        run: |
+          /usr/local/bin/VBoxManage controlvm ${{ matrix.pfsense_version }} poweroff || true
+          /usr/local/bin/VBoxManage snapshot ${{ matrix.pfsense_version }} restore initial
+          /usr/local/bin/VBoxManage startvm ${{ matrix.pfsense_version }} --type headless
+          sleep 5
+
+      # This is only necessary until GitHub Actions allows an easier way to get a URL to download the artifact within pfSense
+      - name: Copy pfSense-pkg-RESTAPI build to pfSense
+        run: |
+          pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
+          pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
+          scp -o StrictHostKeyChecking=no pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg/pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg admin@${{ matrix.pfsense_version }}.jaredhendrickson.com:/tmp/
+
+      - name: Install pfSense-pkg-RESTAPI on pfSense
+        run: |
+          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com "pkg -C /dev/null add /tmp/pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg"
+          sleep 5
+
+      - name: Run pfSense-pkg-RESTAPI unit Tests
+        run: |
+          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-restapi runtests'
+
+      - name: Teardown pfSense VM
+        if: "${{ always() }}"
+        run: |
+          /usr/local/bin/VBoxManage controlvm ${{ matrix.pfsense_version }} poweroff || true
+          /usr/local/bin/VBoxManage snapshot ${{ matrix.pfsense_version }} restore initial
