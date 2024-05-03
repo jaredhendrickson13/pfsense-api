@@ -116,7 +116,7 @@ jobs:
 
   unit_tests:
     runs-on: self-hosted
-    needs: [lint_openapi]
+    needs: [build_openapi]
 
     strategy:
       matrix:
