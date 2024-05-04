@@ -11,7 +11,7 @@ use RESTAPI\Fields\BooleanField;
  * Defines a Model that provides details on pending IPsec changes and allows IPsec changes
  * to be applied.
  */
-class IPsecApply extends Model {
+class OpenVPNApply extends Model {
     public BooleanField $applied;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
@@ -45,7 +45,7 @@ class IPsecApply extends Model {
     }
 
     /**
-     * Applies pending IPsec changes.
+     * Applies pending DNS Resolver changes.
      */
     public function apply(): void {
         (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
