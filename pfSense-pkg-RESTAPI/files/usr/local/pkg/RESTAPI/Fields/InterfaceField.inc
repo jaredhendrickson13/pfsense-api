@@ -40,6 +40,7 @@ class InterfaceField extends StringField {
      * @param bool $allow_localhost_interface If `true`, the localhost interface will be included as a valid choice.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
+     * @param array $allowed_keywords An array of keywords that are allowed to be used as interface values.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
      * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive Fields like passwords,
@@ -87,6 +88,7 @@ class InterfaceField extends StringField {
         public bool $allow_openvpn_interface = false,
         public bool $allow_carp_interface = false,
         public bool $allow_localhost_interface = false,
+        public array $allowed_keywords = [],
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $read_only = false,
@@ -235,6 +237,13 @@ class InterfaceField extends StringField {
         # Allow the Localhost `lo0` interface if requested
         if ($this->allow_localhost_interface) {
             $choices['lo0'] = 'Localhost';
+        }
+
+        # Allow specified keywords if specified
+        if ($this->allowed_keywords) {
+            foreach ($this->allowed_keywords as $keyword) {
+                $choices[$keyword] = $keyword;
+            }
         }
 
         return $choices;

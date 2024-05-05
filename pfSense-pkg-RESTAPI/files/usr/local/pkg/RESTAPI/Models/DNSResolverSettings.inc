@@ -50,6 +50,7 @@ class DNSResolverSettings extends Model
             default: 53,
             allow_alias: false,
             allow_range: false,
+            allow_empty: true,
             help_text: 'The port on which the DNS Resolver service listens.',
         );
         $this->enablessl = new BooleanField(
@@ -67,20 +68,25 @@ class DNSResolverSettings extends Model
             default: 853,
             allow_alias: false,
             allow_range: false,
+            allow_empty: true,
             conditions: ['enablessl' => true],
             help_text: 'The port on which the DNS Resolver service listens for SSL/TLS connections.',
         );
         $this->active_interface = new InterfaceField(
-            required: false,
+            default: [],
             allow_localhost_interface: true,
+            allowed_keywords: ['all', '_llocwan', '_lloclan'],
             allow_empty: true,
+            many: true,
             help_text: 'The interface on which the DNS Resolver service listens for DNS queries. Set empty value ".
                 "to listen on all interfaces.',
         );
         $this->outgoing_interface = new InterfaceField(
-            required: false,
+            default: [],
             allow_localhost_interface: true,
+            allowed_keywords: ['all', '_llocwan', '_lloclan'],
             allow_empty: true,
+            many: true,
             help_text: 'The interface on which the DNS Resolver service sends outgoing DNS queries. Set empty value ".
                 "to use any interface.',
         );
