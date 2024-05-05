@@ -3,6 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\DNSResolverApplyDispatcher;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
@@ -164,5 +165,13 @@ class DNSResolverSettings extends Model
         }, $files);
 
         return $files;
+    }
+
+    /**
+     * Applies pending DNS Resolver changes.
+     */
+    public function apply(): void
+    {
+        (new DNSResolverApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
