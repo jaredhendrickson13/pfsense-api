@@ -14,8 +14,7 @@ use RESTAPI\Fields\StringField;
 /**
  * Defines a Model that represents the DNS Resolver settings.
  */
-class DNSResolverSettings extends Model
-{
+class DNSResolverSettings extends Model {
     public BooleanField $enable;
     public PortField $port;
     public BooleanField $enablessl;
@@ -35,17 +34,13 @@ class DNSResolverSettings extends Model
     public BooleanField $regovpnclients;
     public Base64Field $custom_options;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'unbound';
         $this->subsystem = 'unbound';
 
         # Set model fields
-        $this->enable = new BooleanField(
-            default: false,
-            help_text: 'Enables or disables the DNS Resolver service.',
-        );
+        $this->enable = new BooleanField(default: false, help_text: 'Enables or disables the DNS Resolver service.');
         $this->port = new PortField(
             default: 53,
             allow_alias: false,
@@ -110,14 +105,8 @@ class DNSResolverSettings extends Model
             ],
             help_text: 'The type of local zone used for the system domain.',
         );
-        $this->dnssec = new BooleanField(
-            default: false,
-            help_text: 'Enables or disables DNSSEC validation.',
-        );
-        $this->python = new BooleanField(
-            default: false,
-            help_text: 'Enables or disables the Python module.',
-        );
+        $this->dnssec = new BooleanField(default: false, help_text: 'Enables or disables DNSSEC validation.');
+        $this->python = new BooleanField(default: false, help_text: 'Enables or disables the Python module.');
         $this->python_order = new StringField(
             default: 'pre_validator',
             choices: ['pre_validator', 'post_validator'],
@@ -160,13 +149,12 @@ class DNSResolverSettings extends Model
      * Obtains all available Python module options.
      * @return array The available Python module options.
      */
-    protected function get_python_script_options(): array
-    {
+    protected function get_python_script_options(): array {
         # Use glob to obtain all .py files in /var/unbound/
         $files = glob('/var/unbound/*.py');
 
         # Use pathinfo to get the Python module name
-        $files = array_map(function($file) {
+        $files = array_map(function ($file) {
             return pathinfo($file, PATHINFO_FILENAME);
         }, $files);
 
@@ -176,8 +164,7 @@ class DNSResolverSettings extends Model
     /**
      * Applies pending DNS Resolver changes.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new DNSResolverApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
