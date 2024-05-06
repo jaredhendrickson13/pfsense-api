@@ -70,7 +70,7 @@ class DNSResolverSettings extends Model {
         $this->active_interface = new InterfaceField(
             default: [],
             allow_localhost_interface: true,
-            allowed_keywords: ['all', '_llocwan', '_lloclan'],
+            allow_custom: ['all', '_llocwan', '_lloclan'],
             allow_empty: true,
             many: true,
             help_text: 'The interface on which the DNS Resolver service listens for DNS queries. Set empty value ".
@@ -79,7 +79,7 @@ class DNSResolverSettings extends Model {
         $this->outgoing_interface = new InterfaceField(
             default: [],
             allow_localhost_interface: true,
-            allowed_keywords: ['all', '_llocwan', '_lloclan'],
+            allow_custom: ['all', '_llocwan', '_lloclan'],
             allow_empty: true,
             many: true,
             help_text: 'The interface on which the DNS Resolver service sends outgoing DNS queries. Set empty value ".

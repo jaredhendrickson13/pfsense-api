@@ -40,7 +40,7 @@ class InterfaceField extends StringField {
      * @param bool $allow_localhost_interface If `true`, the localhost interface will be included as a valid choice.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
-     * @param array $allowed_keywords An array of keywords that are allowed to be used as interface values.
+     * @param array $allow_custom An array of keywords that are allowed to be used as interface values.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
      * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive Fields like passwords,
@@ -78,27 +78,27 @@ class InterfaceField extends StringField {
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        bool $required = false,
-        bool $unique = false,
-        mixed $default = null,
-        string $default_callable = '',
+        bool         $required = false,
+        bool         $unique = false,
+        mixed        $default = null,
+        string       $default_callable = '',
         public array $interface_query = [],
-        public bool $allow_interface_groups = false,
-        public bool $allow_ipsec_interface = false,
-        public bool $allow_openvpn_interface = false,
-        public bool $allow_carp_interface = false,
-        public bool $allow_localhost_interface = false,
-        public array $allowed_keywords = [],
-        bool $allow_empty = false,
-        bool $allow_null = false,
-        bool $read_only = false,
-        bool $write_only = false,
-        bool $representation_only = false,
-        bool $editable = true,
-        bool $many = false,
-        int $many_minimum = 1,
-        int $many_maximum = 128,
-        string|null $delimiter = ',',
+        public bool  $allow_interface_groups = false,
+        public bool  $allow_ipsec_interface = false,
+        public bool  $allow_openvpn_interface = false,
+        public bool  $allow_carp_interface = false,
+        public bool  $allow_localhost_interface = false,
+        public array $allow_custom = [],
+        bool         $allow_empty = false,
+        bool         $allow_null = false,
+        bool         $read_only = false,
+        bool         $write_only = false,
+        bool         $representation_only = false,
+        bool         $editable = true,
+        bool         $many = false,
+        int          $many_minimum = 1,
+        int          $many_maximum = 128,
+        string|null  $delimiter = ',',
         string $verbose_name = '',
         string $verbose_name_plural = '',
         string $internal_name = '',
@@ -240,8 +240,8 @@ class InterfaceField extends StringField {
         }
 
         # Allow specified keywords if specified
-        if ($this->allowed_keywords) {
-            foreach ($this->allowed_keywords as $keyword) {
+        if ($this->allow_custom) {
+            foreach ($this->allow_custom as $keyword) {
                 $choices[$keyword] = $keyword;
             }
         }
