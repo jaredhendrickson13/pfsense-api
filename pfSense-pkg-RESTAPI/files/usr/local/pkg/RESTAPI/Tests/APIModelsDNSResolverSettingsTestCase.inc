@@ -40,12 +40,12 @@ class APIModelsDNSResolverSettingsTestCase extends TestCase {
      * Checks that the `tlsport` field correctly controls the tlsport on which the unbound (DNS Resolver) service listens.
      */
     public function test_tlsport(): void {
-        $settings = new DNSResolverSettings(tlsport: '8353', async: false);
+        $settings = new DNSResolverSettings(tlsport: '8353', enablessl: true, async: false);
         $settings->update(apply: true);
         $unbound_config = file_get_contents('/var/unbound/unbound.conf');
         $this->assert_str_contains($unbound_config, 'tls-port: 8353');
 
-        $settings = new DNSResolverSettings(tlsport: '853', async: false);
+        $settings = new DNSResolverSettings(tlsport: '853', enablessl: true, async: false);
         $settings->update(apply: true);
         $unbound_config = file_get_contents('/var/unbound/unbound.conf');
         $this->assert_str_contains($unbound_config, 'tls-port: 853');
