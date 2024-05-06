@@ -38,6 +38,16 @@ class ConfigHistoryRevision extends Model {
     }
 
     /**
+     * Obtains the configuration history as an array. This method is the internal callable for this Model.
+     * @return array The configuration history as an array of objects.
+     */
+    protected function get_config_history(): array {
+        $config_history = get_backups();
+        unset($config_history['versions']);
+        return $config_history;
+    }
+
+    /**
      * Deletes a configuration history entry.
      */
     public function _delete(): void {
