@@ -8,7 +8,7 @@ use RESTAPI\Core\Endpoint;
 
 /**
  * Defines an Endpoint for interacting with a singular DNSResolverHostOverride Model object at
- * /api/v2/services/dns_resolver/host_override.
+ * /api/v2/services/dns_resolver/domain_override.
  */
 class ServicesDNSResolverDomainOverrideEndpoint extends Endpoint {
     public function __construct() {

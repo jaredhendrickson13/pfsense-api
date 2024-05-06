@@ -9,16 +9,17 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 
-class DNSResolverDomainOverride extends Model
-{
+/**
+ * Defines a Model that represents a DNS Resolver domain override.
+ */
+class DNSResolverDomainOverride extends Model {
     public StringField $domain;
     public StringField $ip;
     public StringField $descr;
     public BooleanField $forward_tls_upstream;
     public StringField $tls_hostname;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'unbound/domainoverrides';
         $this->subsystem = 'unbound';
@@ -45,6 +46,7 @@ class DNSResolverDomainOverride extends Model
             default: '',
             allow_empty: true,
             maximum_length: 255,
+            conditions: ['forward_tls_upstream' => true],
             validators: [new HostnameValidator(allow_hostname: true, allow_domain: true, allow_fqdn: true)],
             help_text: 'The hostname to use for the TLS connection to the upstream DNS server.',
         );
