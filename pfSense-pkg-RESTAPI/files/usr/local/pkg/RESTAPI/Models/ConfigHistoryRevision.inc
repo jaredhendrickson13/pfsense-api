@@ -7,6 +7,9 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
 
+/**
+ * Defines a ConfigHistoryRevision Model that represents configuration history revisions.
+ */
 class ConfigHistoryRevision extends Model
 {
     public UnixTimeField $time;
