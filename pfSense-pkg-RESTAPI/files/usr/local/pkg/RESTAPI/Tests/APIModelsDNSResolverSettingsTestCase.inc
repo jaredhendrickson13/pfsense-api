@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
+use RESTAPI\Models\Certificate;
 use RESTAPI\Models\DNSResolverSettings;
 
 class APIModelsDNSResolverSettingsTestCase extends TestCase {
@@ -40,12 +41,25 @@ class APIModelsDNSResolverSettingsTestCase extends TestCase {
      * Checks that the `tlsport` field correctly controls the tlsport on which the unbound (DNS Resolver) service listens.
      */
     public function test_tlsport(): void {
-        $settings = new DNSResolverSettings(tlsport: '8353', enablessl: true, async: false);
+        # Obtain the current webGUI cert
+        $cert = new Certificate(id: 0);
+        
+        $settings = new DNSResolverSettings(
+            tlsport: '8353',
+            sslcertref: $cert->refid->value,
+            enablessl: true, 
+            async: false
+        );
         $settings->update(apply: true);
         $unbound_config = file_get_contents('/var/unbound/unbound.conf');
         $this->assert_str_contains($unbound_config, 'tls-port: 8353');
 
-        $settings = new DNSResolverSettings(tlsport: '853', enablessl: true, async: false);
+        $settings = new DNSResolverSettings(
+            tlsport: '853',
+            enablessl: true,
+            sslcertref: $cert->refid->value,
+            async: false
+        );
         $settings->update(apply: true);
         $unbound_config = file_get_contents('/var/unbound/unbound.conf');
         $this->assert_str_contains($unbound_config, 'tls-port: 853');
