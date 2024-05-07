@@ -43,12 +43,12 @@ class APIModelsDNSResolverSettingsTestCase extends TestCase {
     public function test_tlsport(): void {
         # Obtain the current webGUI cert
         $cert = new Certificate(id: 0);
-        
+
         $settings = new DNSResolverSettings(
             tlsport: '8353',
             sslcertref: $cert->refid->value,
-            enablessl: true, 
-            async: false
+            enablessl: true,
+            async: false,
         );
         $settings->update(apply: true);
         $unbound_config = file_get_contents('/var/unbound/unbound.conf');
@@ -58,7 +58,7 @@ class APIModelsDNSResolverSettingsTestCase extends TestCase {
             tlsport: '853',
             enablessl: true,
             sslcertref: $cert->refid->value,
-            async: false
+            async: false,
         );
         $settings->update(apply: true);
         $unbound_config = file_get_contents('/var/unbound/unbound.conf');
