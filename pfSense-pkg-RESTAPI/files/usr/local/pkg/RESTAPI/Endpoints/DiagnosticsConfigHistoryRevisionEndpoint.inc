@@ -14,7 +14,7 @@ class DiagnosticsConfigHistoryRevisionEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/diagnostics/config_history/revision';
-        $this->model_name = 'ConfigHistory';
+        $this->model_name = 'ConfigHistoryRevision';
         $this->request_method_options = ['GET', 'DELETE'];
         $this->delete_help_text = "Deletes a configuration revision along with it's associated backup file.";
 

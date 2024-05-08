@@ -14,7 +14,7 @@ class DiagnosticsConfigHistoryRevisionsEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/diagnostics/config_history/revisions';
-        $this->model_name = 'ConfigHistory';
+        $this->model_name = 'ConfigHistoryRevision';
         $this->request_method_options = ['GET'];
         $this->many = true;
 
