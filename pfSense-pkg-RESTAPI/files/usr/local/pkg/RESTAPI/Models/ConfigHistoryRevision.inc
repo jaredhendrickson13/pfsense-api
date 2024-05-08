@@ -51,6 +51,6 @@ class ConfigHistoryRevision extends Model {
      * Deletes a configuration history entry.
      */
     public function _delete(): void {
-        unlink("/cf/conf/backup/config-$this->time.xml");
+        unlink("/cf/conf/backup/config-{$this->time->value}.xml");
     }
 }
