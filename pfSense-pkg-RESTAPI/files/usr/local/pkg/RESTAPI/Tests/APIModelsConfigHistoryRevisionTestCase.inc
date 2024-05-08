@@ -6,8 +6,7 @@ use RESTAPI\Models\ConfigHistoryRevision;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Core\TestCase;
 
-class APIModelsConfigHistoryRevisionTestCase extends TestCase
-{
+class APIModelsConfigHistoryRevisionTestCase extends TestCase {
     /**
      * Checks if we can correctly read the configuration history.
      */

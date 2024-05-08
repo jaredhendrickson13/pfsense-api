@@ -8,12 +8,10 @@ use RESTAPI\Fields\StringField;
 /**
  * Defines a Model for interacting with the system log at /var/log/system.log.
  */
-class SystemLog extends Model
-{
+class SystemLog extends Model {
     public StringField $text;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_system_log';
         $this->many = true;

@@ -8,12 +8,10 @@ use RESTAPI\Fields\StringField;
 /**
  * Defines a Model for interacting with the firewall log at /var/log/filter.log.
  */
-class FirewallLog extends Model
-{
+class FirewallLog extends Model {
     public StringField $text;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_firewall_log';
         $this->many = true;

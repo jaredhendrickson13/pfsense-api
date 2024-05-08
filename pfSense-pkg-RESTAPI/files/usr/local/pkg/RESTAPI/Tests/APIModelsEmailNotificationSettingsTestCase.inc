@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\EmailNotificationSettings;
 
-class APIModelsEmailNotificationSettingsTestCase extends TestCase
-{
+class APIModelsEmailNotificationSettingsTestCase extends TestCase {
     /**
      * Checks if we can correctly read and update the email notification settings.
      */
@@ -14,7 +13,7 @@ class APIModelsEmailNotificationSettingsTestCase extends TestCase
         $email_settings = new EmailNotificationSettings(
             disable: false,
             ipaddress: 'example.com',
-            port: "465",
+            port: '465',
             timeout: 24,
             ssl: true,
             sslvalidate: false,
@@ -22,7 +21,7 @@ class APIModelsEmailNotificationSettingsTestCase extends TestCase
             notifyemailaddress: 'to@example.com',
             authentication_mechanism: 'LOGIN',
             username: 'user',
-            password: 'password'
+            password: 'password',
         );
         $email_settings->update();
         $this->assert_is_not_empty(EmailNotificationSettings::read_all()->to_representation());

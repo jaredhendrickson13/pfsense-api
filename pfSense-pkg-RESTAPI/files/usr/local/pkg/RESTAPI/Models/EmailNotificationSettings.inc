@@ -13,8 +13,7 @@ use RESTAPI\Validators\IPAddressValidator;
 /**
  * Defines a model that represents email notification settings.
  */
-class EmailNotificationSettings extends Model
-{
+class EmailNotificationSettings extends Model {
     public BooleanField $disable;
     public StringField $ipaddress;
     public PortField $port;
@@ -27,31 +26,21 @@ class EmailNotificationSettings extends Model
     public StringField $username;
     public StringField $password;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
-        $this->config_path = "notifications/smtp";
+        $this->config_path = 'notifications/smtp';
         $this->many = false;
 
         # Set model fields
-        $this->disable = new BooleanField(
-            default: false,
-            help_text: 'Disables SMTP notifications.',
-        );
+        $this->disable = new BooleanField(default: false, help_text: 'Disables SMTP notifications.');
         $this->ipaddress = new StringField(
             default: '',
             allow_empty: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true)],
             help_text: 'The IP address or hostname of the SMTP server.',
         );
-        $this->port = new PortField(
-            default: 25,
-            help_text: 'The port number of the SMTP server.',
-        );
-        $this->timeout = new IntegerField(
-            default: 20,
-            help_text: 'The timeout (in seconds) for the SMTP connection.',
-        );
+        $this->port = new PortField(default: 25, help_text: 'The port number of the SMTP server.');
+        $this->timeout = new IntegerField(default: 20, help_text: 'The timeout (in seconds) for the SMTP connection.');
         $this->ssl = new BooleanField(
             default: false,
             help_text: 'Enables or disables SSL/TLS for the SMTP connection.',
@@ -74,7 +63,7 @@ class EmailNotificationSettings extends Model
         );
         $this->authentication_mechanism = new StringField(
             default: 'PLAIN',
-            choices: ["PLAIN", "LOGIN"],
+            choices: ['PLAIN', 'LOGIN'],
             help_text: 'The authentication mechanism to use for the SMTP connection.',
         );
         $this->username = new StringField(
