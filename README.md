@@ -117,7 +117,7 @@ revocable and will only allow API authentication; not webConfigurator or SSH aut
 credentials).
 
 ```bash
-curl -H "Authorization: KeyAuth API_KEY_HERE" -X GET https://pfsense.example.com/api/v2/diagnostics/arp_table
+curl -H "x-api-key API_KEY_HERE" -X GET https://pfsense.example.com/api/v2/diagnostics/arp_table
 ```
 
 - To generate API keys, navigate to 'System > REST API' and select the 'Keys' tab. Alternatively, you can generate new

@@ -18,12 +18,12 @@ class APIAuthKeyAuthTestCase extends TestCase {
         $jwt = new RESTAPIKey();
         $jwt->client->username = 'admin';
         $jwt->create();
-        $_SERVER['HTTP_AUTHORIZATION'] = 'KeyAuth ' . $jwt->key->value;
+        $_SERVER['HTTP_X_API_KEY'] = $jwt->key->value;
         $auth = new KeyAuth();
         $this->assert_is_true($auth->authenticate());
 
         # Simulate a client submitting invalid key auth credentials
-        $_SERVER['HTTP_AUTHORIZATION'] = 'KeyAuth badtoken';
+        $_SERVER['HTTP_X_API_KEY'] = 'badtoken';
         $auth = new KeyAuth();
         $this->assert_is_false($auth->authenticate());
     }
