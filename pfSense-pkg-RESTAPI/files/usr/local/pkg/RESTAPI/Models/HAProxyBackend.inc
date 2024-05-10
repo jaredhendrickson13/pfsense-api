@@ -96,6 +96,7 @@ class HAProxyBackend extends Model {
         $this->balance = new StringField(
             default: '',
             choices: ['', 'roundrobin', 'static-rr', 'leastconn', 'source', 'uri'],
+            allow_empty: true,
             help_text: 'The load balancing option to use for servers assigned to this backend.',
         );
         $this->balance_urilen = new IntegerField(
