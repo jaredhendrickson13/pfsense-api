@@ -313,9 +313,9 @@ class Form {
      */
     final public function print_form(): void {
         # Print the static pfSense UI and include any custom CSS or JS files
-        global $config;
+        global $config, $user_settings;
         $pgtitle = $this->title_path;
-        include 'head.inc';
+        include('head.inc');
         echo "<link rel='stylesheet' href='$this->custom_css'/>";
         echo "<script type='application/javascript' src='$this->custom_js'></script>";
         \display_top_tabs($this->tabs, true);
