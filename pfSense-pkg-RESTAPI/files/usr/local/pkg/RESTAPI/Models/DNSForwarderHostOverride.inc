@@ -8,16 +8,14 @@ use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
-class DNSForwarderHostOverride extends Model
-{
+class DNSForwarderHostOverride extends Model {
     public StringField $host;
     public StringField $domain;
     public StringField $ip;
     public StringField $descr;
     public NestedModelField $aliases;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'dnsmasq/hosts';
         $this->subsystem = 'hosts';
@@ -25,24 +23,14 @@ class DNSForwarderHostOverride extends Model
         $this->many = true;
 
         # Set model fields
-        $this->host = new StringField(
-            required: true,
-            help_text: 'The hostname of this override.',
-        );
-        $this->domain = new StringField(
-            required: true,
-            help_text: 'The domain of this override.',
-        );
+        $this->host = new StringField(required: true, help_text: 'The hostname of this override.');
+        $this->domain = new StringField(required: true, help_text: 'The domain of this override.');
         $this->ip = new StringField(
             required: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true)],
             help_text: 'The IP address of this override.',
         );
-        $this->descr = new StringField(
-            default: '',
-            allow_empty: true,
-            help_text: 'The description for this override.',
-        );
+        $this->descr = new StringField(default: '', allow_empty: true, help_text: 'The description for this override.');
         $this->aliases = new NestedModelField(
             model_class: 'DNSForwarderHostOverrideAlias',
             default: [],
@@ -56,8 +44,7 @@ class DNSForwarderHostOverride extends Model
     /**
      * Apply changes to the DNS Forwarder
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         # Apply changes to the DNS Forwarder
         (new DNSForwarderApplyDispatcher(async: $this->async))->spawn_process();
     }

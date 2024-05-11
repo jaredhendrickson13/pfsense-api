@@ -10,13 +10,11 @@ use RESTAPI\Fields\IntegerField;
 /**
  * Defines a Model for interacting with the advanced firewall settings.
  */
-class FirewallAdvancedSettings extends Model
-{
+class FirewallAdvancedSettings extends Model {
     public IntegerField $aliasesresolveinterval;
     public BooleanField $checkaliasesurlcert;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'system';
         $this->update_strategy = 'merge';
@@ -35,8 +33,7 @@ class FirewallAdvancedSettings extends Model
         parent::__construct($id, $parent_id, $data, ...$options);
     }
 
-    public function apply(): void
-    {
+    public function apply(): void {
         # Restart the filterdns service if the aliasesresolveinterval field has changed
         if ($this->initial_object->aliasesresolveinterval->value !== $this->aliasesresolveinterval->value) {
             $this->restart_filterdns();

@@ -7,11 +7,10 @@ use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\DNSForwarderHostOverride;
 
-class APIModelsDNSForwarderHostOverrideTestCase extends TestCase
-{
+class APIModelsDNSForwarderHostOverrideTestCase extends TestCase {
     public function test_crud(): void {
         # Ensure the DNS Forwarder is enabled before starting
-        Model::set_config(path: "dnsmasq/enable", value: "");
+        Model::set_config(path: 'dnsmasq/enable', value: '');
 
         # Create a new DNSForwarderHostOverride object and ensure it is present in /etc/hosts after
         $dns_forwarder_host_override = new DNSForwarderHostOverride(
@@ -21,12 +20,12 @@ class APIModelsDNSForwarderHostOverrideTestCase extends TestCase
             description: 'Test DNSForwarderHostOverride object',
             aliases: [
                 [
-                    "host" => "test-alias",
-                    "domain" => "example.com",
-                    "description" => "Test DNSForwarderHostOverrideAlias object"
-                ]
+                    'host' => 'test-alias',
+                    'domain' => 'example.com',
+                    'description' => 'Test DNSForwarderHostOverrideAlias object',
+                ],
             ],
-            async: false
+            async: false,
         );
         $dns_forwarder_host_override->create(apply: true);
         $etc_hosts = new Command('cat /etc/hosts', trim_whitespace: true);
@@ -41,11 +40,11 @@ class APIModelsDNSForwarderHostOverrideTestCase extends TestCase
             description: 'New Test DNSForwarderHostOverride object',
             aliases: [
                 [
-                    "host" => "newtest-alias",
-                    "domain" => "example.com",
-                    "description" => "New Test DNSForwarderHostOverrideAlias object"
-                ]
-            ]
+                    'host' => 'newtest-alias',
+                    'domain' => 'example.com',
+                    'description' => 'New Test DNSForwarderHostOverrideAlias object',
+                ],
+            ],
         );
         $dns_forwarder_host_override->update(apply: true);
         $etc_hosts = new Command('cat /etc/hosts', trim_whitespace: true);

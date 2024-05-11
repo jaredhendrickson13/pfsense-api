@@ -7,14 +7,12 @@ use RESTAPI\Dispatchers\DNSForwarderApplyDispatcher;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
-class DNSForwarderHostOverrideAlias extends Model
-{
+class DNSForwarderHostOverrideAlias extends Model {
     public StringField $host;
     public StringField $domain;
     public StringField $description;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->parent_model_class = 'DNSForwarderHostOverride';
         $this->config_path = 'aliases/item';
@@ -22,14 +20,8 @@ class DNSForwarderHostOverrideAlias extends Model
         $this->many = true;
 
         # Set model fields
-        $this->host = new StringField(
-            required: true,
-            help_text: 'The hostname of this override alias.',
-        );
-        $this->domain = new StringField(
-            required: true,
-            help_text: 'The domain of this override alias.',
-        );
+        $this->host = new StringField(required: true, help_text: 'The hostname of this override alias.');
+        $this->domain = new StringField(required: true, help_text: 'The domain of this override alias.');
         $this->description = new StringField(
             default: '',
             allow_empty: true,
@@ -42,8 +34,7 @@ class DNSForwarderHostOverrideAlias extends Model
     /**
      * Apply changes to the DNS Forwarder
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         # Apply changes to the DNS Forwarder
         (new DNSForwarderApplyDispatcher(async: $this->async))->spawn_process();
     }
