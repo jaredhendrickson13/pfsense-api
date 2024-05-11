@@ -13,6 +13,14 @@ class APIModelsWireGuardPeerTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-WireGuard'];
 
     /**
+     * Ensures WireGuard is enabled before testing
+     */
+    public function setup(): void {
+        $wg = new WireGuardSettings(enable: true, async: false);
+        $wg->update(apply: true);
+    }
+
+    /**
      * Checks that the `presharedkey` field must be assigned a valid PSK if set.
      */
     public function test_validate_presharedkey(): void {

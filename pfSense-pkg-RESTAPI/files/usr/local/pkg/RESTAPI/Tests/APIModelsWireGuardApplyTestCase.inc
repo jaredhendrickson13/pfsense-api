@@ -14,6 +14,14 @@ class APIModelsWireGuardApplyTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-WireGuard'];
 
     /**
+     * Ensures WireGuard is enabled before testing
+     */
+    public function setup(): void {
+        $wg = new WireGuardSettings(enable: true, async: false);
+        $wg->update(apply: true);
+    }
+
+    /**
      * Ensure the Model is correctly able to apply changes to the WireGuard configuration and determine if there
      * are any pending changes.
      */

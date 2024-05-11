@@ -46,7 +46,7 @@ class TestCase {
         $this->method = 'unknown';
 
         # Install packages required by this TestCase
-        $this->install_packages($this->required_packages);
+        $this->install_packages();
 
         # Setup the test case before running tests
         $this->setup();

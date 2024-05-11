@@ -13,6 +13,14 @@ class APIModelsWireGuardTunnelTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-WireGuard'];
 
     /**
+     * Ensures WireGuard is enabled before testing
+     */
+    public function setup(): void {
+        $wg = new WireGuardSettings(enable: true, async: false);
+        $wg->update(apply: true);
+    }
+
+    /**
      * Checks that the WireGuardTunnel object's `publickey` field value is populated after validation.
      */
     public function test_publickey_populated_after_validation(): void {

@@ -13,6 +13,14 @@ class APIModelsWireGuardTunnelAddressTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-WireGuard'];
 
     /**
+     * Ensures WireGuard is enabled before testing
+     */
+    public function setup(): void {
+        $wg = new WireGuardSettings(enable: true, async: false);
+        $wg->update(apply: true);
+    }
+
+    /**
      * Checks that a WireGuardTunnelAddress cannot be created with an address and mask that conflict with an existing
      * address assignment on the system.
      */

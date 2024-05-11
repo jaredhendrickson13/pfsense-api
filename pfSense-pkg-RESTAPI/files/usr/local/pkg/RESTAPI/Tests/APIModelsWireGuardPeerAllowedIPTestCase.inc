@@ -14,6 +14,14 @@ class APIModelsWireGuardPeerAllowedIPTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-WireGuard'];
 
     /**
+     * Ensures WireGuard is enabled before testing
+     */
+    public function setup(): void {
+        $wg = new WireGuardSettings(enable: true, async: false);
+        $wg->update(apply: true);
+    }
+
+    /**
      * Checks that the WireGuard is correctly represented on the backend after creating, updating and deleting.
      */
     public function test_crud(): void {
