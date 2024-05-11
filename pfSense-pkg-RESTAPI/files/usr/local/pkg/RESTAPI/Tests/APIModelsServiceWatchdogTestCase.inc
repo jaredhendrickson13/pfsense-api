@@ -8,23 +8,7 @@ use RESTAPI\Models\Package;
 use RESTAPI\Models\ServiceWatchdog;
 
 class APIModelsServiceWatchdogTestCase extends TestCase {
-    /**
-     * Ensure the required package is installed before running tests.
-     */
-    public function setup(): void {
-        # Install the service watchdog package
-        $pkg = new Package(name: 'pfSense-pkg-Service_Watchdog');
-        $pkg->create();
-    }
-
-    /**
-     * Ensure the package is uninstalled after completing tests.
-     */
-    public function teardown(): void {
-        # Uninstall the package
-        $pkg = Package::query(name: 'pfSense-pkg-Service_Watchdog')->first();
-        $pkg->delete();
-    }
+    public array $required_packages = ['pfSense-pkg-Service_Watchdog'];
 
     /**
      * Checks that the `validate_description()` method forces the `description` field to match the description of the

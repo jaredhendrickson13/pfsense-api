@@ -8,22 +8,7 @@ use RESTAPI\Models\HAProxySettings;
 use RESTAPI\Models\Package;
 
 class APIModelsHAProxySettingsTestCase extends TestCase {
-    /**
-     * Installs the HAProxy package before running tests
-     */
-    public function setup(): void {
-        # Install HAProxy
-        $pkg = new Package(name: 'pfSense-pkg-haproxy');
-        $pkg->create();
-    }
-
-    /**
-     * Removes the HAProxy package after running tests
-     */
-    public function teardown(): void {
-        $pkg = Package::query(name: 'pfSense-pkg-haproxy')->first();
-        $pkg->delete();
-    }
+    public array $required_packages = ['pfSense-pkg-haproxy'];
 
     /**
      * Checks that the `enable` field correctly controls the HAProxy service's enablement.

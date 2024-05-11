@@ -11,26 +11,7 @@ use RESTAPI\Models\WireGuardSettings;
 use RESTAPI\Models\WireGuardTunnel;
 
 class APIModelsWireGuardPeerAllowedIPTestCase extends TestCase {
-    /**
-     * Ensure the WireGuard package is installed and enabled before running tests.
-     */
-    public function setup(): void {
-        # Install the package
-        $pkg = new Package(name: 'pfSense-pkg-WireGuard');
-        $pkg->create();
-
-        # Enable WireGuard
-        $wg_settings = new WireGuardSettings(enable: true, async: false);
-        $wg_settings->update(apply: true);
-    }
-
-    /**
-     * Ensure the WireGuard package is removed after running tests
-     */
-    public function teardown(): void {
-        $pkg = Package::query(name: 'pfSense-pkg-WireGuard')->first();
-        $pkg->delete();
-    }
+    public array $required_packages = ['pfSense-pkg-WireGuard'];
 
     /**
      * Checks that the WireGuard is correctly represented on the backend after creating, updating and deleting.

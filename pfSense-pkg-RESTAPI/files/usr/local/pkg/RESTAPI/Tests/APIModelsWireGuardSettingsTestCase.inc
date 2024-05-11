@@ -11,21 +11,7 @@ use RESTAPI\Models\Service;
 use RESTAPI\Models\WireGuardSettings;
 
 class APIModelsWireGuardSettingsTestCase extends TestCase {
-    /**
-     * Ensure the WireGuard package is installed before running tests.
-     */
-    public function setup(): void {
-        $pkg = new Package(name: 'pfSense-pkg-WireGuard');
-        $pkg->create();
-    }
-
-    /**
-     * Ensure the WireGuard package is removed after running tests.
-     */
-    public function teardown(): void {
-        $pkg = Package::query(name: 'pfSense-pkg-WireGuard')->first();
-        $pkg->delete();
-    }
+    public array $required_packages = ['pfSense-pkg-WireGuard'];
 
     /**
      * Checks that the `enable` field correctly enables the WireGuard service when `true` and stops the service
