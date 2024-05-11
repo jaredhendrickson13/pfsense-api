@@ -17,20 +17,36 @@ require_once 'RESTAPI/autoloader.inc';
 class TestCase {
     use BaseTraits;
 
+    /**
+     * @var string Placeholder for the method that is currently being tested.
+     */
     public string $method = 'unknown';
+
+    /**
+     * @var string Placeholder for the docstring for the method that is currently being tested.
+     */
     public string $method_docstring = '';
+
+    /**
+     * @var array An array of packages that this TestCase requires to run. These packages will be installed before
+     * running the tests.
+     */
+    public array $required_packages = [];
 
     /**
      * Runs this TestCase when the object is created. Any method that starts with `test` will automatically be run.
      * @throws ReflectionException When ReflectionMethod could not find a test method.
      * @throws Error|Exception The exception thrown by failed Tests, typically an AssertionError.
      */
-    public function run() {
+    public function run(): void {
         # Need direct config access to revert any changes made by Tests
         global $config;
 
         # use a property to keep track of the method that is currently running
         $this->method = 'unknown';
+
+        # Install packages required by this TestCase
+        $this->install_packages($this->required_packages);
 
         # Setup the test case before running tests
         $this->setup();
@@ -68,6 +84,16 @@ class TestCase {
 
         # Teardown the test case now that all tests are completed
         $this->teardown();
+    }
+
+    /**
+     * Installs the required packages for this TestCase.
+     */
+    public function install_packages(): void
+    {
+        foreach ($this->required_packages as $package) {
+            new Command("pkg install -y $package");
+        }
     }
 
     /**
