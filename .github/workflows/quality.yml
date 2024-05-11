@@ -14,6 +14,12 @@ jobs:
       - name: Check Prettier
         run: ./node_modules/.bin/prettier --check ./pfSense-pkg-RESTAPI/files
 
+  check_black:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: psf/black@stable
+
   lint_php:
     runs-on: ubuntu-latest
     needs: ["check_prettier"]
@@ -35,7 +41,7 @@ jobs:
 
   lint_python:
     runs-on: ubuntu-latest
-    needs: ["check_prettier"]
+    needs: ["check_black"]
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
