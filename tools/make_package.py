@@ -175,7 +175,7 @@ class MakePackage:
             dest="host",
             type=str,
             required=bool("--remote" in sys.argv or "-r" in sys.argv),
-            help="The host to connect to when using --build mode",
+            help="hostname or IP of the FreeBSD build host.",
         )
         parser.add_argument(
             "--branch",
@@ -183,7 +183,7 @@ class MakePackage:
             dest="branch",
             type=str,
             default="master",
-            help="The branch to build",
+            help="branch or tag to checkout during the build.",
         )
         parser.add_argument(
             "--username",
@@ -191,7 +191,7 @@ class MakePackage:
             dest="username",
             type=str,
             default=getpass.getuser(),
-            help="The username to use with SSH.",
+            help="username to use for SSH to the FreeBSD build host.",
         )
         parser.add_argument(
             "--tag",
@@ -199,7 +199,7 @@ class MakePackage:
             dest="tag",
             type=tag,
             required=True,
-            help="The version tag to use when building.",
+            help="version tag to assign to the build.",
         )
         parser.add_argument(
             "--filename",
@@ -208,7 +208,7 @@ class MakePackage:
             type=str,
             default=".",
             required=False,
-            help="The filename to use for the package file.",
+            help="filename to use for the built package file.",
         )
         self.args = parser.parse_args()
 
