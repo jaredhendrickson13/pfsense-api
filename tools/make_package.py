@@ -32,6 +32,7 @@ PKG_NAME = "pfSense-pkg-RESTAPI"
 
 class MakePackage:
     """Class that groups together variables and methods required to build the package on a FreeBSD build host."""
+
     def __init__(self):
         self.__start_argparse__()
         self.port_version = self.args.tag.split("_")[0]
@@ -57,11 +58,18 @@ class MakePackage:
         pkg_dir = root_dir.joinpath(PKG_NAME)
         template_dir = root_dir.joinpath("tools").joinpath("templates")
         files_dir = pkg_dir.joinpath("files")
-        file_paths = {"dir": [], "file": [], "port_version": self.port_version, "port_revision": self.port_revision}
+        file_paths = {
+            "dir": [],
+            "file": [],
+            "port_version": self.port_version,
+            "port_revision": self.port_revision,
+        }
         excluded_files = ["pkg-deinstall.in", "pkg-install.in", "etc", "usr"]
 
         # Set Jijna2 environment and variables
-        j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=str(template_dir)))
+        j2_env = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(searchpath=str(template_dir))
+        )
         j2_env.filters["dirname"] = self.dirname
         plist_template = j2_env.get_template("pkg-plist.j2")
         makefile_template = j2_env.get_template("Makefile.j2")
@@ -81,7 +89,9 @@ class MakePackage:
             pkg_plist.write(plist_template.render(files=file_paths))
         # Generate Makefile file
         with open(pkg_dir.joinpath("Makefile"), "w", encoding="utf-8") as makefile:
-            makefile.write(makefile_template.render(files=file_paths).replace("   ", "\t"))
+            makefile.write(
+                makefile_template.render(files=file_paths).replace("   ", "\t")
+            )
 
         self.build_package(pkg_dir)
 
@@ -99,9 +109,19 @@ class MakePackage:
         """Builds the package when the local system is FreeBSD."""
         # If we are running on FreeBSD, make package. Otherwise display warning that package was not compiled
         if platform.system() == "FreeBSD":
-            subprocess.call(["/usr/bin/make", "package", "-C", pkg_dir, "DISABLE_VULNERABILITIES=yes"])
+            subprocess.call(
+                [
+                    "/usr/bin/make",
+                    "package",
+                    "-C",
+                    pkg_dir,
+                    "DISABLE_VULNERABILITIES=yes",
+                ]
+            )
         else:
-            print("WARNING: System is not FreeBSD. Generated Makefile and pkg-plist but did not attempt to build pkg.")
+            print(
+                "WARNING: System is not FreeBSD. Generated Makefile and pkg-plist but did not attempt to build pkg."
+            )
 
     def build_on_remote_host(self):
         """Runs the build on a remote host using SSH."""
@@ -115,7 +135,7 @@ class MakePackage:
             f"composer install --working-dir ~/build/{REPO_NAME}",
             f"rm -rf ~/build/{REPO_NAME}/vendor/composer && rm ~/build/{REPO_NAME}/vendor/autoload.php",
             f"cp -r ~/build/{REPO_NAME}/vendor/* {includes_dir}",
-            f"python3 ~/build/{REPO_NAME}/tools/make_package.py --tag {self.args.tag}"
+            f"python3 ~/build/{REPO_NAME}/tools/make_package.py --tag {self.args.tag}",
         ]
 
         # Run each command and exit on bad status if failure
@@ -150,42 +170,48 @@ class MakePackage:
             description="Build the pfSense REST API on FreeBSD"
         )
         parser.add_argument(
-            '--host', '-i',
+            "--host",
+            "-i",
             dest="host",
             type=str,
             required=bool("--remote" in sys.argv or "-r" in sys.argv),
-            help="The host to connect to when using --build mode"
+            help="The host to connect to when using --build mode",
         )
         parser.add_argument(
-            '--branch', '-b',
+            "--branch",
+            "-b",
             dest="branch",
             type=str,
             default="master",
-            help="The branch to build"
+            help="The branch to build",
         )
         parser.add_argument(
-            '--username', '-u',
+            "--username",
+            "-u",
             dest="username",
             type=str,
             default=getpass.getuser(),
-            help="The username to use with SSH."
+            help="The username to use with SSH.",
         )
         parser.add_argument(
-            '--tag', '-t',
+            "--tag",
+            "-t",
             dest="tag",
             type=tag,
             required=True,
-            help="The version tag to use when building."
+            help="The version tag to use when building.",
         )
         parser.add_argument(
-            '--filename', '-f',
+            "--filename",
+            "-f",
             dest="filename",
             type=str,
             default=".",
             required=False,
-            help="The filename to use for the package file."
+            help="The filename to use for the package file.",
         )
         self.args = parser.parse_args()
+
 
 try:
     MakePackage()
