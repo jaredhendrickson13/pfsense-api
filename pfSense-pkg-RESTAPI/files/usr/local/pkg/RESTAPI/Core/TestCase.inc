@@ -89,8 +89,7 @@ class TestCase {
     /**
      * Installs the required packages for this TestCase.
      */
-    public function install_packages(): void
-    {
+    public function install_packages(): void {
         foreach ($this->required_packages as $package) {
             new Command("pkg install -y $package");
         }
