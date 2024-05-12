@@ -16,8 +16,12 @@ class APIModelsWireGuardTunnelAddressTestCase extends TestCase {
      * Ensures WireGuard is enabled before testing
      */
     public function setup(): void {
-        $wg = new WireGuardSettings(enable: true, async: false);
-        $wg->update(apply: true);
+        # Only enable WireGuard if it's not already enabled
+        $wg = new WireGuardSettings(async: false);
+        if (!$wg->enable->value) {
+            $wg->enable->value = true;
+            $wg->update(apply: true);
+        }
     }
 
     /**
