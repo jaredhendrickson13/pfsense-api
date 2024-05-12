@@ -15,6 +15,11 @@ class FirewallApplyDispatcher extends Dispatcher {
      * Reloads the filter services.
      */
     protected function _process(mixed ...$arguments): void {
-        filter_configure_sync();
+        if ($this->async) {
+            filter_configure();
+        }
+        else {
+            filter_configure_sync();
+        }
     }
 }
