@@ -27,7 +27,6 @@ class HAProxyBackendACL extends Model {
         # Set model fields
         $this->name = new StringField(
             required: true,
-            unique: true,
             minimum_length: 2,
             validators: [new RegexValidator(pattern: '/[^a-zA-Z0-9\.\-_]/', invert: true)],
             help_text: 'The unique name for this backend ACL.',
