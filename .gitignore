@@ -9,3 +9,4 @@ vendor/
 *.pkg
 node_modules
 .phpdoc/
+site/
