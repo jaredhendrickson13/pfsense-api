@@ -3,20 +3,34 @@
 namespace RESTAPI\Core;
 
 /**
- * Defines objects that execute shell commands and keep track of the output.
- * @property string $command The shell command this object should execute.
- * @property string $redirect An optional shell redirect to append to the end of the $command.
- * @property string $output The output of the executed shell command.
- * @property int $result_code The exit/return code of the executed shell command.
- * @property bool $trim_whitespace Automatically remove excessive whitespace from the command $output.
+ * Defines an object that executes shell commands and keeps track of the output and result codes.
  */
 class Command {
     use BaseTraits;
 
+    /**
+     * @var string $command The shell command this object should execute.
+     */
     public string $command;
+
+    /**
+     * @var string $redirect An optional shell redirect to append to the end of the $command.
+     */
     public string $redirect;
+
+    /**
+     * @var string $output The output of the executed shell command.
+     */
     public string $output = '';
+
+    /**
+     * @var int $result_code The exit/return code of the executed shell command.
+     */
     public int $result_code = -1;
+
+    /**
+     * @var bool $trim_whitespace Automatically remove excessive whitespace from the command $output.
+     */
     public bool $trim_whitespace = false;
 
     /**

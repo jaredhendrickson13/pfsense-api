@@ -89,8 +89,19 @@ const HTTP_STATUS_MESSAGES = [
 class Response extends Error {
     use BaseTraits;
 
+    /**
+     * @var int $code The HTTP status code that corresponds with the API response.
+     */
     public $code = 500;
+
+    /**
+     * @var string $status The HTTP status message that corresponds with the HTTP status code.
+     */
     public string $status;
+
+    /**
+     * @var string $help_text A help text message that can be used to describe the API response in more detail.
+     */
     public string $help_text = '';
 
     /**

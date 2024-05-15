@@ -31,8 +31,9 @@ use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
- * Represents an API Endpoint, encapsulating attributes essential for generating the API endpoint
- * and facilitating API calls. description is not adequate.
+ * Defines an API Endpoint, encapsulating attributes essential for generating the PHP endpoint in the pfSense webroot,
+ * and facilitating API calls. Endpoints are also responsible for defining authentication requirements, request methods
+ * available, and allows customizing the generated OpenAPI documentation for the endpoint.
  */
 class Endpoint {
     use BaseTraits;

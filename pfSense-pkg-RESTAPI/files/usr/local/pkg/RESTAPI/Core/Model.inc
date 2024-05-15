@@ -31,7 +31,7 @@ const DEFAULT_CLIENT_USERNAME = '(system)';
 const DEFAULT_CLIENT_IP_ADDRESS = '127.0.0.1';
 
 /**
- * Creates a Model object that relates to a pfSense configuration or service. This model defines the necessary steps
+ * Defines a Model object that relates to a pfSense configuration or service. This model defines the necessary steps
  * to validate incoming configuration and create, read, update, and/or delete data from the pfSense configuration this
  * object relates to.
  */

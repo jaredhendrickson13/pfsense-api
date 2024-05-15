@@ -27,8 +27,9 @@ use RESTAPI\Responses\ServerError;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
- * Creates object that performs authentication and authorization for REST API Endpoints and obtains details about the
- * authenticating client.
+ * Defines object that performs authentication and authorization for REST API Endpoints and obtains details about the
+ * authenticating client. This class is intended to be extended by child classes that define specific authentication
+ * methods.
  */
 class Auth {
     use BaseTraits;
