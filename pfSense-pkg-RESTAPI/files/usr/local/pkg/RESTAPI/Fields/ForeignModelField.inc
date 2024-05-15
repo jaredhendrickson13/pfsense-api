@@ -27,7 +27,8 @@ class ForeignModelField extends Field {
      * existing Model class in the \RESTAPI\Models namespace, but should not include the \RESTAPI\Models namespace prefix.
      * @param string $model_field The field on the assigned $model_name class that this field's value relates to. For
      * example, if this Fields value must be an existing Gateway model object's `name`, you would set $model_name to
-     * `Gateway` and $model_field to `name`. This field must be a `unique` field on the assigned $model_name.
+     * `Gateway` and $model_field to `name`. Note: If this field is not a unique field, related models will be matched
+     * on a first-match basis.
      * @param string $model_field_internal In the event that you want to store a different field value internally,
      * specify that field name here. Leave empty to use the $model_field for both the internal and representation values.
      * For example, if this field's value must be set in config as an existing Gateway model object's `name`, but you
@@ -172,7 +173,7 @@ class ForeignModelField extends Field {
         # Ensure the assigned $model_name is an existing Model class
         if (!class_exists($model_name)) {
             throw new ServerError(
-                message: "ForeignModelField's `model_name` property musted be an existing Model class FQN, " .
+                message: "ForeignModelField's `model_name` property must be an existing Model class FQN, " .
                     "received `$model_name`.",
                 response_id: 'FOREIGN_MODEL_FIELD_WITH_UNKNOWN_MODEL_NAME',
             );
