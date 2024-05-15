@@ -12,7 +12,7 @@ env:
   build_version: "0.0_0-dev-${{ github.event.pull_request.head.sha || github.sha }}"
 
 jobs:
-  build:
+  build_pkg:
     runs-on: self-hosted
 
     strategy:
@@ -114,7 +114,7 @@ jobs:
         with:
           file_path: openapi-${{ matrix.pfsense_version }}.json
 
-  unit_tests:
+  check_tests:
     runs-on: self-hosted
     needs: [build_openapi]
 
@@ -151,7 +151,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com "pkg -C /dev/null add /tmp/pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg"
           sleep 5
 
-      - name: Run pfSense-pkg-RESTAPI unit Tests
+      - name: Run pfSense-pkg-RESTAPI tests
         run: |
           ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-restapi runtests'
 
