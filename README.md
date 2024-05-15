@@ -3,8 +3,10 @@
 [![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg?branch=next_major)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
 [![Quality](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml/badge.svg?branch=next_major)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml)
 
-This package offers a robust and secure REST API for pfSense firewalls. It is designed to streamline automation by 
-transforming the PHP functions and processes used by pfSense's webConfigurator into versatile API endpoints.
+Welcome to the pfSense-pkg-RESTAPI repository! This package offers a robust and secure REST API for pfSense firewalls.
+It is designed to streamline automation by transforming the PHP functions and processes used by pfSense's
+webConfigurator into versatile API endpoints. This document aims to provide comprehensive details about installation,
+configuration, authentication, and usage of the pfSense REST API.
 
 > [!TIP]
 > Detailed API endpoint documentation can be found in the [webConfigurator after installation](#webconfigurator-settings--documentation).
