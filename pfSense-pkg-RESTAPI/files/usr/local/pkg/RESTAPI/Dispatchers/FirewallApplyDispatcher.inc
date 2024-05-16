@@ -17,8 +17,7 @@ class FirewallApplyDispatcher extends Dispatcher {
     protected function _process(mixed ...$arguments): void {
         if ($this->async) {
             filter_configure();
-        }
-        else {
+        } else {
             filter_configure_sync();
         }
     }

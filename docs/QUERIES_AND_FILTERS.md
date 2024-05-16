@@ -2,8 +2,8 @@
 
 ## Queries
 
-Queries can be used to filter the data that is returned from the API based on specific criteria. Queries are passed as 
-query parameters in the URL and are formatted as `key=value`. Multiple queries can be passed in a single request by 
+Queries can be used to filter the data that is returned from the API based on specific criteria. Queries are passed as
+query parameters in the URL and are formatted as `key=value`. Multiple queries can be passed in a single request by
 separating them with an ampersand `&`. There are a couple of requirements for using queries with the REST API:
 
 - Queries are only available for `GET` requests to endpoints.
@@ -22,8 +22,8 @@ query filter is specified.
 
 - Name: `exact`
 - Examples:
-    - `https://pfsense.example.com/api/v2/examples?fieldname=example`
-    - `https://pfsense.example.com/api/v2/examples?fieldname__exact=example`
+  - `https://pfsense.example.com/api/v2/examples?fieldname=example`
+  - `https://pfsense.example.com/api/v2/examples?fieldname__exact=example`
 
 ### Starts With (startswith)
 
@@ -85,10 +85,10 @@ fields.
 ## Pagination
 
 Pagination can be used to limit the number of items returned in a single request. Pagination is controlled by two query
-parameters: `limit` and `offset`. The `limit` parameter specifies the number of items to return, and the `offset` 
+parameters: `limit` and `offset`. The `limit` parameter specifies the number of items to return, and the `offset`
 parameter specifies the starting index of the items to return. Pagination is useful when working with large datasets to
 reduce the amount of data returned in a single request.
 
 !!! Important
-    By default, the REST API does not paginate responses. If you want to paginate the response, you must include the
-    `limit` and `offset` query parameters in your request.
+By default, the REST API does not paginate responses. If you want to paginate the response, you must include the
+`limit` and `offset` query parameters in your request.
