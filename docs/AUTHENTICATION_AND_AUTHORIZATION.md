@@ -17,10 +17,17 @@ logic.
 Basic authentication is the default and simplest form of authentication and is supported by most HTTP clients. This 
 method uses the same username and password as your pfSense webConfigurator login and requires the client to send an 
 `Authorization` header with the value `Basic <base64 encoded username:password>`. The REST API will decode the base64 
-encoded string and attempt to authenticate the user with the provided credentials. Below is an example using `curl`:
+encoded string and attempt to authenticate the user with the provided credentials. Below are two examples of using 
+Basic authentication with `curl`:
 
+Full syntax:
 ```bash
 curl -H "Authorization: Basic YWRtaW46cGZzZW5zZQo=" https://pfsense.example.com/api/v2/firewall/rules
+```
+
+Short syntax:
+```bash
+curl -u admin:pfsense https://pfsense.example.com/api/v2/firewall/rules
 ```
 
 !!! Note

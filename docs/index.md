@@ -5,9 +5,9 @@ designed to be light-weight, fast, and easy to use. This guide will help you get
 provide you with the information you need to configure and use the package effectively.
 
 !!! Tip
-    Looking for documentation on REST API endpoints and parameters? [Swagger documentation](./swagger_and_openapi.md)
+    Looking for documentation on REST API endpoints and parameters? [Swagger documentation](./SWAGGER_AND_OPENAPI.md)
     is available at `System` -> `REST API` -> `Documentation` in the pfSense webConfigurator after 
-    [installation](./install_and_config.md).
+    [installation](./INSTALL_AND_CONFIG.md).
 
 ## Key Features
 

@@ -26,11 +26,11 @@ API response.
 
 #### next
 
-Provides a link to the next set of data when [pagination](./queries_and_filters.md#pagination) is used.
+Provides a link to the next set of data when [pagination](./QUERIES_AND_FILTERS.md#pagination) is used.
 
 #### prev
 
-Provides a link to the previous set of data when [pagination](./queries_and_filters.md#pagination) is used.
+Provides a link to the previous set of data when [pagination](./QUERIES_AND_FILTERS.md#pagination) is used.
 
 #### self
 

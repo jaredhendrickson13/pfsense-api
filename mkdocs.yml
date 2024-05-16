@@ -1,15 +1,16 @@
-site_name: pfSense REST API Documentation
+site_name: pfSense REST API Guide
 nav:
   - Home: index.md
-  - Installation & Configuration: install_and_config.md
-  - Swagger & OpenAPI: swagger_and_openapi.md
-  - Authentication & Authorization: authentication_and_authorization.md
-  - Queries & Filters: queries_and_filters.md
-  - Working with Object IDs: working_with_object_ids.md
-  - Working with HATEOAS: working_with_hateoas.md
-  - Common Control Parameters: common_control_parameters.md
-  - Limitations & FAQs: limitations_and_faqs.md
-  - Glossary: glossary.md
+  - Installation & Configuration: INSTALL_AND_CONFIG.md
+  - Swagger & OpenAPI: SWAGGER_AND_OPENAPI.md
+  - Authentication & Authorization: AUTHENTICATION_AND_AUTHORIZATION.md
+  - Queries & Filters: QUERIES_AND_FILTERS.md
+  - Working with Object IDs: WORKING_WITH_OBJECT_IDS.md
+  - Working with HATEOAS: WORKING_WITH_HATEOAS.md
+  - Common Control Parameters: COMMON_CONTROL_PARAMETERS.md
+  - Limitations & FAQs: LIMITATIONS_AND_FAQS.md
+  - Glossary: GLOSSARY.md
+  - Contributing & Development: CONTRIBUTING.md
 theme:
   name: readthedocs
   features:
