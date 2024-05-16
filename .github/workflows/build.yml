@@ -49,7 +49,7 @@ jobs:
 
   build_openapi:
     runs-on: self-hosted
-    needs: [build]
+    needs: [build_pkg]
     strategy:
       matrix:
         include:
