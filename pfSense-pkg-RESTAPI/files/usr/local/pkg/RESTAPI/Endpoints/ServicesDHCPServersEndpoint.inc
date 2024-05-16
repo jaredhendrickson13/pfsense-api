@@ -16,7 +16,7 @@ class ServicesDHCPServersEndpoint extends Endpoint {
         $this->url = '/api/v2/services/dhcp_servers';
         $this->model_name = 'DHCPServer';
         $this->many = true;
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'PUT'];
 
         # Construct the parent Endpoint object
         parent::__construct();

@@ -6,6 +6,8 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Model;
+use RESTAPI\Core\ModelSet;
+use RESTAPI\Dispatchers\DHCPServerApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
@@ -488,6 +490,21 @@ class DHCPServer extends Model {
     }
 
     /**
+     * Applies DHCP server changes after replacement of all existing DHCP server objects.
+     */
+    public function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects): void
+    {
+        # Always configure RRD after replacing all DHCP server objects
+        enable_rrd_graphing();
+        
+        # Always reset the dhcpd db files after replacing all DHCP server objects
+        mwexec('/bin/rm -rf /var/dhcpd/var/db/*');
+
+        (new DHCPServerApplyDispatcher(async: $this->async))->spawn_process();
+
+    }
+
+    /**
      * Applies the pending DHCP server changes.
      */
     public function apply(): void {
@@ -501,6 +518,6 @@ class DHCPServer extends Model {
             mwexec('/bin/rm -rf /var/dhcpd/var/db/*');
         }
 
-        (new DHCPServerApply())->apply();
+        (new DHCPServerApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

@@ -9,7 +9,7 @@ use RESTAPI\Fields\StringField;
 class DHCPServerBackend extends Model {
     public StringField $dhcpbackend;
 
-    public function __construct(mixed $data = [], ...$options) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = '/';
         $this->many = false;
