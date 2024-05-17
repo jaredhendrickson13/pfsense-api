@@ -72,7 +72,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
      */
     public function test_ipaddr_cannot_overlap_primary_pool(): void {
         # Update the DHCP server primary pool
-        $dhcp_server = new DHCPServer(id: 'lan', range_from: '192.168.1.10', range_to: '192.168.1.15');
+        $dhcp_server = new DHCPServer(id: 'lan', range_from: '192.168.1.10', range_to: '192.168.1.15', async: false);
         $dhcp_server->update();
 
         # Ensure an error is thrown if we try to create a DHCPServerStaticMapping within the primary pool

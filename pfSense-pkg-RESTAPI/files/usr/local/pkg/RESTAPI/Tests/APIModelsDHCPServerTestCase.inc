@@ -20,7 +20,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
 
                 # Temporarily change the `lan` interface to use dhcp IPv4
                 Model::set_config('interfaces/lan/ipaddr', 'dhcp');
@@ -40,7 +40,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
 
                 # Temporarily change the `lan` interface to use dhcp IPv4
                 Model::set_config('dhcrelay/0/interface', 'lan');
@@ -60,7 +60,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $interface = new NetworkInterface(id: 'lan');
 
                 # Try to enable the DHCP server
@@ -78,7 +78,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->range_to->value = '192.168.1.1';
                 $dhcp_server->validate_range_from(range_from: '192.168.1.2');
             },
@@ -94,7 +94,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->validate_range_from(range_from: '1.2.3.4');
             },
         );
@@ -109,7 +109,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $interface = new NetworkInterface(id: 'lan');
 
                 # Try to enable the DHCP server
@@ -127,7 +127,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->validate_range_to(range_to: '1.2.3.4');
             },
         );
@@ -147,7 +147,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 409,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->range_from->value = '192.168.1.2';
                 $dhcp_server->range_to->value = '192.168.1.3';
                 $dhcp_server->validate_extra();
@@ -177,7 +177,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 409,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->range_from->value = '192.168.1.2';
                 $dhcp_server->range_to->value = '192.168.1.3';
                 $dhcp_server->validate_extra();
@@ -197,7 +197,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->defaultleasetime->value = 25000;
                 $dhcp_server->validate_maxleasetime(maxleasetime: 24000);
             },
@@ -213,7 +213,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->validate_gateway(gateway: '1.2.3.4');
             },
         );
@@ -228,7 +228,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->failover_peerip->value = '192.168.1.2';
                 $dhcp_server->validate_nonak(nonak: true);
             },
@@ -249,7 +249,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Use the `lan` DHCP server for this test
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server->validate_staticarp(staticarp: true);
             },
         );
@@ -264,7 +264,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      */
     public function test_enable_controls_dhcpd_process() {
         # Disable the DHCP server and ensure the `dhcpd` process is no longer running
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->enable->value = false;
         $dhcp_server->update();
         $this->assert_str_does_not_contain((new Command('ps aux'))->output, '-pf /var/run/dhcpd.pid em1');
@@ -280,7 +280,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      */
     public function test_ignorebootp_set_dhcpd_ignore_bootp() {
         # Enable `ignorebootp` and ensure it is set in the dhcpd.conf
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->ignorebootp->value = true;
         $dhcp_server->update();
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'ignore bootp;');
@@ -296,7 +296,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      */
     public function test_denyunknown_sets_dhcpd_deny() {
         # Set `denyunknown` to `enabled` and ensure dhcpd.conf denies all unknown clients
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->denyunknown->value = 'enabled';
         $dhcp_server->update();
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'deny unknown-clients;');
@@ -329,7 +329,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      */
     public function test_ignoreclientuids_sets_dhcpd_ignore_client_uids() {
         # Enable `ignoreclientuids` and ensure it is set in the dhcpd.conf
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->ignoreclientuids->value = true;
         $dhcp_server->update();
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'ignore-client-uids true;');
@@ -347,7 +347,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `disablepingcheck` field correctly sets the dhcpd `ping-check` setting.
      */
     public function test_disablepingcheck_sets_dhcpd_ping_check() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->disablepingcheck->value = true;
         $dhcp_server->update();
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'ping-check false;');
@@ -361,7 +361,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `range_from` and `range_to` field correctly configures the DHCP range in dhcpd.conf
      */
     public function test_range_from_and_range_to_sets_dhcpd_range() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->range_from->value = '192.168.1.105';
         $dhcp_server->range_to->value = '192.168.1.108';
         $dhcp_server->update();
@@ -375,7 +375,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `winsserver` field correctly sets the WINS servers configured in dhcpd.conf
      */
     public function test_winsserver_sets_dhcpd_netbios_nameservers() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->winsserver->value = ['192.168.1.100', '192.168.1.101'];
         $dhcp_server->update();
         $this->assert_str_contains(
@@ -388,7 +388,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `dnsserver` field correctly sets the DNS servers configured in dhcpd.conf
      */
     public function test_dnsserver_sets_dhcpd_dns_servers() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->dnsserver->value = ['192.168.1.100', '192.168.1.101'];
         $dhcp_server->update();
         $this->assert_str_contains(
@@ -401,7 +401,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `ntpserver` field correctly sets the NTP servers configured in dhcpd.conf
      */
     public function test_ntpserver_sets_dhcpd_ntp_servers() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->ntpserver->value = ['192.168.1.100', '192.168.1.101'];
         $dhcp_server->update();
         $this->assert_str_contains(
@@ -414,7 +414,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `mac_allow` field sets the proper dhcpd settings
      */
     public function test_mac_allow_sets_dhcpd_allow_members() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->mac_allow->value = ['11:22:33:aa:bb:cc'];
         $dhcp_server->update();
         $this->assert_str_contains(
@@ -431,7 +431,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `mac_deny` field sets the proper dhcpd settings
      */
     public function test_mac_deny_sets_dhcpd_deny_members() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->mac_deny->value = ['11:22:33:aa:bb:cc'];
         $dhcp_server->update();
         $this->assert_str_contains(
@@ -448,7 +448,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `gateway` field correctly sets the router configured in dhcpd.conf
      */
     public function test_gateway_sets_dhcpd_router() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->gateway->value = '192.168.1.2';
         $dhcp_server->update();
         $this->assert_str_contains(
@@ -461,7 +461,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `domain` field correctly sets the domain name configured in dhcpd.conf
      */
     public function test_domain_sets_dhcpd_domain_name() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->domain->value = 'example.com';
         $dhcp_server->update();
         $this->assert_str_contains(
@@ -474,7 +474,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `domainsearchlist` field correctly sets the domain search configured in dhcpd.conf
      */
     public function test_domainsearchlist_sets_dhcpd_domain_search() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->domainsearchlist->value = ['example.com'];
         $dhcp_server->update();
         $this->assert_str_contains(
@@ -487,7 +487,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `defaultleasetime` field correctly sets the default-lease-time configured in dhcpd.conf
      */
     public function test_defaultleasetime_sets_dhcpd_default_lease_time() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->defaultleasetime->value = 7201;
         $dhcp_server->update();
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'default-lease-time 7201;');
@@ -497,7 +497,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `maxleasetime` field correctly sets the max-lease-time configured in dhcpd.conf
      */
     public function test_maxleasetime_sets_dhcpd_max_lease_time() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->maxleasetime->value = 86401;
         $dhcp_server->update();
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'max-lease-time 86401;');
@@ -507,7 +507,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures the `failover_peerip` field correctly sets the failover peer address configured in dhcpd.conf
      */
     public function test_failover_peerip_sets_dhcpd_peer_address() {
-        $dhcp_server = new DHCPServer(id: 'lan');
+        $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->failover_peerip->value = '192.168.1.2';
         $dhcp_server->update();
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'peer address 192.168.1.2;');
