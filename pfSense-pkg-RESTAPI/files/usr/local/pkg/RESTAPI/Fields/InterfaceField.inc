@@ -143,7 +143,7 @@ class InterfaceField extends StringField {
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): string {
+    public function _from_internal(mixed $internal_value): string {
         # Variables
         $interfaces = Model::get_config('interfaces', []);
 
@@ -166,7 +166,7 @@ class InterfaceField extends StringField {
     /**
      * Converts the field's representation value into it's internal pfSense value.
      */
-    protected function _to_internal(mixed $representation_value): array|null|string {
+    public function _to_internal(mixed $representation_value): array|null|string {
         # Query to find this interface using the interfaces representation field and value
         $interface_query = NetworkInterface::query(query_params: [$this->represented_as => $representation_value]);
 

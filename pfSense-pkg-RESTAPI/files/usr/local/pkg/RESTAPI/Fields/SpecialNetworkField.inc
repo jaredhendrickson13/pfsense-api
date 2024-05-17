@@ -266,7 +266,7 @@ class SpecialNetworkField extends InterfaceField {
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|null|string The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value): string {
+    public function _to_internal(mixed $representation_value): string {
         # Keep track if the interface IP modifier was set
         $if_ip_modifier_set = false;
 
@@ -297,7 +297,7 @@ class SpecialNetworkField extends InterfaceField {
      * @param string $internal_value The internal config value to convert to a representation value.
      * @throws ServerError When the child Field class does not override this method.
      */
-    protected function _from_internal(mixed $internal_value): string {
+    public function _from_internal(mixed $internal_value): string {
         # Assign a variable to use when piecing back together our representation value
         $representation_value = '';
 
