@@ -33,8 +33,8 @@ curl -u admin:pfsense https://pfsense.example.com/api/v2/firewall/rules
 ```
 
 !!! Note
-Currently, the REST API does not support Basic authentication with LDAP or RADIUS authentication server backends.
-Only the local database is supported.
+    Currently, the REST API does not support Basic authentication with LDAP or RADIUS authentication server backends.
+    Only the local database is supported.
 
 ### API Key Authentication
 
@@ -49,10 +49,10 @@ curl -H "X-API-Key: xxxxxxxxxxxxxxxxxxxxxxx" https://pfsense.example.com/api/v2/
 ```
 
 !!! Important
-API keys utilize the privileges assigned to the user that generated the key.
+    API keys utilize the privileges assigned to the user that generated the key.
 !!! Warning
-API keys are sensitive information and should be treated as such. Do not share your API key with anyone you do not
-trust. If you believe your API key has been compromised, you can revoke it in the pfSense webConfigurator.
+    API keys are sensitive information and should be treated as such. Do not share your API key with anyone you do not
+    trust. If you believe your API key has been compromised, you can revoke it in the pfSense webConfigurator.
 
 ### JSON Web Token (JWT) Authentication
 
@@ -74,9 +74,9 @@ curl -H "Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx" https://pfsense.example.
 ```
 
 !!! Important
-JWTs are only valid for a limited time (default 1 hour) and must be regenerated after they expire. The expiration
-interval can be configured in the REST API settings within the pfSense webConfigurator or via a `PATCH` request to
-the `/api/v2/system/restapi/settings` endpoint's `jwt_exp` field.
+    JWTs are only valid for a limited time (default 1 hour) and must be regenerated after they expire. The expiration
+    interval can be configured in the REST API settings within the pfSense webConfigurator or via a `PATCH` request to
+    the `/api/v2/system/restapi/settings` endpoint's `jwt_exp` field.
 
 ### Custom Authentication
 
@@ -123,7 +123,7 @@ Once your custom Auth class is created, simply place it at `/usr/local/pkg/RESTA
 automatically become an available authentication method in the REST API settings.
 
 !!! Note
-Rename `MyCustomAuth` to any name you like, but make sure the class name matches the file name.
+    Rename `MyCustomAuth` to any name you like, but make sure the class name matches the file name.
 
 ## Authorization
 
@@ -132,6 +132,6 @@ However, a unique privilege is generated for each API endpoint and it's associat
 be assigned to users the same way as any other privilege in pfSense.
 
 !!! Note
-The REST API will respect the `WebCfg - All pages` and `User - Config: Deny Config Write` privileges. Users with
-the `WebCfg - All pages` privilege will have full access to the REST API. Users with the `User - Config: Deny
+    The REST API will respect the `WebCfg - All pages` and `User - Config: Deny Config Write` privileges. Users with
+    the `WebCfg - All pages` privilege will have full access to the REST API. Users with the `User - Config: Deny
     Config Write` privilege will be allowed to make API calls but attempts to modify the configuration will be denied.

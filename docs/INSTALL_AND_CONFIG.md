@@ -8,8 +8,8 @@ Overall, the REST API package is designed to be as lightweight as possible and s
 run pfSense. It's recommended to follow Netgate's [minimum hardware requirements](https://docs.netgate.com/pfsense/en/latest/hardware/minimum-requirements.html).
 
 !!! Warning
-While the package should behavior identically on architectures other than amd64, it has only been tested on amd64
-builds of pfSense. Support on other architectures is not guaranteed.
+    While the package should behavior identically on architectures other than amd64, it has only been tested on amd64
+    builds of pfSense. Support on other architectures is not guaranteed.
 
 ### Supported pfSense versions
 
@@ -17,8 +17,8 @@ builds of pfSense. Support on other architectures is not guaranteed.
 - pfSense Plus 24.03 (amd64)
 
 !!! Tip
-Don't see your version of pfSense? Older versions of pfSense may be supported by older versions of this package.
-Check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases).
+    Don't see your version of pfSense? Older versions of pfSense may be supported by older versions of this package.
+    Check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases).
 
 ## Installing the package
 
@@ -30,13 +30,13 @@ pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/re
 ```
 
 !!! Note
-You may need to customize the installation command to reference the package built for your pfSense version. Check
-the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
-your version of pfSense.
+    You may need to customize the installation command to reference the package built for your pfSense version. Check
+    the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
+    your version of pfSense.
 
 !!! Important
-When updating pfSense, **you must reinstall this package afterward** as pfSense removes unofficial packages during
-system updates.
+    When updating pfSense, **you must reinstall this package afterward** as pfSense removes unofficial packages during
+    system updates.
 
 ## Configuring the package
 
@@ -53,8 +53,8 @@ pfsense-restapi delete
 ```
 
 !!! Note
-In the event that you are unable to use the `pfsense-restapi` command, you can manually remove the package by
-running `pkg-static delete pfSense-pkg-RESTAPI`.
+    In the event that you are unable to use the `pfsense-restapi` command, you can manually remove the package by
+    running `pkg-static delete pfSense-pkg-RESTAPI`.
 
 ## Updating the package
 

@@ -90,5 +90,5 @@ parameter specifies the starting index of the items to return. Pagination is use
 reduce the amount of data returned in a single request.
 
 !!! Important
-By default, the REST API does not paginate responses. If you want to paginate the response, you must include the
-`limit` and `offset` query parameters in your request.
+    By default, the REST API does not paginate responses. If you want to paginate the response, you must include the
+    `limit` and `offset` query parameters in your request.

@@ -13,12 +13,12 @@ parameters you can use:
   parameter may not be supported by all endpoints.
 
 !!! Tip
-Instead of forcing the API to wait for changes to apply, it is recommended to leave this parameter set to `true`
-and periodically check the status of the changes using a `GET` request to the applicable apply endpoint.
+    Instead of forcing the API to wait for changes to apply, it is recommended to leave this parameter set to `true`
+    and periodically check the status of the changes using a `GET` request to the applicable apply endpoint.
 !!! Warning
-Setting this parameter to `false` may cause the API to hang if the changes take a long time to apply. In severe cases,
-this may result in your API request receiving a timeout. It is recommended to use this parameter with caution and
-only when necessary.
+    Setting this parameter to `false` may cause the API to hang if the changes take a long time to apply. In severe cases,
+    this may result in your API request receiving a timeout. It is recommended to use this parameter with caution and
+    only when necessary.
 
 ## apply
 
@@ -40,5 +40,5 @@ only when necessary.
   force specific sorting attributes that may override this parameter.
 
 !!! Warning
-Use caution when setting placement of objects which may be sensitive to order such as firewall rules. Placing the
-object in the wrong location may have unintended consequences such as blocking all traffic or allowing all traffic.
+    Use caution when setting placement of objects which may be sensitive to order such as firewall rules. Placing the
+    object in the wrong location may have unintended consequences such as blocking all traffic or allowing all traffic.
