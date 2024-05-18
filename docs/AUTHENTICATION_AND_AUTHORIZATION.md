@@ -9,8 +9,8 @@ methods, custom authentication methods can be added by extending the `Auth` clas
 logic.
 
 !!! Note
-Multiple authentication methods can be enabled at the same time. If multiple methods are
-enabled, the first method that successfully authenticates the user will be used.
+    Multiple authentication methods can be enabled at the same time. If multiple methods are
+    enabled, the first method that successfully authenticates the user will be used.
 
 ### Basic Authentication (Local database)
 
