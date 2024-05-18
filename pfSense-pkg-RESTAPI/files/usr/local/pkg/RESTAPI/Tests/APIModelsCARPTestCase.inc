@@ -24,6 +24,7 @@ class APIModelsCARPTestCase extends TestCase {
                 'password' => 'testpasswd',
                 'vhid' => 5,
             ],
+            async: false,
         );
         $carp_vip->create(apply: true);
 
@@ -66,6 +67,7 @@ class APIModelsCARPTestCase extends TestCase {
                 'advbase' => 1,
                 'advskew' => 1,
             ],
+            async: false,
         );
         $carp_vip->create(apply: true);
 
