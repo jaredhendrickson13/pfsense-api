@@ -22,6 +22,7 @@ use RESTAPI\Validators\MACAddressValidator;
  * Defines a Model that configures the DHCP server for a given interface.
  */
 class DHCPServer extends Model {
+    public InterfaceField $interface;
     public BooleanField $enable;
     public StringField $range_from;
     public StringField $range_to;
@@ -56,6 +57,15 @@ class DHCPServer extends Model {
         $this->verbose_name = 'DHCP Server';
 
         # Define Model Fields
+        $this->interface = new InterfaceField(
+            required: true,
+            representation_only: true,
+            help_text: 'The interface to configure the DHCP server for. This field is only necessary when you want'.
+                'to change the interface (ID) of an existing DHCP server, or you are replacing all DHCP server objects '.
+                'with a new configuration. Note that specifying an interface in this field will update the ID of the '.
+                'DHCP server to match the interface specified here. Leaving this field empty will retain the '.
+                'existing interface.'
+        );
         $this->enable = new BooleanField(default: false, help_text: 'Enable the DHCP server for this interface.');
         $this->range_from = new StringField(
             default: '',
@@ -252,6 +262,14 @@ class DHCPServer extends Model {
                 $this->set_config(path: "$this->config_path/$if->id", value: []);
             }
         }
+    }
+
+    /**
+     * Obtains the internal `interface` field value since it is not stored in the config.
+     * @return string The internal interface ID of the DHCPServer.
+     */
+    public function from_internal_interface(): string {
+        return $this->interface->_from_internal($this->id);
     }
 
     /**
@@ -487,6 +505,16 @@ class DHCPServer extends Model {
         }
 
         return null;
+    }
+
+    /**
+     * Obtains the next available ID for a new DHCP server object.
+     * @return string The interface ID associated with `interface` field value.
+     * @note This is not the conventional use case for this method, but it is necessary for the DHCPServer::replace_all()
+     * method to associate DHCP server objects with the requested interface.
+     */
+    public function get_next_id(): string {
+        return $this->interface->_to_internal($this->interface->value) ?: "unknown";
     }
 
     /**
