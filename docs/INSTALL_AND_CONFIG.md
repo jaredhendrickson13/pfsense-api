@@ -8,7 +8,7 @@ Overall, the REST API package is designed to be as lightweight as possible and s
 run pfSense. It's recommended to follow Netgate's [minimum hardware requirements](https://docs.netgate.com/pfsense/en/latest/hardware/minimum-requirements.html).
 
 !!! Warning
-    While the package should behavior identically on architectures other than amd64, it has only been tested on amd64
+    While the package should behave identically on architectures other than amd64, it has only been tested on amd64
     builds of pfSense. Support on other architectures is not guaranteed.
 
 ### Supported pfSense versions
