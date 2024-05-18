@@ -1968,7 +1968,7 @@ class Model {
             $model_object->validate();
 
             # If an error was not thrown during Model object creation or validation, give it an ID and set the config
-            $model_object->id = $this->get_next_id();
+            $model_object->id = $model_object->get_next_id();
             $this->set_config("{$this->get_config_path()}/$model_object->id", $model_object->to_internal());
         }
 
