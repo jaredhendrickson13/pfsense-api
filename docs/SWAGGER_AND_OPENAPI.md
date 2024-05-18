@@ -7,9 +7,9 @@ After installation, an interactive Swagger documentation site is available on yo
 associated parameters, as well as provides a quick and interactive way to try out API calls.
 
 !!! Note
-When you expand an endpoint for `GET` and `DELETE` requests, Swagger will display field options as query parameters.
-For `POST`, `PATCH` and `PUT` requests, Swagger will display field options as request body parameters under the
-'Schema' tab.
+    When you expand an endpoint for `GET` and `DELETE` requests, Swagger will display field options as query parameters.
+    For `POST`, `PATCH` and `PUT` requests, Swagger will display field options as request body parameters under the
+    'Schema' tab.
 
 ## OpenAPI Schema
 

@@ -6,12 +6,12 @@ HATEOAS driven development by providing links to related resources in the respon
 easily navigate the API and discover available actions and resources related to the current API response.
 
 !!! Notes - Links are based on [HAL (Hypertext Application Language)](https://stateless.group/hal_specification.html) along
-with some [custom link types](#link-types). - HATEOAS is an optional feature and is disabled by default. HATEOAS can be enabled in the
-pfSense webConfigurator under `System` -> `REST API` -> `Settings` by checking the `Enable HATEOAS` checkbox or
-via a `PATCH` request to the `/api/v2/system/restapi/settings` endpoint's `hateoas` field.
+    with some [custom link types](#link-types). - HATEOAS is an optional feature and is disabled by default. HATEOAS can be enabled in the
+    pfSense webConfigurator under `System` -> `REST API` -> `Settings` by checking the `Enable HATEOAS` checkbox or
+    via a `PATCH` request to the `/api/v2/system/restapi/settings` endpoint's `hateoas` field.
 !!! Important
-Enabling HATEOAS can greatly increase the size of API responses as additional links are included in the response data;
-which may also impact performance on large datasets.
+    Enabling HATEOAS can greatly increase the size of API responses as additional links are included in the response data;
+    which may also impact performance on large datasets.
 
 ### Link types
 
@@ -19,8 +19,8 @@ Below are the different link types that can be returned by the API. These will b
 API response.
 
 !!! Note
-These `_links` can be found both in the root of the API response and nested under specific objects under the
-`data` section. When nested under an object in the `data` section, the links will be specific to that object.
+    These `_links` can be found both in the root of the API response and nested under specific objects under the
+    `data` section. When nested under an object in the `data` section, the links will be specific to that object.
 
 #### next
 

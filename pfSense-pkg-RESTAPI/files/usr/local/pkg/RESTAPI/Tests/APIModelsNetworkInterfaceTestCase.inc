@@ -330,7 +330,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
             code: 400,
             callable: function () {
                 # Disable the DHCP server for this lan interface so it does not throw an error
-                $dhcp_server = new DHCPServer(id: 'lan');
+                $dhcp_server = new DHCPServer(id: 'lan', async: false);
                 $dhcp_server_original_enable = $dhcp_server->enable->value;
                 $dhcp_server->enable->value = false;
                 $dhcp_server->update();
