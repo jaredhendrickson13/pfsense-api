@@ -35,5 +35,6 @@ opening a pull request.
 
 ## Disclaimers
 
-- This package is not affiliated or supported by Netgate or the pfSense team. This package is developed and maintained
-  by the community.
+!!! Caution
+    - This package is not affiliated or supported by Netgate or the pfSense team. This package is developed and maintained
+      by the community.
