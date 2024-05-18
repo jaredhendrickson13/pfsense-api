@@ -18,10 +18,10 @@ provide you with the information you need to configure and use the package effec
 
 ## Quick Start
 
-- [Installation and Configuration](https://https://pfrest.org/INSTALL_AND_CONFIG/)
-- [Authentication and Authorization](https://https://pfrest.org/AUTHENTICATION_AND_AUTHORIZATION/)
-- [Swagger and OpenAPI](https://https://pfrest.org/SWAGGER_AND_OPENAPI/)
-- [Queries and Filters](https://https://pfrest.org/QURIES_AND_FILTERS/)
+- [Installation and Configuration](https://pfrest.org/INSTALL_AND_CONFIG/)
+- [Authentication and Authorization](https://pfrest.org/AUTHENTICATION_AND_AUTHORIZATION/)
+- [Swagger and OpenAPI](https://pfrest.org/SWAGGER_AND_OPENAPI/)
+- [Queries and Filters](https://pfrest.org/QURIES_AND_FILTERS/)
 
 > [!CAUTION]
 > This package is not affiliated or supported by Netgate or the pfSense team. This package is developed and maintained
