@@ -35,7 +35,7 @@ class VirtualIPApply extends Model {
      * @return array The internal value array to be loaded by this model as the internal callable
      */
     public function get_applied_status(): array {
-        return ['applied' => !is_file("/tmp/.firewall_virtual_ip.apply")];
+        return ['applied' => !is_file('/tmp/.firewall_virtual_ip.apply')];
     }
 
     /**

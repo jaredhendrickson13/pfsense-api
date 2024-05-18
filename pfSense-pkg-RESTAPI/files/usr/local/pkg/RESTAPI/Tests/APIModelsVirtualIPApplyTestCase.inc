@@ -12,7 +12,7 @@ class APIModelsVirtualIPApplyTestCase extends TestCase {
      */
     public function test_apply(): void {
         # Simulate serialized changes and ensure applied is seen as false
-        file_put_contents('/tmp/.firewall_virtual_ip.apply', "");
+        file_put_contents('/tmp/.firewall_virtual_ip.apply', '');
         $vip_apply = new VirtualIPApply(async: false);
         $this->assert_is_false($vip_apply->applied->value);
 

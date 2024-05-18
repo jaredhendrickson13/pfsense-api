@@ -60,11 +60,11 @@ class DHCPServer extends Model {
         $this->interface = new InterfaceField(
             required: true,
             representation_only: true,
-            help_text: 'The interface to configure the DHCP server for. This field is only necessary when you want'.
-                'to change the interface (ID) of an existing DHCP server, or you are replacing all DHCP server objects '.
-                'with a new configuration. Note that specifying an interface in this field will update the ID of the '.
-                'DHCP server to match the interface specified here. Leaving this field empty will retain the '.
-                'existing interface.'
+            help_text: 'The interface to configure the DHCP server for. This field is only necessary when you want' .
+                'to change the interface (ID) of an existing DHCP server, or you are replacing all DHCP server objects ' .
+                'with a new configuration. Note that specifying an interface in this field will update the ID of the ' .
+                'DHCP server to match the interface specified here. Leaving this field empty will retain the ' .
+                'existing interface.',
         );
         $this->enable = new BooleanField(default: false, help_text: 'Enable the DHCP server for this interface.');
         $this->range_from = new StringField(
@@ -514,7 +514,7 @@ class DHCPServer extends Model {
      * method to associate DHCP server objects with the requested interface.
      */
     public function get_next_id(): string {
-        return $this->interface->_to_internal($this->interface->value) ?: "unknown";
+        return $this->interface->_to_internal($this->interface->value) ?: 'unknown';
     }
 
     /**

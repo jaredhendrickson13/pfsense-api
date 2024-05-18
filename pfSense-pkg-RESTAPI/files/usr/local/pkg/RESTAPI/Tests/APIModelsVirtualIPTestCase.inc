@@ -83,7 +83,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'subnet' => '1.2.3.4',
                 'subnet_bits' => 24,
             ],
-            async: false
+            async: false,
         );
         $test_model_1->create();
 
@@ -109,7 +109,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'subnet' => '1.2.3.4',
                 'subnet_bits' => 24,
             ],
-            async: false
+            async: false,
         );
         $test_model->create(apply: true);
         $ifconfig = new Command('ifconfig');
@@ -145,7 +145,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'advskew' => 11,
                 'password' => 'testpasswd',
             ],
-            async: false
+            async: false,
         );
         $test_model->create(apply: true);
         $ifconfig = new Command('ifconfig');
@@ -189,7 +189,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'subnet' => '1.2.3.4',
                 'subnet_bits' => 32,
             ],
-            async: false
+            async: false,
         );
         $test_model->create(apply: true);
         $choparp = new Command('/usr/bin/top -baHS 999 | grep choparp');
@@ -223,7 +223,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'password' => 'testpasswd',
                 'vhid' => 5,
             ],
-            async: false
+            async: false,
         );
         $carp_vip->create(apply: true);
 
