@@ -14,7 +14,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
      * Checks that the virtual IP `type` cannot be `network` when `mode` is set to
      * `ipalias` or `carp`.
      */
-    public function test_type_cannot_be_network_with_ipalias_or_carp() {
+    public function test_type_cannot_be_network_with_ipalias_or_carp(): void {
         $this->assert_throws_response(
             response_id: 'VIRTUALIP_MODE_DOES_NOT_SUPPORT_NETWORK_TYPE',
             code: 400,
@@ -39,7 +39,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
     /**
      * Checks that the virtual IP `subnet_bits` is effectively limited to >=32 for IPv4 vips
      */
-    public function test_ipv4_subnet_bits_is_limited() {
+    public function test_ipv4_subnet_bits_is_limited(): void {
         $this->assert_throws_response(
             response_id: 'VIRTUALIP_IPV4_SUBNET_BITS_EXCEEDED',
             code: 400,
@@ -74,7 +74,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
     /**
      * Checks that pending virtual IP changes are properly serialized before applying.
      */
-    public function test_serialize_changes() {
+    public function test_serialize_changes(): void {
         # Create a vip but don't apply it so we can check the serialized changes file
         $test_model_1 = new VirtualIP(
             data: [
@@ -83,6 +83,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'subnet' => '1.2.3.4',
                 'subnet_bits' => 24,
             ],
+            async: false
         );
         $test_model_1->create();
 
@@ -99,7 +100,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
     /**
      * Checks that ipalias virtual IPs are actually configured after applying.
      */
-    public function test_ipalias_virtual_ip() {
+    public function test_ipalias_virtual_ip(): void {
         # Create a new ipalias virtual IP and ensure it is present in ifconfig afterward
         $test_model = new VirtualIP(
             data: [
@@ -108,6 +109,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'subnet' => '1.2.3.4',
                 'subnet_bits' => 24,
             ],
+            async: false
         );
         $test_model->create(apply: true);
         $ifconfig = new Command('ifconfig');
@@ -130,7 +132,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
     /**
      * Checks that carp virtual IPs are actually configured after applying.
      */
-    public function test_carp_virtual_ip() {
+    public function test_carp_virtual_ip(): void {
         # Create a new virtual IP and ensure it is present in ifconfig afterward
         $test_model = new VirtualIP(
             data: [
@@ -143,6 +145,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'advskew' => 11,
                 'password' => 'testpasswd',
             ],
+            async: false
         );
         $test_model->create(apply: true);
         $ifconfig = new Command('ifconfig');
@@ -177,7 +180,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
     /**
      * Checks that proxyarp virtual IPs are actually configured after applying.
      */
-    public function test_proxyarp_virtual_ip() {
+    public function test_proxyarp_virtual_ip(): void {
         # Create a new proxyarp virtual IP and ensure it is present in ifconfig afterward
         $test_model = new VirtualIP(
             data: [
@@ -186,6 +189,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'subnet' => '1.2.3.4',
                 'subnet_bits' => 32,
             ],
+            async: false
         );
         $test_model->create(apply: true);
         $choparp = new Command('/usr/bin/top -baHS 999 | grep choparp');
@@ -207,7 +211,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
     /**
      * Checks that the virtual IP `carp_status` is accurately represented.
      */
-    public function test_carp_status() {
+    public function test_carp_status(): void {
         # Create CARP status and CARP VIP objects to test with
         $carp_status = new CARP(async: false);
         $carp_vip = new VirtualIP(
@@ -219,6 +223,7 @@ class APIModelsVirtualIPTestCase extends TestCase {
                 'password' => 'testpasswd',
                 'vhid' => 5,
             ],
+            async: false
         );
         $carp_vip->create(apply: true);
 

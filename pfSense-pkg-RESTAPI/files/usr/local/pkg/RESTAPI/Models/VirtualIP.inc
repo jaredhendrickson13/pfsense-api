@@ -5,6 +5,7 @@ namespace RESTAPI\Models;
 use RESTAPI;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\VirtualIPApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
@@ -186,7 +187,7 @@ class VirtualIP extends Model {
     /**
      * Serializes changes to virtual IPs before applying them.
      */
-    private function serialize_changes() {
+    private function serialize_changes(): void {
         global $g;
 
         # Retain existing serialized virtual IPs if present
@@ -204,13 +205,13 @@ class VirtualIP extends Model {
     /**
      * Applies pending virtual IP changes.
      */
-    public function apply() {
-        applyVIP();
+    public function apply(): void {
+        (new VirtualIPApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**
      * Serializes new virtual IPs as pending changes and saves them to configuration.     */
-    public function _create() {
+    public function _create(): void {
         $this->serialize_changes();
         parent::_create();
     }
@@ -218,7 +219,7 @@ class VirtualIP extends Model {
     /**
      * Serializes updated virtual IPs as pending changes and saves them to configuration.
      */
-    public function _update() {
+    public function _update(): void {
         $this->serialize_changes();
         parent::_update();
     }
@@ -226,7 +227,7 @@ class VirtualIP extends Model {
     /**
      * Brings down and removes this virtual IP from the configuration.
      */
-    public function _delete() {
+    public function _delete(): void {
         # Call the parent _delete() method to remove the entry from config
         parent::_delete();
 
