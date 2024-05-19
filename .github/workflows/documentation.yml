@@ -161,8 +161,11 @@ jobs:
                   ],
                   layout: "StandaloneLayout",
                   supportedSubmitMethods: [],
-                  configObject: {
-                    showSwaggerPetstore: false
+                  
+                  // Hide the Swagger support header
+                  const header = document.querySelector('.topbar-wrapper > .topbar');
+                  if (header) {
+                    header.style.display = 'none';
                   }
                 });
               };' > ./www/api-docs/swagger-initializer.js
