@@ -140,6 +140,11 @@ jobs:
           name: openapi.json
           path: openapi.json
 
+      - name: Debug List contents of downloaded OpenAPI schema
+        run: |
+          ls -l openapi.json
+          cat openapi.json
+
       - name: Build Swagger UI
         run: |
           mkdir -p ./www/api-docs/
