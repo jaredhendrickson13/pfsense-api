@@ -140,18 +140,13 @@ jobs:
           name: openapi.json
           path: openapi.json
 
-      - name: Debug List contents of downloaded OpenAPI schema
-        run: |
-          ls -l openapi.json
-          cat openapi.json
-
       - name: Build Swagger UI
         run: |
           mkdir -p ./www/api-docs/
           wget -O /tmp/swagger.tar.gz https://github.com/swagger-api/swagger-ui/archive/refs/tags/v${{ env.SWAGGER_UI_VERSION }}.tar.gz
           tar -xzf /tmp/swagger.tar.gz -C /tmp/
           cp -r /tmp/swagger-ui-${{ env.SWAGGER_UI_VERSION }}/dist/* ./www/api-docs/
-          cp openapi.json ./www/api-docs/openapi.json
+          cp openapi.json/openapi.json ./www/api-docs/openapi.json
           echo 'window.onload = function() {
                   window.ui = SwaggerUIBundle({
                   url: "/api-docs/openapi.json",
