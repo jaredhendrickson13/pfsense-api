@@ -17,6 +17,7 @@ namespace RESTAPI\Core\Tools;
 
 use RESTAPI\Core\Response;
 use RESTAPI\Models\RESTAPISettings;
+use RESTAPI\Models\RESTAPIVersion;
 use RESTAPI\Responses\ServerError;
 
 require_once 'RESTAPI/autoloader.inc';
@@ -167,6 +168,7 @@ function generate_documentation(): bool {
     $auth_classes = get_classes_from_namespace('\\RESTAPI\\Auth\\');
     $auth_classes_short = get_classes_from_namespace('\\RESTAPI\\Auth\\', shortnames: true);
     $content_handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
+    $restapi_version = new RESTAPIVersion();
     $assigned_tags = [];
 
     # Set static openapi details
@@ -175,7 +177,7 @@ function generate_documentation(): bool {
         'servers' => [['url' => '/', 'description' => 'This firewall']],
         'info' => [
             'title' => 'pfSense REST API Documentation',
-            'version' => 'v2',
+            'version' => $restapi_version->current_version->value,
             'contact' => [
                 'name' => 'GitHub',
                 'url' => 'https://github.com/jaredhendrickson13/pfsense-api',
