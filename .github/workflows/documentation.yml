@@ -160,7 +160,10 @@ jobs:
                     SwaggerUIBundle.plugins.DownloadUrl
                   ],
                   layout: "StandaloneLayout",
-                  supportedSubmitMethods: []
+                  supportedSubmitMethods: [],
+                  configObject: {
+                    showSwaggerPetstore: false
+                  }
                 });
               };' > ./www/api-docs/swagger-initializer.js
 
