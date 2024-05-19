@@ -146,6 +146,7 @@ jobs:
           wget -O /tmp/swagger.tar.gz https://github.com/swagger-api/swagger-ui/archive/refs/tags/v${{ env.SWAGGER_UI_VERSION }}.tar.gz
           tar -xzf /tmp/swagger.tar.gz -C /tmp/
           cp -r /tmp/swagger-ui-${{ env.SWAGGER_UI_VERSION }}/dist/* ./www/api-docs/
+          cp pfSense-pkg-RESTAPI/files/usr/local/www/swagger/index.css ./www/api-docs/index.css
           cp openapi.json/openapi.json ./www/api-docs/openapi.json
           echo 'window.onload = function() {
                   window.ui = SwaggerUIBundle({
@@ -162,12 +163,6 @@ jobs:
                   layout: "StandaloneLayout",
                   supportedSubmitMethods: [],
                 });
-          
-                // Hide the Swagger support header
-                  const header = document.querySelector('.topbar-wrapper > .topbar');
-                  if (header) {
-                    header.style.display = 'none';
-                  }
               };' > ./www/api-docs/swagger-initializer.js
 
       - name: Build PHP reference documentation
