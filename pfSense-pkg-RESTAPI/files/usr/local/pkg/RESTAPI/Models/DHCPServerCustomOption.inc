@@ -59,7 +59,16 @@ class DHCPServerCustomOption extends Model
      * Adds extra validation to the `value` field.
      * @param string $value The incoming value to validate.
      * @return string The validated value to be assigned.
-     * @throws ValidationError TODO: Add exception message.
+     * @throws ValidationError When $value contains quotes and type is set to 'text'.
+     * @throws ValidationError When $value is not a string enclosed in quotes or a hex string and type is set to 'string'.
+     * @throws ValidationError When $value is not one of the boolean options and type is set to 'boolean'.
+     * @throws ValidationError When $value is not a number between 0 and 255 and type is set to 'unsigned integer 8'.
+     * @throws ValidationError When $value is not a number between 0 and 65535 and type is set to 'unsigned integer 16'.
+     * @throws ValidationError When $value is not a number between 0 and 4294967295 and type is set to 'unsigned integer 32'.
+     * @throws ValidationError When $value is not a number between -128 and 127 and type is set to 'signed integer 8'.
+     * @throws ValidationError When $value is not a number between -32768 and 32767 and type is set to 'signed integer 16'.
+     * @throws ValidationError When $value is not a number between -2147483648 and 2147483647 and type is set to 'signed integer 32'.
+     * @throws ValidationError When $value is not a valid IPv4 address or hostname and type is set to 'ip-address'.
      */
     public function validate_value(string $value): string {
         # Define regular expressions for string validation
@@ -134,7 +143,7 @@ class DHCPServerCustomOption extends Model
         # Validate this field when the type is set to 'ip-address'
         elseif ($this->type->value === "ip-address" and (!is_ipaddrv4($value) or !is_hostname($value))) {
             throw new ValidationError(
-                message: "Field `value` must be a valid IPv4 address when the type is set to 'ip-address'.",
+                message: "Field `value` must be a valid IPv4 address or hostname when the type is set to 'ip-address'.",
                 response_id: "DHCP_SERVER_CUSTOM_OPTION_VALUE_MUST_BE_VALID_IPV4_WITH_IP_ADDRESS_TYPE"
             );
         }
