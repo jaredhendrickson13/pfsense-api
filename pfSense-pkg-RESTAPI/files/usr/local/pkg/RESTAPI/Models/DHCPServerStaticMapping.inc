@@ -136,6 +136,12 @@ class DHCPServerStaticMapping extends Model {
             default: false,
             help_text: 'Assign a static ARP entry for this static mapping.',
         );
+        $this->descr = new StringField(
+            default: '',
+            allow_empty: true,
+            maximum_length: 255,
+            help_text: 'The description of this static mapping.',
+        );
 
         parent::__construct($id, $parent_id, $data, ...$options);
     }
