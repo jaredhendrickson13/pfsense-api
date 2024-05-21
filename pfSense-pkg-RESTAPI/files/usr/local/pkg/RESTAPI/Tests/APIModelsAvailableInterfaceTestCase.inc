@@ -5,13 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\AvailableInterface;
 
-class APIModelsAvailableInterfaceTestCase extends TestCase
-{
+class APIModelsAvailableInterfaceTestCase extends TestCase {
     /**
      * Checks that we can correctly read AvailableInterface objects
      */
-    public function test_read(): void
-    {
+    public function test_read(): void {
         # Create a AvailableInterface to populate an interface
         $available_interface = AvailableInterface::read_all();
         $this->assert_is_true($available_interface->exists());

@@ -10,8 +10,7 @@ use RESTAPI\Fields\StringField;
 /**
  * Defines a model that represents interface statistics and detailed interface information.
  */
-class InterfaceStats extends Model
-{
+class InterfaceStats extends Model {
     public StringField $name;
     public StringField $descr;
     public StringField $hwif;
@@ -40,147 +39,122 @@ class InterfaceStats extends Model
     public StringField $gateway;
     public StringField $gatewayv6;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_interface_stats';
         $this->many = true;
 
         # Set model fields
         $this->name = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The name of the interface.',
         );
         $this->descr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The description of the interface.',
         );
         $this->hwif = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The hardware interface name of the interface.',
         );
         $this->macaddr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The MAC address of the interface.',
         );
         $this->mtu = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The MTU of the interface.',
         );
-        $this->enable = new BooleanField(
-            default: false,
-            help_text: 'Whether the interface is enabled.',
-        );
+        $this->enable = new BooleanField(default: false, help_text: 'Whether the interface is enabled.');
         $this->status = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The status of the interface.',
         );
         $this->ipaddr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The IPv4 address of the interface.',
         );
         $this->subnet = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The IPv4 subnet of the interface.',
         );
         $this->linklocal = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The IPv6 link-local address of the interface.',
         );
         $this->ipaddrv6 = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The IPv6 address of the interface.',
         );
         $this->subnetv6 = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The IPv6 subnet of the interface.',
         );
-        $this->inerrs = new IntegerField(
-            default: 0,
-            help_text: 'The number of inbound errors on the interface.',
-        );
-        $this->outerrs = new IntegerField(
-            default: 0,
-            help_text: 'The number of outbound errors on the interface.',
-        );
-        $this->collisions = new IntegerField(
-            default: 0,
-            help_text: 'The number of collisions on the interface.',
-        );
-        $this->inbytes = new IntegerField(
-            default: 0,
-            help_text: 'The number of inbound bytes on the interface.',
-        );
+        $this->inerrs = new IntegerField(default: 0, help_text: 'The number of inbound errors on the interface.');
+        $this->outerrs = new IntegerField(default: 0, help_text: 'The number of outbound errors on the interface.');
+        $this->collisions = new IntegerField(default: 0, help_text: 'The number of collisions on the interface.');
+        $this->inbytes = new IntegerField(default: 0, help_text: 'The number of inbound bytes on the interface.');
         $this->inbytespass = new IntegerField(
             default: 0,
             help_text: 'The number of inbound bytes passed on the interface.',
         );
-        $this->outbytes = new IntegerField(
-            default: 0,
-            help_text: 'The number of outbound bytes on the interface.',
-        );
+        $this->outbytes = new IntegerField(default: 0, help_text: 'The number of outbound bytes on the interface.');
         $this->outbytespass = new IntegerField(
             default: 0,
             help_text: 'The number of outbound bytes passed on the interface.',
         );
-        $this->inpkts = new IntegerField(
-            default: 0,
-            help_text: 'The number of inbound packets on the interface.',
-        );
+        $this->inpkts = new IntegerField(default: 0, help_text: 'The number of inbound packets on the interface.');
         $this->inpktspass = new IntegerField(
             default: 0,
             help_text: 'The number of inbound packets passed on the interface.',
         );
-        $this->outpkts = new IntegerField(
-            default: 0,
-            help_text: 'The number of outbound packets on the interface.',
-        );
+        $this->outpkts = new IntegerField(default: 0, help_text: 'The number of outbound packets on the interface.');
         $this->outpktspass = new IntegerField(
             default: 0,
             help_text: 'The number of outbound packets passed on the interface.',
         );
         $this->dhcplink = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The DHCP link status of the interface.',
         );
         $this->media = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The speed/duplex of the interface.',
         );
         $this->gateway = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The IPv4 gateway of the interface.',
         );
         $this->gatewayv6 = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             allow_null: true,
             help_text: 'The IPv6 gateway of the interface.',
@@ -199,7 +173,7 @@ class InterfaceStats extends Model
         $if_info = [];
 
         foreach ($if_descrs as $if_descr => $if_name) {
-            $if = ["name" => $if_descr, "descr" => $if_name];
+            $if = ['name' => $if_descr, 'descr' => $if_name];
             $if = $if + get_interface_info($if_descr);
             $if_info[] = $if;
         }
