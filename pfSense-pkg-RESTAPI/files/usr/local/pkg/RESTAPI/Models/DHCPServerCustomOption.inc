@@ -3,6 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\DHCPServerApplyDispatcher;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
@@ -141,7 +142,7 @@ class DHCPServerCustomOption extends Model
             );
         }
         # Validate this field when the type is set to 'ip-address'
-        elseif ($this->type->value === "ip-address" and (!is_ipaddrv4($value) or !is_hostname($value))) {
+        elseif ($this->type->value === "ip-address" and !is_ipaddrv4($value) and !is_fqdn($value)) {
             throw new ValidationError(
                 message: "Field `value` must be a valid IPv4 address or hostname when the type is set to 'ip-address'.",
                 response_id: "DHCP_SERVER_CUSTOM_OPTION_VALUE_MUST_BE_VALID_IPV4_WITH_IP_ADDRESS_TYPE"
@@ -150,5 +151,13 @@ class DHCPServerCustomOption extends Model
 
         # Otherwise, input is valid. Save a Base64 representation of the data as expected by pfSense
         return $value;
+    }
+
+    /**
+     * Applies changes the DHCP Server.
+     */
+    public function apply(): void
+    {
+        (new DHCPServerApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
