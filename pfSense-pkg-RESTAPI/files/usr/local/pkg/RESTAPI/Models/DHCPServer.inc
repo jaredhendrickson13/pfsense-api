@@ -46,6 +46,7 @@ class DHCPServer extends Model {
     public BooleanField $statsgraph;
     public StringField $denyunknown;
     public NestedModelField $pool;
+    public NestedModelField $numberoptions;
     public NestedModelField $staticmap;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
@@ -229,6 +230,12 @@ class DHCPServer extends Model {
             default: [],
             allow_empty: true,
             help_text: 'Additional address pools applied to this DHCP server.',
+        );
+        $this->numberoptions = new NestedModelField(
+            model_class: 'DHCPServerCustomOption',
+            default: [],
+            allow_empty: true,
+            help_text: 'The custom DHCP options to apply to this DHCP server.',
         );
         $this->staticmap = new NestedModelField(
             model_class: 'DHCPServerStaticMapping',
