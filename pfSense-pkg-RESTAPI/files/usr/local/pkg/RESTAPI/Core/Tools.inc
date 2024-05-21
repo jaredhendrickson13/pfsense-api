@@ -418,13 +418,13 @@ function generate_documentation(): bool {
                         'in' => 'query',
                         'name' => 'limit',
                         'description' => 'The number of objects to obtain at once. Set to 0 for no limit.',
-                        'schema' => ['type' => 'integer',  'default' => 0,],
+                        'schema' => ['type' => 'integer', 'default' => 0],
                     ],
                     [
                         'in' => 'query',
                         'name' => 'offset',
                         'description' => 'The starting point in the dataset to begin fetching objects.',
-                        'schema' => ['type' => 'integer',  'default' => 0,],
+                        'schema' => ['type' => 'integer', 'default' => 0],
                     ],
                 ];
             }

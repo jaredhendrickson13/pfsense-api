@@ -98,7 +98,7 @@ class FirewallRule extends Model {
             help_text: 'The IP/transport protocol this rule should match.',
         );
         $this->icmptype = new StringField(
-            default: 'any',
+            default: ['any'],
             choices: [
                 'althost',
                 'dataconv',

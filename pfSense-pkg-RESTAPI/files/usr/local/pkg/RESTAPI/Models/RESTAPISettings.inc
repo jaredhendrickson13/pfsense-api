@@ -124,7 +124,7 @@ class RESTAPISettings extends Model {
             real interface name (e.g. em0, igb1, bxe3).",
         );
         $this->auth_methods = new StringField(
-            default: 'BasicAuth',
+            default: ['BasicAuth'],
             choices_callable: 'get_auth_methods_choices',
             many: true,
             many_minimum: 1,
