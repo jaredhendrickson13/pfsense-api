@@ -42,7 +42,7 @@ jobs:
           /usr/local/bin/VBoxManage controlvm ${{ matrix.freebsd_version }} poweroff || true
           /usr/local/bin/VBoxManage snapshot ${{matrix.freebsd_version}} restore initial
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
@@ -57,7 +57,7 @@ jobs:
             freebsd_id: freebsd14
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
@@ -90,7 +90,7 @@ jobs:
           /usr/local/bin/VBoxManage controlvm ${{ matrix.pfsense_version }} poweroff || true
           /usr/local/bin/VBoxManage snapshot ${{ matrix.pfsense_version }} restore initial
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: openapi-${{ matrix.pfsense_version }}.json
           path: openapi-${{ matrix.pfsense_version }}.json
@@ -105,7 +105,7 @@ jobs:
             freebsd_id: freebsd14
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: openapi-${{ matrix.pfsense_version }}.json
           path: openapi-${{ matrix.pfsense_version }}.json
@@ -134,7 +134,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg

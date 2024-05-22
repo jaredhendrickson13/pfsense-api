@@ -26,6 +26,7 @@ jobs:
     strategy:
       matrix:
         include:
+          # Note: The first item in this matrix must use env.DEFAULT_PFSENSE_VERSION as the PFSENSE_VERSION!
           - FREEBSD_VERSION: FreeBSD-14.0-CURRENT
             PFSENSE_VERSION: ${{ env.DEFAULT_PFSENSE_VERSION }}
 
@@ -50,8 +51,13 @@ jobs:
           /usr/local/bin/VBoxManage controlvm ${{ matrix.FREEBSD_VERSION }} poweroff || true
           /usr/local/bin/VBoxManage snapshot ${{matrix.FREEBSD_VERSION}} restore initial
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pfSense-${{ matrix.PFSENSE_VERSION }}-pkg-RESTAPI.pkg
+          path: pfSense-${{ matrix.PFSENSE_VERSION }}-pkg-RESTAPI.pkg
+
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: pfSense-${{ matrix.PFSENSE_VERSION }}-pkg-RESTAPI.pkg
           
@@ -61,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg
           path: pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg
@@ -94,7 +100,7 @@ jobs:
           /usr/local/bin/VBoxManage controlvm ${{ env.DEFAULT_PFSENSE_VERSION }} poweroff || true
           /usr/local/bin/VBoxManage snapshot ${{ env.DEFAULT_PFSENSE_VERSION }} restore initial
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: openapi.json
           path: openapi.json
@@ -126,7 +132,7 @@ jobs:
           mv ./site/* ./www/
 
       - name: Download OpenAPI schema
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: openapi.json
           path: openapi.json
