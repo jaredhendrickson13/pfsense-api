@@ -39,7 +39,7 @@ class EmailNotificationSettings extends Model {
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true)],
             help_text: 'The IP address or hostname of the SMTP server.',
         );
-        $this->port = new PortField(default: 25, help_text: 'The port number of the SMTP server.');
+        $this->port = new PortField(default: "25", help_text: 'The port number of the SMTP server.');
         $this->timeout = new IntegerField(default: 20, help_text: 'The timeout (in seconds) for the SMTP connection.');
         $this->ssl = new BooleanField(
             default: false,

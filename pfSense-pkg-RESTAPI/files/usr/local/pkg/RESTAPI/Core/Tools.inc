@@ -264,11 +264,12 @@ function generate_documentation(): bool {
             $required_packages_str = $model->packages ? implode(', ', $model->packages) : 'None';
             $requires_auth_str = $endpoint->requires_auth ? 'Yes' : 'No';
             $auth_method_str = implode(', ', $endpoint->auth_methods ?: $auth_classes_short);
+            $operation_id = "$request_method{$endpoint->get_class_shortname()}";
 
             # Add openapi for all requests at this path
             $openapi_config['paths'][$endpoint->url][$request_method] = [
                 'responses' => [],
-                'operationId' => $endpoint::class . "-$request_method",
+                'operationId' => $operation_id,
                 'description' =>
                     '<h3>Description:</h3>' .
                     "$help_text<br>" .

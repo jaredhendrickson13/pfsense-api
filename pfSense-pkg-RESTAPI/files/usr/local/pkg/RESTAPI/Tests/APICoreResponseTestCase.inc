@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI;
+use stdClass;
 
 /**
  * Defines test case for testing RESTAPI\Core\Response.
@@ -125,7 +126,6 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
                 ],
                 '_links' => [
                     'description' => 'An array of links to resources that are related to this API response.',
-                    'example' => [],
                     'type' => 'object',
                 ],
             ],

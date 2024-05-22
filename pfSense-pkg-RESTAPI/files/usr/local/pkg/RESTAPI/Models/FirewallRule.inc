@@ -100,6 +100,7 @@ class FirewallRule extends Model {
         $this->icmptype = new StringField(
             default: ['any'],
             choices: [
+                'any',
                 'althost',
                 'dataconv',
                 'echorep',

@@ -20,6 +20,7 @@ require_once 'RESTAPI/autoloader.inc';
 use Error;
 use ReflectionClass;
 use RESTAPI\Models\RESTAPISettings;
+use stdClass;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 const HTTP_STATUS_MESSAGES = [
@@ -231,7 +232,6 @@ class Response extends Error {
                 ],
                 '_links' => [
                     'description' => 'An array of links to resources that are related to this API response.',
-                    'example' => [],
                     'type' => 'object',
                 ],
             ],
