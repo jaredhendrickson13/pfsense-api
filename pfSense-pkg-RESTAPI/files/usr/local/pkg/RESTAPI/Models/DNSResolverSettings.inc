@@ -42,7 +42,7 @@ class DNSResolverSettings extends Model {
         # Set model fields
         $this->enable = new BooleanField(default: false, help_text: 'Enables or disables the DNS Resolver service.');
         $this->port = new PortField(
-            default: "53",
+            default: '53',
             allow_alias: false,
             allow_range: false,
             allow_empty: true,
@@ -60,7 +60,7 @@ class DNSResolverSettings extends Model {
             help_text: 'The SSL/TLS certificate to use for the DNS Resolver service.',
         );
         $this->tlsport = new PortField(
-            default: "853",
+            default: '853',
             allow_alias: false,
             allow_range: false,
             allow_empty: true,
