@@ -30,7 +30,8 @@ jobs:
             PFSENSE_VERSION: ${{ env.DEFAULT_PFSENSE_VERSION }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        
       - name: Setup FreeBSD build VM
         run: |
           /usr/local/bin/VBoxManage controlvm ${{ matrix.FREEBSD_VERSION }} poweroff || true
@@ -59,6 +60,7 @@ jobs:
     needs: [ release_pkg ]
     steps:
       - uses: actions/checkout@v4
+        
       - uses: actions/download-artifact@v3
         with:
           name: pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg
@@ -104,8 +106,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Pages
         uses: actions/configure-pages@v5.0.0
