@@ -167,11 +167,11 @@ jobs:
 
       - name: Build PHP reference documentation
         run: |
-          mkdir ./www/php_reference
+          mkdir ./www/php-docs
           wget https://phpdoc.org/phpDocumentor.phar
           chmod +x phpDocumentor.phar
           ./phpDocumentor.phar
-          mv ./.phpdoc/build/* ./www/php_reference/
+          mv ./.phpdoc/build/* ./www/php-docs/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3.0.1

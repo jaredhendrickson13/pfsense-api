@@ -37,7 +37,7 @@ Below is a brief overview of the project's structure:
 
 !!! Tip
     The full PHP API reference for this package including documentation for all applicable classes can be
-    found [here](https://pfrest.org/php_reference/).
+    found [here](https://pfrest.org/php-docs/).
 
 ## Style Guidelines
 
