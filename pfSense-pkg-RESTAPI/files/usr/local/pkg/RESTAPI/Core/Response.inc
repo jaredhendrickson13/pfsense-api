@@ -227,10 +227,7 @@ class Response extends Error {
                         'been requested, this field will be an array of objects. Otherwise, it will only return' .
                         'the single object requested.',
                     'example' => [],
-                    'oneOf' => [
-                        ['type' => 'array', 'items' => ['type' => 'object']],
-                        ['type' => 'object']
-                    ],
+                    'oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']],
                 ],
                 '_links' => [
                     'description' => 'An array of links to resources that are related to this API response.',
