@@ -9,7 +9,7 @@ easily navigate the API and discover available actions and resources related to 
     - Links are based on [HAL (Hypertext Application Language)](https://stateless.group/hal_specification.html) along
       with some [custom link types](#link-types).
     - HATEOAS is an optional feature and is disabled by default. HATEOAS can be enabled in the
-      pfSense webConfigurator under `System` -> `REST API` -> `Settings` by checking the `Enable HATEOAS` checkbox or
+      pfSense webConfigurator under 'System' -> 'REST API' -> 'Settings' by checking the `Enable HATEOAS` checkbox or
       via a `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/RESTAPI%5CEndpoints%5CSystemRESTAPISettingsEndpoint-patch) 
       endpoint's `hateoas` field.
 !!! Important

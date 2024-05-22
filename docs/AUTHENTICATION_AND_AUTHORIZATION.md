@@ -3,7 +3,7 @@
 ## Authentication
 
 There are three authentication methods available for the pfSense REST API out of the box. The allowed authentication methods
-can be configured in the pfSense webConfigurator under `System` -> `REST API` -> `Settings` -> `Authentication Methods`
+can be configured in the pfSense webConfigurator under 'System' -> 'REST API' -> 'Documentation' -> 'Authentication Methods'
 or via a `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/RESTAPI%5CEndpoints%5CSystemRESTAPISettingsEndpoint-patch) 
 endpoint's `auth_methods` field. In addition to these methods, custom authentication methods can be added by extending 
 the `Auth` class and implementing your own authentication logic.
@@ -41,7 +41,7 @@ curl -u admin:pfsense https://pfsense.example.com/api/v2/firewall/rules
 API key authentication is a more secure form of authentication that requires the client to send an `X-API-Key` header
 containing a valid API key. These keys are better suited to distribute to systems as they cannot allow webConfigurator
 or SSH authentication (like local database credentials can). API keys can be generated in the pfSense webConfigurator
-under `System` -> `REST API` -> `Keys` or by `POST` request to [/api/v2/auth/key](https://pfrest.org/api-docs/#/AUTH/RESTAPI%5CEndpoints%5CAuthKeyEndpoint-post). 
+under 'System' -> 'REST API' -> 'Keys' or by `POST` request to [/api/v2/auth/key](https://pfrest.org/api-docs/#/AUTH/RESTAPI%5CEndpoints%5CAuthKeyEndpoint-post). 
 Below is an example of API Key authentication using `curl`:
 
 ```bash

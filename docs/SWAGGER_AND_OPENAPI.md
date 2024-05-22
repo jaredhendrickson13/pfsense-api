@@ -3,8 +3,9 @@
 ## Swagger Documentation
 
 After installation, an interactive Swagger documentation site is available on your pfSense instance under
-`System` -> `REST API` -> `Documentation`. This site provides full documentation for all API endpoints and their
-associated parameters, as well as provides a quick and interactive way to try out API calls.
+'System' -> 'REST API' -> 'Documentation'. This site provides full documentation for all API endpoints and their
+associated parameters, as well as provides a quick and interactive way to try out API calls. Alternatively, a simplified
+version of the Swagger documentation is available publicly [here](https://pfrest.org/api-docs/).
 
 !!! Note
     When you expand an endpoint for `GET` and `DELETE` requests, Swagger will display field options as query parameters.
