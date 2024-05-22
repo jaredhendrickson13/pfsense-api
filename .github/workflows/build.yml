@@ -109,10 +109,17 @@ jobs:
         with:
           name: openapi-${{ matrix.pfsense_version }}.json
           path: openapi-${{ matrix.pfsense_version }}.json
-      - name: Lint OpenAPI spec
-        uses: vaibhav-jain/spectral-action/@v2.6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          file_path: openapi-${{ matrix.pfsense_version }}.json
+          node-version: '20'
+
+      - name: Install npm dependencies
+        run: npm i
+
+      - name: Validate OpenAPI schema
+        run: ./node_modules/.bin/spectral lint openapi-${{ matrix.pfsense_version }}.json
 
   check_tests:
     runs-on: self-hosted
