@@ -21,11 +21,15 @@ use Exception;
 use JsonException;
 use RESTAPI;
 use RESTAPI\ContentHandlers\JSONContentHandler;
+use RESTAPI\Models\NetworkInterface;
+use RESTAPI\Models\RESTAPISettings;
+use RESTAPI\Models\VirtualIP;
 use RESTAPI\Responses\AuthenticationError;
 use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\MediaTypeError;
 use RESTAPI\Responses\MethodNotAllowedError;
 use RESTAPI\Responses\ServerError;
+use RESTAPI\Responses\ServiceUnavailableError;
 use RESTAPI\Responses\Success;
 use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
@@ -56,7 +60,7 @@ class Endpoint {
      * @var Model $model
      * The actual Model object created for the assigned $model_name.
      */
-    protected Model $model;
+    public Model $model;
 
     /**
      * @var string $tag
@@ -80,10 +84,10 @@ class Endpoint {
     protected Auth $client;
 
     /**
-     * @var array $api_config
+     * @var RESTAPISettings $restapi_settings
      * Contains the current API configuration.
      */
-    public array $api_config;
+    public RESTAPISettings $restapi_settings;
 
     /**
      * @var array $request_data
@@ -251,9 +255,6 @@ class Endpoint {
         # Prevent PHP warnings in API Responses.
         error_reporting(E_ERROR);
 
-        # Fetch the current API configuration whenever the object is first created.
-        $this->api_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
-
         # Fetch request method whenever the object is first created.
         $this->request_method = strtoupper($_SERVER['REQUEST_METHOD']);
 
@@ -280,7 +281,7 @@ class Endpoint {
     /**
      * Checks for conflicting attributes during object construction.
      */
-    private function check_construct(): void {
+    public function check_construct(): void {
         # Do not allow `many` Endpoints that are assigned non `many` Models
         if ($this->many and !$this->model->many) {
             throw new ServerError(
@@ -479,46 +480,53 @@ class Endpoint {
      * Checks if the API is enabled before allowing the call.
      */
     private function check_enabled(): void {
-        if (!$this->api_config['enabled'] == 'enabled' and !$this->ignore_enabled) {
-            header('Location: /');
-            exit();
+        if (!$this->restapi_settings->enabled->value and !$this->ignore_enabled) {
+            throw new ServiceUnavailableError(
+                message: 'The REST API is currently not enabled.',
+                response_id: 'ENDPOINT_REST_API_IS_NOT_ENABLED',
+            );
         }
     }
 
     /**
      * Checks if the interface receiving the API call is allowed to answer API calls.
      */
-    private function check_server_ip(): void {
+    private function check_interface_allowed(): void {
         # Variables
-        $allow_ifs = $this->api_config['allowed_interfaces'];
-        $whitelist = explode(',', $allow_ifs);
+        $server_ip = $_SERVER['SERVER_ADDR'];
+        $allowed_interfaces = $this->restapi_settings->allowed_interfaces->value;
 
-        # Allow the action if the allowed interfaces is empty
-        if (empty($allow_ifs)) {
+
+        # Allow any interface if the allowed interfaces is empty or the ignore_interfaces flag is set
+        if (!$allowed_interfaces or $this->ignore_interfaces) {
             return;
         }
 
-        # Check if our server IP is in our whitelist
-        foreach ($whitelist as $wif) {
-            $if_info = get_interface_info($wif);
-            # Check if our server IP is a valid if address, VIP, localhost, or any
-            if ($_SERVER['SERVER_ADDR'] === $if_info['ipaddr']) {
+        # Allow localhost if the server IP is localhost
+        if (in_array($server_ip, ['::1', '127.0.0.1', 'localhost']) and in_array('lo0', $allowed_interfaces)) {
+            return;
+        }
+
+        # Loop through each allowed interface and check if the server IP is allowed to answer API calls
+        foreach ($this->restapi_settings->allowed_interfaces->get_related_models()->model_objects as $allowed_interface) {
+            # Allow the server IP if it matches the current interface's IPv4 or IPv6 address
+            if ($server_ip === $allowed_interface->get_current_ipv4()) {
                 return;
-            } elseif ($_SERVER['SERVER_ADDR'] === $if_info['ipaddrv6']) {
+            }
+            if ($server_ip === $allowed_interface->get_current_ipv6()) {
                 return;
-            } elseif (in_array($_SERVER['SERVER_ADDR'], ['::1', '127.0.0.1', 'localhost']) and $wif === 'localhost') {
-                return;
-            } elseif ($wif === 'any') {
-                return;
-            } elseif ($this->ignore_interfaces) {
+            }
+
+            # Check if this interface has a virtual IP that matches the server IP that accepted the API call
+            $vip_q = VirtualIP::query(interface: $allowed_interface->represented_as(), subnet: $server_ip);
+            if ($vip_q->exists()) {
                 return;
             }
         }
-
         # Throw a forbidden error if this API call was made to a non-API enabled interface
         throw new ForbiddenError(
             message: 'The requested action is not allowed by admin policy',
-            response_id: 'ENDPOINT_ACTION_NOT_ALLOWED',
+            response_id: 'ENDPOINT_INTERFACE_NOT_ALLOWED',
         );
     }
 
@@ -540,7 +548,7 @@ class Endpoint {
         }
 
         # Throw an error if the API is currently in read mode and this is not a GET or OPTIONS request
-        $read_only = ($this->api_config['read_only'] === 'enabled' and !$this->ignore_read_only);
+        $read_only = ($this->restapi_settings->read_only->value and !$this->ignore_read_only);
         if ($read_only and $this->request_method !== 'GET') {
             throw new MethodNotAllowedError(
                 message: "Resource at $this->url cannot support the requested HTTP method `$this->request_method` " .
@@ -604,10 +612,14 @@ class Endpoint {
         # Variables
         $resp_data = null;
         $content_handler = new JSONContentHandler();
+        $this->restapi_settings = new RESTAPISettings();
 
         try {
+            # First, ensure the API is enabled before allowing the call
+            $this->check_enabled();
+
             # Ensure API is enabled and the receiving interface is allowed to answer API calls.
-            $this->check_server_ip();
+            $this->check_interface_allowed();
 
             # Checks client authentication and authorization if required
             if ($this->requires_auth) {

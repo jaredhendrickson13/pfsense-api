@@ -1239,4 +1239,17 @@ class NetworkInterface extends Model {
     public function is_ipv4_in_cidr(string $ipaddr): bool {
         return (bool) ip_in_subnet($ipaddr, $this->get_current_ipv4() . '/' . $this->get_current_subnetv4());
     }
+
+    /**
+     * Obtains the string representation for this interface as specified in the REST API settings
+     * 'represent_interfaces_as' field.
+     */
+    public function represented_as(): string {
+        $api_settings = new RESTAPISettings();
+        return match ($api_settings->represent_interfaces_as->value) {
+            'descr' => $this->descr->value,
+            'if' => $this->if->value,
+            default => $this->id,
+        };
+    }
 }

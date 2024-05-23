@@ -110,6 +110,7 @@ class RESTAPISettings extends Model {
         );
         $this->allowed_interfaces = new InterfaceField(
             default: [],
+            allow_localhost_interface: true,
             allow_empty: true,
             many: true,
             delimiter: ',',
