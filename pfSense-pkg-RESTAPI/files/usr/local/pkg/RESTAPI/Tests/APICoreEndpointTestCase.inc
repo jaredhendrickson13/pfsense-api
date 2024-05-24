@@ -6,7 +6,6 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Endpoints\DiagnosticsARPTableEndpoint;
 use RESTAPI\Endpoints\FirewallAliasEndpoint;
 use RESTAPI\Endpoints\ServicesDNSResolverHostOverrideAliasEndpoint;
-use RESTAPI\Models\DNSResolverHostOverrideAlias;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\RESTAPISettings;
@@ -156,28 +155,26 @@ class APICoreEndpointTestCase extends TestCase
         );
     }
 
-//    /**
-//     * Checks that the check_auth() method correct enforces authentication
-//     */
-//    public function test_check_auth(): void {
-//        # Ensure the endpoint requires authentication
-//        $endpoint = new FirewallAliasEndpoint();
-//        $this->assert_throws_response(
-//            response_id: "ENDPOINT_AUTHENTICATION_REQUIRED",
-//            code: 401,
-//            callable: function() use ($endpoint) {
-//                $endpoint->check_auth();
-//            }
-//        );
-//
-//        # Ensure the endpoint allows unauthenticated requests if the $ignore_auth flag is set
-//        $endpoint->ignore_auth = true;
-//        $this->assert_not_throws_response(
-//            callable: function() use ($endpoint) {
-//                $endpoint->check_auth();
-//            }
-//        );
-//    }
+    /**
+     * Checks that the check_auth() method correct enforces authentication
+     */
+    public function test_check_auth(): void {
+        # Ensure the endpoint requires authentication when the $requires_auth flag is set
+        $_SERVER["PHP_AUTH_USER"] = null;
+        $_SERVER["PHP_AUTH_PW"] = null;
+        $_SERVER["REQUEST_METHOD"] = "GET";
+        $endpoint = new FirewallAliasEndpoint();
+        $endpoint->requires_auth = true;
+        $json_resp = json_decode($endpoint->process_request());
+        $this->assert_equals($json_resp->response_id, "AUTH_AUTHENTICATION_FAILED");
+        $this->assert_equals($json_resp->code, 401);
+
+        # Ensure the endpoint allows unauthenticated requests if the $requires_auth flag is not set
+        $endpoint->requires_auth = false;
+        $json_resp = json_decode($endpoint->process_request());
+        $this->assert_not_equals($json_resp->response_id, "AUTH_AUTHENTICATION_FAILED");
+        $this->assert_not_equals($json_resp->code, 401);
+    }
 
     /**
      * Checks that the API must be enabled for the endpoint to process requests

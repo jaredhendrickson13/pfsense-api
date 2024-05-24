@@ -18,21 +18,16 @@ require_once 'RESTAPI/autoloader.inc';
 
 use Error;
 use Exception;
-use JsonException;
 use RESTAPI;
 use RESTAPI\ContentHandlers\JSONContentHandler;
-use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\VirtualIP;
-use RESTAPI\Responses\AuthenticationError;
 use RESTAPI\Responses\ForbiddenError;
-use RESTAPI\Responses\MediaTypeError;
 use RESTAPI\Responses\MethodNotAllowedError;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ServiceUnavailableError;
 use RESTAPI\Responses\Success;
 use RESTAPI\Responses\ValidationError;
-use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
  * Defines an API Endpoint, encapsulating attributes essential for generating the PHP endpoint in the pfSense webroot,
