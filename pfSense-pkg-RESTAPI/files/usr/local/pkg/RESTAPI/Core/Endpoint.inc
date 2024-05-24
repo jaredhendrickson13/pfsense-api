@@ -692,7 +692,7 @@ class Endpoint {
     /**
      * Obtains the object data for GET requests to this Endpoint.
      */
-    public function get(): Model|ModelSet {
+    protected function get(): Model|ModelSet {
         # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
         if ($this->many) {
             $this->get_pagination_resource_links(
@@ -716,7 +716,7 @@ class Endpoint {
     /**
      * Creates a new object for the assigned Model using the data submitted in a POST request.
      */
-    public function post(): Model|ModelSet {
+    protected function post(): Model|ModelSet {
         # POST request cannot include an ID, strip the ID if present
         unset($this->request_data['id']);
         $this->model->from_representation(data: $this->request_data);
@@ -727,7 +727,7 @@ class Endpoint {
     /**
      * Replaces all existing objects for the assigned Model using the data submitted in a PUT request.
      */
-    public function put(): Model|ModelSet {
+    protected function put(): Model|ModelSet {
         # Remove magic parameters
         unset($this->request_data['async']);
         unset($this->request_data['limit']);
@@ -738,7 +738,7 @@ class Endpoint {
     /**
      * Updates an existing object for the assigned Model using the data submitted in a PATCH request.
      */
-    public function patch(): Model|ModelSet {
+    protected function patch(): Model|ModelSet {
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
         return $this->model->update(apply: $this->request_data['apply'] === true);
@@ -747,7 +747,7 @@ class Endpoint {
     /**
      * Deletes an existing object for the assigned Model using the data submitted in a DELETE request.
      */
-    public function delete(): Model|ModelSet {
+    protected function delete(): Model|ModelSet {
         $this->model->from_representation(data: $this->request_data);
         return $this->model->delete(apply: $this->request_data['apply'] === true);
     }
@@ -755,9 +755,18 @@ class Endpoint {
     /**
      * Populates associated headers whenever an OPTIONS request is received.
      */
-    final public function options(): void {
+    final protected function options(): void {
         header('access-control-allow-methods: ' . implode(', ', $this->request_method_options));
         header('Allow: ' . implode(', ', $this->request_method_options));
+    }
+
+    /**
+     * Obtains the absolute filepath to the PHP file generated for this Endpoint.
+     * @return string The absolute filepath to this Endpoint's PHP file within the pfSense webroot.
+     */
+    public function get_endpoint_filepath(): string
+    {
+        return '/usr/local/www' . $this->url . '/index.php';
     }
 
     /**
@@ -766,8 +775,8 @@ class Endpoint {
      */
     public function build_endpoint_url(): bool {
         # Get the fully qualified and non qualified class names for this object
-        $fq_class_name = get_class($this);
-        $nq_class_name = (new \ReflectionClass($this))->getShortName();
+        $fq_class_name = $this->get_class_fqn();
+        $nq_class_name = $this->get_class_shortname();
 
         # Specify the PHP code to write to the Endpoints index.php file
         $code =
@@ -781,11 +790,11 @@ class Endpoint {
         # Create directories and files corresponding with class
         if ($this->url) {
             mkdir('/usr/local/www' . $this->url, 0644, true);
-            file_put_contents('/usr/local/www' . $this->url . '/index.php', $code);
+            file_put_contents($this->get_endpoint_filepath(), $code);
         }
 
         # Return true if the endpoint was successfully built
-        if ($this->url and is_file('/usr/local/www' . $this->url . '/index.php')) {
+        if ($this->url and is_file($this->get_endpoint_filepath())) {
             return true;
         }
 

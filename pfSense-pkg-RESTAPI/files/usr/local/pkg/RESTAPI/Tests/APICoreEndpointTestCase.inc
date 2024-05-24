@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
+use RESTAPI\Endpoints\DiagnosticsARPTableEndpoint;
 use RESTAPI\Endpoints\FirewallAliasEndpoint;
 use RESTAPI\Endpoints\ServicesDNSResolverHostOverrideAliasEndpoint;
 use RESTAPI\Models\DNSResolverHostOverrideAlias;
@@ -17,7 +18,7 @@ class APICoreEndpointTestCase extends TestCase
      * Sets up this test case with the necessary settings.
      */
     public function setup(): void {
-        # Disable login protection so we don't flood syslog with login attempts during tests
+        # Disable login protection, so we don't flood syslog with login attempts during tests
         $api_settings = new RESTAPISettings(login_protection: false);
         $api_settings->update();
     }
@@ -155,6 +156,29 @@ class APICoreEndpointTestCase extends TestCase
         );
     }
 
+//    /**
+//     * Checks that the check_auth() method correct enforces authentication
+//     */
+//    public function test_check_auth(): void {
+//        # Ensure the endpoint requires authentication
+//        $endpoint = new FirewallAliasEndpoint();
+//        $this->assert_throws_response(
+//            response_id: "ENDPOINT_AUTHENTICATION_REQUIRED",
+//            code: 401,
+//            callable: function() use ($endpoint) {
+//                $endpoint->check_auth();
+//            }
+//        );
+//
+//        # Ensure the endpoint allows unauthenticated requests if the $ignore_auth flag is set
+//        $endpoint->ignore_auth = true;
+//        $this->assert_not_throws_response(
+//            callable: function() use ($endpoint) {
+//                $endpoint->check_auth();
+//            }
+//        );
+//    }
+
     /**
      * Checks that the API must be enabled for the endpoint to process requests
      */
@@ -232,7 +256,7 @@ class APICoreEndpointTestCase extends TestCase
      * Checks that the check_request_method() method correctly stops unsupported request methods.
      */
     public function test_check_request_method(): void {
-        # This validated after authenticating, so we need to authenticate first
+        # check_request_method() runs after authenticating, so we need to authenticate first
         $_SERVER['PHP_AUTH_USER'] = "admin";
         $_SERVER['PHP_AUTH_PW'] = "pfsense";
 
@@ -262,5 +286,158 @@ class APICoreEndpointTestCase extends TestCase
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_not_equals($json_resp->response_id, "ENDPOINT_METHOD_NOT_ALLOWED_IN_READ_ONLY_MODE");
+    }
+    
+    /**
+     * Ensure the check_request_data() method correctly obtains and decodes requested data from the client.
+     */
+    public function test_check_request_data(): void
+    {
+        # check_request_method() runs after authenticating, so we need to authenticate first
+        $_SERVER['PHP_AUTH_USER'] = "admin";
+        $_SERVER['PHP_AUTH_PW'] = "pfsense";
+        
+        # Ensure the request data is correctly obtained and decoded
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER["HTTP_CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+        $_GET = ["key" => "value"];
+        $endpoint = new FirewallAliasEndpoint();
+        $endpoint->process_request();
+        $this->assert_equals(
+            $endpoint->request_data, 
+            ["key" => "value", "async" => true, "limit" => 0, "offset" => 0]
+        );
+    }
+    
+    /**
+     * Ensures that endpoint specific fields are correctly validated.
+     */
+    public function test_validate_endpoint_fields(): void {
+        # check_request_method() runs after authenticating, so we need to authenticate first
+        $_SERVER['PHP_AUTH_USER'] = "admin";
+        $_SERVER['PHP_AUTH_PW'] = "pfsense";
+
+        # Ensure the request data is correctly obtained and decoded
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER["HTTP_CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+
+        $_GET = ["async" => "invalid"];
+        $endpoint = new FirewallAliasEndpoint();
+        $json_resp = json_decode($endpoint->process_request());
+        $this->assert_equals($json_resp->response_id, "ENDPOINT_ASYNC_FIELD_INVALID_TYPE");
+        
+        $_GET = ["limit" => "invalid"];
+        $endpoint = new FirewallAliasEndpoint();
+        $json_resp = json_decode($endpoint->process_request());
+        $this->assert_equals($json_resp->response_id, "ENDPOINT_LIMIT_FIELD_INVALID_TYPE");
+
+        $_GET = ["offset" => "invalid"];
+        $endpoint = new FirewallAliasEndpoint();
+        $json_resp = json_decode($endpoint->process_request());
+        $this->assert_equals($json_resp->response_id, "ENDPOINT_OFFSET_FIELD_INVALID_TYPE");
+    }
+    
+    /**
+     * Ensures the process_request() correctly handles 'POST' requests
+     */
+    public function test_process_request(): void
+    {
+        # check_request_method() runs after authenticating, so we need to authenticate first
+        $_SERVER['PHP_AUTH_USER'] = "admin";
+        $_SERVER['PHP_AUTH_PW'] = "pfsense";
+
+        # Mock an example POST request and ensure the response is correct
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER["HTTP_CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+        $_GET = ["name" => "test_alias", "type" => "host", "descr" => "test description"];
+        $endpoint = new FirewallAliasEndpoint();
+        $json_resp = json_decode($endpoint->process_request(), associative: true);
+        $this->assert_equals(
+            $json_resp['data'],
+            $endpoint->model->to_representation()
+        );
+        $id = $json_resp['data']['id'];
+        $alias = new FirewallAlias(id: $id);
+        
+        # Mock an example GET request and ensure the response is correct
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_GET = ["id" => $id];
+        $endpoint = new FirewallAliasEndpoint();
+        $json_resp = json_decode($endpoint->process_request(), associative: true);
+        $this->assert_equals(
+            $json_resp['data'],
+            $alias->to_representation()
+        );
+        
+        # Mock an example PATCH request and ensure the response is correct
+        $_SERVER['REQUEST_METHOD'] = 'PATCH';
+        $_GET = ["id" => $id, "descr" => "new description"];
+        $endpoint = new FirewallAliasEndpoint();
+        $json_resp = json_decode($endpoint->process_request(), associative: true);
+        $alias = new FirewallAlias(id: $id);
+        $this->assert_equals(
+            $json_resp['data']['descr'],
+            "new description"
+        );
+        $this->assert_equals(
+            $json_resp['data'],
+            $alias->to_representation()
+        );
+        
+        # Mock an example DELETE request and ensure the response is correct
+        $_SERVER['REQUEST_METHOD'] = 'DELETE';
+        $_GET = ["id" => $id];
+        $endpoint = new FirewallAliasEndpoint();
+        $json_resp = json_decode($endpoint->process_request(), associative: true);
+        $this->assert_equals(
+            $json_resp['data'],
+            $alias->to_representation()
+        );
+        $this->assert_is_false(FirewallAlias::query(id: $id)->exists());
+    }
+
+    /**
+     * Ensures the get_endpoint_filepath() method correctly constructs the endpoint's PHP file path
+     * in the pfSense webroot.
+     */
+    public function test_get_endpoint_filepath(): void
+    {
+        # Test a few different endpoints and ensure the filepath is correctly constructed
+        $endpoint = new FirewallAliasEndpoint();
+        $this->assert_equals(
+            $endpoint->get_endpoint_filepath(),
+            "/usr/local/www/api/v2/firewall/alias/index.php"
+        );
+        
+        $endpoint = new DiagnosticsARPTableEndpoint();
+        $this->assert_equals(
+            $endpoint->get_endpoint_filepath(),
+            "/usr/local/www/api/v2/diagnostics/arp_table/index.php"
+        );
+        
+        $endpoint = new ServicesDNSResolverHostOverrideAliasEndpoint();
+        $this->assert_equals(
+            $endpoint->get_endpoint_filepath(),
+            "/usr/local/www/api/v2/services/dns_resolver/host_override/alias/index.php"
+        );
+    }
+    
+    /**
+     * Ensures the build_endpoint_url() method correctly constructs the endpoint's PHP file in the pfSense
+     * webroot.
+     */
+    public function test_build_endpoint_url(): void
+    {
+        # Use the FirewallAliasEndpoint to test this
+        $endpoint = new FirewallAliasEndpoint();
+        
+        # Remove the existing endpoint file
+        unlink($endpoint->get_endpoint_filepath());
+        $this->assert_is_false(file_exists($endpoint->get_endpoint_filepath()));
+        
+        # Run the build_endpoint_url() method and ensure the file is created
+        $endpoint->build_endpoint_url();
+        $this->assert_is_true(file_exists($endpoint->get_endpoint_filepath()));
+        $this->assert_is_not_empty(file_get_contents($endpoint->get_endpoint_filepath()));
     }
 }
