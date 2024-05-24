@@ -491,7 +491,6 @@ class Endpoint {
         $server_ip = $_SERVER['SERVER_ADDR'];
         $allowed_interfaces = $this->restapi_settings->allowed_interfaces->value;
 
-
         # Allow any interface if the allowed interfaces is empty or the ignore_interfaces flag is set
         if (!$allowed_interfaces or $this->ignore_interfaces) {
             return;
@@ -503,7 +502,10 @@ class Endpoint {
         }
 
         # Loop through each allowed interface and check if the server IP is allowed to answer API calls
-        foreach ($this->restapi_settings->allowed_interfaces->get_related_models()->model_objects as $allowed_interface) {
+        foreach (
+            $this->restapi_settings->allowed_interfaces->get_related_models()->model_objects
+            as $allowed_interface
+        ) {
             # Allow the server IP if it matches the current interface's IPv4 or IPv6 address
             if ($server_ip === $allowed_interface->get_current_ipv4()) {
                 return;
@@ -759,8 +761,7 @@ class Endpoint {
      * Obtains the absolute filepath to the PHP file generated for this Endpoint.
      * @return string The absolute filepath to this Endpoint's PHP file within the pfSense webroot.
      */
-    public function get_endpoint_filepath(): string
-    {
+    public function get_endpoint_filepath(): string {
         return '/usr/local/www' . $this->url . '/index.php';
     }
 
