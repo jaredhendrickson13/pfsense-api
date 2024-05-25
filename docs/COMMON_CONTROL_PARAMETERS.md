@@ -30,6 +30,11 @@ parameters you can use:
   call to the applicable apply endpoint. This may not be applicable to all endpoints as some always apply changes
   immediately.
 
+!!! Tip
+    The [Swagger documentation](./SWAGGER_AND_OPENAPI.md#swagger-documentation) will indicate if an endpoint applies
+    changes immediately or requires a separate apply call. If an endpoint applies changes immediately, this parameter
+    will have no effect.
+
 ## placement
 
 - Type: Integer
