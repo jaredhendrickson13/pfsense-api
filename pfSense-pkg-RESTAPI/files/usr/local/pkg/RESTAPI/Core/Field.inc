@@ -143,7 +143,7 @@ class Field {
         public bool $sensitive = false,
         public bool $representation_only = false,
         public bool $many = false,
-        public int $many_minimum = 1,
+        public int $many_minimum = 0,
         public int $many_maximum = 128,
         public string|null $delimiter = ',',
         public string $verbose_name = '',
