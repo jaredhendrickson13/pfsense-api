@@ -25,7 +25,7 @@ class APIModelsFirewallStatesSizeTestCase extends TestCase {
         # Create a FirewallStatesSize object to test with
         $states_size = new FirewallStatesSize(async: false);
         $states_size->maximumstates->value = 500;
-        $states_size->update();
+        $states_size->update(apply: true);
         sleep(1);
 
         # Check the hard states limit in pfctl and ensure it matches the value we set
@@ -34,6 +34,6 @@ class APIModelsFirewallStatesSizeTestCase extends TestCase {
 
         # Set the states limit back to the default
         $states_size->maximumstates->value = $states_size->defaultmaximumstates->value;
-        $states_size->update();
+        $states_size->update(apply: true);
     }
 }
