@@ -8,7 +8,6 @@ use RESTAPI\Core\Dispatcher;
  * Defines a Dispatcher for applying changes to interface configurations.
  */
 class InterfaceApplyDispatcher extends Dispatcher {
-
     /**
      * Applies pending interface changes.
      */

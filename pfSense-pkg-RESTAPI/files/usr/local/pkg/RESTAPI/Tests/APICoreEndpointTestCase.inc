@@ -407,12 +407,12 @@ class APICoreEndpointTestCase extends TestCase {
         # Ensure a PUT request to a `many` endpoint requires the request data to be an indexed array
         $json_resp = \RESTAPI\Core\Tools\http_request(
             url: 'https://localhost/api/v2/firewall/aliases',
-            method: "PUT",
+            method: 'PUT',
             data: ['not_an_indexed_array' => 'not_an_indexed_array'],
-            headers: ['Content-Type'=>'application/json'],
+            headers: ['Content-Type' => 'application/json'],
             username: 'admin',
             password: 'pfsense',
-            validate_certs: false
+            validate_certs: false,
         );
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->response_id, 'ENDPOINT_REQUEST_DATA_MUST_BE_INDEXED_ARRAY');
@@ -420,15 +420,15 @@ class APICoreEndpointTestCase extends TestCase {
         # Ensure we can make a successful PUT request to a `many` endpoint
         $json_resp = \RESTAPI\Core\Tools\http_request(
             url: 'https://localhost/api/v2/firewall/aliases',
-            method: "PUT",
+            method: 'PUT',
             data: [
                 ['name' => 'test_alias', 'type' => 'host', 'descr' => 'test description', 'address' => ['1.2.3.4']],
-                ['name' => 'test_alias2', 'type' => 'host', 'descr' => 'test description2', 'address' => ['4.3.2.1']]
+                ['name' => 'test_alias2', 'type' => 'host', 'descr' => 'test description2', 'address' => ['4.3.2.1']],
             ],
-            headers: ['Content-Type'=>'application/json'],
+            headers: ['Content-Type' => 'application/json'],
             username: 'admin',
             password: 'pfsense',
-            validate_certs: false
+            validate_certs: false,
         );
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->code, 200);
