@@ -4,12 +4,11 @@ if [ "${2}" != "DEINSTALL" ]; then
 	exit 0
 fi
 
-# Remove Endpoints
-rm -rf /usr/local/www/api/v2
-
 # Unlink this package from pfSense
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% POST-DEINSTALL
 
 # Remove the pfsense-RESTAPI command line tool
 /bin/rm /usr/local/bin/pfsense-restapi
 
+# Remove Endpoints
+rm -rf /usr/local/www/api/v2
