@@ -28,6 +28,7 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ServiceUnavailableError;
 use RESTAPI\Responses\Success;
 use RESTAPI\Responses\ValidationError;
+use function RESTAPI\Core\Tools\is_assoc_array;
 
 /**
  * Defines an API Endpoint, encapsulating attributes essential for generating the PHP endpoint in the pfSense webroot,
@@ -571,6 +572,14 @@ class Endpoint {
      * @throws ValidationError When one or more Endpoint releated fields fail validation.
      */
     private function validate_endpoint_fields(): void {
+        # Ensure request data is an indexed array if this a PUT request to a many endpoint
+        if ($this->request_method === 'PUT' and $this->many and is_assoc_array($this->request_data)) {
+            throw new ValidationError(
+                message: 'PUT requests to \'many\' endpoints must contain an indexed array of objects to replace.',
+                response_id: 'ENDPOINT_REQUEST_DATA_MUST_BE_INDEXED_ARRAY',
+            );
+        }
+
         # Ensure the special async, limit and offset parameters are of the correct type
         if (!isset($this->request_data['async'])) {
             $this->request_data['async'] = true;

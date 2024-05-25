@@ -16,7 +16,6 @@
 namespace RESTAPI\Core\Tools;
 
 use RESTAPI\Core\Response;
-use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\RESTAPIVersion;
 use RESTAPI\Responses\ServerError;
 
@@ -33,7 +32,7 @@ function is_assoc_array(array $array): bool {
 
     # Loop through the keys of this array to check for non-associative indexing
     foreach (array_keys($array) as $key) {
-        # This is an associtive array if the key is not an integer, or the index is not sequential
+        # This is an associative array if the key is not an integer, or the index is not sequential
         if (!is_integer($key) or $key !== $index) {
             return true;
         }
