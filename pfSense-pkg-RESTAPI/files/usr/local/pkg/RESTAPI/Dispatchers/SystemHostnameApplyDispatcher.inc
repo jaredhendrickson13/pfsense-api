@@ -10,7 +10,7 @@ use RESTAPI\Core\Model;
  */
 class SystemHostnameApplyDispatcher extends Dispatcher {
     # Only allow the system hostname services to be applied one at a time
-    public int $max_concurrency = 1;
+    public int $max_queue = 1;
 
     /**
      * Restarts system hostname services.

@@ -9,7 +9,7 @@ use RESTAPI\Core\Dispatcher;
  */
 class FirewallApplyDispatcher extends Dispatcher {
     # Do not limit the number concurrent filter reloads that can run
-    public int $max_concurrency = 0;
+    public int $max_queue = 0;
 
     /**
      * Reloads the filter services.

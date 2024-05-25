@@ -10,7 +10,7 @@ use RESTAPI\Core\Dispatcher;
  */
 class SystemHaltDispatcher extends Dispatcher {
     # Only allow one shutdown at a time
-    public int $max_concurrency = 1;
+    public int $max_queue = 1;
 
     /**
      * Schedules a shutdown in 15 seconds

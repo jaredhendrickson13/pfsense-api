@@ -15,13 +15,13 @@ class APICoreDispatcherTestCase extends TestCase {
     public function test_max_concurrency() {
         # Create a test dispatcher and spawn the maximum number of processes
         $dispatcher = new Dispatcher();
-        $dispatcher->max_concurrency = 2;
+        $dispatcher->max_queue = 2;
         $dispatcher->spawn_process();
         $dispatcher->spawn_process();
 
         # Ensure an error is thrown trying to spawn another
         $this->assert_throws_response(
-            response_id: 'DISPATCHER_TOO_MANY_CONCURRENT_PROCESSES',
+            response_id: 'DISPATCHER_TOO_MANY_QUEUED_PROCESSES',
             code: 503,
             callable: function () use ($dispatcher) {
                 $dispatcher->spawn_process();

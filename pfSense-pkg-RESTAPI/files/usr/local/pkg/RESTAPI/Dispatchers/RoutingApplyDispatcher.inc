@@ -9,7 +9,7 @@ use RESTAPI\Core\Dispatcher;
  */
 class RoutingApplyDispatcher extends Dispatcher {
     # Only allow one routing apply to occur at a time
-    public int $max_concurrency = 1;
+    public int $max_queue = 1;
 
     /**
      * Reload routing services to apply routing changes.

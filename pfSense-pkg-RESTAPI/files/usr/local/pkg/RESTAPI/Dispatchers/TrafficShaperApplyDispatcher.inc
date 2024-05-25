@@ -9,7 +9,7 @@ use RESTAPI\Core\Dispatcher;
  */
 class TrafficShaperApplyDispatcher extends Dispatcher {
     # Do not limit the number concurrent traffic shaper reloads that can run
-    public int $max_concurrency = 0;
+    public int $max_queue = 0;
 
     /**
      * Reloads the traffic shaper services.

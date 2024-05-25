@@ -10,7 +10,7 @@ use RESTAPI\Core\Model;
  */
 class DHCPServerApplyDispatcher extends Dispatcher {
     # Only allow one DHCP server reload to occur at a time
-    public int $max_concurrency = 1;
+    public int $max_queue = 1;
 
     /**
      * Reloads the DHCP server and associated services.

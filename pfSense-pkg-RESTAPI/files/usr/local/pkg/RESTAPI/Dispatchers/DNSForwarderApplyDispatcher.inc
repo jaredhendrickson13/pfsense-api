@@ -6,7 +6,7 @@ use RESTAPI\Core\Dispatcher;
 
 class DNSForwarderApplyDispatcher extends Dispatcher {
     # Only allow one Dnsmasq reload to occur at a time
-    public int $max_concurrency = 1;
+    public int $max_queue = 1;
 
     public function process(...$arguments): void {
         # Reload the DNS Forwarder service

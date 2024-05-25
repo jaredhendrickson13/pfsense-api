@@ -9,7 +9,7 @@ use RESTAPI\Core\Dispatcher;
  */
 class InterfaceApplyDispatcher extends Dispatcher {
     # Do not limit the number concurrent filter reloads that can run
-    public int $max_concurrency = 1;
+    public int $max_queue = 1;
 
     /**
      * Applies pending interface changes.

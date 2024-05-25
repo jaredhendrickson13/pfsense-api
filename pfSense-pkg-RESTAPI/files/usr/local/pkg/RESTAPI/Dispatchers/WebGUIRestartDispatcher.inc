@@ -10,7 +10,7 @@ use RESTAPI\Core\Dispatcher;
  */
 class WebGUIRestartDispatcher extends Dispatcher {
     # Don't limit the number of Web GUI restarts that can run at a time.
-    public int $max_concurrency = 0;
+    public int $max_queue = 0;
 
     /**
      * Restarts the web GUI.

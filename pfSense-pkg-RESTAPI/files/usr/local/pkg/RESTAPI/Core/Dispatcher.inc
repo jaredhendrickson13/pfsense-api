@@ -61,11 +61,11 @@ class Dispatcher {
      */
     public int $timeout = 600;
     /**
-     * @var int $max_concurrency
-     * Sets the maximum number of processes this Dispatcher can have running at one time.
-     * Attempts to spawn process past this limit will result in a ServiceUnavailableError error.
+     * @var int $max_queue
+     * Sets the maximum number of processes this Dispatcher can have queued at one time.
+     * Attempts to spawn processes past this limit will result in a ServiceUnavailableError error.
      */
-    public int $max_concurrency = 0;
+    public int $max_queue = 0;
     /**
      * @var bool $async
      * Indicates whether this Dispatcher object should spawn processes asynchronously (in the
@@ -207,11 +207,11 @@ class Dispatcher {
         $this->check_required_packages();
 
         # Before we spawn a new process, ensure we don't have too many concurrent processes running now
-        if ($this->max_concurrency and count($this->get_running_processes()) >= $this->max_concurrency) {
+        if ($this->max_queue and count($this->get_running_processes()) >= $this->max_queue) {
             throw new ServiceUnavailableError(
-                message: "Dispatcher allows for a maximum of `$this->max_concurrency` processes to be running at " .
+                message: "Dispatcher allows for a maximum of `$this->max_queue` processes to be queued at " .
                     "once, try again after `$this->timeout` seconds.",
-                response_id: 'DISPATCHER_TOO_MANY_CONCURRENT_PROCESSES',
+                response_id: 'DISPATCHER_TOO_MANY_QUEUED_PROCESSES',
                 retry_after: $this->timeout,
             );
         }

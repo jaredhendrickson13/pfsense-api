@@ -107,17 +107,30 @@ function notify_dispatcher(string|null $dispatcher_name): void {
     $class = "\\RESTAPI\\Dispatchers\\$dispatcher_name";
 
     # Ensure this Dispatcher class exists
-    if (class_exists($class)) {
-        # Start the Dispatcher process asynchronously.
-        echo "Running $class process... ";
-        $dispatcher = new $class(async: false);
-        $dispatcher->process();
-        echo 'done.' . PHP_EOL;
-        exit(0);
-    } else {
+    if (!class_exists($class)) {
         echo "No dispatcher exists at $class" . PHP_EOL;
         exit(1);
     }
+
+    # Check if there is already a Dispatcher process running in the queue
+    if (file_exists("/tmp/$dispatcher_name.lock")) {
+        echo "Waiting for previous $dispatcher_name process to complete... ";
+        while (file_exists("/tmp/$dispatcher_name.lock")) {
+            sleep(1);
+        }
+        echo 'done.' . PHP_EOL;
+    }
+
+    # Lock the Dispatcher and start the Dispatcher process.
+    echo "Running $class process... ";
+    file_put_contents("/tmp/$dispatcher_name.lock", 'lock');
+    $dispatcher = new $class(async: false);
+    $dispatcher->process();
+
+    # Remove the lock and exit once the process is complete
+    echo 'done.' . PHP_EOL;
+    unlink("/tmp/$dispatcher_name.lock");
+    exit(0);
 }
 
 /**
