@@ -90,11 +90,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
      */
     public function test_from_internal(): void {
         # Create FirewallAlias objects to use for testing purposes
-        $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []]);
+        $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []], async: false);
         $host_alias->create();
-        $net_alias = new FirewallAlias(data: ['name' => 'NET_ALIAS', 'type' => 'network', 'address' => []]);
+        $net_alias = new FirewallAlias(data: ['name' => 'NET_ALIAS', 'type' => 'network', 'address' => []], async: false);
         $net_alias->create();
-        $port_alias = new FirewallAlias(data: ['name' => 'PORT_ALIAS', 'type' => 'port', 'address' => []]);
+        $port_alias = new FirewallAlias(data: ['name' => 'PORT_ALIAS', 'type' => 'port', 'address' => []], async: false);
         $port_alias->create();
 
         # Create a ForeignModelField object for testing
@@ -103,8 +103,8 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
         $this->assert_equals($field->value, 'NET_ALIAS');
 
         # Delete the firewall aliases used for testing
-        $host_alias->delete(apply: true);
-        $net_alias->delete(apply: true);
+        $host_alias->delete();
+        $net_alias->delete();
         $port_alias->delete(apply: true);
     }
 
@@ -113,11 +113,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
      */
     public function test_to_internal(): void {
         # Create FirewallAlias objects to use for testing purposes
-        $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []]);
+        $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []], async: false);
         $host_alias->create();
-        $net_alias = new FirewallAlias(data: ['name' => 'NET_ALIAS', 'type' => 'network', 'address' => []]);
+        $net_alias = new FirewallAlias(data: ['name' => 'NET_ALIAS', 'type' => 'network', 'address' => []], async: false);
         $net_alias->create();
-        $port_alias = new FirewallAlias(data: ['name' => 'PORT_ALIAS', 'type' => 'port', 'address' => []]);
+        $port_alias = new FirewallAlias(data: ['name' => 'PORT_ALIAS', 'type' => 'port', 'address' => []], async: false);
         $port_alias->create();
 
         # Create a ForeignModelField object for testing
@@ -126,8 +126,8 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
         $this->assert_equals($field->to_internal(), 'PORT_ALIAS');
 
         # Delete the firewall aliases used for testing
-        $host_alias->delete(apply: true);
-        $net_alias->delete(apply: true);
+        $host_alias->delete();
+        $net_alias->delete();
         $port_alias->delete(apply: true);
     }
 
@@ -156,7 +156,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
         $host_alias->create();
         $net_alias = new FirewallAlias(data: ['name' => 'NET_ALIAS', 'type' => 'network', 'address' => []]);
         $net_alias->create();
-        $port_alias = new FirewallAlias(data: ['name' => 'PORT_ALIAS', 'type' => 'port', 'address' => []]);
+        $port_alias = new FirewallAlias(data: ['name' => 'PORT_ALIAS', 'type' => 'port', 'address' => []], async: false);
         $port_alias->create();
 
         # Create a ForeignModelField object that can only relate to FirewallAlias objects that are of `type` network
@@ -187,8 +187,8 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
         );
 
         # Delete the firewall aliases used for testing
-        $host_alias->delete(apply: true);
-        $net_alias->delete(apply: true);
+        $host_alias->delete();
+        $net_alias->delete();
         $port_alias->delete(apply: true);
     }
 
@@ -197,11 +197,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
      */
     public function test_get_related_model(): void {
         # Create FirewallAlias objects to use for testing purposes
-        $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []]);
+        $host_alias = new FirewallAlias(data: ['name' => 'HOST_ALIAS', 'type' => 'host', 'address' => []], async: false);
         $host_alias->create();
-        $net_alias = new FirewallAlias(data: ['name' => 'NET_ALIAS', 'type' => 'network', 'address' => []]);
+        $net_alias = new FirewallAlias(data: ['name' => 'NET_ALIAS', 'type' => 'network', 'address' => []], async: false);
         $net_alias->create();
-        $port_alias = new FirewallAlias(data: ['name' => 'PORT_ALIAS', 'type' => 'port', 'address' => []]);
+        $port_alias = new FirewallAlias(data: ['name' => 'PORT_ALIAS', 'type' => 'port', 'address' => []], async: false);
         $port_alias->create();
 
         # Create a non `many` ForeignModelField object
@@ -224,8 +224,8 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
         }
 
         # Delete the firewall aliases used for testing
-        $host_alias->delete(apply: true);
-        $net_alias->delete(apply: true);
+        $host_alias->delete();
+        $net_alias->delete();
         $port_alias->delete(apply: true);
     }
 
@@ -240,6 +240,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
             bandwidth: 100,
             bandwidthtype: 'Mb',
             queue: [['name' => 'TestQueue1', 'qlimit' => 50, 'bandwidth' => 50, 'bandwidthtype' => 'Mb']],
+            async: false
         );
         $shaper1->create();
         $shaper2 = new TrafficShaper(
@@ -248,6 +249,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
             bandwidth: 100,
             bandwidthtype: 'Mb',
             queue: [['name' => 'TestQueue2', 'qlimit' => 50, 'bandwidth' => 50, 'bandwidthtype' => 'Mb']],
+            async: false
         );
         $shaper2->create(apply: true);
 
