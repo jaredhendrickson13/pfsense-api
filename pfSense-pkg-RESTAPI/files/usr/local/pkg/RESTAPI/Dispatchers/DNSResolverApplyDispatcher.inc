@@ -8,9 +8,6 @@ use RESTAPI\Core\Dispatcher;
  * Defines a Dispatcher for applying changes to the DNS Resolver configuration.
  */
 class DNSResolverApplyDispatcher extends Dispatcher {
-    # Only allow one Unbound reload to occur at a time
-    public int $max_queue = 1;
-
     /**
      * Reloads the DNS Resolver and associated services.
      */

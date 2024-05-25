@@ -9,9 +9,6 @@ use RESTAPI\Core\Model;
  * Defines a Dispatcher for applying changes to the DHCP server configuration.
  */
 class DHCPServerApplyDispatcher extends Dispatcher {
-    # Only allow one DHCP server reload to occur at a time
-    public int $max_queue = 1;
-
     /**
      * Reloads the DHCP server and associated services.
      */

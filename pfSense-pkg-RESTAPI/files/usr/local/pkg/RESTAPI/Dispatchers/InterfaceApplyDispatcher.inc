@@ -8,8 +8,6 @@ use RESTAPI\Core\Dispatcher;
  * Defines a Dispatcher for applying changes to interface configurations.
  */
 class InterfaceApplyDispatcher extends Dispatcher {
-    # Do not limit the number concurrent filter reloads that can run
-    public int $max_queue = 1;
 
     /**
      * Applies pending interface changes.

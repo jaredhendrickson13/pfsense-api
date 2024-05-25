@@ -5,9 +5,9 @@ namespace RESTAPI\Dispatchers;
 use RESTAPI\Core\Dispatcher;
 
 class DNSForwarderApplyDispatcher extends Dispatcher {
-    # Only allow one Dnsmasq reload to occur at a time
-    public int $max_queue = 1;
-
+    /**
+     * Reloads the DNS Forwarder and associated services.
+     */
     public function process(...$arguments): void {
         # Reload the DNS Forwarder service
         services_dnsmasq_configure();

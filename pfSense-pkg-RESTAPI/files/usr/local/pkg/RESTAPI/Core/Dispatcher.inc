@@ -59,13 +59,13 @@ class Dispatcher {
      * After this time-frame, the process will be terminated. This ensures Dispatchers cannot spawn processes that run
      * endlessly and crash the system.
      */
-    public int $timeout = 600;
+    public int $timeout = 300;
     /**
      * @var int $max_queue
      * Sets the maximum number of processes this Dispatcher can have queued at one time.
      * Attempts to spawn processes past this limit will result in a ServiceUnavailableError error.
      */
-    public int $max_queue = 0;
+    public int $max_queue = 10;
     /**
      * @var bool $async
      * Indicates whether this Dispatcher object should spawn processes asynchronously (in the

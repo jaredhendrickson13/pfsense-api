@@ -8,9 +8,6 @@ use RESTAPI\Core\Dispatcher;
  * Defines a Dispatcher that applies pending Traffic Shaper changes.
  */
 class TrafficShaperApplyDispatcher extends Dispatcher {
-    # Do not limit the number concurrent traffic shaper reloads that can run
-    public int $max_queue = 0;
-
     /**
      * Reloads the traffic shaper services.
      */

@@ -10,7 +10,6 @@ use RESTAPI\Core\Dispatcher;
  * Defines a Dispatcher for applying changes to the HAProxy settings.
  */
 class HAProxyApplyDispatcher extends Dispatcher {
-    public int $max_queue = 1; // Only allow one HAProxy process to run at a time
     protected array $required_packages = ['pfSense-pkg-haproxy'];
     protected array $package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
 

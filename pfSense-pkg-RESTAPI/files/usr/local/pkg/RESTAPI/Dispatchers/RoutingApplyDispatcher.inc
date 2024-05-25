@@ -8,9 +8,6 @@ use RESTAPI\Core\Dispatcher;
  * Defines a Dispatcher for applying changes to the routing configuration.
  */
 class RoutingApplyDispatcher extends Dispatcher {
-    # Only allow one routing apply to occur at a time
-    public int $max_queue = 1;
-
     /**
      * Reload routing services to apply routing changes.
      */
