@@ -27,6 +27,7 @@ class APIModelsFirewallScheduleTestCase extends TestCase {
                     ],
                 ],
             ],
+            async: false,
         );
         $sched->create();
 

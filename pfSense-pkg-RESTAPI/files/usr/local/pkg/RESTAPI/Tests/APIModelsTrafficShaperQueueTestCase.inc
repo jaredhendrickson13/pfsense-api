@@ -22,7 +22,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase {
      */
     public function test_no_child_queues_when_codelq_parent(): void {
         # Create a parent CODELQ TrafficShaper
-        $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
+        $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA, async: false);
         $shaper->scheduler->value = 'CODELQ';
         $shaper->create();
 
@@ -107,7 +107,7 @@ class APIModelsTrafficShaperQueueTestCase extends TestCase {
      */
     public function test_priority_maximum_condition(): void {
         # Create a parent TrafficShaper
-        $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA);
+        $shaper = new TrafficShaper(data: self::PARENT_BASE_DATA, async: false);
         $shaper->scheduler->value = 'HFSC';
         $shaper->create();
 
