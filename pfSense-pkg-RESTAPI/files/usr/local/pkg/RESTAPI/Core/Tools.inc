@@ -280,9 +280,9 @@ function generate_documentation(): bool {
                     "**Requires authentication**: $requires_auth_str<br>" .
                     "**Supported authentication modes:** [ $auth_method_str ]<br>" .
                     "**Allowed privileges**: [ $priv_options_str ]<br>" .
-                    "**Required packages**: [ $required_packages_str ]",
-                "**Applies immediately**: $applies_immediately<br>",
-                "**Utilizes cache**: $cache_class<br>",
+                    "**Required packages**: [ $required_packages_str ]" .
+                    "**Applies immediately**: $applies_immediately<br>" .
+                    "**Utilizes cache**: $cache_class<br>",
             ];
 
             # Nest this endpoint under its assigned or assumed tag
