@@ -119,7 +119,7 @@ jobs:
         run: npm i
 
       - name: Validate OpenAPI schema
-        run: ./node_modules/.bin/spectral lint openapi-${{ matrix.pfsense_version }}.json/openapi-${{ matrix.pfsense_version }}.json
+        run: ./node_modules/.bin/spectral lint openapi-${{ matrix.pfsense_version }}.json/openapi-${{ matrix.pfsense_version }}.json --fail-severity warn
 
   check_tests:
     runs-on: self-hosted
