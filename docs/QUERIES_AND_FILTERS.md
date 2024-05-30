@@ -27,21 +27,24 @@ query filter is specified.
 
 ### Starts With (startswith)
 
-Search for objects whose field value starts with a given substring.
+Search for objects whose field value starts with a given substring for non-array fields, or search for objects whose field
+value array starts with a given value for array fields.
 
 - Name: `startswith`
 - Example: `https://pfsense.example.com/api/v2/examples?fieldname__startswith=example`
 
 ### Ends With (endswith)
 
-Search for objects whose field value ends with a given substring.
+Search for objects whose field value ends with a given substring for non-array fields, or search for objects whose field
+value array ends with a given value for array fields.
 
 - Name: `endswith`
 - Example: `https://pfsense.example.com/api/v2/examples?fieldname__endswith=example`
 
 ### Contains (contains)
 
-Search for objects whose field value contains a given substring.
+Search for objects whose field value contains a given substring for non-array fields, or search for objects whose field
+value array contains a given value for array fields.
 
 - Name: `contains`
 - Example: `https://pfsense.example.com/api/v2/examples?fieldname__contains=example`
@@ -73,14 +76,6 @@ Search for objects whose field value is greater than or equal to a given integer
 
 - Name: `gte`
 - Example: `https://pfsense.example.com/api/v2/examples?fieldname__gte=5`
-
-### Has (has)
-
-Search for objects field value is an array that has a given value. This query filter is only supported on array-type
-fields.
-
-- Name: `has`
-- Example: `https://pfsense.example.com/api/v2/examples?fieldname__has=example`
 
 ## Pagination
 
