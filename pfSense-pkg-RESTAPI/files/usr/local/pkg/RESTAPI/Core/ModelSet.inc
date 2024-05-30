@@ -14,8 +14,6 @@ require_once 'RESTAPI/autoloader.inc';
 class ModelSet {
     use BaseTraits;
 
-    const QUERY_FILTERS = ['startswith', 'endswith', 'contains', 'lt', 'lte', 'gt', 'gte', 'exact', 'except', 'has'];
-
     /**
      * @var array $model_objects An array of Model objects contained by this ModelSet.
      */
@@ -125,11 +123,11 @@ class ModelSet {
             $is_match = true;
 
             # Loop through each query parameter to determine if this object is a match
-            foreach ($query_params as $query_target => $query_value) {
+            foreach ($query_params as $query_target => $filter_value) {
                 # Loop variables
                 $query_options = $this->get_query_options($query_target);
                 $field = $query_options['field'];
-                $filter = $query_options['filter'];
+                $filter_name = $query_options['filter'];
 
                 # Skip this field if it's excluded
                 if (in_array($field, $excluded)) {
@@ -143,10 +141,11 @@ class ModelSet {
                 }
 
                 # Obtain the value for this field. If it is the ID, handle accordingly.
-                $value = $field === 'id' ? $model_object->id : $model_object->$field->value;
+                $field_value = $field === 'id' ? $model_object->id : $model_object->$field->value;
 
                 # Ensure the filter matches
-                if (!$this->$filter($value, $query_value)) {
+                $filter = QueryFilter::get_by_name($filter_name);
+                if (!$filter->evaluate($field_value, $filter_value)) {
                     $is_match = false;
                     break;
                 }
@@ -175,7 +174,7 @@ class ModelSet {
             $query_target = explode('__', $query_target);
 
             # Check if a valid query filter was specified
-            if (in_array(end($query_target), self::QUERY_FILTERS)) {
+            if (QueryFilter::get_by_name(end($query_target))) {
                 # Store the filter and remove the last item of the array.
                 $query_options['filter'] = array_pop($query_target);
             }
@@ -185,143 +184,5 @@ class ModelSet {
         }
 
         return $query_options;
-    }
-
-    /**
-     * Checks if a given value string starts with another substring.
-     * @param mixed $value The object value to evaluate.
-     * @param mixed $substr The substring to check for.
-     * @return bool `true` if $value startswith $substr. `false` if it does not.
-     */
-    private static function startswith(mixed $value, mixed $substr): bool {
-        if (str_starts_with(strval($value), strval($substr))) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a given value string ends with another substring.
-     * @param mixed $value The object value to evaluate.
-     * @param mixed $substr The substring to check for.
-     * @return bool `true` if $value endswith $substr. `false` if it does not.
-     */
-    private static function endswith(mixed $value, mixed $substr): bool {
-        if (str_ends_with(strval($value), strval($substr))) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a given value string contains with another substring.
-     * @param mixed $value The object value to evaluate.
-     * @param mixed $substr The substring to check for.
-     * @return bool `true` if $value contains $substr. `false` if it does not.
-     */
-    private static function contains(mixed $value, mixed $substr): bool {
-        if (str_contains(strval($value), strval($substr))) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a given value is within an array.
-     * @param mixed $haystack The array being evaluated.
-     * @param mixed $needle The value to check for within the $haystack.
-     * @return bool true if the $needle is in the $haystack, false otherwise.
-     * @throws ValidationError When $haystack is not an array
-     */
-    public function has(mixed $haystack, mixed $needle): bool {
-        # Throw a validation error if the $haystack is not an array
-        if (!is_array($haystack)) {
-            throw new ValidationError(
-                message: 'Query filter `has` can only be used on array Fields',
-                response_id: 'MODELSET_HAS_QUERY_MUST_BE_ARRAY_FIELD',
-            );
-        }
-
-        return in_array($needle, $haystack, strict: true);
-    }
-
-    /**
-     * Checks if two values are an exact match.
-     * @param mixed $value1 The first value to evaluate.
-     * @param mixed $value2 The second value to evaluate.
-     * @return bool `true` if the $value1 and $value2 match exactly. `false` if they do not.
-     */
-    private static function exact(mixed $value1, mixed $value2): bool {
-        return $value1 == $value2;
-    }
-
-    /**
-     * Checks if two values are not equal to each other
-     * @param mixed $value1 The first value to evaluate.
-     * @param mixed $value2 The second value to evaluate.
-     * @return bool `true` if the $value1 and $value2 do not match. `false` if they do not.
-     */
-    private static function except(mixed $value1, mixed $value2): bool {
-        return $value1 !== $value2;
-    }
-
-    /**
-     * Checks if a value is less than a specified limit.
-     * @param mixed $value The value to evaluate.
-     * @param mixed $limit The value to check if $value is less than.
-     * @return bool `true` if $value is less than $limit. `false` if it is not.
-     */
-    private function lt(mixed $value, mixed $limit): bool {
-        if (is_numeric($value) and is_numeric($limit)) {
-            if (floatval($value) < floatval($limit)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a value is less than or equal to a specified limit.
-     * @param mixed $value The value to evaluate.
-     * @param mixed $limit The value to check if $value is less than or equal to.
-     * @return bool `true` if $value is less than or equal to $limit. `false` if it is not.
-     */
-    private function lte(mixed $value, mixed $limit): bool {
-        if (is_numeric($value) and is_numeric($limit)) {
-            if (floatval($value) <= floatval($limit)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a value is greater than to a specified limit.
-     * @param mixed $value The value to evaluate.
-     * @param mixed $limit The value to check if $value is greater than.
-     * @return bool `true` if $value is greater than $limit. `false` if it is not.
-     */
-    private function gt(mixed $value, mixed $limit): bool {
-        if (is_numeric($value) and is_numeric($limit)) {
-            if (floatval($value) > floatval($limit)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a value is greater than or equal to a specified limit.
-     * @param mixed $value The value to evaluate.
-     * @param mixed $limit The value to check if $value is greater than or equal to.
-     * @return bool `true` if $value is greater than or equal to $limit. `false` if it is not.
-     */
-    private function gte(mixed $value, mixed $limit): bool {
-        if (is_numeric($value) and is_numeric($limit)) {
-            if (floatval($value) >= floatval($limit)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

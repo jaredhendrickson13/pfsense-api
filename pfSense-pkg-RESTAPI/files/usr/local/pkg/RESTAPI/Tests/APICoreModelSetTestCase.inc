@@ -216,7 +216,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
      * Checks that the ModelSet queries using the `has` (checks if an array field has a given value) filter works
      * as expected.
      */
-    public function test_query_has() {
+    public function test_query_array_contains() {
         # Create firewall alias objects to test with
         $alias_a = new FirewallAlias(data: ['name' => 'alias_a', 'type' => 'host', 'address' => ['a.co']]);
         $alias_b = new FirewallAlias(data: ['name' => 'alias_b', 'type' => 'host', 'address' => ['b.co']]);
@@ -227,8 +227,8 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $modelset = new ModelSet(model_objects: [$alias_a, $alias_b]);
 
         # Ensure the `has` query correctly identifies the targetted object(s)
-        $this->assert_equals($modelset->query(address__has: 'b.co')->first()->name->value, $alias_b->name->value);
-        $this->assert_equals($modelset->query(address__has: 'a.co')->first()->name->value, $alias_a->name->value);
+        $this->assert_equals($modelset->query(address__contains: 'b.co')->first()->name->value, $alias_b->name->value);
+        $this->assert_equals($modelset->query(address__contains: 'a.co')->first()->name->value, $alias_a->name->value);
 
         # Delete the firewall aliases
         $alias_a->delete();
