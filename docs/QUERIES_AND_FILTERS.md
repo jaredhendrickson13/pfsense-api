@@ -77,6 +77,13 @@ Search for objects whose field value is greater than or equal to a given integer
 - Name: `gte`
 - Example: `https://pfsense.example.com/api/v2/examples?fieldname__gte=5`
 
+### Regex (regex)
+
+Search for objects whose field value matches a given PCRE regular expression.
+
+- Name: `regex`
+- Example: `https://pfsense.example.com/api/v2/examples?fieldname__regex=^example`
+
 ## Pagination
 
 Pagination can be used to limit the number of items returned in a single request. Pagination is controlled by two query
