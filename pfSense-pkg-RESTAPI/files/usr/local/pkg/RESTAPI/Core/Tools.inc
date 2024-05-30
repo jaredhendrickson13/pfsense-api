@@ -186,7 +186,7 @@ function generate_documentation(): bool {
                 'url' => 'https://raw.githubusercontent.com/jaredhendrickson13/pfsense-api/master/LICENSE',
             ],
             'description' =>
-                '## Getting Started' .
+                '### Getting Started' .
                 '<br>' .
                 '- [Authentication and Authorization](https://pfrest.org/AUTHENTICATION_AND_AUTHORIZATION/)<br>' .
                 '- [Working with Object IDs](https://pfrest.org/WORKING_WITH_OBJECT_IDS/)<br>' .
@@ -280,9 +280,9 @@ function generate_documentation(): bool {
                     "**Requires authentication**: $requires_auth_str<br>" .
                     "**Supported authentication modes:** [ $auth_method_str ]<br>" .
                     "**Allowed privileges**: [ $priv_options_str ]<br>" .
-                    "**Required packages**: [ $required_packages_str ]" .
+                    "**Required packages**: [ $required_packages_str ]<br>" .
                     "**Applies immediately**: $applies_immediately<br>" .
-                    "**Utilizes cache**: $cache_class<br>",
+                    "**Utilizes cache**: $cache_class",
             ];
 
             # Nest this endpoint under its assigned or assumed tag
