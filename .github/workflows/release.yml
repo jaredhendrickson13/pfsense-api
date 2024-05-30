@@ -146,6 +146,7 @@ jobs:
           cp pfSense-pkg-RESTAPI/files/usr/local/www/api/swagger/index.css ./www/api-docs/index.css
           cp openapi.json/openapi.json ./www/api-docs/openapi.json
           echo 'window.onload = function() {
+                  document.title = "pfSense REST API Documentation";
                   window.ui = SwaggerUIBundle({
                   url: "/api-docs/openapi.json",
                   dom_id: "#swagger-ui",
