@@ -158,7 +158,8 @@ jobs:
                     SwaggerUIBundle.plugins.DownloadUrl
                   ],
                   layout: "StandaloneLayout",
-                  supportedSubmitMethods: []
+                  supportedSubmitMethods: [],
+                  validatorUrl: null
                 });
               };' > ./www/api-docs/swagger-initializer.js
 
