@@ -2,13 +2,11 @@
 
 namespace RESTAPI\QueryFilters;
 
-require_once('RESTAPI/autoloader.inc');
-
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\QueryFilter;
 
-class ContainsQueryFilter extends QueryFilter
-{
+class ContainsQueryFilter extends QueryFilter {
     public string $name = 'contains';
 
     /**
@@ -18,12 +16,11 @@ class ContainsQueryFilter extends QueryFilter
      * @param mixed $filter_value The value of the filter criteria to evaluate against.
      * @return bool true if the field_value contains the filter_value, false otherwise.
      */
-    public function evaluate(mixed $field_value, mixed $filter_value): bool
-    {
+    public function evaluate(mixed $field_value, mixed $filter_value): bool {
         if (is_array($field_value)) {
             return in_array($filter_value, $field_value);
         }
 
-        return (str_contains(strval($field_value), strval($filter_value)));
+        return str_contains(strval($field_value), strval($filter_value));
     }
 }

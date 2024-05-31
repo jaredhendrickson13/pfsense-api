@@ -8,8 +8,7 @@ use RESTAPI\QueryFilters\EndsWithQueryFilter;
 use RESTAPI\QueryFilters\ExactQueryFilter;
 use RESTAPI\QueryFilters\StartsWithQueryFilter;
 
-class APIQueryFiltersEndsWithQueryFilterTestCase extends TestCase
-{
+class APIQueryFiltersEndsWithQueryFilterTestCase extends TestCase {
     /**
      * Checks that the 'evaluate' method correctly returns true when the field value ends with the filter value.
      */

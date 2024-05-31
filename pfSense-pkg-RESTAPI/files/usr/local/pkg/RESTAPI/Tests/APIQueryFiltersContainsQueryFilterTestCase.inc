@@ -6,8 +6,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\QueryFilters\ContainsQueryFilter;
 use RESTAPI\QueryFilters\ExactQueryFilter;
 
-class APIQueryFiltersContainsQueryFilterTestCase extends TestCase
-{
+class APIQueryFiltersContainsQueryFilterTestCase extends TestCase {
     /**
      * Checks that the 'evaluate' method correctly returns true when the field value contains the filter value.
      */
@@ -23,6 +22,5 @@ class APIQueryFiltersContainsQueryFilterTestCase extends TestCase
         $this->assert_is_true($filter->evaluate(['test', 'test2'], 'test'));
         $this->assert_is_true($filter->evaluate(['test', 'test2'], 'test2'));
         $this->assert_is_false($filter->evaluate(['test', 'test2'], 'test3'));
-
     }
 }

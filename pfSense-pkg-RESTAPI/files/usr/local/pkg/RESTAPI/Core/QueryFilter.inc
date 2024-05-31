@@ -7,8 +7,7 @@ use RESTAPI\Responses\NotFoundError;
 /**
  * Defines a query filter that can be used to further filter a ModelSet's 'model_objects'.
  */
-abstract class QueryFilter
-{
+abstract class QueryFilter {
     use BaseTraits;
 
     /**
@@ -28,16 +27,15 @@ abstract class QueryFilter
      * Obtains an array of all available QueryFilter names.
      * @return array An array of all available QueryFilter names.
      */
-     public static function get_all_names(): array
-     {
-         $filter_classes = Tools\get_classes_from_namespace(namespace: "\\RESTAPI\\QueryFilters\\");
-         $filters = [];
-         foreach ($filter_classes as $filter_class) {
-             $filter = new $filter_class();
-             $filters[] = $filter->name;
-         }
-         return $filters;
-     }
+    public static function get_all_names(): array {
+        $filter_classes = Tools\get_classes_from_namespace(namespace: '\\RESTAPI\\QueryFilters\\');
+        $filters = [];
+        foreach ($filter_classes as $filter_class) {
+            $filter = new $filter_class();
+            $filters[] = $filter->name;
+        }
+        return $filters;
+    }
 
     /**
      * Obtains the QueryFilter object associated with the given name.
@@ -47,7 +45,7 @@ abstract class QueryFilter
      */
     public static function get_by_name(string $name): QueryFilter {
         # Get all available QueryFilter classes
-        $filter_classes = Tools\get_classes_from_namespace(namespace: "\\RESTAPI\\QueryFilters\\");
+        $filter_classes = Tools\get_classes_from_namespace(namespace: '\\RESTAPI\\QueryFilters\\');
 
         # Iterate through each QueryFilter class and return the one with the matching name
         foreach ($filter_classes as $filter_class) {
@@ -60,7 +58,7 @@ abstract class QueryFilter
         # If no matching QueryFilter class was found, throw an error
         throw new NotFoundError(
             message: "No QueryFilter class found with the name '$name'.",
-            response_id: "QUERY_FILTER_NOT_FOUND"
+            response_id: 'QUERY_FILTER_NOT_FOUND',
         );
     }
 }

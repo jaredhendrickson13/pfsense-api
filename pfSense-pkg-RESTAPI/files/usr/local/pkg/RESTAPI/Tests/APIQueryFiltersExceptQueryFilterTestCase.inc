@@ -6,8 +6,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\QueryFilters\ExactQueryFilter;
 use RESTAPI\QueryFilters\ExceptQueryFilter;
 
-class APIQueryFiltersExceptQueryFilterTestCase extends TestCase
-{
+class APIQueryFiltersExceptQueryFilterTestCase extends TestCase {
     /**
      * Checks that the 'evaluate' method correctly returns true when the field value does not match the filter value.
      */

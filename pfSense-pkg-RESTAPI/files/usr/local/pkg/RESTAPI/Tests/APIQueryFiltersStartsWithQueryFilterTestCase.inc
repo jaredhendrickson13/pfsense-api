@@ -7,8 +7,7 @@ use RESTAPI\QueryFilters\ContainsQueryFilter;
 use RESTAPI\QueryFilters\ExactQueryFilter;
 use RESTAPI\QueryFilters\StartsWithQueryFilter;
 
-class APIQueryFiltersStartsWithQueryFilterTestCase extends TestCase
-{
+class APIQueryFiltersStartsWithQueryFilterTestCase extends TestCase {
     /**
      * Checks that the 'evaluate' method correctly returns true when the field value starts with the filter value.
      */

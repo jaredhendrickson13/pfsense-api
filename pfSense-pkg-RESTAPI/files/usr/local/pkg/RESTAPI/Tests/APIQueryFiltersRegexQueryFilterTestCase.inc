@@ -7,8 +7,7 @@ use RESTAPI\QueryFilters\ContainsQueryFilter;
 use RESTAPI\QueryFilters\ExactQueryFilter;
 use RESTAPI\QueryFilters\RegexQueryFilter;
 
-class APIQueryFiltersRegexQueryFilterTestCase extends TestCase
-{
+class APIQueryFiltersRegexQueryFilterTestCase extends TestCase {
     /**
      * Checks that the 'evaluate' method correctly returns true when the field value matches a given regex pattern.
      */

@@ -2,12 +2,11 @@
 
 namespace RESTAPI\QueryFilters;
 
-require_once('RESTAPI/autoloader.inc');
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\QueryFilter;
 
-class ExceptQueryFilter extends QueryFilter
-{
+class ExceptQueryFilter extends QueryFilter {
     public string $name = 'except';
 
     /**
@@ -16,8 +15,7 @@ class ExceptQueryFilter extends QueryFilter
      * @param mixed $filter_value The value of the filter criteria to evaluate against.
      * @return bool true if the field_value does not match the filter_value, false otherwise.
      */
-    public function evaluate(mixed $field_value, mixed $filter_value): bool
-    {
+    public function evaluate(mixed $field_value, mixed $filter_value): bool {
         return $field_value != $filter_value;
     }
 }

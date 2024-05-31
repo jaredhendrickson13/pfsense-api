@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\QueryFilters\ExactQueryFilter;
 
-class APIQueryFiltersExactQueryFilterTestCase extends TestCase
-{
+class APIQueryFiltersExactQueryFilterTestCase extends TestCase {
     /**
      * Checks that the 'evaluate' method correctly returns true when the field value matches the filter value exactly.
      */
