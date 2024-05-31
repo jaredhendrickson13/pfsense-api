@@ -4,10 +4,10 @@
 
 Queries can be used to filter the data that is returned from the API based on specific criteria. Queries are passed as
 query parameters in the URL and are formatted as `key=value`. Multiple queries can be passed in a single request by
-separating them with an ampersand `&`. There are a couple of requirements for using queries with the REST API:
+separating them with an ampersand `&`.
 
-- Queries are only available for `GET` requests to endpoints.
-- Queries are only available on endpoints that return a list of items in the `data` section of the response.
+!!! Note
+    Queries are only available for `GET` requests to [plural endpoints](./ENDPOINT_TYPES.md#plural-many-endpoints).
 
 ## Query Filters
 
@@ -84,6 +84,11 @@ Search for objects whose field value matches a given PCRE regular expression.
 - Name: `regex`
 - Example: `https://pfsense.example.com/api/v2/examples?fieldname__regex=^example`
 
+## Custom Query Filters
+
+For advanced users, the REST API's framework allows for custom query filter classes to be added using PHP. Refer to
+[Building Custom Query Filters](./BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md) for more information.
+
 ## Pagination
 
 Pagination can be used to limit the number of items returned in a single request. Pagination is controlled by two query
@@ -92,5 +97,6 @@ parameter specifies the starting index of the items to return. Pagination is use
 reduce the amount of data returned in a single request.
 
 !!! Important
-    By default, the REST API does not paginate responses. If you want to paginate the response, you must include the
+    - By default, the REST API does not paginate responses. If you want to paginate the response, you must include the
     `limit` and `offset` query parameters in your request.
+    - Pagination is only available for `GET` requests to [plural endpoints](./ENDPOINT_TYPES.md#plural-many-endpoints).

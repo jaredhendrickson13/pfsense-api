@@ -83,50 +83,8 @@ curl -H "Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx" https://pfsense.example.
 
 ### Custom Authentication
 
-For advanced users, the REST API's framework allows for custom authentication methods to be added using PHP. To add a custom
-authentication method, extend the `\RESTAPI\Core\Auth` class and implement the `_authenticate` method. This method simply
-needs to return a boolean value indicating if the user is authenticated or not. Below is an example of a custom Auth class:
-
-```php
-<?php
-
-namespace RESTAPI\Auth;
-
-require_once "RESTAPI/autoloader.inc";
-
-use RESTAPI\Core\Auth;
-
-class MyCustomAuth extends Auth
-{
-  # Defines a human-readable name for your custom auth method
-  public ?string $verbose_name = "My Custom Auth";
-
-  # Tells OpenAPI how to use your custom auth method in the Swagger documentation. In this example, we are telling
-  # OpenAPI to check for an authentication secret in the HTTP header named 'custom-header-name'
-  public array $security_scheme = [
-    "type" => "apiKey",
-    "in" => "header",
-    "name" => "custom-header-name",
-  ];
-
-  public function _authenticate(): bool
-  {
-    # Add your custom authentication logic here
-    if ($my_custom_auth_logic) {
-      return true;
-    }
-
-    # Return false if authentication fails
-    return false;
-  }
-}
-```
-
-Once your custom Auth class is created, simply place it at `/usr/local/pkg/RESTAPI/Auth/MyCustomAuth.inc` and it will
-automatically become an available authentication method in the REST API settings.
-
-!!! Note
-    Rename `MyCustomAuth` to any name you like, but make sure the class name matches the file name.
+For advanced users, the REST API's framework allows for custom authentication methods to be added using PHP. See
+[Building Custom Authentication](./BUILDING_CUSTOM_AUTH_CLASSES.md) for more information.
 
 ## Authorization
 

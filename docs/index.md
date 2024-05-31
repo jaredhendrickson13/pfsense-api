@@ -12,7 +12,7 @@ provide you with the information you need to configure and use the package effec
 
 ## Key Features
 
-- 80+ endpoints available for managing your firewall and associated services
+- 100+ endpoints available for managing your firewall and associated services
 - Easy to use querying and filtering
 - Configurable security settings
 - Supports HATEOAS driven development
