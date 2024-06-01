@@ -142,17 +142,20 @@ if (isset($_POST["save"])) {
     # Validate subnets within the specified access list
     if (!empty($_POST["access_list"])) {
         # Convert access list to array and remove line breaks
-        $access_list = explode(" ", $_POST["access_list"]);
+        $access_list_raw = explode(" ", $_POST["access_list"]);
+        $access_list = [];
 
         # Check each subnet within the access list to ensure it is valid
-        foreach ($access_list as $subnet) {
+        foreach ($access_list_raw as $subnet) {
+            $subnet = trim($subnet);
             if (!is_subnet($subnet)) {
                 $input_errors[] = "Access list entry '".$subnet."' is not a valid IPv4 or IPv6 CIDR.";
                 $has_errors = true;
                 break;
             }
+            $access_list[] = $subnet;
         }
-        $pkg_config["access_list"] = $_POST["access_list"];
+        $pkg_config["access_list"] = implode(" ", $access_list);
     } else {
         $pkg_config["access_list"] = "";
     }
