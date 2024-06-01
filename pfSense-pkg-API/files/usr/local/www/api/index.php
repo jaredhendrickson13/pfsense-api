@@ -148,6 +148,13 @@ if (isset($_POST["save"])) {
         # Check each subnet within the access list to ensure it is valid
         foreach ($access_list_raw as $subnet) {
             $subnet = trim($subnet);
+
+            # Skip this subnet if it is empty
+            if (empty($subnet)) {
+                continue;
+            }
+
+            # Ensure the subnet is a valid IPv4 or IPv6 CIDR
             if (!is_subnet($subnet)) {
                 $input_errors[] = "Access list entry '".$subnet."' is not a valid IPv4 or IPv6 CIDR.";
                 $has_errors = true;
