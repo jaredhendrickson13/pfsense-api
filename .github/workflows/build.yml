@@ -20,6 +20,8 @@ jobs:
         include:
           - freebsd_version: FreeBSD-14.0-CURRENT
             freebsd_id: freebsd14
+          - freebsd_version: FreeBSD-15.0-CURRENT
+            freebsd_id: freebsd15
 
     steps:
       - uses: actions/checkout@v4
