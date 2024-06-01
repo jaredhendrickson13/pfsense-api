@@ -729,7 +729,7 @@ class Field {
             # If this is a $many field, query for any other object has this value in the array
             if ($this->many) {
                 $query = $modelset->query(
-                    query_params: ['id__except' => $this->context->id, "{$this->name}__has" => $value],
+                    query_params: ['id__except' => $this->context->id, "{$this->name}__contains" => $value],
                 );
             }
             # Otherwise, query for any other of the parent context's Model objects with the same exact field value
