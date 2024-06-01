@@ -19,6 +19,11 @@ class ExactQueryFilter extends QueryFilter {
      * @return bool true if the field_value matches the filter_value, false otherwise.
      */
     public function evaluate(mixed $field_value, mixed $filter_value): bool {
+        # If either value is null, use strict comparison to check if they are equal.
+        if ($field_value === null or $filter_value === null) {
+            return $field_value === $filter_value;
+        }
+
         return $field_value == $filter_value;
     }
 }

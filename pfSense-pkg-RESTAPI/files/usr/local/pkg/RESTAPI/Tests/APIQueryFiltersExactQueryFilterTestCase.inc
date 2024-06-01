@@ -13,5 +13,6 @@ class APIQueryFiltersExactQueryFilterTestCase extends TestCase {
         $query_filter = new ExactQueryFilter();
         $this->assert_is_true($query_filter->evaluate('test', 'test'));
         $this->assert_is_false($query_filter->evaluate('test', 'test2'));
+        $this->assert_is_false($query_filter->evaluate(0, null));
     }
 }
