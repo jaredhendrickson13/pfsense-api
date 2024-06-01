@@ -137,7 +137,7 @@ class DHCPServerAddressPool extends Model {
             default: [],
             allow_empty: true,
             many: true,
-            many_maximum: 3,
+            many_maximum: 4,
             maximum_length: 256,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: true)],
