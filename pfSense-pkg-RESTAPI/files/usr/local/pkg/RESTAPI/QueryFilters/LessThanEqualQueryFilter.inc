@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\QueryFilter;
 
+/**
+ * Defines a query filter that checks if the given field value is less than or equal to the given filter value.
+ */
 class LessThanEqualQueryFilter extends QueryFilter {
     public string $name = 'lte';
 

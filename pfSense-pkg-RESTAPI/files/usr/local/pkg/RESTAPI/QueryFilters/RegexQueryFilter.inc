@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\QueryFilter;
 
+/**
+ * Defines a query filter that checks if the given field value matches the given filter value using a regular expression.
+ */
 class RegexQueryFilter extends QueryFilter {
     public string $name = 'regex';
 

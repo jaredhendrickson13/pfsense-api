@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\QueryFilter;
 
+/**
+ * Defines a query filter that checks if the given field value does not match the given filter value exactly.
+ */
 class ExceptQueryFilter extends QueryFilter {
     public string $name = 'except';
 

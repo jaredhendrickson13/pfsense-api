@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\QueryFilter;
 
+/**
+ * Defines a query filter that checks if the given field value contains the given filter value.
+ */
 class ContainsQueryFilter extends QueryFilter {
     public string $name = 'contains';
 

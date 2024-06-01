@@ -6,6 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\QueryFilter;
 
+/**
+ * Defines a query filter that checks if the given field value is greater than the given filter value.
+ */
 class GreaterThanQueryFilter extends QueryFilter {
     public string $name = 'gt';
 
