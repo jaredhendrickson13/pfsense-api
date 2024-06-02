@@ -855,7 +855,8 @@ class Field {
         if ($this->representation_only or is_null($internal_value) and $this->type !== 'boolean') {
             # Check if this field has a default, if so, use the default value
             if ($this->default and $this->are_conditions_met()) {
-                $internal_value = $this->default;
+                $this->value = $this->default;
+                return;
             }
             # Otherwise, just assume the value is null
             else {
