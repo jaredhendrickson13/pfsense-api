@@ -103,8 +103,7 @@ class APIModelsPortForwardTestCase extends TestCase {
 
         # Ensure the pure NAT reflection rule is no longer present and the NAT proxy rule is present
         $rules_debug = file_get_contents('/tmp/rules.debug');
-        $natproxy_rule =
-            "rdr on { {$this->env['PFREST_LAN_IF']} openvpn } proto tcp from any to 127.3.2.1 port 8443 tag PFREFLECT -> 127.0.0.1 port 19000";
+        $natproxy_rule = "rdr on { {$this->env['PFREST_LAN_IF']} openvpn } proto tcp from any to 127.3.2.1 port 8443 tag PFREFLECT -> 127.0.0.1 port 19000";
         $this->assert_str_does_not_contain($rules_debug, $purenat_rule);
         $this->assert_str_contains($rules_debug, $natproxy_rule);
 

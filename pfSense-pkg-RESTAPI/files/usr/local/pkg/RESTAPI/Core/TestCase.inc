@@ -141,11 +141,10 @@ class TestCase {
     /**
      * Obtains the environment variable with a given name.
      */
-    protected function get_envs(): void
-    {
-        $this->env["PFREST_WAN_IF"] = getenv("PFREST_WAN_IF") ?: "em0";
-        $this->env["PFREST_LAN_IF"] = getenv("PFREST_LAN_IF") ?: "em1";
-        $this->env["PFREST_OPT1_IF"] = getenv("PFREST_OPT1_IF") ?: "em2";
+    protected function get_envs(): void {
+        $this->env['PFREST_WAN_IF'] = getenv('PFREST_WAN_IF') ?: 'em0';
+        $this->env['PFREST_LAN_IF'] = getenv('PFREST_LAN_IF') ?: 'em1';
+        $this->env['PFREST_OPT1_IF'] = getenv('PFREST_OPT1_IF') ?: 'em2';
     }
 
     /**

@@ -267,12 +267,18 @@ class APIModelsDHCPServerTestCase extends TestCase {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->enable->value = false;
         $dhcp_server->update();
-        $this->assert_str_does_not_contain((new Command('ps aux'))->output, "-pf /var/run/dhcpd.pid {$this->env['PFREST_LAN_IF']}");
+        $this->assert_str_does_not_contain(
+            (new Command('ps aux'))->output,
+            "-pf /var/run/dhcpd.pid {$this->env['PFREST_LAN_IF']}",
+        );
 
         # Enable the DHCP server and ensure the `dhcpd` process is now running
         $dhcp_server->enable->value = true;
         $dhcp_server->update();
-        $this->assert_str_contains((new Command('ps aux'))->output, "-pf /var/run/dhcpd.pid {$this->env['PFREST_LAN_IF']}");
+        $this->assert_str_contains(
+            (new Command('ps aux'))->output,
+            "-pf /var/run/dhcpd.pid {$this->env['PFREST_LAN_IF']}",
+        );
     }
 
     /**

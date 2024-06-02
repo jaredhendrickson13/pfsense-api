@@ -16,7 +16,7 @@ class APIModelsStaticRouteTestCase extends TestCase {
         # Create an interface to use for testing
         $test_if = new NetworkInterface(
             data: [
-                'if' => $this->env["PFREST_OPT1_IF"],
+                'if' => $this->env['PFREST_OPT1_IF'],
                 'enable' => true,
                 'descr' => 'TESTIF',
                 'typev4' => 'static',
@@ -122,7 +122,7 @@ class APIModelsStaticRouteTestCase extends TestCase {
         # Create an interface to use for testing
         $test_if = new NetworkInterface(
             data: [
-                'if' => $this->env["PFREST_OPT1_IF"],
+                'if' => $this->env['PFREST_OPT1_IF'],
                 'enable' => true,
                 'descr' => 'TESTIF',
                 'typev4' => 'static',

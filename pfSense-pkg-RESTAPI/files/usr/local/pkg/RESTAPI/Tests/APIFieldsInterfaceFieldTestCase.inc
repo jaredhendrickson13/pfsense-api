@@ -38,8 +38,8 @@ class APIFieldsInterfaceFieldTestCase extends TestCase {
         $api_settings->update();
         $test_field = new InterfaceField();
         $test_field->set_choices_from_callable();
-        $this->assert_is_true(in_array($this->env["PFREST_WAN_IF"], $test_field->choices));
-        $this->assert_is_true(in_array($this->env["PFREST_LAN_IF"], $test_field->choices));
+        $this->assert_is_true(in_array($this->env['PFREST_WAN_IF'], $test_field->choices));
+        $this->assert_is_true(in_array($this->env['PFREST_LAN_IF'], $test_field->choices));
 
         # Check that allowed keywords are present when set
         $test_field = new InterfaceField(allow_localhost_interface: true);
@@ -104,7 +104,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase {
         $api_settings->represent_interfaces_as->value = 'if';
         $api_settings->update();
         $test_field = new InterfaceField();
-        $test_field->value = $this->env["PFREST_WAN_IF"];
+        $test_field->value = $this->env['PFREST_WAN_IF'];
         $this->assert_equals($test_field->to_internal(), 'wan');
     }
 
@@ -135,6 +135,6 @@ class APIFieldsInterfaceFieldTestCase extends TestCase {
         $api_settings->update();
         $test_field = new InterfaceField();
         $test_field->from_internal('wan');
-        $this->assert_equals($test_field->value, $this->env["PFREST_WAN_IF"]);
+        $this->assert_equals($test_field->value, $this->env['PFREST_WAN_IF']);
     }
 }

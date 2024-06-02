@@ -13,7 +13,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
         # Create a new VLAN interface
         $test_vlan = new InterfaceVLAN(
             data: [
-                'if' => $this->env["PFREST_LAN_IF"],
+                'if' => $this->env['PFREST_LAN_IF'],
                 'tag' => 2,
                 'pcp' => 4,
             ],
@@ -54,7 +54,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
         # Create a new VLAN interface
         $test_vlan = new InterfaceVLAN(
             data: [
-                'if' => $this->env["PFREST_LAN_IF"],
+                'if' => $this->env['PFREST_LAN_IF'],
                 'tag' => 5,
             ],
         );
@@ -68,7 +68,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
                 # Create a new VLAN interface
                 $bad_vlan = new InterfaceVLAN(
                     data: [
-                        'if' => $this->env["PFREST_LAN_IF"],
+                        'if' => $this->env['PFREST_LAN_IF'],
                         'tag' => 5,
                     ],
                 );
