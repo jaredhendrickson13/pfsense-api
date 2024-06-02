@@ -187,7 +187,7 @@ class RESTAPIVersion extends Model {
                 }
 
                 # Only include releases for this version of pfSense
-                if (str_starts_with($asset['name'], 'pfSense-' . $pf_version->base->value)) {
+                if ($asset['name'] === 'pfSense-' . $pf_version->base->value . '-pkg-RESTAPI.pkg') {
                     # The first item of our list is the latest release, mark it as such.
                     if ($count === 0) {
                         $versions[$release['tag_name']] = $release['name'] . ' - Latest';
