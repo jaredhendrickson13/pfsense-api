@@ -5,13 +5,36 @@
 
 version: 2
 updates:
+  # MASTER BRANCH (v2)
   - package-ecosystem: "composer"
     directory: "/"
     target-branch: "master"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "pip"
     directory: "/"
     target-branch: "master"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "master"
+    schedule:
+      interval: "monthly"
+
+  # LEGACY BRANCH (v1)
+  - package-ecosystem: "composer"
+    directory: "/"
+    target-branch: "legacy"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "pip"
+    directory: "/"
+    target-branch: "legacy"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "legacy"
+    schedule:
+      interval: "monthly"
