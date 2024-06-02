@@ -153,7 +153,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         # Create a new interface VLAN
         $vlan = new InterfaceVLAN(
             data: [
-                'if' => 'em2',
+                'if' => $this->env["PFREST_OPT1_IF"],
                 'tag' => 2,
             ],
         );
@@ -162,7 +162,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         # Configure the MTU on the VLANs parent interface
         $parent_if = new NetworkInterface(
             data: [
-                'if' => 'em2',
+                'if' => $this->env["PFREST_OPT1_IF"],
                 'enable' => true,
                 'descr' => 'test_parent',
                 'mtu' => 1450,
@@ -181,7 +181,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
                 # Try to configure the VLAN interface with an MTU higher than the parent's
                 $vlan_if = new NetworkInterface(
                     data: [
-                        'if' => 'em2.2',
+                        'if' => "{$this->env['PFREST_OPT1_IF']}.2",
                         'descr' => 'test_vlan_if',
                         'mtu' => 1500,
                         'typev4' => 'none',
@@ -593,7 +593,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         # Create a new 6to4 typev6 interface
         $if_6to4 = new NetworkInterface(
             data: [
-                'if' => 'em2',
+                'if' => $this->env["PFREST_OPT1_IF"],
                 'descr' => 'test_6to4',
                 'typev4' => 'none',
                 'typev6' => '6to4',
@@ -623,7 +623,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         # Create a static IPv6 interface to test with
         $test_model = new NetworkInterface(
             data: [
-                'if' => 'em2',
+                'if' => $this->env["PFREST_OPT1_IF"],
                 'descr' => 'testv6',
                 'typev4' => 'none',
                 'typev6' => 'staticv6',
@@ -675,7 +675,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
     public function test_get_supported_media() {
         # Create a model object to test with
         $test_model = new NetworkInterface();
-        $test_model->if->value = 'em0';
+        $test_model->if->value = $this->env["PFREST_WAN_IF"];
 
         # Run ifconfig to gather interface details
         exec("/sbin/ifconfig -m {$test_model->if->value} | grep \"media \"", $ifconfig_output);
@@ -704,7 +704,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         # Create a NetworkInterface object to test with
         $test_model = new NetworkInterface(
             data: [
-                'if' => 'em2',
+                'if' => $this->env["PFREST_OPT1_IF"],
                 'enable' => true,
                 'descr' => 'testif',
                 'typev4' => 'static',
@@ -772,10 +772,10 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         $test_model = new NetworkInterface();
 
         # Ensure the wan interface is found
-        $this->assert_is_true(array_key_exists('em0', $test_model->get_all_avail_interfaces()));
+        $this->assert_is_true(array_key_exists($this->env["PFREST_WAN_IF"], $test_model->get_all_avail_interfaces()));
 
         # Ensure the lan interface is found
-        $this->assert_is_true(array_key_exists('em1', $test_model->get_all_avail_interfaces()));
+        $this->assert_is_true(array_key_exists($this->env["PFREST_LAN_IF"], $test_model->get_all_avail_interfaces()));
     }
 
     /**
@@ -786,7 +786,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         # Create a new static NetworkInterface
         $static_if = new NetworkInterface(
             data: [
-                'if' => 'em2',
+                'if' => $this->env["PFREST_OPT1_IF"],
                 'descr' => 'teststatic',
                 'enable' => true,
                 'spoofmac' => '00:00:00:00:00:00',
@@ -803,7 +803,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         $static_if->create(apply: true);
 
         # Run ifconfig to check the configured interface's values
-        exec('ifconfig em2', $ifconfig_output);
+        exec("ifconfig {$this->env['PFREST_OPT1_IF']}", $ifconfig_output);
         $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
 
         # Ensure the interface's mtu is shown by ifconfig
@@ -832,7 +832,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         $static_if->update(apply: true);
 
         # Run ifconfig to check the configured interface's new values
-        exec('ifconfig em2', $ifconfig_output);
+        exec("ifconfig {$this->env['PFREST_OPT1_IF']}", $ifconfig_output);
         $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
 
         # Ensure the interface's new mtu is shown by ifconfig
@@ -850,7 +850,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase {
         $static_if->delete();
 
         # Run ifconfig to check the configured interface's deleted values
-        exec('ifconfig em2', $ifconfig_output);
+        exec("ifconfig {$this->env['PFREST_OPT1_IF']}", $ifconfig_output);
         $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
 
         # Ensure the new static IPv4 address is not shown by ifconfig

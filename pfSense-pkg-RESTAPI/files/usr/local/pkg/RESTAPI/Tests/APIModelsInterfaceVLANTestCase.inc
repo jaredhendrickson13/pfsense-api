@@ -13,7 +13,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
         # Create a new VLAN interface
         $test_vlan = new InterfaceVLAN(
             data: [
-                'if' => 'em1',
+                'if' => $this->env["PFREST_LAN_IF"],
                 'tag' => 2,
                 'pcp' => 4,
             ],
@@ -21,7 +21,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
         $test_vlan->create();
 
         # Ensure the newly created VLAN is correctly configuring by checking ifconfig
-        $ifconfig_output = shell_exec('ifconfig em1.2');
+        $ifconfig_output = shell_exec("ifconfig {$this->env['PFREST_LAN_IF']}.2");
         $this->assert_str_contains($ifconfig_output, 'vlan: 2');
         $this->assert_str_contains($ifconfig_output, 'vlanpcp: 4');
 
@@ -31,11 +31,11 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
         $test_vlan->update();
 
         # Ensure the old VLAN is no longer present
-        $ifconfig_output = shell_exec('ifconfig em1.2');
+        $ifconfig_output = shell_exec("ifconfig {$this->env['PFREST_LAN_IF']}.2");
         $this->assert_equals($ifconfig_output, null);
 
         # Ensure the new VLAN is present
-        $ifconfig_output = shell_exec('ifconfig em1.55');
+        $ifconfig_output = shell_exec("ifconfig {$this->env['PFREST_LAN_IF']}.55");
         $this->assert_str_contains($ifconfig_output, 'vlan: 55');
         $this->assert_str_contains($ifconfig_output, 'vlanpcp: 7');
 
@@ -43,7 +43,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
         $test_vlan->delete();
 
         # Ensure the VLAN is no longer present
-        $ifconfig_output = shell_exec('ifconfig em1.55');
+        $ifconfig_output = shell_exec("ifconfig {$this->env['PFREST_LAN_IF']}.55");
         $this->assert_equals($ifconfig_output, null);
     }
 
@@ -54,7 +54,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
         # Create a new VLAN interface
         $test_vlan = new InterfaceVLAN(
             data: [
-                'if' => 'em1',
+                'if' => $this->env["PFREST_LAN_IF"],
                 'tag' => 5,
             ],
         );
@@ -68,7 +68,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
                 # Create a new VLAN interface
                 $bad_vlan = new InterfaceVLAN(
                     data: [
-                        'if' => 'em1',
+                        'if' => $this->env["PFREST_LAN_IF"],
                         'tag' => 5,
                     ],
                 );

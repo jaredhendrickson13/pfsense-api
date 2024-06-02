@@ -34,6 +34,11 @@ class TestCase {
     public array $required_packages = [];
 
     /**
+     * @var array An array of known environment variables that are available to this TestCase.
+     */
+    public array $env = [];
+
+    /**
      * Runs this TestCase when the object is created. Any method that starts with `test` will automatically be run.
      * @throws ReflectionException When ReflectionMethod could not find a test method.
      * @throws Error|Exception The exception thrown by failed Tests, typically an AssertionError.
@@ -41,6 +46,9 @@ class TestCase {
     public function run(): void {
         # Need direct config access to revert any changes made by Tests
         global $config;
+
+        # Collect available environment variables
+        $this->get_envs();
 
         # use a property to keep track of the method that is currently running
         $this->method = 'unknown';
@@ -128,6 +136,16 @@ class TestCase {
      * that may have been created during tests.
      */
     public function teardown(): void {
+    }
+
+    /**
+     * Obtains the environment variable with a given name.
+     */
+    protected function get_envs(): void
+    {
+        $this->env["PFREST_WAN_IF"] = getenv("PFREST_WAN_IF") ?: "em0";
+        $this->env["PFREST_LAN_IF"] = getenv("PFREST_LAN_IF") ?: "em1";
+        $this->env["PFREST_OPT1_IF"] = getenv("PFREST_OPT1_IF") ?: "em2";
     }
 
     /**

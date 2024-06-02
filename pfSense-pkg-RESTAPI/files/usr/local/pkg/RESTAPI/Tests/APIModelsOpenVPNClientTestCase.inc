@@ -142,7 +142,7 @@ class APIModelsOpenVPNClientTestCase extends TestCase {
      */
     public function test_ipv4_client_must_use_ipv4_interface(): void {
         # Create a new interface without an IPv4 address
-        $if = new NetworkInterface(if: 'em2', descr: 'OVPNTEST', typev4: 'none', typev6: 'none');
+        $if = new NetworkInterface(if: $this->env["PFREST_OPT1_IF"], descr: 'OVPNTEST', typev4: 'none', typev6: 'none');
         $if->create();
 
         # Ensure an IPv4 only OpenVPNClient cannot be created on the interface without an IPv4 address
@@ -164,7 +164,7 @@ class APIModelsOpenVPNClientTestCase extends TestCase {
      */
     public function test_ipv6_client_must_use_ipv6_interface(): void {
         # Create a new interface without an IPv6 address
-        $if = new NetworkInterface(if: 'em2', descr: 'OVPNTEST', typev4: 'none', typev6: 'none');
+        $if = new NetworkInterface(if: $this->env["PFREST_OPT1_IF"], descr: 'OVPNTEST', typev4: 'none', typev6: 'none');
         $if->create();
 
         # Ensure an IPv4 only OpenVPNClient cannot be created on the interface without an IPv4 address

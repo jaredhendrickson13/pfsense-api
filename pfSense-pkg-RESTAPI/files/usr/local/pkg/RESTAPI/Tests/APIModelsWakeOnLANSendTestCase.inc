@@ -14,7 +14,7 @@ class APIModelsWakeOnLANSendTestCase extends TestCase {
         # Create an interface without an IP
         $if = new NetworkInterface(
             data: [
-                'if' => 'em2',
+                'if' => $this->env["PFREST_OPT1_IF"],
                 'descr' => 'test',
                 'typev4' => 'none',
                 'typev6' => 'none',

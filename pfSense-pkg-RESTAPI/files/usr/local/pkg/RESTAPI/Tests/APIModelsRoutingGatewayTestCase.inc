@@ -71,7 +71,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase {
         $test_if = new NetworkInterface(
             data: [
                 'enable' => true,
-                'if' => 'em2',
+                'if' => $this->env["PFREST_OPT1_IF"],
                 'descr' => 'TEST_IFACE',
                 'typev4' => 'none',
                 'typev6' => 'none',

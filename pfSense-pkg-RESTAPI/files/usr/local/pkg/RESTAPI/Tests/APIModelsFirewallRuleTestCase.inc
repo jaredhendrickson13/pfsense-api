@@ -400,7 +400,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         # Ensure the floating rule is present in pfctl as configured above
         $pfctl_rules = file_get_contents('/tmp/rules.debug');
         $rid = $rule->tracker->value;
-        $pfctl_rule = "pass  out  on {  em0  em1  } inet proto tcp  from any to any ridentifier $rid";
+        $pfctl_rule = "pass  out  on {  {$this->env['PFREST_WAN_IF']}  {$this->env['PFREST_LAN_IF']}  } inet proto tcp  from any to any ridentifier $rid";
         $this->assert_str_contains($pfctl_rules, $pfctl_rule);
 
         # Delete the firewall rule

@@ -223,7 +223,7 @@ class APIModelsOneToOneNATMappingTestCase extends TestCase {
         $this->assert_str_contains($pfctl->output, $expected_line);
 
         # Ensure a NAT reflection rule is also found
-        $rdr_expected_line = "rdr on em1 $proto from $dest to $external -> $source bitmask";
+        $rdr_expected_line = "rdr on {$this->env['PFREST_LAN_IF']} $proto from $dest to $external -> $source bitmask";
         $this->assert_str_contains($pfctl->output, $rdr_expected_line);
 
         # Delete and ensure the mapping is no longer found
