@@ -21,6 +21,13 @@ updates:
     target-branch: "master"
     schedule:
       interval: "monthly"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "chore"
+    open-pull-requests-limit: 10
 
   # LEGACY BRANCH (v1)
   - package-ecosystem: "composer"
