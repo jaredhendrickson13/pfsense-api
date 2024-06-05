@@ -23,11 +23,12 @@ updates:
       interval: "monthly"
   - package-ecosystem: "npm"
     directory: "/"
+    target-branch: "master"
+    open-pull-requests-limit: 10
     schedule:
       interval: "monthly"
     commit-message:
       prefix: "chore"
-    open-pull-requests-limit: 10
 
   # LEGACY BRANCH (v1)
   - package-ecosystem: "composer"
