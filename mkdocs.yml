@@ -4,7 +4,7 @@ nav:
       - Home: index.md
       - Installation & Configuration: INSTALL_AND_CONFIG.md
       - Swagger & OpenAPI: SWAGGER_AND_OPENAPI.md
-      - Endpoints Types: ENDPOINT_TYPES.md
+      - Endpoint Types: ENDPOINT_TYPES.md
       - Authentication & Authorization: AUTHENTICATION_AND_AUTHORIZATION.md
       - Queries & Filters: QUERIES_AND_FILTERS.md
       - Working with Object IDs: WORKING_WITH_OBJECT_IDS.md
@@ -12,11 +12,13 @@ nav:
       - Common Control Parameters: COMMON_CONTROL_PARAMETERS.md
       - Limitations & FAQs: LIMITATIONS_AND_FAQS.md
       - Glossary: GLOSSARY.md
-      - Contributing & Development: CONTRIBUTING.md
+      - API Reference: https://pfrest.org/api-docs/
   - Advanced Topics:
       - Dispatchers & Caching: DISPATCHERS_AND_CACHING.md
       - Building Custom Authentication: BUILDING_CUSTOM_AUTH_CLASSES.md
       - Building Custom Query Filters: BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md
+      - Contributing & Development: CONTRIBUTING.md
+      - PHP Reference: https://pfrest.org/php-docs/
 theme:
   name: readthedocs
   features:

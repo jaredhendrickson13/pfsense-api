@@ -26,7 +26,7 @@ The pfSense REST API package is built just like any other pfSense package and ca
 `pkg` from the pfSense command line:
 
 ```bash
-pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7-pkg-API.pkg
+pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7.2-pkg-RESTAPI.pkg
 ```
 
 !!! Note
