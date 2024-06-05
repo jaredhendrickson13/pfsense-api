@@ -14,6 +14,9 @@ use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model for interacting with HAProxy backends.
+ */
 class HAProxyBackend extends Model {
     public StringField $name;
     public NestedModelField $servers;

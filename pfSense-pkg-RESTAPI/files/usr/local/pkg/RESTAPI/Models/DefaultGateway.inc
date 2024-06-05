@@ -6,6 +6,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\RoutingApplyDispatcher;
 use RESTAPI\Fields\ForeignModelField;
 
+/**
+ * Defines a Model for interacting with the system's default gateways.
+ */
 class DefaultGateway extends Model {
     public ForeignModelField $defaultgw4;
     public ForeignModelField $defaultgw6;

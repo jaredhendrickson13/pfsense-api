@@ -7,6 +7,9 @@ use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model for HAProxy Frontend Actions.
+ */
 class HAProxyFrontendAction extends Model {
     public StringField $action;
     public ForeignModelField $acl;

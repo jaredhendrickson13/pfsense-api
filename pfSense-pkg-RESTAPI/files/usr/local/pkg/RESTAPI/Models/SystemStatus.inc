@@ -9,6 +9,9 @@ use RESTAPI\Fields\FloatField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model that represents the system's current status.
+ */
 class SystemStatus extends Model {
     public StringField $platform;
     public StringField $serial;

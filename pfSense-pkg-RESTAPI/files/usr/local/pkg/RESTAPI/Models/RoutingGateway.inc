@@ -14,7 +14,7 @@ use RESTAPI\Validators\FilterNameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**
- * Defines a Model for reading, creating, updating and deleting routing gateways.
+ * Defines a Model for interacting with routing gateways in pfSense.
  */
 class RoutingGateway extends Model {
     public StringField $name;

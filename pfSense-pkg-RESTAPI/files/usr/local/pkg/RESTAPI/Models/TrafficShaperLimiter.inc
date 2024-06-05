@@ -12,6 +12,9 @@ use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\FilterNameValidator;
 
+/**
+ * Defines a Model for interacting with the traffic shaper limiters.
+ */
 class TrafficShaperLimiter extends Model {
     public StringField $name;
     public IntegerField $number;

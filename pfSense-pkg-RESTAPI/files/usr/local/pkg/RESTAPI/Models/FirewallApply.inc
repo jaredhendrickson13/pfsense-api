@@ -12,7 +12,7 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 
 /**
- * A Model object that gathers details on pending firewall changes as well as tools to apply pending firewall changes.
+ * Defiens a Model object that gathers details on pending firewall changes as well as tools to apply pending firewall changes.
  */
 class FirewallApply extends Model {
     const FIREWALL_SUBSYSTEMS = ['aliases', 'natconf', 'filter', 'shaper'];

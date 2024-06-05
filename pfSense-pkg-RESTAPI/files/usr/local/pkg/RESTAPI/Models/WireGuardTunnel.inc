@@ -14,6 +14,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Model for interacting with the WireGuard tunnels on this system.
+ */
 class WireGuardTunnel extends Model {
     public StringField $name;
     public BooleanField $enabled;

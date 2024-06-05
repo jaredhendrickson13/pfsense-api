@@ -7,6 +7,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model for interacting with the system's CARP settings.
+ */
 class CARP extends Model {
     public BooleanField $enable;
     public BooleanField $maintenance_mode;

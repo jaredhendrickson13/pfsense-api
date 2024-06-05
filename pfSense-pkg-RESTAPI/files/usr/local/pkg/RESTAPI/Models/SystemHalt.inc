@@ -6,6 +6,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\SystemHaltDispatcher;
 use RESTAPI\Fields\BooleanField;
 
+/**
+ * Defines a Model that performs a system halt operation.
+ */
 class SystemHalt extends Model {
     public BooleanField $dry_run;
 

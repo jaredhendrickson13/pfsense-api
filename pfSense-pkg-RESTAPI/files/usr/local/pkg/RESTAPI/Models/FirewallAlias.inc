@@ -12,7 +12,7 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\FilterNameValidator;
 
 /**
- * Defines a model object for firewall aliases.
+ * Defines a Model that interacts with firewall aliases.
  */
 class FirewallAlias extends Model {
     public StringField $name;

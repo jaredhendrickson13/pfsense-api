@@ -8,6 +8,9 @@ use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model for HAProxy DNS Resolvers.
+ */
 class HAProxyDNSResolver extends Model {
     public StringField $name;
     public StringField $server;

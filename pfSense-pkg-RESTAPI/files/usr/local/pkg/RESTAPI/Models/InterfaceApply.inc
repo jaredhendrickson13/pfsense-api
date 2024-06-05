@@ -12,7 +12,7 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\InterfaceField;
 
 /**
- * A Model object that gathers details on pending interface changes as well as tools to apply pending interface changes.
+ * Defines a Model object that gathers details on pending interface changes as well as tools to apply pending interface changes.
  */
 class InterfaceApply extends Model {
     public BooleanField $applied;

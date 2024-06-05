@@ -16,7 +16,7 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\MACAddressValidator;
 
-/*
+/**
  * Defines a Model that configures additional address pools for a parent DHCPServer.
  */
 class DHCPServerAddressPool extends Model {

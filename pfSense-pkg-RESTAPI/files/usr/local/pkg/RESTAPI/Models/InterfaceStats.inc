@@ -8,7 +8,7 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
 /**
- * Defines a model that represents interface statistics and detailed interface information.
+ * Defines a Model that represents interface statistics and detailed interface information.
  */
 class InterfaceStats extends Model {
     public StringField $name;

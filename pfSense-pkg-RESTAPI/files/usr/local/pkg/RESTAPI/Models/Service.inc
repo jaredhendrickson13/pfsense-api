@@ -8,6 +8,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model that represents the status of services on this system.
+ */
 class Service extends Model {
     public StringField $name;
     public StringField $action;

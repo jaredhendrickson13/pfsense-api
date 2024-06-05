@@ -9,6 +9,9 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model that represents the DNS configuration on this system.
+ */
 class SystemDNS extends Model {
     public BooleanField $dnsallowoverride;
     public StringField $dnslocalhost;

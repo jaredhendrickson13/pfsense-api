@@ -12,6 +12,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\FilterNameValidator;
 use RESTAPI\Validators\UniqueFromForeignModelValidator;
 
+/**
+ * Defines a Model for interacting with the traffic shaper limiter queues.
+ */
 class TrafficShaperLimiterQueue extends Model {
     public StringField $name;
     public IntegerField $number;

@@ -23,6 +23,9 @@ const API_SETTINGS_RESTORE_SUCCESS = 0;
 const API_SETTINGS_RESTORE_NO_CHANGE = 1;
 const API_SETTINGS_RESTORE_NO_BACKUP = 2;
 
+/**
+ * Defines a Model that represents the REST API settings.
+ */
 class RESTAPISettings extends Model {
     public BooleanField $enabled;
     public BooleanField $read_only;

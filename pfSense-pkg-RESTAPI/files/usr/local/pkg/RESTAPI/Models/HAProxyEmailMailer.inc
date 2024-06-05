@@ -8,6 +8,9 @@ use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model for HAProxy Email Mailers.
+ */
 class HAProxyEmailMailer extends Model {
     public StringField $name;
     public StringField $mailserver;

@@ -8,7 +8,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
 
 /**
- * Defines a ConfigHistoryRevision Model that represents configuration history revisions.
+ * Defines a Model that interacts with the pfSense configuration history.
  */
 class ConfigHistoryRevision extends Model {
     public UnixTimeField $time;

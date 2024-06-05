@@ -12,6 +12,9 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 use RESTAPI\Validators\X509Validator;
 
+/**
+ * Defines a Model for interacting with the system's certificates.
+ */
 class Certificate extends Model {
     public StringField $descr;
     public UIDField $refid;

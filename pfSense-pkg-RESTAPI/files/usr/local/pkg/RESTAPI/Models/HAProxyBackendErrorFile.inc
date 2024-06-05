@@ -7,6 +7,9 @@ use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 
+/**
+ * Defines a Model that interacts with HAProxy backend error files.
+ */
 class HAProxyBackendErrorFile extends Model {
     public IntegerField $errorcode;
     public ForeignModelField $errorfile;

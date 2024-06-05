@@ -9,7 +9,7 @@ use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 
 /**
- * Defines access list entries for the DNS Resolver (Unbound) service.
+ * Defines a Model that interacts with access list entries for the DNS Resolver (Unbound) service.
  */
 class DNSResolverAccessList extends Model {
     public StringField $name;

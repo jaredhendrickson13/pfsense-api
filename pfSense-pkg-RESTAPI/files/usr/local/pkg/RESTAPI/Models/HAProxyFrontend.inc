@@ -11,6 +11,9 @@ use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model that interacts with HAProxy frontends.
+ */
 class HAProxyFrontend extends Model {
     public StringField $name;
     public StringField $descr;

@@ -19,6 +19,9 @@ use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Model that interacts with firewall rules.
+ */
 class FirewallRule extends Model {
     public StringField $type;
     public InterfaceField $interface;

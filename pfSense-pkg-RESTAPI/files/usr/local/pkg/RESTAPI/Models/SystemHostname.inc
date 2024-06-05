@@ -8,6 +8,9 @@ use RESTAPI\Dispatchers\SystemHostnameApplyDispatcher;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\HostnameValidator;
 
+/**
+ * Defines a Model that represents the system's current hostname.
+ */
 class SystemHostname extends Model {
     public StringField $hostname;
     public StringField $domain;

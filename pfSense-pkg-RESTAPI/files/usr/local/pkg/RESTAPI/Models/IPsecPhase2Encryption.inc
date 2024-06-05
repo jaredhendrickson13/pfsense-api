@@ -9,6 +9,9 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Model that represents IPsec Phase 2 Encryption settings.
+ */
 class IPsecPhase2Encryption extends Model {
     public StringField $name;
     public IntegerField $keylen;

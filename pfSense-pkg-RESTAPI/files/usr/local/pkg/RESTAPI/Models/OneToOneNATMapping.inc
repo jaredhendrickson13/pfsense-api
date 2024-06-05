@@ -11,6 +11,9 @@ use RESTAPI\Fields\SpecialNetworkField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Model that represents 1:1 NAT mappings.
+ */
 class OneToOneNATMapping extends Model {
     public InterfaceField $interface;
     public BooleanField $disabled;

@@ -12,7 +12,7 @@ use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 
 /**
- * Defines a Model that represents the DNS Resolver settings.
+ * Defines a Model that interacts with the DNS Resolver settings.
  */
 class DNSResolverSettings extends Model {
     public BooleanField $enable;

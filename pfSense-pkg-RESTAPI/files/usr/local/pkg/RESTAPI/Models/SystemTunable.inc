@@ -7,6 +7,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model that represents a sysctl tunable on this system.
+ */
 class SystemTunable extends Model {
     public StringField $tunable;
     public StringField $value;

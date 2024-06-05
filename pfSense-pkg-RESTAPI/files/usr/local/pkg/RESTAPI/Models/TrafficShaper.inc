@@ -13,6 +13,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\bandwidth_to_bits;
 
+/**
+ * Defines a Model for interacting with the traffic shaper.
+ */
 class TrafficShaper extends Model {
     public BooleanField $enabled;
     public InterfaceField $interface;

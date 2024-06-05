@@ -6,6 +6,9 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model that represents the pfSense version of the current system.
+ */
 class SystemVersion extends Model {
     const VERSION_PATH = '/etc/version';
     const VERSION_PATCH_PATH = '/etc/version.patch';

@@ -11,6 +11,9 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\MACAddressValidator;
 
+/**
+ * Defines a Model for sending wake-on-LAN packets to hosts on the network.
+ */
 class WakeOnLANSend extends Model {
     public InterfaceField $interface;
     public StringField $mac_addr;

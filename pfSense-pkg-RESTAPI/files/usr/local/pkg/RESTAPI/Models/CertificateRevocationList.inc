@@ -10,6 +10,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model for interacting with the system's certificate revocation lists.
+ */
 class CertificateRevocationList extends Model {
     public UIDField $refid;
     public StringField $descr;

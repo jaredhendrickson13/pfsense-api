@@ -11,6 +11,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model that interacts with DNS Resolver host overrides.
+ */
 class DNSResolverHostOverride extends Model {
     public StringField $host;
     public StringField $domain;

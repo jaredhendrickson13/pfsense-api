@@ -8,6 +8,9 @@ use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model for HAProxy Files.
+ */
 class HAProxyFile extends Model {
     public StringField $name;
     public StringField $type;

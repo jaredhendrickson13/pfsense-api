@@ -12,7 +12,7 @@ use RESTAPI\Validators\GatewayValidator;
 use RESTAPI\Validators\SubnetValidator;
 
 /**
- * Defines a Model object for StaticRoutes
+ * Defines a Model that interacts with static routes on this system.
  */
 class StaticRoute extends Model {
     public StringField $network;

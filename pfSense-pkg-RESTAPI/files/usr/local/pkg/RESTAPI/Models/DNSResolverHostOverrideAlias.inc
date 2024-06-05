@@ -9,6 +9,9 @@ use RESTAPI\Dispatchers\DNSResolverApplyDispatcher;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\HostnameValidator;
 
+/**
+ * Defines a Model that interacts with DNS Resolver host override aliases.
+ */
 class DNSResolverHostOverrideAlias extends Model {
     public StringField $host;
     public StringField $domain;

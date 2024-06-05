@@ -8,6 +8,9 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model for HAProxy Frontend Addresses.
+ */
 class HAProxyFrontendAddress extends Model {
     public StringField $extaddr;
     public StringField $extaddr_custom;

@@ -13,6 +13,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
 use RESTAPI\Validators\FilterNameValidator;
 
+/**
+ * Defines a Model that interacts with firewall schedules.
+ */
 class FirewallSchedule extends Model {
     public UIDField $schedlabel;
     public StringField $name;

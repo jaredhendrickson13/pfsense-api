@@ -15,6 +15,9 @@ use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model for interacting with the local users on this system.
+ */
 class User extends Model {
     public StringField $name;
     public StringField $password;

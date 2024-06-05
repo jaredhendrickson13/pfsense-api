@@ -6,6 +6,9 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 
+/**
+ * Defines a Model that represents the console configuration on this system.
+ */
 class SystemConsole extends Model {
     public BooleanField $passwd_protect_console;
 

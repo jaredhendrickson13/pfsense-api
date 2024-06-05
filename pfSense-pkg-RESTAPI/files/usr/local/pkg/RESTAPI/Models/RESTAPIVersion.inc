@@ -10,6 +10,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
 
+/**
+ * Defines a Model that represents the REST API version installed on this system.
+ */
 class RESTAPIVersion extends Model {
     const REPO_URL = 'https://github.com/jaredhendrickson13/pfsense-api';
 

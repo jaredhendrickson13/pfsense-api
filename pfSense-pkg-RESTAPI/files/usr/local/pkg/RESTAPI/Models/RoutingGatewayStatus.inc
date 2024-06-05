@@ -8,6 +8,9 @@ use RESTAPI\Fields\FloatField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model that represents the status of gateways on this system.
+ */
 class RoutingGatewayStatus extends Model {
     public ForeignModelField $name;
     public StringField $srcip;

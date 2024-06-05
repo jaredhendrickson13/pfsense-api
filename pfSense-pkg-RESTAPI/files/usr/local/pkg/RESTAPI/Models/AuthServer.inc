@@ -14,12 +14,14 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model for interacting with remote authentication servers.
+ */
 class AuthServer extends Model {
     public UIDField $refid;
     public StringField $type;
     public StringField $name;
     public StringField $host;
-
     public PortField $ldap_port;
     public StringField $ldap_urltype;
     public IntegerField $ldap_protver;

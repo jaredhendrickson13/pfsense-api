@@ -8,6 +8,9 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Model for interacting with Interface Bridges.
+ */
 class InterfaceBridge extends Model {
     public InterfaceField $members;
     public StringField $descr;

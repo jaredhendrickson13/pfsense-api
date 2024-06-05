@@ -15,6 +15,9 @@ use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model that interacts with HAProxy settings.
+ */
 class HAProxySettings extends Model {
     public BooleanField $enable;
     public IntegerField $maxconn;

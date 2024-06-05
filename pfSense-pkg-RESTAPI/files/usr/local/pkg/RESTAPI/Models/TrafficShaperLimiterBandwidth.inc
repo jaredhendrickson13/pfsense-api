@@ -8,6 +8,9 @@ use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model for interacting with the traffic shaper limiter bandwidth.
+ */
 class TrafficShaperLimiterBandwidth extends Model {
     public IntegerField $bw;
     public StringField $bwscale;

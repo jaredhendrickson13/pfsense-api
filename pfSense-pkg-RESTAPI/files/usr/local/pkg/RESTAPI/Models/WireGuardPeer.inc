@@ -13,6 +13,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model for interacting with the WireGuard peers on this system.
+ */
 class WireGuardPeer extends Model {
     public BooleanField $enabled;
     public ForeignModelField $tun;

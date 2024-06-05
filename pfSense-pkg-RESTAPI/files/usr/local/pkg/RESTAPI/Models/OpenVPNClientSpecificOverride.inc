@@ -13,6 +13,9 @@ use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 
+/**
+ * Defines a Model that represents OpenVPN Client Specific Overrides.
+ */
 class OpenVPNClientSpecificOverride extends Model {
     public StringField $common_name;
     public BooleanField $disable;

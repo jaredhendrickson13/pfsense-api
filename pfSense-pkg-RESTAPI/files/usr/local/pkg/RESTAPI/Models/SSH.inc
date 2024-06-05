@@ -8,6 +8,9 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model that represents the SSH server configuration on this system.
+ */
 class SSH extends Model {
     public BooleanField $enable;
     public PortField $port;

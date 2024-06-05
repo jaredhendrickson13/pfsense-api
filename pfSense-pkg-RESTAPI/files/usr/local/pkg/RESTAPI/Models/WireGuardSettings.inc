@@ -11,6 +11,9 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
 
+/**
+ * Defines a Model for interacting with the WireGuard settings on this system.
+ */
 class WireGuardSettings extends Model {
     public BooleanField $enable;
     public BooleanField $keep_conf;

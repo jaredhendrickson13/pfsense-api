@@ -11,7 +11,7 @@ use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**
- * Defines a model that represents email notification settings.
+ * Defines a model that interacts with email notification settings.
  */
 class EmailNotificationSettings extends Model {
     public BooleanField $disable;

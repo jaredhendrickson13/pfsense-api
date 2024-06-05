@@ -6,6 +6,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\DHCPServerApplyDispatcher;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model for assigning the backend DHCP server service.
+ */
 class DHCPServerBackend extends Model {
     public StringField $dhcpbackend;
 

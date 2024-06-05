@@ -7,6 +7,9 @@ use RESTAPI\Dispatchers\DNSForwarderApplyDispatcher;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model that interacts with DNS Forwarder host override aliases.
+ */
 class DNSForwarderHostOverrideAlias extends Model {
     public StringField $host;
     public StringField $domain;

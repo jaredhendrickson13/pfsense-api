@@ -15,6 +15,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\HexValidator;
 
+/**
+ * Defines a Model that represents outbound NAT mappings.
+ */
 class OutboundNATMapping extends Model {
     const SOURCE_HASH_KEY_BYTES = 16;
     public InterfaceField $interface;

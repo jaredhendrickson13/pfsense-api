@@ -15,6 +15,9 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\FilterNameValidator;
 use function RESTAPI\Core\Tools\bandwidth_to_bits;
 
+/**
+ * Defines a Model for interacting with the traffic shaper queues.
+ */
 class TrafficShaperQueue extends Model {
     public InterfaceField $interface;
     public BooleanField $enabled;

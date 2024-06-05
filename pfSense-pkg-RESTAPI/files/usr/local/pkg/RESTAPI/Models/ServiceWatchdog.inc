@@ -7,6 +7,9 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model that represents the Service Watchdog configuration on this system.
+ */
 class ServiceWatchdog extends Model {
     public ForeignModelField $name;
     public StringField $description;

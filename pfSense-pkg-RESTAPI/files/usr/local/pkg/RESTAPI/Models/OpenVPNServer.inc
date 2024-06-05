@@ -16,6 +16,9 @@ use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 
+/**
+ * Defines a Model that represents OpenVPN server settings.
+ */
 class OpenVPNServer extends Model {
     const INTERFACE_PREFIX = 'ovpns';
     const STATIC_KEY_PREFIX = '-----BEGIN OpenVPN Static key V1-----';

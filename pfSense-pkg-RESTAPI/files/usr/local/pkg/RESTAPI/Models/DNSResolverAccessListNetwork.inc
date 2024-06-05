@@ -11,7 +11,7 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**
- * Defines access list entries for the DNS Resolver (Unbound) service.
+ * Defines a Model that interacts with access list network entries for the DNS Resolver (Unbound) service.
  */
 class DNSResolverAccessListNetwork extends Model {
     public StringField $network;

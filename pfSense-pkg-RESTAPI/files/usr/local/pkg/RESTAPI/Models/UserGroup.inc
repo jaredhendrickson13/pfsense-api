@@ -13,6 +13,9 @@ use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model for interacting with the user groups on this system.
+ */
 class UserGroup extends Model {
     public StringField $name;
     public IntegerField $gid;

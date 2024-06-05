@@ -9,7 +9,7 @@ use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 
 /**
- * Defines a Model for packages that are available to install on this system.
+ * Defines a Model for packages that are currently installed on this system.
  */
 class Package extends Model {
     public ForeignModelField $name;

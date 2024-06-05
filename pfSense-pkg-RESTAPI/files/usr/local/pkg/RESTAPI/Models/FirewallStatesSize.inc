@@ -7,6 +7,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\IntegerField;
 
+/**
+ * Defines a Model for interacting with the firewall states size.
+ */
 class FirewallStatesSize extends Model {
     public IntegerField $maximumstates;
     public IntegerField $defaultmaximumstates;

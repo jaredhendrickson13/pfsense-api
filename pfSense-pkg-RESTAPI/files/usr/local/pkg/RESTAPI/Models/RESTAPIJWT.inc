@@ -14,6 +14,9 @@ use RESTAPI\Dispatchers\RESTAPISettingsSyncDispatcher;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ServerError;
 
+/**
+ * Defines a Model that represents a REST API JWT.
+ */
 class RESTAPIJWT extends Model {
     public StringField $token;
 

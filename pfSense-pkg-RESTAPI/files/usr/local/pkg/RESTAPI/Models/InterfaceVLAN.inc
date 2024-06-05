@@ -11,7 +11,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
 /**
- * Defines a model object for interface VLANs.
+ * Defines a Model for interacting with VLAN interfaces.
  */
 class InterfaceVLAN extends Model {
     public StringField $if;

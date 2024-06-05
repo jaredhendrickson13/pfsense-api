@@ -12,6 +12,9 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a Model that represents REST API keys.
+ */
 class RESTAPIKey extends Model {
     public StringField $descr;
     public StringField $username;

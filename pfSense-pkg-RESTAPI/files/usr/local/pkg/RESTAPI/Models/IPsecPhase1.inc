@@ -17,6 +17,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model for interacting with IPsec Phase 1 entries.
+ */
 class IPsecPhase1 extends Model {
     const INADDR_ANY = ['0.0.0.0', '::'];
 

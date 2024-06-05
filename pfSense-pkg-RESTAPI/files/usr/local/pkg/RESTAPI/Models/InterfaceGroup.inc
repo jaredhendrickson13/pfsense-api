@@ -10,6 +10,9 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\FilterNameValidator;
 
+/**
+ * Defines a Model for interacting with Interface Groups.
+ */
 class InterfaceGroup extends Model {
     public StringField $ifname;
     public InterfaceField $members;

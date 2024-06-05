@@ -16,6 +16,9 @@ use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 
+/**
+ * Defines a Model that represents OpenVPN clients.
+ */
 class OpenVPNClient extends Model {
     const INTERFACE_PREFIX = 'ovpnc';
     const STATIC_KEY_PREFIX = '-----BEGIN OpenVPN Static key V1-----';

@@ -18,8 +18,8 @@ use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\MACAddressValidator;
 
-/*
- * Defines a Model that configures the DHCP server for a given interface.
+/**
+ * Defines a Model that interacts with the DHCP server for a given interface.
  */
 class DHCPServer extends Model {
     public InterfaceField $interface;

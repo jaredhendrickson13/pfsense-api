@@ -8,6 +8,9 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model for HAProxy Backend Access Control Lists.
+ */
 class HAProxyBackendACL extends Model {
     public StringField $name;
     public StringField $expression;

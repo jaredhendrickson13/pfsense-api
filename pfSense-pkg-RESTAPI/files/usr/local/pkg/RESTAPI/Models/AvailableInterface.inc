@@ -6,7 +6,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
 
 /**
- * Defines a Model for interfaces that are available to assign on this system.
+ * Defines a Model for interfaces that are available to be assigned on this system.
  */
 class AvailableInterface extends Model {
     public StringField $if;

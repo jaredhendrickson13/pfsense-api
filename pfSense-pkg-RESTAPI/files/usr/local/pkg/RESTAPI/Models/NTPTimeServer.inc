@@ -7,6 +7,9 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model for interacting with NTP time server settings.
+ */
 class NTPTimeServer extends Model {
     const AUTO_POOL_SUFFIX = 'pool.ntp.org';
 

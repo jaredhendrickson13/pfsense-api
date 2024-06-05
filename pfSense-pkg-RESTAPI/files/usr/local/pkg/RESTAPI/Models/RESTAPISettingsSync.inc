@@ -11,6 +11,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\cprint;
 
+/**
+ * Defines a Model that interacts with the REST API settings sync feature. This Model is not intended for public use.
+ */
 class RESTAPISettingsSync extends Model {
     public StringField $sync_data;
 

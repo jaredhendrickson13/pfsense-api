@@ -8,6 +8,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model for interacting with the system's cron jobs.
+ */
 class CronJob extends Model {
     const CRON_PREDEFINED_EVENTS = [
         '@reboot',

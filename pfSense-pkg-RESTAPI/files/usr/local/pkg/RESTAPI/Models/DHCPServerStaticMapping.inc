@@ -16,8 +16,8 @@ use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\MACAddressValidator;
 
-/*
- * Defines a Model that configures a static DHCP mapping for a given client.
+/**
+ * Defines a Model that interacts with static DHCP mappings for the DHCP server.
  */
 class DHCPServerStaticMapping extends Model {
     public StringField $mac;

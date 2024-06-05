@@ -10,7 +10,7 @@ use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**
- * Defines a Model that represents a DNS Resolver domain override.
+ * Defines a Model that interacts with DNS Resolver domain overrides.
  */
 class DNSResolverDomainOverride extends Model {
     public StringField $domain;

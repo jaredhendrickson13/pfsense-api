@@ -15,6 +15,9 @@ use RESTAPI\Fields\UIDField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model that represents IPsec Phase 2 settings.
+ */
 class IPsecPhase2 extends Model {
     public UIDField $uniqid;
     public IntegerField $reqid;

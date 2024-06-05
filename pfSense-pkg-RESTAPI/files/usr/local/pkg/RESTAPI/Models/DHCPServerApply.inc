@@ -7,6 +7,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\DHCPServerApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 
+/**
+ * Defines a Model for applying changes to the DHCP server configuration.
+ */
 class DHCPServerApply extends Model {
     public BooleanField $applied;
 

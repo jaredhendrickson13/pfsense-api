@@ -11,6 +11,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\RegexValidator;
 
+/**
+ * Defines a Model for HAProxy Backend Servers.
+ */
 class HAProxyBackendServer extends Model {
     public StringField $name;
     public StringField $status;

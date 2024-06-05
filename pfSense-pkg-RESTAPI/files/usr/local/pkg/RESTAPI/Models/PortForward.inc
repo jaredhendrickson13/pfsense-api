@@ -13,6 +13,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model that represents port forward rules.
+ */
 class PortForward extends Model {
     public InterfaceField $interface;
     public StringField $protocol;

@@ -11,6 +11,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\LengthValidator;
 
+/**
+ * Defines a Model for interacting with NTP server settings.
+ */
 class NTPSettings extends Model {
     public BooleanField $enable;
     public InterfaceField $interface;

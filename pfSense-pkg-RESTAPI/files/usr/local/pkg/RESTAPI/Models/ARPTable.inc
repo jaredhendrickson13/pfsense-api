@@ -9,6 +9,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model for interacting with the system's ARP table.
+ */
 class ARPTable extends Model {
     public StringField $hostname;
     public StringField $ip_address;

@@ -6,6 +6,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 
+/**
+ * Defines a Model for applying the HAProxy configuration.
+ */
 class HAProxyApply extends Model {
     public BooleanField $applied;
 

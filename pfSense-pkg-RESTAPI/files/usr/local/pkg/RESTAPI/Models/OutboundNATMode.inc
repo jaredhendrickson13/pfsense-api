@@ -7,6 +7,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model that represents the outbound NAT mode.
+ */
 class OutboundNATMode extends Model {
     public StringField $mode;
 

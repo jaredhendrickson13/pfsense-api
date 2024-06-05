@@ -16,7 +16,7 @@ use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\UniqueFromForeignModelValidator;
 
 /**
- * Defines a Model for creating, reading, updating and deleting virtual IPs
+ * Defines a Model for interacting with the virtual IPs on this system.
  */
 class VirtualIP extends Model {
     public UIDField $uniqid;

@@ -9,6 +9,9 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
 use RESTAPI\Validators\IPAddressValidator;
 
+/**
+ * Defines a Model for interacting with the WireGuard tunnel addresses on this system.
+ */
 class WireGuardTunnelAddress extends Model {
     public StringField $address;
     public IntegerField $mask;

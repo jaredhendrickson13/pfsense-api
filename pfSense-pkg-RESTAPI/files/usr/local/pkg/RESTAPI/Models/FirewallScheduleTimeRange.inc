@@ -8,6 +8,9 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
+/**
+ * Defines a model that interacts with firewall schedule time ranges.
+ */
 class FirewallScheduleTimeRange extends Model {
     const SUPPORTED_MINUTES = ['00', '15', '30', '45', '59'];
 

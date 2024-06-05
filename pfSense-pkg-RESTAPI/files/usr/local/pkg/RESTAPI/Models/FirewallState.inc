@@ -6,6 +6,9 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
+/**
+ * Defines a Model for interacting with the firewall states.
+ */
 class FirewallState extends Model {
     public StringField $interface;
     public StringField $protocol;
