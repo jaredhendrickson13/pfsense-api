@@ -791,6 +791,8 @@ components:
           example: { }
           oneOf:
             - type: array
+              items:
+                type: object
             - type: object
       type: object
   securitySchemes:
