@@ -12,8 +12,8 @@ use RESTAPI\Fields\StringField;
  */
 class HAProxyBackendAction extends Model {
     public StringField $action;
-    public ForeignModelField $acl;
-    public ForeignModelField $server;
+    public StringField $acl;
+    public StringField $server;
     public StringField $customaction;
     public StringField $deny_status;
     public StringField $realm;
@@ -30,7 +30,7 @@ class HAProxyBackendAction extends Model {
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->parent_model_class = 'HAProxyBackend';
-        $this->config_path = 'a_actionsitems/item';
+        $this->config_path = 'a_actionitems/item';
         $this->packages = ['pfSense-pkg-haproxy'];
         $this->package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
         $this->many = true;
@@ -86,15 +86,11 @@ class HAProxyBackendAction extends Model {
             ],
             help_text: 'The action to take when an ACL match is found.',
         );
-        $this->acl = new ForeignModelField(
-            model_name: 'HAProxyBackendACL',
-            model_field: 'name',
+        $this->acl = new StringField(
             required: true,
             help_text: 'The name of the backend ACL this action is associated with.',
         );
-        $this->server = new ForeignModelField(
-            model_name: 'HAProxyBackendServer',
-            model_field: 'name',
+        $this->server = new StringField(
             required: true,
             conditions: ['action' => 'use_server'],
             help_text: 'The backend server to use when an ACL match is found.',
@@ -233,15 +229,16 @@ class HAProxyBackendAction extends Model {
     }
 
     /**
-     * Extends the default `from_internal()` method to automatically set the internal names of fields before calling.
+     * Extends the default `from_internal_object()` method to automatically set the internal names of fields before calling.
+     * @param array $internal_object The internal representation of this model to load from.
      */
-    public function from_internal(): void {
+    public function from_internal_object(array $internal_object): void {
         # Do an initial load of the object to ensure the `action` is obtained first
-        parent::from_internal();
+        $this->action->value = $internal_object['action'];
 
         # Set the internal names of all fields before doing another load to include dynamic field names
         $this->set_field_internal_names();
-        parent::from_internal();
+        parent::from_internal_object($internal_object);
     }
 
     /**
@@ -256,9 +253,9 @@ class HAProxyBackendAction extends Model {
         # Loop through each field and change it's internal name to be prefixed with the current `action` assigned
         foreach ($fields as $field) {
             # Don't change exempt field's internal names
-            if (!in_array($field, $exempt_fields)) {
-                $field = str_replace('lua_function', 'lua-function', $field);
-                $this->$field->internal_name = $this->action->value . $field;
+            if (!in_array($field, $exempt_fields) and $this->action->value and $this->$field) {
+                $corrected_field = str_replace('lua_function', 'lua-function', $field);
+                $this->$field->internal_name = $this->action->value . $corrected_field;
             }
         }
     }
