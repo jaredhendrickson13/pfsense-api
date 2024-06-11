@@ -28,7 +28,24 @@
             <server_key></server_key>
             <jwt_exp>3600</jwt_exp>
             <keys></keys>
-            <access_list></access_list>
+            <access_list>
+                <item>
+                    <type>allow</type>
+                    <weight>10</weight>
+                    <network>0.0.0.0/0</network>
+                    <users></users>
+                    <sched></sched>
+                    <descr><![CDATA[Default allow all IPv4]]></descr>
+                </item>
+                <item>
+                    <type>allow</type>
+                    <weight>10</weight>
+                    <network>0::/0</network>
+                    <users></users>
+                    <sched></sched>
+                    <descr><![CDATA[Default allow all IPv6]]></descr>
+                </item>
+            </access_list>
         </conf>
     </package>
 </pfsensepkgs>
