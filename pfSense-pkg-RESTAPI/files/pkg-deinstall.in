@@ -11,4 +11,4 @@ fi
 /bin/rm /usr/local/bin/pfsense-restapi
 
 # Remove Endpoints
-rm -rf /usr/local/www/api/v2
+rm -rf /usr/local/www/api/v2 2>/dev/null
