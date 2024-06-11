@@ -20,6 +20,7 @@ use Error;
 use Exception;
 use RESTAPI;
 use RESTAPI\ContentHandlers\JSONContentHandler;
+use RESTAPI\Models\RESTAPIAccessListEntry;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\VirtualIP;
 use RESTAPI\Responses\ForbiddenError;
@@ -161,6 +162,15 @@ class Endpoint {
      * the API is disabled.
      */
     public bool $ignore_enabled = false;
+
+    /**
+     * @var bool $ignore_acl
+     * Allow this Endpoint to ignore the REST API Access List. By default, Endpoints
+     * will not accept API calls from clients that are not allowed by the REST API
+     * Access List. Setting this value to `true` will allow this Endpoint to respond
+     * to API calls from any client regardless of the REST API Access List.
+     */
+    public bool $ignore_acl = false;
 
     /**
      * @var ResourceLinkSet|null $resource_link_set
@@ -473,6 +483,27 @@ class Endpoint {
     }
 
     /**
+     * Checks if the client is allowed to access this Endpoint according to the REST API Access List.
+     * @throws ForbiddenError When the client is not allowed to access this Endpoint.
+     */
+    private function check_acl(): void {
+        # Allow the API call if the ignore_acl flag is set
+        if ($this->ignore_acl) {
+            return;
+        }
+
+        # Check if the client is allowed to access this Endpoint according to the REST API Access List
+        if (
+            !RESTAPIAccessListEntry::is_allowed_by_acl(ip: $this->client->ip_address, username: $this->client->username)
+        ) {
+            throw new ForbiddenError(
+                message: 'The requested action is not allowed by admin policy',
+                response_id: 'ENDPOINT_CLIENT_NOT_ALLOWED_BY_ACL',
+            );
+        }
+    }
+
+    /**
      * Checks if the API is enabled before allowing the call.
      */
     private function check_enabled(): void {
@@ -631,6 +662,9 @@ class Endpoint {
             if ($this->requires_auth) {
                 $this->check_auth();
             }
+
+            # Checks that the client is allowed to access this Endpoint according to the REST API Access List
+            $this->check_acl();
 
             # Ensure we can obtain the ContentHandler that will be responsible for encoding response content
             # This will throw an error if the client's Accept header is not supported by an existing ContentHandler

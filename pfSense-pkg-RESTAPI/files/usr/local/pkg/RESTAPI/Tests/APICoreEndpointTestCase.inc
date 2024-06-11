@@ -5,9 +5,11 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Endpoints\DiagnosticsARPTableEndpoint;
 use RESTAPI\Endpoints\FirewallAliasEndpoint;
+use RESTAPI\Endpoints\FirewallAliasesEndpoint;
 use RESTAPI\Endpoints\ServicesDNSResolverHostOverrideAliasEndpoint;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\NetworkInterface;
+use RESTAPI\Models\RESTAPIAccessListEntry;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\VirtualIP;
 
@@ -243,6 +245,7 @@ class APICoreEndpointTestCase extends TestCase {
         # check_request_method() runs after authenticating, so we need to authenticate first
         $_SERVER['PHP_AUTH_USER'] = 'admin';
         $_SERVER['PHP_AUTH_PW'] = 'pfsense';
+        $_SERVER['REMOTE_ADDR'] = '1.2.3.4';
 
         # Ensure the OPTIONS request method is always allowed
         $_SERVER['REQUEST_METHOD'] = 'OPTIONS';
@@ -279,6 +282,7 @@ class APICoreEndpointTestCase extends TestCase {
         # check_request_method() runs after authenticating, so we need to authenticate first
         $_SERVER['PHP_AUTH_USER'] = 'admin';
         $_SERVER['PHP_AUTH_PW'] = 'pfsense';
+        $_SERVER['REMOTE_ADDR'] = '1.2.3.4';
 
         # Ensure the request data is correctly obtained and decoded
         $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -296,6 +300,7 @@ class APICoreEndpointTestCase extends TestCase {
         # check_request_method() runs after authenticating, so we need to authenticate first
         $_SERVER['PHP_AUTH_USER'] = 'admin';
         $_SERVER['PHP_AUTH_PW'] = 'pfsense';
+        $_SERVER['REMOTE_ADDR'] = '1.2.3.4';
 
         # Ensure the request data is correctly obtained and decoded
         $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -324,6 +329,7 @@ class APICoreEndpointTestCase extends TestCase {
         # check_request_method() runs after authenticating, so we need to authenticate first
         $_SERVER['PHP_AUTH_USER'] = 'admin';
         $_SERVER['PHP_AUTH_PW'] = 'pfsense';
+        $_SERVER['REMOTE_ADDR'] = '1.2.3.4';
 
         # Mock an example POST request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -432,5 +438,35 @@ class APICoreEndpointTestCase extends TestCase {
         );
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->code, 200);
+    }
+
+    /**
+     * Ensures that Endpoints correctly allow or deny access based on the REST API Access List.
+     */
+    public function test_check_acl(): void {
+        # check_request_method() runs after authenticating, so we need to authenticate first
+        $_SERVER['PHP_AUTH_USER'] = 'admin';
+        $_SERVER['PHP_AUTH_PW'] = 'pfsense';
+
+        # Mock the client's IP address as an IP that is not in the ACL
+        $_SERVER['REMOTE_ADDR'] = '4.3.2.1';
+
+        # Mock a GET request
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        # Ensure the Endpoint throws a Forbidden response when the client is not in the ACL
+        $acl = new RESTAPIAccessListEntry();
+        $acl->replace_all([['type' => 'allow', 'network' => '1.2.3.4/32']]);
+
+        $endpoint = new FirewallAliasesEndpoint();
+        $json_resp = json_decode($endpoint->process_request());
+        $this->assert_equals($json_resp->response_id, 'ENDPOINT_CLIENT_NOT_ALLOWED_BY_ACL');
+        $this->assert_equals($json_resp->code, 403);
+
+        # Mock the client's IP address as an IP that is in the ACL and ensure the Endpoint processes the request
+        $_SERVER['REMOTE_ADDR'] = '1.2.3.4';
+        $endpoint = new FirewallAliasesEndpoint();
+        $json_resp = json_decode($endpoint->process_request());
+        $this->assert_equals($json_resp->code, 200);
     }
 }

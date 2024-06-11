@@ -1103,6 +1103,11 @@ class Field {
         # Format the title to include an asterisk (*) if it is required.
         $title = $this->required ? ucwords($this->verbose_name) . '*' : ucwords($this->verbose_name);
 
+        # Add placeholder attribute for fields with a default
+        if ($this->default) {
+            $attributes['placeholder'] = $this->default;
+        }
+
         # Return a static text class if this is a read-only field
         if ($this->read_only) {
             $input = new \Form_StaticText(title: $title, text: $this->value);

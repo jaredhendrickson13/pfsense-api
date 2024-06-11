@@ -141,9 +141,10 @@ class Form {
 
         # Obtain the class FQN
         $this->model_class = "\\RESTAPI\\Models\\$this->model_class";
+        $this->model = new $this->model_class();
 
-        # For `many` Forms, specify an ID
-        if ($this->many) {
+        # For `many` Models, specify an ID
+        if ($this->model->many) {
             $this->model = new $this->model_class(id: $this->id, client: $client);
         }
         # For non `many` Forms, don't specify an ID when creating
@@ -195,6 +196,8 @@ class Form {
                 else {
                     $section->addInput($this->model->$section_field->to_form_input());
                 }
+
+                # Populate the default if present
             }
 
             # Add this section to the form
@@ -253,6 +256,11 @@ class Form {
             foreach ($this->table_fields as $table_field) {
                 # Determine the value of this field
                 $value = $model_object->$table_field->value;
+
+                # Format array values to be more readable
+                if ($model_object->$table_field->many) {
+                    $value = $model_object->$table_field->to_internal();
+                }
 
                 # Use the choice verbose value if present
                 if (
@@ -363,7 +371,7 @@ class Form {
      */
     public function on_save(): void {
         # Update settings with the newly provided values
-        $representation_data = $this->id ? ['id' => $this->id] : [];
+        $representation_data = isset($this->id) ? ['id' => $this->id] : [];
         $representation_data += $this->form_data_to_model_representation(form_data: $_POST, model: $this->model);
         $this->model->from_representation(data: $representation_data);
 
@@ -377,7 +385,7 @@ class Form {
 
         # When an ID was found or the assigned model is not a `many` model, update the object. Otherwise create it.
         try {
-            ($this->id or !$this->model->many) ? $this->model->update() : $this->model->create();
+            (isset($this->id) or !$this->model->many) ? $this->model->update() : $this->model->create();
             $this->print_success_banner();
         } catch (Response $resp_error) {
             $error_message = $resp_error->getMessage();
@@ -428,6 +436,11 @@ class Form {
             # For sensitive fields, do not update the value if the value matches the masked value
             if ($model->$field->sensitive and $form_data[$field] === Field::SENSITIVE_MASK) {
                 unset($form_data[$field]);
+            }
+
+            # For 'many' fields with empty values, convert them to an empty array
+            if ($model->$field->many and empty($form_data[$field])) {
+                $form_data[$field] = [];
             }
 
             # Skip this field if it is not found in the form data

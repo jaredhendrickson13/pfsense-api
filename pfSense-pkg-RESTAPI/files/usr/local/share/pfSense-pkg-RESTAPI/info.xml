@@ -28,6 +28,7 @@
             <server_key></server_key>
             <jwt_exp>3600</jwt_exp>
             <keys></keys>
+            <access_list></access_list>
         </conf>
     </package>
 </pfsensepkgs>

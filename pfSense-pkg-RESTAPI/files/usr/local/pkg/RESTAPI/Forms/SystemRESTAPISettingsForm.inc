@@ -17,6 +17,7 @@ class SystemRESTAPISettingsForm extends Form {
     public array $tabs = [
         ['Settings', true, '/system_restapi_settings.php'],
         ['Keys', false, '/system_restapi_key.php'],
+        ['Access List', false, '/system_restapi_acl.php'],
         ['Updates', false, '/system_restapi_updates.php'],
         ['Documentation', false, '/api/v2/documentation'],
     ];
