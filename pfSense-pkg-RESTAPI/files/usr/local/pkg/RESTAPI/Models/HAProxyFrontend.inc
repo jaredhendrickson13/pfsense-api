@@ -127,7 +127,7 @@ class HAProxyFrontend extends Model {
             default: false,
             indicates_true: 'yes',
             indicates_false: '',
-            internal_name: 'log-separate-errors',
+            internal_name: 'log-detailed',
             help_text: 'Enables or disables more detailed logging.',
         );
         $this->a_errorfiles = new NestedModelField(
@@ -160,6 +160,7 @@ class HAProxyFrontend extends Model {
         );
         $this->advanced = new Base64Field(
             default: null,
+            allow_empty: true,
             allow_null: true,
             help_text: 'Custom configuration to pass to this frontend.',
         );
