@@ -8,7 +8,7 @@ parameters you can use:
 
 - Type: Boolean
 - Default: `true`
-- Description: This parameter allows you to control the API's default behavior of apply changes in the background. Setting
+- Description: This parameter allows you to control the API's default behavior of applying changes in the background. Setting
   this parameter to `false` will force the API to wait for the changes to be made on the backend before responding. This
   parameter may not be supported by all endpoints.
 
