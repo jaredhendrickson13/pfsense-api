@@ -33,29 +33,84 @@ The project utilizes PHP namespaces to organize its codebase.
 
 Below is a brief overview of the project's structure:
 
-- `RESTAPI/`: The main namespace for the REST API package.
-  - `.resources/`: While not a PHP namespace, this directory contains a common place resources and tools:
-    - `cache/`: Contains the cache files for the REST API package. Cache files are typically JSON datasets that are
-      populated by `\RESTAPI\Core\Cache` classes and are refreshed on the schedule defined in the class.
-    - `includes/`: Contains additional PHP libraries and classes required by the REST API package. Because pfSense does
-      not include a PHP package manager, these libraries are installed to this directory via composer when the package
-      is built.
-    - `scripts/`: Contains helper scripts for the REST API package. These scripts are used to automate tasks such as
-      generating OpenAPI documentation, running tests, and more.
-  - `Auth/`: Contains the \RESTAPI\Core\Auth child classes
-  - `Caches/`: Contains the \RESTAPI\Core\Cache child classes
-  - `ContentHandlers/`: Contains the \RESTAPI\Core\ContentHandler child classes
-  - `Core/`: Contains the core classes and interfaces for the REST API package framework.
-  - `Dispatchers/`: Contains the \RESTAPI\Core\Dispatcher child classes
-  - `Endpoints/`: Contains the \RESTAPI\Core\Endpoint child classes for the REST API package.
-  - `Fields/`: Contains the \RESTAPI\Core\Field child classes
-  - `Forms/`: Contains the \RESTAPI\Core\Form child classes
-  - `Models/`: Contains the \RESTAPI\Core\Model child classes
-  - `Responses/`: Contains the \RESTAPI\Core\Response child classes
-  - `Tests/`: Contains the \RESTAPI\Core\TestCase child classes
-  - `Validators/`: Contains the \RESTAPI\Core\Validator child classes
-  - `autoloader.inc`: The autoloader script for the REST API package. This file can be included in your .php or .inc
-    file's `require_once` statements to automatically load all RESTAPI classes.
+Certainly! Here is the content separated into distinct sections:
+
+### RESTAPI/
+
+The main namespace for the REST API package. All classes and interfaces are organized under this namespace or a child
+namespace within the `RESTAPI/` directory.
+
+### .resources/
+
+While not a PHP namespace, this directory contains common resources and tools used by the REST API package. This includes:
+
+#### cache/
+
+Contains the cache files for the REST API package. Cache files are typically JSON datasets populated by [\RESTAPI\Core\Cache](https://pfrest.org/php-docs/classes/RESTAPI-Core-Cache.html) child classes and are refreshed on the schedule defined in the class.
+
+#### includes/
+
+Contains additional PHP libraries and classes required by the REST API package. Because pfSense does not include a PHP package manager, these libraries are installed to this directory via composer when the package is built.
+
+#### scripts/
+
+Contains helper scripts for the REST API package. These scripts are used to automate tasks such as generating OpenAPI documentation, running tests, and more.
+
+### Auth/
+
+Contains the [\RESTAPI\Core\Auth](https://pfrest.org/php-docs/classes/RESTAPI-Core-Auth.html) child classes. Auth classes are used to define and manage authentication methods for the REST API package. For information about writing custom authentication classes, see the [Building Custom Authentication Classes](BUILDING_CUSTOM_AUTH_CLASSES.md) documentation.
+
+### Caches/
+
+Contains the [\RESTAPI\Core\Cache](https://pfrest.org/php-docs/classes/RESTAPI-Core-Cache.html) child classes. [Cache classes](DISPATCHERS_AND_CACHING.md) are used to define and manage cache data and files for the REST API package.
+
+### ContentHandlers/
+
+Contains the [\RESTAPI\Core\ContentHandler](https://pfrest.org/php-docs/classes/RESTAPI-Core-ContentHandler.html) child classes. ContentHandler classes are used to define and manage the supported `content-type` and `accept` header options for the REST API package.
+
+### Core/
+
+Contains the [core classes and interfaces](https://pfrest.org/php-docs/namespaces/restapi-core.html) for the REST API package framework.
+
+### Dispatchers/
+
+Contains the [\RESTAPI\Core\Dispatcher](https://pfrest.org/php-docs/classes/RESTAPI-Core-Dispatcher.html) child classes. Dispatcher classes are used to define and manage long-running processes that run in the background.
+
+### Endpoints/
+
+Contains the [\RESTAPI\Core\Endpoint](https://pfrest.org/php-docs/classes/RESTAPI-Core-Endpoint.html) child classes for the REST API package. Endpoint classes are used to define, customize, and manage the REST API endpoints. Each endpoint class corresponds to a specific REST API endpoint in the pfSense web root and is responsible for dynamically generating the endpoint's PHP file in the web root.
+
+### Fields/
+
+Contains the [\RESTAPI\Core\Field](https://pfrest.org/php-docs/classes/RESTAPI-Core-Field.html) child classes. Field classes are used to define and manage various data types supported by the REST API and are intended to be assigned to Model classes.
+
+### Forms/
+
+Contains the [\RESTAPI\Core\Form](https://pfrest.org/php-docs/classes/RESTAPI-Core-Form.html) child classes. Forms are used to dynamically generate pfSense webConfigurator pages for a specific Model class.
+
+### Models/
+
+Contains the [\RESTAPI\Core\Model](https://pfrest.org/php-docs/classes/RESTAPI-Core-Model.html) child classes. Model classes are used to define and manage the data structure of the REST API package.
+
+### QueryFilters/
+
+Contains the [\RESTAPI\Core\QueryFilter](https://pfrest.org/php-docs/classes/RESTAPI-Core-QueryFilter.html) child classes. QueryFilter classes are used to define and manage the query filters that are used to filter data returned by the REST API. For information about writing query filters, see the [Building Custom Query Filter Classes](BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md) documentation.
+
+### Responses/
+
+Contains the [\RESTAPI\Core\Response](https://pfrest.org/php-docs/classes/RESTAPI-Core-Response.html) child classes. Response classes are throwable classes that are used to generate and return a specific HTTP response code and message. Endpoints will automatically catch these exceptions if thrown and return the appropriate, JSON formatted response to the client along with the appropriate HTTP response code and headers.
+
+### Tests/
+
+Contains the [\RESTAPI\Core\TestCase](https://pfrest.org/php-docs/classes/RESTAPI-Core-TestCase.html) child classes. TestCase classes are used to define and manage the tests for the REST API package. See the [Testing](#testing) section for more information.
+
+### Validators/
+
+Contains the [\RESTAPI\Core\Validator](https://pfrest.org/php-docs/classes/RESTAPI-Core-Validator.html) child classes. Validator classes are reusable classes that are used to validate data for a specific Field object. They are intended to be assigned to a Field object's `validators` property to perform the specific validation against that field.
+
+### autoloader.inc
+
+The autoloader script for the REST API package. This file can be included in your .php or .inc file's `require_once` statements to automatically load all RESTAPI classes.
 
 !!! Tip
     The full PHP API reference for this package including documentation for all applicable classes can be
@@ -142,6 +197,3 @@ pfsense-restapi runtests <keyword>
 !!! Danger
     Running tests is a disruptive process and should not be done on a production pfSense instance. It is recommended to
     only run tests on a development or testing instance of pfSense. A virtual machine with snapshots is ideal for this.
-
-!!! Note
-    When limiting tests to a specific keyword, the keyword must be present in the test case's class name.

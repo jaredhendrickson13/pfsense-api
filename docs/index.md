@@ -27,7 +27,7 @@ repository](https://github.com/jaredhendrickson13/pfsense-api/issues/new?labels=
 The source code for this project is available in its entirety on [GitHub](https://github.com/jaredhendrickson13/pfsense-api)
 and is licensed under an [Apache 2.0 license](https://github.com/jaredhendrickson13/pfsense-api/blob/master/LICENSE).
 Contributions are welcome and encouraged. If you would like to contribute to the project, please read through the
-[contribution guidelines](https://github.com/jaredhendrickson13/pfsense-api/blob/master/docs/CONTRIBUTING.md) before
+[contribution guidelines](CONTRIBUTING.md) before
 opening a pull request.
 
 ### Maintainers
