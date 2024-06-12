@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg?branch=next_major)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
 [![Quality](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml/badge.svg?branch=next_major)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml)
+[![Release](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/release.yml/badge.svg?branch=next_major)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/release.yml)
 
 The pfSense REST API package is an unofficial, open-source REST API for pfSense CE and pfSense Plus firewalls. This package is
 designed to be light-weight, fast, and easy to use. This guide will help you get started with the REST API package and
