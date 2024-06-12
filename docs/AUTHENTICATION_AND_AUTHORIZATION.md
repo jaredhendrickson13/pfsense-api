@@ -4,7 +4,7 @@
 
 There are three authentication methods available for the pfSense REST API out of the box. The allowed authentication methods
 can be configured in the pfSense webConfigurator under 'System' -> 'REST API' -> 'Documentation' -> 'Authentication Methods'
-or via a `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/RESTAPI%5CEndpoints%5CSystemRESTAPISettingsEndpoint-patch) 
+or via a `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint) 
 endpoint's `auth_methods` field. In addition to these methods, custom authentication methods can be added by extending 
 the `Auth` class and implementing your own authentication logic.
 
@@ -41,7 +41,7 @@ curl -u admin:pfsense https://pfsense.example.com/api/v2/firewall/rules
 API key authentication is a more secure form of authentication that requires the client to send an `X-API-Key` header
 containing a valid API key. These keys are better suited to distribute to systems as they cannot allow webConfigurator
 or SSH authentication (like local database credentials can). API keys can be generated in the pfSense webConfigurator
-under 'System' -> 'REST API' -> 'Keys' or by `POST` request to [/api/v2/auth/key](https://pfrest.org/api-docs/#/AUTH/RESTAPI%5CEndpoints%5CAuthKeyEndpoint-post). 
+under 'System' -> 'REST API' -> 'Keys' or by `POST` request to [/api/v2/auth/key](https://pfrest.org/api-docs/#/AUTH/postAuthKeyEndpoint). 
 Below is an example of API Key authentication using `curl`:
 
 ```bash
@@ -53,14 +53,14 @@ curl -H "X-API-Key: xxxxxxxxxxxxxxxxxxxxxxx" https://pfsense.example.com/api/v2/
 !!! Warning
     API keys are sensitive information and should be treated as such. Do not share your API key with anyone you do not
     trust. If you believe your API key has been compromised, you can revoke it in the pfSense webConfigurator or by
-    making a DELETE request to the [/api/v2/auth/key](https://pfrest.org/api-docs/#/AUTH/RESTAPI%5CEndpoints%5CAuthKeyEndpoint-delete) endpoint.
+    making a DELETE request to the [/api/v2/auth/key](https://pfrest.org/api-docs/#/AUTH/deleteAuthKeyEndpoint) endpoint.
 
 ### JSON Web Token (JWT) Authentication
 
 JSON Web Token (JWT) authentication is a stateless, secure authentication method that uses a signed token to authenticate
 users. This method requires the client to send a `Bearer` token in the `Authorization` header. The token is signed with
 a secret key that only the REST API and the client know. JWT tokens can be generated using the 
-[/api/v2/auth/jwt](https://pfrest.org/api-docs/#/AUTH/RESTAPI%5CEndpoints%5CAuthJWTEndpoint-post) endpoint
+[/api/v2/auth/jwt](https://pfrest.org/api-docs/#/AUTH/postAuthJWTEndpoint) endpoint
 and require the client to authenticate as a local database user. Below is an example of receiving a JWT token using
 `curl`:
 
@@ -78,7 +78,7 @@ curl -H "Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx" https://pfsense.example.
 !!! Important
     JWTs are only valid for a limited time (default 1 hour) and must be regenerated after they expire. The expiration
     interval can be configured in the REST API settings within the pfSense webConfigurator or via a `PATCH` request to
-    the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/RESTAPI%5CEndpoints%5CSystemRESTAPISettingsEndpoint-patch)
+    the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint)
     endpoint's `jwt_exp` field.
 
 ### Custom Authentication

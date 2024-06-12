@@ -42,7 +42,7 @@ pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/re
 
 The REST API is designed to be used out of the box. However, there are a number of configuration options available to
 you to customize the API to your needs. The REST API settings can be configured in pfSense webConfigurator under
-'System' -> 'REST API' or via `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/RESTAPI%5CEndpoints%5CSystemRESTAPISettingsEndpoint-patch)
+'System' -> 'REST API' or via `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint)
 endpoint.
 
 ## Deleting the package

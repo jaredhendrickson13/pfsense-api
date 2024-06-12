@@ -10,7 +10,7 @@ easily navigate the API and discover available actions and resources related to 
       with some [custom link types](#link-types).
     - HATEOAS is an optional feature and is disabled by default. HATEOAS can be enabled in the
       pfSense webConfigurator under 'System' -> 'REST API' -> 'Settings' by checking the `Enable HATEOAS` checkbox or
-      via a `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/RESTAPI%5CEndpoints%5CSystemRESTAPISettingsEndpoint-patch) 
+      via a `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint) 
       endpoint's `hateoas` field.
 !!! Important
     Enabling HATEOAS can greatly increase the size of API responses as additional links are included in the response data;
