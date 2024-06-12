@@ -22,8 +22,8 @@ query filter is specified.
 
 - Name: `exact`
 - Examples:
-  - `https://pfsense.example.com/api/v2/examples?fieldname=example`
-  - `https://pfsense.example.com/api/v2/examples?fieldname__exact=example`
+    - `https://pfsense.example.com/api/v2/examples?fieldname=example`
+    - `https://pfsense.example.com/api/v2/examples?fieldname__exact=example`
 
 ### Starts With (startswith)
 

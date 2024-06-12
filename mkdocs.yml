@@ -11,7 +11,6 @@ nav:
       - Working with HATEOAS: WORKING_WITH_HATEOAS.md
       - Common Control Parameters: COMMON_CONTROL_PARAMETERS.md
       - Limitations & FAQs: LIMITATIONS_AND_FAQS.md
-      - Glossary: GLOSSARY.md
       - API Reference: https://pfrest.org/api-docs/
   - Advanced Topics:
       - Dispatchers & Caching: DISPATCHERS_AND_CACHING.md
