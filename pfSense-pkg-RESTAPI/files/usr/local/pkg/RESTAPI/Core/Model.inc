@@ -2078,4 +2078,14 @@ class Model {
         # Return the current representation of this object
         return $this;
     }
+    
+    /**
+     * Obtains an array of all Model classes.
+     * @param $shortnames bool Set to true to obtain the shortnames of all Model classes.
+     * @return array An array of all Model classes.
+     */
+    public static function get_all_model_classes(bool $shortnames = false): array {
+        $model_classes = get_classes_from_namespace('\\RESTAPI\\Models\\');
+        return $shortnames ? array_map(fn($class) => (new $class())->get_class_shortname(), $model_classes) : $model_classes;
+    }
 }
