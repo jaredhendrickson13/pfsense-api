@@ -6,6 +6,9 @@ on:
     branches:
       - "master"
 
+# Ensure only one build job runs at a time
+concurrency: build
+
 # Commit SHAs may differ when trigger via pull request vs workflow_dispatch, ensure the correct commit is referenced.
 env:
   COMMIT_ID: "${{ github.event.pull_request.head.sha || github.sha }}"
