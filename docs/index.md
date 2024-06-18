@@ -1,6 +1,6 @@
 # pfSense REST API
 
-The pfSense REST API package is an unofficial, open-source REST API for pfSense CE and pfSense Plus firewalls. This package is
+The pfSense REST API package is an unofficial, open-source REST API for pfSense CE and pfSense Plus firewalls that is
 designed to be light-weight, fast, and easy to use. This guide will help you get started with the REST API package and
 provide you with the information you need to configure and use the package effectively.
 
@@ -9,6 +9,10 @@ provide you with the information you need to configure and use the package effec
     site is available on your pfSense instance after [installing the package](./INSTALL_AND_CONFIG.md) under 
     'System' -> 'REST API' -> 'Documentation'. Alternatively, a simplified version of the Swagger documentation is 
     available [here](https://pfrest.org/api-docs/).
+
+!!! Note
+    These docs are only applicable to the REST API v2 package and later. If you are using the legacy v1 package, please
+    refer to the docs on the [legacy branch](https://github.com/jaredhendrickson13/pfsense-api/tree/legacy).
 
 ## Key Features
 

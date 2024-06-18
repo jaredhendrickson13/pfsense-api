@@ -14,7 +14,7 @@ to wait for the operation to complete. A list of all current Dispatcher classes 
 [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-dispatchers.html).
 
 !!! Note
-    You can bypass the Dispatcher spawning processes in the background by setting the ['async' control parameter](https://pfrest.org/COMMON_CONTROL_PARAMETERS/#async)
+    You can bypass the Dispatcher process spawning in the background in your API calls by setting the ['async' control parameter](https://pfrest.org/COMMON_CONTROL_PARAMETERS/#async)
     to `false`. This will cause the Dispatcher to execute the operation within the main process and wait for the operation to
     complete before returning a response.
 

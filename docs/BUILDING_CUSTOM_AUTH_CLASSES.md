@@ -1,5 +1,9 @@
 # Building Custom Authentication Classes
 
+!!! Danger
+    This feature is intended for advanced use cases only. Incorrectly implemented custom authentication classes can lead to
+    significant security vulnerabilities.
+
 For advanced users, the REST API's framework allows for custom authentication methods to be added using PHP. To add a custom
 authentication method, extend the `\RESTAPI\Core\Auth` class and implement the `_authenticate` method. This method simply
 needs to return a boolean value indicating if the user is authenticated or not. Below is an example of a custom Auth class:

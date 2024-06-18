@@ -14,7 +14,8 @@ easily navigate the API and discover available actions and resources related to 
       endpoint's `hateoas` field.
 !!! Important
     Enabling HATEOAS can greatly increase the size of API responses as additional links are included in the response data;
-    which may also impact performance on large datasets.
+    which may also impact performance on large datasets. It is strongly recommended to only enable HATEOAS when needed and
+    to use [pagination](./QUERIES_AND_FILTERS.md#pagination) to limit the amount of data returned in a single request.
 
 ### Link types
 

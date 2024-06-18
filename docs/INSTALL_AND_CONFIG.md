@@ -8,13 +8,13 @@ Overall, the REST API package is designed to be as lightweight as possible and s
 run pfSense. It's recommended to follow Netgate's [minimum hardware requirements](https://docs.netgate.com/pfsense/en/latest/hardware/minimum-requirements.html).
 
 !!! Warning
-    While the package should behave identically on architectures other than amd64, it has only been tested on amd64
+    While the package should behave identically on architectures other than amd64, automated testing only covers amd64
     builds of pfSense. Support on other architectures is not guaranteed.
 
 ### Supported pfSense versions
 
-- pfSense CE 2.7.2 (amd64)
-- pfSense Plus 24.03 (amd64)
+- pfSense CE 2.7.2
+- pfSense Plus 24.03
 
 !!! Tip
     Don't see your version of pfSense? Older versions of pfSense may be supported by older versions of this package.
@@ -36,11 +36,11 @@ pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/re
 
 !!! Important
     When updating pfSense, **you must reinstall this package afterward** as pfSense removes unofficial packages during
-    system updates.
+    system updates and has no way to automatically reinstall them.
 
 ## Configuring the package
 
-The REST API is designed to be used out of the box. However, there are a number of configuration options available to
+The REST API is designed to be ready to use out of the box. However, there are a number of configuration options available to
 you to customize the API to your needs. The REST API settings can be configured in pfSense webConfigurator under
 'System' -> 'REST API' or via `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint)
 endpoint.

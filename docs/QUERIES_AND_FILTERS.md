@@ -6,8 +6,11 @@ Queries can be used to filter the data that is returned from the API based on sp
 query parameters in the URL and are formatted as `key=value`. Multiple queries can be passed in a single request by
 separating them with an ampersand `&`.
 
-!!! Note
-    Queries are only available for `GET` requests to [plural endpoints](./ENDPOINT_TYPES.md#plural-many-endpoints).
+!!! Important
+    - Queries are only available for `GET` requests to [plural endpoints](./ENDPOINT_TYPES.md#plural-many-endpoints).
+    - While it is not standard HTTP practice, the REST API will allow you to pass query parameters in the request body
+    for `GET` requests as long as the correct Content-Type header is set. This may be useful when you need to force
+    the type of a query parameter or when the query parameter is too long to fit in the URL.
 
 ## Query Filters
 

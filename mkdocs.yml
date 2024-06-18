@@ -6,6 +6,7 @@ nav:
       - Swagger & OpenAPI: SWAGGER_AND_OPENAPI.md
       - Endpoint Types: ENDPOINT_TYPES.md
       - Authentication & Authorization: AUTHENTICATION_AND_AUTHORIZATION.md
+      - Content & Accept Types: CONTENT_AND_ACCEPT_TYPES.md
       - Queries & Filters: QUERIES_AND_FILTERS.md
       - Working with Object IDs: WORKING_WITH_OBJECT_IDS.md
       - Working with HATEOAS: WORKING_WITH_HATEOAS.md

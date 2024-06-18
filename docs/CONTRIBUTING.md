@@ -33,8 +33,6 @@ The project utilizes PHP namespaces to organize its codebase.
 
 Below is a brief overview of the project's structure:
 
-Certainly! Here is the content separated into distinct sections:
-
 ### RESTAPI/
 
 The main namespace for the REST API package. All classes and interfaces are organized under this namespace or a child
