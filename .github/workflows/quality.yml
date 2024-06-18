@@ -31,7 +31,7 @@ jobs:
       - name: "Setup PHP ${{ matrix.PHP_VERSION }}"
         uses: shivammathur/setup-php@v2
         with:
-          PHP_VERSION: "${{ matrix.PHP_VERSION }}"
+          php-version: "${{ matrix.PHP_VERSION }}"
           coverage: "none"
       - name: "Run phplint"
         run: |
