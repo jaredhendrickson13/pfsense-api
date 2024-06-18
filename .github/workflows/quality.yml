@@ -25,13 +25,13 @@ jobs:
     needs: ["check_prettier"]
     strategy:
       matrix:
-        php-version: ["8.2"]
+        PHP_VERSION: ["8.2"]
     steps:
       - uses: actions/checkout@v4
-      - name: "Setup PHP ${{ matrix.php-version }}"
+      - name: "Setup PHP ${{ matrix.PHP_VERSION }}"
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "${{ matrix.php-version }}"
+          PHP_VERSION: "${{ matrix.PHP_VERSION }}"
           coverage: "none"
       - name: "Run phplint"
         run: |
@@ -44,13 +44,13 @@ jobs:
     needs: ["check_black"]
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        PYTHON_VERSION: ["3.9", "3.10", "3.11"]
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.PYTHON_VERSION }}
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python-version }}
+          PYTHON_VERSION: ${{ matrix.PYTHON_VERSION }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
