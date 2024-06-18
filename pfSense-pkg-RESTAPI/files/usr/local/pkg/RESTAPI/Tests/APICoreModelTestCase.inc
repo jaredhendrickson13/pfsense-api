@@ -651,16 +651,15 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $alias_2->delete();
         $alias_3->delete();
     }
-    
+
     /**
      * Checks that the get_all_model_classes() method correctly returns all Model classes that extend the Model class.
      */
-    public function test_get_all_model_classes(): void
-    {
+    public function test_get_all_model_classes(): void {
         # Variables
         $class_fqns = Model::get_all_model_classes();
         $class_shortnames = Model::get_all_model_classes(shortnames: true);
-        
+
         # Get all Model classes and ensure they are all instances of the Model class
         foreach ($class_fqns as $index => $model_class) {
             $class_obj = new $model_class();

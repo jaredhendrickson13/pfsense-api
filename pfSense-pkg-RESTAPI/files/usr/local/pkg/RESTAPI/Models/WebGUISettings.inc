@@ -11,20 +11,18 @@ use RESTAPI\Fields\StringField;
 /**
  * Defines a Model for interacting with the system's web GUI settings.
  */
-class WebGUISettings extends Model
-{
+class WebGUISettings extends Model {
     public StringField $protocol;
     public PortField $port;
     public ForeignModelField $sslcertref;
-    
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'system/webgui';
         $this->update_strategy = 'merge';
         $this->many = false;
         $this->always_apply = true;
-        
+
         # Set model fields
         $this->protocol = new StringField(
             default: 'https',
@@ -44,17 +42,16 @@ class WebGUISettings extends Model
             internal_name: 'ssl-certref',
             help_text: 'The SSL/TLS certificate to use for the web GUI.',
         );
-        
+
         parent::__construct($id, $parent_id, $data, ...$options);
     }
-    
+
     /**
      * Applies changes to the web GUI settings.
-     * @note This method restarts the web server services which may cause a temporary loss of connectivity. It is 
+     * @note This method restarts the web server services which may cause a temporary loss of connectivity. It is
      * recommended to call this method with the $async property set to true to avoid blocking the API response.
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         (new WebGUIRestartDispatcher(async: $this->async))->spawn_process();
     }
 }
