@@ -11,10 +11,20 @@ use RESTAPI\Core\ContentHandler;
 class URLContentHandler extends ContentHandler {
     public string $mime_type = 'application/x-www-form-urlencoded';
 
+    /**
+     * Obtains the client's request data from PHP's $_GET superglobal.
+     *
+     * @return array The request data parsed from the query string.
+     */
     public function get_content(): array {
         return $_GET;
     }
 
+    /**
+     * Decodes the given content from URL encoded data and makes basic type interference.
+     * @param mixed|null $content The content to decode.
+     * @return mixed The decode content.
+     */
     protected function _decode(mixed $content = null): mixed {
         # Loop through each query string item and check for expected data types
         foreach ($content as $key => $value) {
