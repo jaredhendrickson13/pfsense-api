@@ -18,9 +18,7 @@ namespace RESTAPI\Core;
 require_once 'RESTAPI/autoloader.inc';
 
 use Error;
-use ReflectionClass;
 use RESTAPI\Models\RESTAPISettings;
-use stdClass;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 const HTTP_STATUS_MESSAGES = [

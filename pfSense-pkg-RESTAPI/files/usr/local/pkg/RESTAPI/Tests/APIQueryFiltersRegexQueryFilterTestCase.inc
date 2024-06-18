@@ -3,8 +3,6 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\QueryFilters\ContainsQueryFilter;
-use RESTAPI\QueryFilters\ExactQueryFilter;
 use RESTAPI\QueryFilters\RegexQueryFilter;
 
 class APIQueryFiltersRegexQueryFilterTestCase extends TestCase {

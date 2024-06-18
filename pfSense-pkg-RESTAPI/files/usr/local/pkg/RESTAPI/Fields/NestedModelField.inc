@@ -6,7 +6,6 @@ use RESTAPI\Core\Field;
 use RESTAPI\Core\Model;
 use RESTAPI\Core\ModelSet;
 use RESTAPI\Core\Response;
-use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
 /**

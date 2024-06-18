@@ -2,9 +2,9 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\TestCase;
 use RESTAPI\Models\ConfigHistoryRevision;
 use RESTAPI\Models\FirewallAlias;
-use RESTAPI\Core\TestCase;
 
 class APIModelsConfigHistoryRevisionTestCase extends TestCase {
     /**

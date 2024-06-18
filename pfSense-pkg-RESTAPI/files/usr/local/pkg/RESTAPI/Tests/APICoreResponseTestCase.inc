@@ -3,7 +3,6 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI;
-use stdClass;
 
 /**
  * Defines test case for testing RESTAPI\Core\Response.

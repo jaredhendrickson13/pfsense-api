@@ -3,7 +3,6 @@
 namespace RESTAPI\Models;
 
 use RESTAPI;
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;

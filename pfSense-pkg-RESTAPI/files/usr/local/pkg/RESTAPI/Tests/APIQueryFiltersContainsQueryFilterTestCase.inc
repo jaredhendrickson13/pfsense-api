@@ -4,7 +4,6 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
 use RESTAPI\QueryFilters\ContainsQueryFilter;
-use RESTAPI\QueryFilters\ExactQueryFilter;
 
 class APIQueryFiltersContainsQueryFilterTestCase extends TestCase {
     /**

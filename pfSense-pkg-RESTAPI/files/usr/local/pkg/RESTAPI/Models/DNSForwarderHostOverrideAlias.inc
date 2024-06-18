@@ -5,7 +5,6 @@ namespace RESTAPI\Models;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\DNSForwarderApplyDispatcher;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Validators\IPAddressValidator;
 
 /**
  * Defines a Model that interacts with DNS Forwarder host override aliases.

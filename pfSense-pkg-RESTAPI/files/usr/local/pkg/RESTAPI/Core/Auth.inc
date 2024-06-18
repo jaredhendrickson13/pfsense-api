@@ -18,7 +18,6 @@ namespace RESTAPI\Core;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
-use RESTAPI\Auth\BasicAuth;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\User;
 use RESTAPI\Responses\AuthenticationError;

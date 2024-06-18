@@ -5,7 +5,6 @@ namespace RESTAPI\Forms;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Form;
-use RESTAPI\Models\RESTAPISettings;
 
 /**
  * Defines the Form for creating, editing, and deleting REST API Access List entries.

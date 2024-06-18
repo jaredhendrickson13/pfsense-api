@@ -4,7 +4,6 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\CronJob;
-use RESTAPI\Models\Package;
 use RESTAPI\Models\ServiceWatchdog;
 
 class APIModelsServiceWatchdogTestCase extends TestCase {

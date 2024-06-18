@@ -3,10 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\QueryFilters\ContainsQueryFilter;
 use RESTAPI\QueryFilters\EndsWithQueryFilter;
-use RESTAPI\QueryFilters\ExactQueryFilter;
-use RESTAPI\QueryFilters\StartsWithQueryFilter;
 
 class APIQueryFiltersEndsWithQueryFilterTestCase extends TestCase {
     /**

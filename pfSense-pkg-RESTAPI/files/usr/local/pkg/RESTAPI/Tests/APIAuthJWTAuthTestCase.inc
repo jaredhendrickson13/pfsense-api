@@ -2,7 +2,6 @@
 
 namespace RESTAPI\Tests;
 
-use RESTAPI\Auth\BasicAuth;
 use RESTAPI\Auth\JWTAuth;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RESTAPIJWT;

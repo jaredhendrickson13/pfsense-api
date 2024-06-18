@@ -3,11 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\QueryFilters\ExactQueryFilter;
-use RESTAPI\QueryFilters\GreaterThanEqualQueryFilter;
 use RESTAPI\QueryFilters\GreaterThanQueryFilter;
-use RESTAPI\QueryFilters\LessThanEqualQueryFilter;
-use RESTAPI\QueryFilters\LessThanQueryFilter;
 
 class APIQueryFiltersGreaterThanQueryFilterTestCase extends TestCase {
     /**

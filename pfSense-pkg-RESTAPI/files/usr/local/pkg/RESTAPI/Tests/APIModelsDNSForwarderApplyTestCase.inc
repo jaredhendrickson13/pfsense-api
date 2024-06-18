@@ -5,8 +5,6 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\DNSForwarderApply;
 use RESTAPI\Models\DNSForwarderHostOverride;
-use RESTAPI\Models\DNSResolverApply;
-use RESTAPI\Models\DNSResolverHostOverride;
 
 class APIModelsDNSForwarderApplyTestCase extends TestCase {
     /**

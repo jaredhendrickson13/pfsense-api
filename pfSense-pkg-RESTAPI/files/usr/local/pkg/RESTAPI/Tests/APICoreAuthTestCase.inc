@@ -4,7 +4,6 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Auth\BasicAuth;
 use RESTAPI\Core\Auth;
-use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPIKey;

@@ -8,7 +8,6 @@ use RESTAPI\Models\Certificate;
 use RESTAPI\Models\CertificateAuthority;
 use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\OpenVPNClient;
-use RESTAPI\Models\OpenVPNServer;
 
 class APIModelsOpenVPNClientTestCase extends TestCase {
     /**

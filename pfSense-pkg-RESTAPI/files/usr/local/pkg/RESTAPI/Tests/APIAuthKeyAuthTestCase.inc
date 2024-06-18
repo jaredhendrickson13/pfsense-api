@@ -2,11 +2,8 @@
 
 namespace RESTAPI\Tests;
 
-use RESTAPI\Auth\BasicAuth;
-use RESTAPI\Auth\JWTAuth;
 use RESTAPI\Auth\KeyAuth;
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPIKey;
 
 class APIAuthKeyAuthTestCase extends TestCase {

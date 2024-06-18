@@ -4,7 +4,6 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
-use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 
 /**

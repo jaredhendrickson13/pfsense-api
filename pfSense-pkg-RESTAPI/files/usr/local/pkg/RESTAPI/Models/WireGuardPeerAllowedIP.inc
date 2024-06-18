@@ -6,7 +6,6 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\WireGuardApplyDispatcher;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Responses\ConflictError;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**

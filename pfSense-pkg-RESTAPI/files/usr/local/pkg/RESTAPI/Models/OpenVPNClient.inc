@@ -12,7 +12,6 @@ use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ValidationError;
-use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
 

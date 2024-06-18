@@ -4,7 +4,6 @@ namespace RESTAPI\Models;
 
 require_once 'RESTAPI/autoloader.inc';
 
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Endpoints\SystemRESTAPISettingsSyncEndpoint;
 use RESTAPI\Fields\StringField;

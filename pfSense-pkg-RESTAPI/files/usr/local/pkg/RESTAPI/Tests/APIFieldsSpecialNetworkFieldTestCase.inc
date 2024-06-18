@@ -3,7 +3,6 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\Fields\FilterAddressField;
 use RESTAPI\Fields\SpecialNetworkField;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\RESTAPISettings;

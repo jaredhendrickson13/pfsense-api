@@ -2,7 +2,6 @@
 
 namespace RESTAPI\Models;
 
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\InterfaceApplyDispatcher;
 use RESTAPI\Fields\BooleanField;

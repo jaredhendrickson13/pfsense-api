@@ -5,7 +5,6 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\HAProxyApply;
 use RESTAPI\Models\HAProxySettings;
-use RESTAPI\Models\Package;
 
 class APIModelsHAProxyApplyTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-haproxy'];

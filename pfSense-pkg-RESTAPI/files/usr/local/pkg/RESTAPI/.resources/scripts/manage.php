@@ -22,7 +22,6 @@ use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\RESTAPISettingsSync;
 use RESTAPI\Models\RESTAPIVersion;
-use function RESTAPI\Core\Tools\cprint;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**

@@ -2,9 +2,7 @@
 
 namespace RESTAPI\ContentHandlers;
 
-use JsonException;
 use RESTAPI\Core\ContentHandler;
-use RESTAPI\Responses\ValidationError;
 
 /**
  * Defines a ContentHandler for URL encoded data. This handler is responsible for decoding URL encoded data for the

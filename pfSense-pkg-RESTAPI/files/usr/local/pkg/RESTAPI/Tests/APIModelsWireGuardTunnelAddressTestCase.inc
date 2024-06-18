@@ -4,7 +4,6 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\Package;
 use RESTAPI\Models\WireGuardSettings;
 use RESTAPI\Models\WireGuardTunnel;
 use RESTAPI\Models\WireGuardTunnelAddress;

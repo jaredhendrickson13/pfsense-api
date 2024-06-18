@@ -2,8 +2,6 @@
 
 namespace RESTAPI\Core;
 
-use ReflectionClass;
-
 require_once 'RESTAPI/autoloader.inc';
 
 /**

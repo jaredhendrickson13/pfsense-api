@@ -4,7 +4,6 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
 use RESTAPI\Fields\ForeignModelField;
-use RESTAPI\Models\DNSResolverHostOverride;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\TrafficShaper;
 

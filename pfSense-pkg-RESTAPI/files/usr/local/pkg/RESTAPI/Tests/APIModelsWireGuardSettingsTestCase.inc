@@ -4,9 +4,7 @@ namespace RESTAPI\Tests;
 
 require_once 'RESTAPI/autoloader.inc';
 
-use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\Package;
 use RESTAPI\Models\Service;
 use RESTAPI\Models\WireGuardSettings;
 

@@ -3,11 +3,9 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Command;
-use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallSchedule;
 use RESTAPI\Models\TrafficShaperLimiter;
-use RESTAPI\Models\TrafficShaperLimiterBandwidth;
 
 class APIModelsTrafficShaperLimiterBandwidthTestCase extends TestCase {
     /**

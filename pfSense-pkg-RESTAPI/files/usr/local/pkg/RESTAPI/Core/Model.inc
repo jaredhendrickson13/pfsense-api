@@ -17,7 +17,6 @@ namespace RESTAPI\Core;
 
 require_once 'RESTAPI/autoloader.inc';
 
-use ReflectionClass;
 use RESTAPI;
 use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ForbiddenError;

@@ -5,7 +5,6 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\NetworkInterface;
-use RESTAPI\Models\Package;
 use RESTAPI\Models\WireGuardSettings;
 use RESTAPI\Models\WireGuardTunnel;
 

@@ -9,7 +9,6 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\DHCPServerApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
-use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ValidationError;

@@ -5,8 +5,6 @@ namespace RESTAPI\Forms;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Form;
-use RESTAPI\Core\Response;
-use RESTAPI\Models\RESTAPISettings;
 
 /**
  * Defines the Form for creating and editing REST API Access List entries.

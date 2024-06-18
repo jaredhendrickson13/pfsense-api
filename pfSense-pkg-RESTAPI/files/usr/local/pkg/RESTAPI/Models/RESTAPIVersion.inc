@@ -2,12 +2,10 @@
 
 namespace RESTAPI\Models;
 
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
 
 /**

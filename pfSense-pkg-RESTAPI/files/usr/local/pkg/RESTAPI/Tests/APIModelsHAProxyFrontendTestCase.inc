@@ -4,7 +4,6 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\HAProxyBackend;
-use RESTAPI\Models\HAProxyBackendAction;
 use RESTAPI\Models\HAProxyFrontend;
 use RESTAPI\Models\HAProxyFrontendACL;
 use RESTAPI\Models\HAProxyFrontendAction;

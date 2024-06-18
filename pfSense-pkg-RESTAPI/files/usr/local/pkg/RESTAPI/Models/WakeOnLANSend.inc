@@ -2,7 +2,6 @@
 
 namespace RESTAPI\Models;
 
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\InterfaceField;

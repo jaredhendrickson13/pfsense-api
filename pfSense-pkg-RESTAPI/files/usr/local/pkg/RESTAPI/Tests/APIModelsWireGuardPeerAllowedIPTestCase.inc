@@ -4,7 +4,6 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\Package;
 use RESTAPI\Models\WireGuardPeer;
 use RESTAPI\Models\WireGuardPeerAllowedIP;
 use RESTAPI\Models\WireGuardSettings;

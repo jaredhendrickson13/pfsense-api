@@ -3,9 +3,6 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\DNSResolverApply;
-use RESTAPI\Models\DNSResolverHostOverride;
-use RESTAPI\Models\Package;
 use RESTAPI\Models\WireGuardApply;
 use RESTAPI\Models\WireGuardPeer;
 use RESTAPI\Models\WireGuardSettings;

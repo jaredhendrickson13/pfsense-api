@@ -3,7 +3,6 @@
 namespace RESTAPI\Core;
 
 use RESTAPI\Responses\ServerError;
-use RESTAPI\Responses\ValidationError;
 
 require_once 'RESTAPI/autoloader.inc';
 

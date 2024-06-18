@@ -8,7 +8,6 @@ use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use RESTAPI;
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\RESTAPISettingsSyncDispatcher;
 use RESTAPI\Fields\StringField;
