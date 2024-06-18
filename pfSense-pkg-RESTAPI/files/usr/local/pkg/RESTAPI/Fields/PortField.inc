@@ -139,7 +139,7 @@ class PortField extends Field {
         );
 
         # To prevent the need to add redundant openapi to the help text, append a standard set of help text.
-        $this->help_text .= ' Valid value options are: ' . $this->get_valid_opts_str();
+        $this->help_text .= " {$this->get_valid_opts_str()}";
     }
 
     /**
