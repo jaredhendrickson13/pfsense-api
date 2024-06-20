@@ -96,7 +96,7 @@ class InterfaceField extends StringField {
         bool $representation_only = false,
         bool $editable = true,
         bool $many = false,
-        int $many_minimum = 1,
+        int $many_minimum = 0,
         int $many_maximum = 128,
         string|null $delimiter = ',',
         string $verbose_name = '',

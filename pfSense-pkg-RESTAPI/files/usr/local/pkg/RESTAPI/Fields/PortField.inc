@@ -93,7 +93,7 @@ class PortField extends Field {
         bool $write_only = false,
         bool $representation_only = false,
         bool $many = false,
-        int $many_minimum = 1,
+        int $many_minimum = 0,
         int $many_maximum = 128,
         ?string $delimiter = ',',
         string $verbose_name = '',

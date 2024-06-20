@@ -80,7 +80,7 @@ class IntegerField extends Field {
         bool $write_only = false,
         bool $representation_only = false,
         bool $many = false,
-        int $many_minimum = 1,
+        int $many_minimum = 0,
         int $many_maximum = 128,
         public int $minimum = 0,
         public int $maximum = 99999999999999,

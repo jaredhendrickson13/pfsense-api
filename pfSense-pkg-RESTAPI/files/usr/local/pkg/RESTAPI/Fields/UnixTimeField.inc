@@ -84,7 +84,7 @@ class UnixTimeField extends IntegerField {
         bool $write_only = false,
         bool $representation_only = false,
         bool $many = false,
-        int $many_minimum = 1,
+        int $many_minimum = 0,
         int $many_maximum = 128,
         int $minimum = 0,
         int $maximum = 99999999999999,
