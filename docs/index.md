@@ -38,6 +38,11 @@ opening a pull request.
 
 - <a href="https://github.com/jaredhendrickson13"><img src="https://github.com/jaredhendrickson13.png" alt="Jared Hendrickson" title="Jared Hendrickson" width="30" height="30"/> Jared Hendrickson</img></a> - github@jaredhendrickson.com
 
+!!! Important
+    Unless your inquiry is regarding a security vulnerability or other sensitive matter, please do not contact the
+    maintainers directly. Instead, please [open an issue](https://github.com/jaredhendrickson13/pfsense-api/issues/new/choose)
+    to report a bug or request a feature. For general questions or help requests, please [open a discussion](https://github.com/jaredhendrickson13/pfsense-api/discussions/new/choose).
+
 ## Disclaimers
 
 !!! Caution
