@@ -8,8 +8,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     yes | pkg update
     yes | pkg upgrade
-    yes | pkg install python38-3.8.18
-    yes | pkg install php80-composer-2.6.6
+    yes | pkg install python38
+    yes | pkg install php82-composer
     yes | pkg install portsnap
     portsnap fetch --interactive
     portsnap extract
