@@ -366,8 +366,9 @@ class Form {
 
     /**
      * Performs validation and saves the Model assigned to this ModelForm.
+     * @param string $success_banner_msg The message to append to the success banner when the Model is saved.
      */
-    public function on_save(): void {
+    public function on_save(string $success_banner_msg = ''): void {
         # Update settings with the newly provided values
         $representation_data = isset($this->id) ? ['id' => $this->id] : [];
         $representation_data += $this->form_data_to_model_representation(form_data: $_POST, model: $this->model);
@@ -384,7 +385,7 @@ class Form {
         # When an ID was found or the assigned model is not a `many` model, update the object. Otherwise create it.
         try {
             (isset($this->id) or !$this->model->many) ? $this->model->update() : $this->model->create();
-            $this->print_success_banner();
+            $this->print_success_banner(message: $success_banner_msg);
         } catch (Response $resp_error) {
             $error_message = $resp_error->getMessage();
             $this->print_input_error_banner(message: $error_message);

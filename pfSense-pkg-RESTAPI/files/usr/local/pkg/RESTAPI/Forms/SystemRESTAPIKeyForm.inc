@@ -45,8 +45,9 @@ class SystemRESTAPIKeyForm extends Form {
 
     /**
      * Overwrite the on_save() method to include the generated API key.
+     * @param string $success_banner_msg The message to display in the success banner. (unused)
      */
-    public function on_save(): void {
+    public function on_save(string $success_banner_msg = ''): void {
         # Update settings with the newly provided values
         $representation_data = $this->id ? ['id' => $this->id] : [];
         $representation_data += $this->form_data_to_model_representation(form_data: $_POST, model: $this->model);
