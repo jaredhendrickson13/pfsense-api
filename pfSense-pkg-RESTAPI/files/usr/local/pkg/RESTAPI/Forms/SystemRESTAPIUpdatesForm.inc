@@ -28,12 +28,11 @@ class SystemRESTAPIUpdatesForm extends Form {
             'fields' => ['install_version'],
         ],
     ];
-    
-    public function on_save(string $success_banner_msg = ''): void
-    {
+
+    public function on_save(string $success_banner_msg = ''): void {
         parent::on_save(
-            success_banner_msg: "The requested version is being installed in the background. Check this page again " .
-                "later to see the status."
+            success_banner_msg: 'The requested version is being installed in the background. Check this page again ' .
+                'later to see the status.',
         );
     }
 }

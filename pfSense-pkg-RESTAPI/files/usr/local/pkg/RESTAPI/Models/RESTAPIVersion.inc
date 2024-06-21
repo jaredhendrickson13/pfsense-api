@@ -87,7 +87,7 @@ class RESTAPIVersion extends Model {
         if (!$this->install_version->value) {
             return;
         }
-        
+
         # Install in the background if $async is set to true
         if ($this->async) {
             $this->install_version_async(tag: $this->install_version->value);
@@ -245,9 +245,9 @@ class RESTAPIVersion extends Model {
 
         return null;
     }
-    
+
     /**
-     * Runs install_version() in the background by calling php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php 
+     * Runs install_version() in the background by calling php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php
      * revert in a nohup process.
      * @param string $tag The tag of the version to install.
      */
@@ -255,7 +255,7 @@ class RESTAPIVersion extends Model {
         $tag = escapeshellarg($tag);
         new Command(
             command: "nohup php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php revert $tag",
-            redirect: "> /dev/null 2>&1 &"
+            redirect: '> /dev/null 2>&1 &',
         );
     }
 }
