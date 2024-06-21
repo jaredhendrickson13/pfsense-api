@@ -88,7 +88,7 @@ Contains the [\RESTAPI\Core\Form](https://pfrest.org/php-docs/classes/RESTAPI-Co
 
 ### Models/
 
-Contains the [\RESTAPI\Core\Model](https://pfrest.org/php-docs/classes/RESTAPI-Core-Model.html) child classes. Model classes are used to define and manage the data structure of the REST API package.
+Contains the [\RESTAPI\Core\Model](https://pfrest.org/php-docs/classes/RESTAPI-Core-Model.html) child classes. Model classes are used to define and manage the data structure of the object's the REST API package interacts with (i.e. firewall rules, static routes, etc.).
 
 ### QueryFilters/
 
