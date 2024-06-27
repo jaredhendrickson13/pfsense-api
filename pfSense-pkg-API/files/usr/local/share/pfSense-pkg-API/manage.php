@@ -14,6 +14,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 require_once("api/framework/APITools.inc");
+require_once("api/models/APISystemAPIVersionRead.inc");
 
 function build_endpoints() {
     # Import each endpoint class
@@ -84,8 +85,9 @@ function sync() {
 
 function update() {
     $pf_version = APITools\get_pfsense_version()["base"];
+    $latest_version = APISystemAPIVersionRead::get_latest_api_version();
     echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-    echo shell_exec("/usr/sbin/pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.pkg");
+    echo shell_exec("/usr/sbin/pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/download/$latest_version/pfSense-".$pf_version."-pkg-API.pkg");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 

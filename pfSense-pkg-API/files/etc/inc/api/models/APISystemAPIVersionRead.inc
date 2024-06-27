@@ -107,7 +107,7 @@ class APISystemAPIVersionRead extends APIModel {
             if ($release["prerelease"] === false or isset($pkg_config["allow_pre_release"])) {
                 # Loop through the assets of each release and check if our version of pfSense is supported
                 foreach ($release["assets"] as $asset) {
-                    if (str_starts_with($asset["name"], "pfSense-" . $pf_version)) {
+                    if ($asset["name"] === "pfSense-$pf_version-pkg-API.pkg") {
                         # The first item of our list is the latest release, mark it as such.
                         if ($count === 0) {
                             $versions[$release["tag_name"]] = $release["name"] . " - Latest";
