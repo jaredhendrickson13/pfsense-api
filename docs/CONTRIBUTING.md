@@ -128,17 +128,18 @@ that contributions are easier to review and maintain. The project uses the follo
 
 ## Building the Package From Source
 
-Building this package requires access to suitable FreeBSD build environment. The package must be built using the FreeBSD
+Building this package requires access to a suitable FreeBSD build environment. The package must be built using the FreeBSD
 version that corresponds to the pfSense version you are building for. Luckily, there are several tools available to help
 you build the package:
 
-### Step 1: Install Virtualbox and Vagrant
+### Scripted Build Process
+
+#### Step 1: Install Virtualbox and Vagrant
 
 On your development machine, install [Virtualbox](https://www.virtualbox.org) and [Vagrant](https://www.vagrantup.com).
-These tools will allow you to create a virtual machine with the correct FreeBSD version for building the package with
-minimal effort.
+These tools will allow you to create a FreeBSD virtual machine for building the package with minimal effort.
 
-### Step 2: Clone the Repository
+#### Step 2: Clone the Repository
 
 Clone the repository to your development machine:
 
@@ -146,10 +147,9 @@ Clone the repository to your development machine:
 git clone git@github.com:jaredhendrickson13/pfsense-api.git
 ```
 
-### Step 3: Run the vagrant-build.sh script
+#### Step 3: Run the vagrant-build.sh script
 
-From the project root, run the `vagrant-build.sh` script to create a virtual machine with the correct FreeBSD version
-and build the package:
+From the project root, run the `vagrant-build.sh` script to create a FreeBSD virtual machine and build the package:
 
 ```bash
 sh vagrant-build.sh
