@@ -126,6 +126,49 @@ that contributions are easier to review and maintain. The project uses the follo
     - From the project root, run `pip install -r requirements.txt` to install Black.
     - From the project root, run `black .` to format all Python files in the project.
 
+## Building the Package From Source
+
+Building this package requires access to suitable FreeBSD build environment. The package must be built using the FreeBSD
+version that corresponds to the pfSense version you are building for. Luckily, there are several tools available to help
+you build the package:
+
+### Step 1: Install Virtualbox and Vagrant
+
+On your development machine, install [Virtualbox](https://www.virtualbox.org) and [Vagrant](https://www.vagrantup.com).
+These tools will allow you to create a virtual machine with the correct FreeBSD version for building the package with
+minimal effort.
+
+### Step 2: Clone the Repository
+
+Clone the repository to your development machine:
+
+```bash
+git clone git@github.com:jaredhendrickson13/pfsense-api.git
+```
+
+### Step 3: Run the vagrant-build.sh script
+
+From the project root, run the `vagrant-build.sh` script to create a virtual machine with the correct FreeBSD version
+and build the package:
+
+```bash
+sh vagrant-build.sh
+```
+
+After the script completes, the package will be built and the resulting `.pkg` file will be located in your current
+working directory.
+
+!!! Important
+    - You will need to copy this `.pkg` file to your pfSense instance and install it using `pkg`. The package will not operate correctly if installed on a non-pfSense FreeBSD system.
+    - The script will not automatically destroy the virtual machine after the build process completes. You will need to manually destroy the virtual machine using `vagrant destroy` when you are finished.
+
+#### Supported Build Environment Variables
+
+Below are the supported environment variables to customize the build process:
+
+- `FREEBSD_VERSION`: The version of FreeBSD to use for the build. This must be an existing Vagrant box name including the `freebsd/` prefix. The default value is `freebsd/FreeBSD-14.0-STABLE`. For a list of available boxes, see the [Vagrant Cloud](https://app.vagrantup.com/freebsd) page.
+- `BUILD_VERSION`: The version tag to give the build, this must be in a FreeBSD package version format (e.g. `0.0_0`). The default value is `0.0_0-dev`.
+
 ## Testing
 
 Testing this package poses a number of challenges. Because pfSense is a hardened, security-focused operating system,
