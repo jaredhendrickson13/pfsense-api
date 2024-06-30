@@ -2,6 +2,8 @@
 
 namespace RESTAPI\Tests;
 
+use ReflectionClass;
+use ReflectionException;
 use RESTAPI;
 use RESTAPI\Caches\RESTAPIVersionReleasesCache;
 use RESTAPI\Core\Model;
@@ -665,6 +667,36 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             $class_obj = new $model_class();
             $this->assert_is_true(is_subclass_of($class_obj, Model::class));
             $this->assert_equals($class_obj->get_class_shortname(), $class_shortnames[$index]);
+        }
+    }
+
+    /**
+     * Checks that each Model class in /usr/local/pkg/RESTAPI/Models/ has the correct constructor signature.
+     */
+    public function test_model_constructor_signature(): void
+    {
+        # Variables
+        $class_fqns = Model::get_all_model_classes();
+
+        # Ensure each Model class has the correct constructor signature
+        foreach ($class_fqns as $model_class) {
+            # Get the constructor parameters
+            $reflection = new ReflectionClass($model_class);
+            $constructor = $reflection->getConstructor();
+            $parameters = $constructor->getParameters();
+            $param_names = array_map(
+                function($param) {
+                    return $param->getName();
+                },
+                $parameters
+            );
+
+            # Ensure all required parameters are present
+            $this->assert_is_true(in_array('id', $param_names), "$model_class is missing 'id' parameter");
+            $this->assert_is_true(in_array('parent_id', $param_names), "$model_class is missing 'parent_id' parameter");
+            $this->assert_is_true(in_array('data', $param_names), "$model_class is missing 'data' parameter");
+            $this->assert_is_true(in_array('options', $param_names), "$model_class is missing 'options' parameter");
+
         }
     }
 }
