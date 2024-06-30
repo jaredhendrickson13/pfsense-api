@@ -673,8 +673,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that each Model class in /usr/local/pkg/RESTAPI/Models/ has the correct constructor signature.
      */
-    public function test_model_constructor_signature(): void
-    {
+    public function test_model_constructor_signature(): void {
         # Variables
         $class_fqns = Model::get_all_model_classes();
 
@@ -684,19 +683,15 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             $reflection = new ReflectionClass($model_class);
             $constructor = $reflection->getConstructor();
             $parameters = $constructor->getParameters();
-            $param_names = array_map(
-                function($param) {
-                    return $param->getName();
-                },
-                $parameters
-            );
+            $param_names = array_map(function ($param) {
+                return $param->getName();
+            }, $parameters);
 
             # Ensure all required parameters are present
             $this->assert_is_true(in_array('id', $param_names), "$model_class is missing 'id' parameter");
             $this->assert_is_true(in_array('parent_id', $param_names), "$model_class is missing 'parent_id' parameter");
             $this->assert_is_true(in_array('data', $param_names), "$model_class is missing 'data' parameter");
             $this->assert_is_true(in_array('options', $param_names), "$model_class is missing 'options' parameter");
-
         }
     }
 }
