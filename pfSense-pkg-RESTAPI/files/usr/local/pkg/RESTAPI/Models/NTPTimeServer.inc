@@ -18,7 +18,7 @@ class NTPTimeServer extends Model {
     public BooleanField $prefer;
     public BooleanField $noselect;
 
-    public function __construct(mixed $id = null, mixed $data = [], ...$options) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->many_minimum = 1; // Require at least one timeserver at all times
         $this->many = true;

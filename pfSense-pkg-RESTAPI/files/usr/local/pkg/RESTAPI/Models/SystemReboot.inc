@@ -12,7 +12,7 @@ use RESTAPI\Fields\BooleanField;
 class SystemReboot extends Model {
     public BooleanField $dry_run;
 
-    public function __construct(mixed $data = [], ...$options) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->many = false;
 

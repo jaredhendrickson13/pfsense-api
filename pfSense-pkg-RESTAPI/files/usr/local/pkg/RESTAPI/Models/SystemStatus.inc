@@ -33,7 +33,7 @@ class SystemStatus extends Model {
     public FloatField $swap_usage;
     public FloatField $disk_usage;
 
-    public function __construct(mixed $data = [], ...$options) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_system_status_internal';
 

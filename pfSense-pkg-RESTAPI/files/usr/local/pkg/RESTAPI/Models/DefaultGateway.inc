@@ -13,7 +13,7 @@ class DefaultGateway extends Model {
     public ForeignModelField $defaultgw4;
     public ForeignModelField $defaultgw6;
 
-    public function __construct(mixed $data = [], ...$options) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'gateways';
         $this->update_strategy = 'merge';

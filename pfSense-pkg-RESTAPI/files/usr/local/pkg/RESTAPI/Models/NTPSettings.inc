@@ -33,7 +33,7 @@ class NTPSettings extends Model {
     public Base64Field $serverauthkey;
     public StringField $serverauthalgo;
 
-    public function __construct(mixed $data = [], ...$options) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'ntpd';
         $this->update_strategy = 'merge';
