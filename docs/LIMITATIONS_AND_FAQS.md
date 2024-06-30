@@ -35,7 +35,7 @@ the v1 API and still allow both packages to be installed concurrently for users 
 when trying to implement v2. v2 was designed from the ground up with namespaces in mind to prevent these conflicts and
 allow major revisions to be included in the same package going forward.
 3. **Accuracy**: The v1 codebase was a brute force attempt at creating an API for pfSense. Initially it was not 
-designed to with RESTful principles. The v2 API was designed from the ground up with RESTful principles in mind and
-is a much more accurate representation of a RESTful API, therfor it was decided to create a new package to reflect this
-change while also differentiating it from Netgate's purported RESTCONF plans.
+designed to comply with RESTful principles and was only meant to be REST-like. The v2 API was designed from the ground
+up with RESTful principles in mind and is a much more accurate representation of a RESTful API, therefor it was decided 
+to create a new package to reflect this change while also differentiating it from Netgate's supposed RESTCONF plans.
 
