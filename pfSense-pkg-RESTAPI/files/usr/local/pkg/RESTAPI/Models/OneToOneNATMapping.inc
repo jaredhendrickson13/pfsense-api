@@ -25,7 +25,7 @@ class OneToOneNATMapping extends Model {
     public FilterAddressField $destination;
     public StringField $descr;
 
-    public function __construct(mixed $id = null, mixed $data = [], ...$options) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'nat/onetoone';
         $this->subsystem = 'natconf';
