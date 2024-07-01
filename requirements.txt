@@ -1,4 +1,5 @@
 jinja2~=3.1.4
-requests~=2.32.3
-urllib3~=1.26.17
-pylint~=3.2.3
+pylint~=3.2.1
+black~=24.4.2
+mkdocs~=1.6.0
+boto3~=1.34.117

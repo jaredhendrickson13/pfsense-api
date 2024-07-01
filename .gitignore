@@ -8,6 +8,5 @@ vendor/
 .vagrant
 *.pkg
 node_modules
-.phpdoc
+.phpdoc/
 site/
-

@@ -5,17 +5,44 @@
 
 version: 2
 updates:
+  # MASTER BRANCH (v2)
   - package-ecosystem: "composer"
     directory: "/"
     target-branch: "master"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "pip"
     directory: "/"
     target-branch: "master"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "master"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "master"
+    open-pull-requests-limit: 10
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "chore"
+
+  # LEGACY BRANCH (v1)
+  - package-ecosystem: "composer"
+    directory: "/"
+    target-branch: "legacy"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "pip"
+    directory: "/"
+    target-branch: "legacy"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "legacy"
+    schedule:
+      interval: "monthly"

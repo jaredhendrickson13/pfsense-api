@@ -1,10 +1,9 @@
 ---
 name: Feature Request
 about: Suggest an idea for this project
-title: ''
+title: ""
 labels: backlog, feature request
-assignees: ''
-
+assignees: ""
 ---
 
 **Is your feature request related to existing pfSense functionality that is missing from the API? Please describe.**
