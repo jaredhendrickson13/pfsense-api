@@ -18,6 +18,7 @@ nav:
       - Building Custom Authentication: BUILDING_CUSTOM_AUTH_CLASSES.md
       - Building Custom Query Filters: BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md
       - Building Custom Models: BUILDING_CUSTOM_MODEL_CLASSES.md
+      - Building Custom Endpoints: BUILDING_CUSTOM_ENDPOINT_CLASSES.md
       - Contributing & Development: CONTRIBUTING.md
       - PHP Reference: https://pfrest.org/php-docs/
 theme:

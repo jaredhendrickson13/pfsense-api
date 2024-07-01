@@ -1,7 +1,7 @@
 # Building Custom Model Classes
 
 Model classes are a core component of the REST API. They define the structure of the data that the API will work with
-and provide an simpler way to define pfSense configuration data in a way that is consistent and easy to work with. Notable
+and provide an simpler way to define pfSense configuration data in a consistent and easy to work with manner. Notable
 responsibilities of Model classes include:
 
 - Defining the data structure and typing of the data that the API will work with.
@@ -31,6 +31,10 @@ class MyCustomModel extends Model {
 }
 ```
 
+!!! Important
+    Be sure to place this class file within `/usr/local/pkg/RESTAPI/Models/` directory and name the file after your 
+    Model class name with a `.inc` extension.
+
 ## Define __construct() Method Properties
 
 The `__construct()` method is used to initialize the Model class. It is responsible for setting the various Model
@@ -57,7 +61,8 @@ $this->config_path = 'unbound/hosts';
 
 The `internal_callable` property is used to define a callable function that will be used to read the internal data for
 the Model's objects. This is typically pfSense data that is not stored in the configuration, such as real-time metrics.
-The value assigned here must be a method available in the Model class.
+The value assigned here must be a method available in the Model class. See the [Non-Configuration Based Models](#non-configuration-based-models) 
+section for more information.
 
 Example:
 
@@ -480,6 +485,11 @@ The `allow_null` property is used to define whether the field can be `null` when
     - If set to `true`, the `allow_null` property will bypass other validations if the value assigned is `null`.
     - pfSense represents `null` values in the XML configuration as an omitted field. Use `allow_empty` to allow empty values and represent them as `<field></field>` in the XML configuration.
 
+### unique
+
+The `unique` property is used to define whether the field must have a unique value when creating or updating objects of the Model.
+If any other object of the Model already has the same value assigned to the field, the validation will fail.
+
 ### editable
 
 The `editable` property is used to define whether the field can be edited when updating objects of the Model. If `false`, the
@@ -813,3 +823,318 @@ class MyCustomModel extends Model {
         }
     }
 ```
+
+## Implementing Apply Methods
+
+In most cases, simply writing a Model object to the XML configuration is not enough to apply the changes to the system.
+The `apply()` method is used to apply the changes made to the Model object to the system. This method is automatically
+called after a Model object is created, updated, or deleted. The `apply()` method should contain the logic to apply the
+changes made to the Model object to the system. There are a few different types of `apply()` methods that can be used:
+
+### apply()
+
+The standard `apply()` method is used to apply changes to the system when a Model object is created, updated, or deleted.
+This method will be used by default if no other `apply_*()` method is defined.
+
+### apply_create()
+
+The `apply_create()` method is used to apply changes to the system when a Model object is created. This method will 
+default to the `apply()` method if not defined.
+
+### apply_update()
+
+The `apply_update()` method is used to apply changes to the system when a Model object is updated. This method will
+default to the `apply()` method if not defined.
+
+### apply_delete()
+
+The `apply_delete()` method is used to apply changes to the system when a Model object is deleted. This method will
+default to the `apply()` method if not defined.
+
+### apply_replace_all()
+
+The `apply_replace_all()` method is used to apply changes to the system when all Model objects are replaced. This method
+will default to the `apply()` method if not defined.
+
+### Utilizing Dispatchers
+
+When implementing any apply method, it is important to consider the amount of time it may take to apply the changes. If
+the apply method will take a long time to complete, it is recommended to create a new [Dispatcher class](https://pfrest.org/php-docs/classes/RESTAPI-Core-Dispatcher.html) for your Model
+and call the Dispatcher in your apply method like so:
+
+```php
+public function apply(): void {
+    $dispatcher = new MyCustomDispatcher(async: $this->async);
+    $dispatcher->spawn_process();
+}
+```
+
+!!! Notes
+    - The `async` property is used to define whether the Dispatcher should run asynchronously. If `true`, the Dispatcher
+      will run in the background and the apply method will return immediately. If `false`, the Dispatcher will run
+      synchronously and the apply method will wait for the Dispatcher to complete before returning.
+
+### Tracking Original Model State
+
+In certain situations, you may need to reference the Model object as it was before any changes were made. This can be
+done by using the `$this->initial_object` property of your Model class. This property will contain the Model object as
+it was before any changes were made.
+
+!!! Note
+    After the Model is created, updated, or delete, the `$this->initial_object` property will be updated to reflect the
+    current state of the Model object.
+
+## Utilizing the Model Class
+
+After you have defined your custom Model class, you can call the Model within PHP code to interact with the pfSense
+configuration it represents. 
+
+!!! Important
+    This documentations only applies to interacting the Model objects within the package internally (PHP). It does not cover
+    how to interact with the Model objects via the REST API.
+
+Below are examples of how to create, read, update, and delete objects of the Model class:
+
+
+
+### Create an Object
+
+Once you have constructed the Model object and assigned the desired field values, you can call the `create()` method to
+validate the object and write the object to the XML configuration:
+
+```php
+<?php
+
+require_once 'RESTAPI/autoloader.inc';
+
+use RESTAPI\Models\MyCustomModel;
+
+# Create a new Model object
+$my_custom_model = new MyCustomModel(name: "EXAMPLE_NAME", timeout: 60, enabled: true);
+$my_custom_model->create();
+```
+
+### Read an Object
+
+To read an existing object, simply construct the Model object with an `id` for `many` enabled Models or without an `id`
+for `many` disabled Models. Then call the `read()` method to read the object from the XML configuration:
+
+```php
+<?php
+
+require_once 'RESTAPI/autoloader.inc';
+
+use RESTAPI\Models\MyCustomModel;
+
+# Read an existing Model object
+$my_custom_model = new MyCustomModel(id: 1);
+```
+
+### Update an Object
+
+To update an existing object, construct the Model object with an `id` for `many` enabled Models or without an `id` for
+`many` disabled Models. Then assign the desired field values and call the `update()` method to validate the object and
+write the object to the XML configuration:
+
+```php
+<?php
+
+require_once 'RESTAPI/autoloader.inc';
+
+use RESTAPI\Models\MyCustomModel;
+
+# Update an existing Model object
+$my_custom_model = new MyCustomModel(id: 1, name: "NEW_NAME", timeout: 90, enabled: false);
+$my_custom_model->update();
+```
+
+### Delete an Object
+
+To delete an existing object, construct the Model object with an `id` for `many` enabled Models or without an `id` for
+`many` disabled Models. Then call the `delete()` method to delete the object from the XML configuration:
+
+```php
+<?php
+
+require_once 'RESTAPI/autoloader.inc';
+
+use RESTAPI\Models\MyCustomModel;
+
+# Delete an existing Model object
+$my_custom_model = new MyCustomModel(id: 1);
+$my_custom_model->delete();
+```
+
+## Non-configuration Based Models
+
+In some cases, you may need to create a Model class that does not interact with the pfSense configuration. Some common
+examples of non-configuration based Models include Models that fetch real-time data, interact with services directly, or
+execute certain commands. To create a non-configuration based Model, you can omit the `config_path` property and define
+an `internal_callable` property instead. The `internal_callable` property is used to define a callable function that will
+be used to fetch the Model's data internally. This function must be defined in the Model class and must return an array 
+of objects for `many` enabled Models or a single object for `many` disabled Models.
+
+Below is an example of how to define a non-configuration based Model class:
+
+```php
+<?php
+
+namespace RESTAPI\Models;
+
+require_once 'RESTAPI/autoloader.inc';
+
+use RESTAPI\Core\Model;
+
+/**
+TODO: Add a description of your Model class here.
+*/
+class MyCustomModel extends Model {
+    public function __construct() {
+        # Set model attributes
+        $this->internal_callable = 'fetch_data';
+        $this->many = true;
+        
+        # Set model fields
+        $this->name = new StringField(
+            required: true,
+            unique: true,
+            help_text: 'Demonstrates an example StringField.',
+        );
+        $this->timeout = new IntegerField(
+            default: 30,
+            help_text: 'Demonstrates an example IntegerField.',
+        );
+        $this->enabled = new BooleanField(
+            default: true,
+            indicates_true: "on", // The value stored in the XML configuration when the field is true
+            indicates_false: "off", // The value stored in the XML configuration when the field is false
+            help_text: 'Demonstrates an example BooleanField.',
+        );
+    }
+
+    /**
+    * Fetches data for the Model object.
+    * @return array The data for the Model object.
+    */
+    public function fetch_data(): array {
+        return [
+            [
+                'name' => 'EXAMPLE_NAME_1',
+                'timeout' => 60,
+                'enabled' => true,
+            ],
+            [
+                'name' => 'EXAMPLE_NAME_2',
+                'timeout' => 90,
+                'enabled' => false,
+            ],
+        ];
+    }
+}
+```
+
+### Defining CRUD Methods
+
+When creating a non-configuration based Model, the default `create()`, `update()`, and `delete()` methods will throw an error. To enable these methods, you must define the `_create()`, `_update()` and `_delete()` yourself. Below is an
+example of how to define custom CRUD methods for a non-configuration based Model:
+
+```php
+<?php
+
+namespace RESTAPI\Models;
+
+require_once 'RESTAPI/autoloader.inc';
+
+use RESTAPI\Core\Model;
+
+/**
+TODO: Add a description of your Model class here.
+*/
+class MyCustomModel extends Model {
+    public function __construct() {
+        # Set model attributes
+        $this->internal_callable = 'fetch_data';
+        $this->many = true;
+        
+        # Set model fields
+        $this->name = new StringField(
+            required: true,
+            unique: true,
+            help_text: 'Demonstrates an example StringField.',
+        );
+        $this->timeout = new IntegerField(
+            default: 30,
+            help_text: 'Demonstrates an example IntegerField.',
+        );
+        $this->enabled = new BooleanField(
+            default: true,
+            indicates_true: "on", // The value stored in the XML configuration when the field is true
+            indicates_false: "off", // The value stored in the XML configuration when the field is false
+            help_text: 'Demonstrates an example BooleanField.',
+        );
+    }
+
+    /**
+    * Fetches data for the Model object.
+    * @return array The data for the Model object.
+    */
+    public function fetch_data(): array {
+        return [
+            [
+                'name' => 'EXAMPLE_NAME_1',
+                'timeout' => 60,
+                'enabled' => true,
+            ],
+            [
+                'name' => 'EXAMPLE_NAME_2',
+                'timeout' => 90,
+                'enabled' => false,
+            ],
+        ];
+    }
+    
+    /**
+    * Defines steps to 'create' an instance of this Model.
+    */
+    public function _create(): void {
+        # TODO: Add custom logic to create an object
+    }
+    
+    /**
+    * Defines steps to 'update' an instance of this Model.
+    */
+    public function _update(): void {
+        # TODO: Add custom logic to update an object
+    }   
+    
+    /**
+    * Defines steps to 'delete' an instance of this Model.
+    */
+    public function _delete(): void {
+        # TODO: Add custom logic to delete an object
+    }
+}
+```
+
+Once you have defined the applicable CRUD methods, you can call them in the same way as the standard CRUD methods:
+
+```php
+<?php
+
+require_once 'RESTAPI/autoloader.inc';
+
+use RESTAPI\Models\MyCustomModel;
+
+# Create a new Model object
+$my_custom_model = new MyCustomModel();
+$my_custom_model->create();
+```
+
+!!! Important
+    You should not call the `_create()`, `_update()`, or `_delete()` methods directly. These methods are automatically called
+    when the create(), update(), or delete() methods are called.
+
+## Exposing Model via REST API Endpoint
+
+Once you have defined your Model class, you can expose it via a REST API endpoint. To do this, you must create a new Endpoint
+class. Refer to the [Building Custom Endpoint Classes](BUILDING_CUSTOM_ENDPOINT_CLASSES.md) documentation for more information.
