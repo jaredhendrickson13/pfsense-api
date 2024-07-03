@@ -14,12 +14,16 @@ nav:
       - Limitations & FAQs: LIMITATIONS_AND_FAQS.md
       - API Reference: https://pfrest.org/api-docs/
   - Advanced Topics:
-      - Dispatchers & Caching: DISPATCHERS_AND_CACHING.md
+      - Introduction: ADVANCED_TOPICS_INTRO.md
+      - Contributing & Development: CONTRIBUTING.md
       - Building Custom Authentication: BUILDING_CUSTOM_AUTH_CLASSES.md
       - Building Custom Query Filters: BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md
       - Building Custom Models: BUILDING_CUSTOM_MODEL_CLASSES.md
       - Building Custom Endpoints: BUILDING_CUSTOM_ENDPOINT_CLASSES.md
-      - Contributing & Development: CONTRIBUTING.md
+      - Building Custom Validators: BUILDING_CUSTOM_VALIDATOR_CLASSES.md
+      - Building Custom Dispatchers: BUILDING_CUSTOM_DISPATCHER_CLASSES.md
+      - Building Custom Caches: BUILDING_CUSTOM_CACHE_CLASSES.md
+      - Building Custom Content Handlers: BUILDING_CUSTOM_CONTENT_HANDLER_CLASSES.md
       - PHP Reference: https://pfrest.org/php-docs/
 theme:
   name: readthedocs

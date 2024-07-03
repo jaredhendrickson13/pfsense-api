@@ -869,6 +869,8 @@ public function apply(): void {
 }
 ```
 
+For more information on how to build custom Dispatcher classes, refer to the [Building Custom Dispatcher Classes](https://pfrest.org/docs/BUILDING_CUSTOM_DISPATCHER_CLASSES.html) documentation.
+
 !!! Notes
     - The `async` property is used to define whether the Dispatcher should run asynchronously. If `true`, the Dispatcher
       will run in the background and the apply method will return immediately. If `false`, the Dispatcher will run

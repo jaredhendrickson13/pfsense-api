@@ -6,7 +6,8 @@ with the REST API package and provide you with the information you need to devel
 
 ## Contributing
 
-You can contribute to the project in a variety of ways, including but not limited to:
+For those looking to contribute to the project, you can contribute to the project in a variety of ways, 
+including but not limited to:
 
 - Bug fixes
 - New features
@@ -56,11 +57,11 @@ Contains helper scripts for the REST API package. These scripts are used to auto
 
 ### Auth/
 
-Contains the [\RESTAPI\Core\Auth](https://pfrest.org/php-docs/classes/RESTAPI-Core-Auth.html) child classes. Auth classes are used to define and manage authentication methods for the REST API package. For information about writing custom authentication classes, see the [Building Custom Authentication Classes](BUILDING_CUSTOM_AUTH_CLASSES.md) documentation.
+Contains the [\RESTAPI\Core\Auth](https://pfrest.org/php-docs/classes/RESTAPI-Core-Auth.html) child classes. [Auth classes](BUILDING_CUSTOM_AUTH_CLASSES.md) are used to define and manage authentication methods for the REST API package. For information about writing custom authentication classes, see the [Building Custom Authentication Classes](BUILDING_CUSTOM_AUTH_CLASSES.md) documentation.
 
 ### Caches/
 
-Contains the [\RESTAPI\Core\Cache](https://pfrest.org/php-docs/classes/RESTAPI-Core-Cache.html) child classes. [Cache classes](DISPATCHERS_AND_CACHING.md) are used to define and manage cache data and files for the REST API package.
+Contains the [\RESTAPI\Core\Cache](https://pfrest.org/php-docs/classes/RESTAPI-Core-Cache.html) child classes. [Cache classes](BUILDING_CUSTOM_CACHE_CLASSES.md) are used to define and manage cache data and files for the REST API package.
 
 ### ContentHandlers/
 
@@ -72,11 +73,11 @@ Contains the [core classes and interfaces](https://pfrest.org/php-docs/namespace
 
 ### Dispatchers/
 
-Contains the [\RESTAPI\Core\Dispatcher](https://pfrest.org/php-docs/classes/RESTAPI-Core-Dispatcher.html) child classes. Dispatcher classes are used to define and manage long-running processes that run in the background.
+Contains the [\RESTAPI\Core\Dispatcher](https://pfrest.org/php-docs/classes/RESTAPI-Core-Dispatcher.html) child classes. [Dispatcher classes](BUILDING_CUSTOM_DISPATCHER_CLASSES.md) are used to define and manage long-running processes that run in the background.
 
 ### Endpoints/
 
-Contains the [\RESTAPI\Core\Endpoint](https://pfrest.org/php-docs/classes/RESTAPI-Core-Endpoint.html) child classes for the REST API package. Endpoint classes are used to define, customize, and manage the REST API endpoints. Each endpoint class corresponds to a specific REST API endpoint in the pfSense web root and is responsible for dynamically generating the endpoint's PHP file in the web root.
+Contains the [\RESTAPI\Core\Endpoint](https://pfrest.org/php-docs/classes/RESTAPI-Core-Endpoint.html) child classes for the REST API package. [Endpoint classes](BUILDING_CUSTOM_ENDPOINT_CLASSES.md) are used to define, customize, and manage the REST API endpoints. Each endpoint class corresponds to a specific REST API endpoint in the pfSense web root and is responsible for dynamically generating the endpoint's PHP file in the web root.
 
 ### Fields/
 
@@ -88,11 +89,11 @@ Contains the [\RESTAPI\Core\Form](https://pfrest.org/php-docs/classes/RESTAPI-Co
 
 ### Models/
 
-Contains the [\RESTAPI\Core\Model](https://pfrest.org/php-docs/classes/RESTAPI-Core-Model.html) child classes. Model classes are used to define and manage the data structure of the object's the REST API package interacts with (i.e. firewall rules, static routes, etc.).
+Contains the [\RESTAPI\Core\Model](https://pfrest.org/php-docs/classes/RESTAPI-Core-Model.html) child classes. [Model classes](BUILDING_CUSTOM_MODEL_CLASSES.md) are used to define and manage the data structure of the object's the REST API package interacts with (i.e. firewall rules, static routes, etc.).
 
 ### QueryFilters/
 
-Contains the [\RESTAPI\Core\QueryFilter](https://pfrest.org/php-docs/classes/RESTAPI-Core-QueryFilter.html) child classes. QueryFilter classes are used to define and manage the query filters that are used to filter data returned by the REST API. For information about writing query filters, see the [Building Custom Query Filter Classes](BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md) documentation.
+Contains the [\RESTAPI\Core\QueryFilter](https://pfrest.org/php-docs/classes/RESTAPI-Core-QueryFilter.html) child classes. [QueryFilter classes](BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md) are used to define and manage the query filters that are used to filter data returned by the REST API. For information about writing query filters, see the [Building Custom Query Filter Classes](BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md) documentation.
 
 ### Responses/
 
@@ -104,7 +105,7 @@ Contains the [\RESTAPI\Core\TestCase](https://pfrest.org/php-docs/classes/RESTAP
 
 ### Validators/
 
-Contains the [\RESTAPI\Core\Validator](https://pfrest.org/php-docs/classes/RESTAPI-Core-Validator.html) child classes. Validator classes are reusable classes that are used to validate data for a specific Field object. They are intended to be assigned to a Field object's `validators` property to perform the specific validation against that field.
+Contains the [\RESTAPI\Core\Validator](https://pfrest.org/php-docs/classes/RESTAPI-Core-Validator.html) child classes. [Validator classes](BUILDING_CUSTOM_VALIDATOR_CLASSES.md) are reusable classes that are used to validate data for a specific Field object. They are intended to be assigned to a Field object's `validators` property to perform the specific validation against that field.
 
 ### autoloader.inc
 
