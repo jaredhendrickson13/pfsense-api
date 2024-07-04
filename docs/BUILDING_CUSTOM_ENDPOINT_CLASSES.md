@@ -51,6 +51,10 @@ Example:
 $this->url = '/api/v2/my/custom/endpoint';
 ```
 
+!!! Important
+    This URL should NOT end with a trailing slash `/`, and should not contain a file extension such `index.php`. 
+    The REST API will automatically generate the `index.php` file for the endpoint at the specified URL path.
+
 ### model_name
 
 The `model_name` property is used to define the Model class that the endpoint will expose. This must be the Model 
@@ -58,6 +62,17 @@ class's short name, not the fully qualified class name. This property is require
 
 !!! Important
     The Model class set in this property must be defined within the `/usr/local/pkg/RESTAPI/Models/` directory.
+
+### many
+
+The `many` property is used to define if the endpoint will return a single object or many objects. This property
+defaults to `false`. When set to `true`, the endpoint will return an array of objects in the `data` section of the response.
+When set to `false`, the endpoint will return a single object in the `data` section of the response.
+
+For more information on the difference between many and non-many endpoints, refer to the [Endpoint Types](ENDPOINT_TYPES.md) documentation.
+
+!!! Important
+    The `many` property can only be set to `true` if the assigned `model_name` property is a Model class that is also `many` enabled.
 
 ### request_method_options
 
@@ -80,25 +95,15 @@ Each supported request method corresponds with a the following Model class metho
     endpoint. A successful options request will return a `200 OK` response with the `Allow` and `access-control-allow-methods`
     response header set to the allowed request methods.
 
-### many
-
-The `many` property is used to define if the endpoint will return a single object or many objects. This property
-defaults to `false`. When set to `true`, the endpoint will return an array of objects in the `data` section of the response.
-When set to `false`, the endpoint will return a single object in the `data` section of the response.
-
-For more information on the difference between many and non-many endpoints, refer to the [Endpoint Types](ENDPOINT_TYPES.md) documentation.
-
-!!! Important
-    The `many` property can only be set to `true` if the assigned `model_name` property is a Model class that is also `many` enabled.
-
 ### tag
 
-The `tag` property is used to define the OpenAPI tag for the endpoint. This property is optional and defaults to the
-first section of the URL after the `/api/v2/` prefix.
+The `tag` property is used to define the [OpenAPI tag](https://swagger.io/docs/specification/grouping-operations-with-tags/)
+for the endpoint. This is used to group related endpoints together in the API documentation. This property is optional 
+and defaults to the first section of the URL after the `/api/v2/` prefix.
 
 ### requires_auth
 
-The `requires_auth` property is used to define if the endpoint requires authentication and authorization. This property
+The `requires_auth` property is used to specify whether the endpoint requires authentication and authorization. This property
 defaults to `true`.
 
 !!! Danger
@@ -234,3 +239,9 @@ To regenerate the OpenAPI documentation for all Endpoint classes, run the follow
 ```shell
 pfsense-restapi generatedocs
 ```
+
+## Examples
+
+You can find examples of fully implemented Endpoint classes in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-endpoints.html).
+Select the Endpoint class you are interested in to view the class's PHPDoc documentation, and then click on the
+`<>` symbol next to the class name to view the class's source code.

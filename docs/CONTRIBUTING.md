@@ -57,7 +57,7 @@ Contains helper scripts for the REST API package. These scripts are used to auto
 
 ### Auth/
 
-Contains the [\RESTAPI\Core\Auth](https://pfrest.org/php-docs/classes/RESTAPI-Core-Auth.html) child classes. [Auth classes](BUILDING_CUSTOM_AUTH_CLASSES.md) are used to define and manage authentication methods for the REST API package. For information about writing custom authentication classes, see the [Building Custom Authentication Classes](BUILDING_CUSTOM_AUTH_CLASSES.md) documentation.
+Contains the [\RESTAPI\Core\Auth](https://pfrest.org/php-docs/classes/RESTAPI-Core-Auth.html) child classes. [Auth classes](BUILDING_CUSTOM_AUTH_CLASSES.md) are used to define and manage authentication methods for the REST API package.
 
 ### Caches/
 
@@ -65,7 +65,7 @@ Contains the [\RESTAPI\Core\Cache](https://pfrest.org/php-docs/classes/RESTAPI-C
 
 ### ContentHandlers/
 
-Contains the [\RESTAPI\Core\ContentHandler](https://pfrest.org/php-docs/classes/RESTAPI-Core-ContentHandler.html) child classes. ContentHandler classes are used to define and manage the supported `content-type` and `accept` header options for the REST API package.
+Contains the [\RESTAPI\Core\ContentHandler](https://pfrest.org/php-docs/classes/RESTAPI-Core-ContentHandler.html) child classes. [ContentHandler classes](BUILDING_CUSTOM_CONTENT_HANDLER_CLASSES.md) are used to define and manage the supported `content-type` and `accept` header options for the REST API package.
 
 ### Core/
 
@@ -81,7 +81,7 @@ Contains the [\RESTAPI\Core\Endpoint](https://pfrest.org/php-docs/classes/RESTAP
 
 ### Fields/
 
-Contains the [\RESTAPI\Core\Field](https://pfrest.org/php-docs/classes/RESTAPI-Core-Field.html) child classes. Field classes are used to define and manage various data types supported by the REST API and are intended to be assigned to Model classes.
+Contains the [\RESTAPI\Core\Field](https://pfrest.org/php-docs/classes/RESTAPI-Core-Field.html) child classes. Field classes are used to define and manage various data types supported by the REST API and are intended to be [assigned to Model classes](BUILDING_CUSTOM_MODEL_CLASSES.md#define-field-objects).
 
 ### Forms/
 

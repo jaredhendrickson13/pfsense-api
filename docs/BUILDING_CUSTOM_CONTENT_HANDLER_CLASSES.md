@@ -103,3 +103,9 @@ protected function _encode(mixed $data): mixed {
 !!! Important
     You do not need to worry about setting the HTTP response headers in the ContentHandler. The REST API package will handle
     setting the appropriate headers based on the ContentHandler's MIME type automatically.
+
+## Examples
+
+You can find examples of fully implemented ContentHandler classes in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-contenthandlers.html).
+Select the ContentHandler class you are interested in to view the class's PHPDoc documentation, and then click on the
+`<>` symbol next to the class name to view the class's source code.

@@ -55,3 +55,9 @@ automatically become an available authentication method in the REST API settings
 
 !!! Tip
     You can rename `MyCustomAuth` to any name you like, but make sure the class name matches the file name.
+
+## Examples
+
+You can find examples of fully implemented Auth classes in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-auth.html).
+Select the Auth class you are interested in to view the class's PHPDoc documentation, and then click on the
+`<>` symbol next to the class name to view the class's source code.

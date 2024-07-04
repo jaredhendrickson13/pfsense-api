@@ -135,3 +135,9 @@ whole process looks like this:
 Dispatchers are intended to be called automatically by the relevant Models so there should be no need to
 manually call a Dispatcher. However, if you do need to manually call a Dispatcher, you can do so using the
 `pfsense-restapi notifydispatcher <DISPATCHER CLASS NAME>` command from the command line.
+
+## Examples
+
+You can find examples of fully implemented Dispatcher classes in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-dispatchers.html).
+Select the Dispatcher class you are interested in to view the class's PHPDoc documentation, and then click on the
+`<>` symbol next to the class name to view the class's source code.

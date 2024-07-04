@@ -38,8 +38,8 @@ class MyCustomModel extends Model {
 ## Define __construct() Method Properties
 
 The `__construct()` method is used to initialize the Model class. It is responsible for setting the various Model
-properties such as the configuration path, sorting properties, etc., as well as defining the various Field objects that
-will be used to define the data structure of the Model. Below are the properties available to help configure your Model:
+properties such as the configuration path, sorting properties, etc., as well as [defining the various Field objects](#define-field-objects)
+that will be used to define the data structure of the Model. Below are the properties available to help configure your Model:
 
 ### config_path
 
@@ -129,7 +129,7 @@ with parent Models include DNS Resolver Host Override Aliases, IPsec Phase 1 Enc
 Example:
 
 ```php
-$this->parent_model_class = 'ParentModelClassShortname';
+$this->parent_model_class = 'ParentModelClass';
 ```
 
 !!! Notes
@@ -216,27 +216,10 @@ $this->unique_together_fields = ['name', 'port'];
 
 !!! Important
     Only use this property for two or more fields that must be unique together. If a single field must be unique, use the
-    `unique` property in the Field object instead.
+    [`unique` property in the Field object](#unique) instead.
 !!! Notes
     - The `unique_together_fields` property is only applicable when the `many` property is set to `true`.
     - The fields defined in the `unique_together_fields` property must be defined in the Model's Field objects.
-
-### sort_option
-
-The `sort_option` property is used to define the PHP sorting option for objects of the Model. When this property is set,
-objects created and updated will be sorted according to the assigned option. For valid sorting options, refer to: For valid value options for this property, refer to the 
-[PHP multi-sort function type flags](https://www.php.net/manual/en/function.array-multisort.php).
-
-Example:
-
-```php
-$this->sort_option = SORT_ASC;
-```
-
-!!! Warning
-    The use of sorting in a Model may cause IDs to be re-ordered when objects are created or updated.
-!!! Notes
-    - The `sort_option` property is only applicable when the `many` property is set to `true`.
 
 ### sort_by_field
 
@@ -255,10 +238,28 @@ $this->sort_by_field = 'name';
     - The `sort_by_field` property is only applicable when the `many` property is set to `true`.
     - The field defined in the `sort_by_field` property must be defined in the Model's Field objects.
 
+### sort_option
+
+The `sort_option` property is used to define the PHP sorting option for objects of the Model. When this property is set,
+objects created and updated will be sorted according to the assigned option. For valid sorting options, refer to: For valid value options for this property, refer to the
+[PHP multi-sort function type flags](https://www.php.net/manual/en/function.array-multisort.php).
+
+Example:
+
+```php
+$this->sort_option = SORT_ASC;
+```
+
+!!! Warning
+    The use of sorting in a Model may cause IDs to be re-ordered when objects are created or updated.
+!!! Notes
+    - The `sort_option` property is only applicable when the `many` property is set to `true`.
+    - The `sort_option` property is only applicable when a `sort_by_field` is defined.
+
 ### subsystem
 
 The `subsystem` property is used to define the pfSense subsystem that the Model belongs to. When Models with a `config_path`
-assigned are created, updated or delete, this subsystem will automatically be marked as dirty (changed).
+assigned are created, updated or delete, this subsystem will automatically be marked as dirty (changed, awaiting an apply).
 
 Example:
 
@@ -370,7 +371,7 @@ class MyCustomModel extends Model {
 
 !!! Important
     - All Field objects must be scoped as public properties of the Model class.
-    - In general, property name you choose for the Field object should match the field name stored in the XML configuration. If you cannot match the field name, you must use the `internal_name` property in the Field object to define the XML configuration field's name.
+    - In general, the property name you choose for the Field object should match the field name stored in the XML configuration. If you cannot match the field name, you must use the `internal_name` property in the Field object to define the XML configuration field's name.
 
 
 Field objects have many properties that can be set to define the data structure of the field. Some properties are unique
@@ -384,7 +385,7 @@ The `required` property is used to define whether the field is required when cre
 If `true`, the field must always have a value assigned to pass validation.
 
 !!! Notes
-- The `required` and `default` properties are mutually exclusive and cannot both be assigned to single Field object.
+    - The `required` and `default` properties are mutually exclusive and cannot both be assigned to single Field object.
 
 ### many
 
@@ -414,6 +415,7 @@ The `delimiter` property is used to define the delimiter that will be used to se
 This property is only applicable to `many` enabled Field objects.
 
 !!! Notes
+    - In most cases, pfSense stores array values as a comma-separated string in the XML configuration.
     - In the situation that pfSense stores the values as an actual array in the XML configuration, set this property to `null`
 
 ### default
@@ -457,7 +459,7 @@ $this->field = new StringField(
 !!! Notes
     - The `choices` property may not be relevant to some Field classes such as the `BooleanField` class.
     - The human-readable choice names will only be used for documentation purposes where applicable.
-    - In the case of a `many` enabled Field, choices defines which values for valid for each item in the array value.
+    - In the case of a `many` enabled Field, choices defines which values are valid for any item within the array.
 
 ### choices_callable
 
@@ -661,6 +663,7 @@ $this->field = new StringField(
 The `validators` property is used to define an array of Validator objects that will be used to validate the field's value.
 Validators are reusable objects that make it simple to apply specific validations to Field objects. An up-to-date list of
 available Validator classes and their associated properties can be found in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-validators.html).
+You can also build your own custom Validator classes, see the [Building Custom Validator Classes](BUILDING_CUSTOM_VALIDATOR_CLASSES.md) guide for more information.
 
 ### help_text
 
@@ -1140,3 +1143,9 @@ $my_custom_model->create();
 
 Once you have defined your Model class, you can expose it via a REST API endpoint. To do this, you must create a new Endpoint
 class. Refer to the [Building Custom Endpoint Classes](BUILDING_CUSTOM_ENDPOINT_CLASSES.md) documentation for more information.
+
+## Examples
+
+You can find examples of fully implemented Model classes in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-models.html).
+Select the Model class you are interested in to view the class's PHPDoc documentation, and then click on the
+`<>` symbol next to the class name to view the class's source code.

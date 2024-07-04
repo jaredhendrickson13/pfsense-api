@@ -5,8 +5,8 @@
 There are three authentication methods available for the pfSense REST API out of the box. The allowed authentication methods
 can be configured in the pfSense webConfigurator under 'System' -> 'REST API' -> 'Documentation' -> 'Authentication Methods'
 or via a `PATCH` request to the [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint) 
-endpoint's `auth_methods` field. In addition to these methods, custom authentication methods can be added by extending 
-the `Auth` class and implementing your own authentication logic.
+endpoint's `auth_methods` field. In addition to these methods, [custom authentication methods](#custom-authentication) 
+can be created to implement your own authentication logic.
 
 !!! Note
     Multiple authentication methods can be enabled at the same time. If multiple methods are
@@ -14,7 +14,7 @@ the `Auth` class and implementing your own authentication logic.
 
 ### Basic Authentication (Local database)
 
-Basic authentication is the default and simplest form of authentication and is supported by most HTTP clients. This
+Basic authentication is the default and simplest form of authentication, and is supported by most HTTP clients. This
 method uses the same username and password as your pfSense webConfigurator login and requires the client to send an
 `Authorization` header with the value `Basic <base64 encoded username:password>`. The REST API will decode the base64
 encoded string and attempt to authenticate the user with the provided credentials. Below are two examples of using
@@ -61,7 +61,7 @@ JSON Web Token (JWT) authentication is a stateless, secure authentication method
 users. This method requires the client to send a `Bearer` token in the `Authorization` header. The token is signed with
 a secret key that only the REST API and the client know. JWT tokens can be generated using the 
 [/api/v2/auth/jwt](https://pfrest.org/api-docs/#/AUTH/postAuthJWTEndpoint) endpoint
-and require the client to authenticate as a local database user. Below is an example of receiving a JWT token using
+and require the client to authenticate as a local database user. Below is an example of obtaining a JWT using
 `curl`:
 
 ```bash

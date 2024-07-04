@@ -106,3 +106,9 @@ rm /usr/local/pkg/RESTAPI/.resources/cache/<CACHE CLASS NAME>.json
 !!! Caution
     Do not manually modify cache files as this may cause unexpected behavior in the API. If you need to modify the data
     in a cache file, you should do so by modifying the relevant Cache class and [refreshing the cache](#refreshing-a-cache).
+
+## Examples
+
+You can find examples of fully implemented Cache classes in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-caches.html).
+Select the Cache class you are interested in to view the class's PHPDoc documentation, and then click on the
+`<>` symbol next to the class name to view the class's source code.

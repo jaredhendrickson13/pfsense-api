@@ -1,6 +1,6 @@
 # Content and Accept Types
 
-The REST API has been designed to support multiple content and accept types to allow for flexibility in the data being sent and received. This document outlines the content and accept types supported by the REST API.
+The REST API has been designed to allow multiple content and accept types to be supported, providing flexibility in the data being sent and received. This document outlines the content and accept types currently supported by the REST API.
 
 ## Content Types
 

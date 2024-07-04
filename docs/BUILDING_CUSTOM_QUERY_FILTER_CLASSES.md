@@ -32,3 +32,9 @@ An example usage of this custom query filter would be `/api/v2/firewall/rules?fi
 
 !!! Tip
     You can rename `MyCustomQueryFilter` to any name you like, but make sure the class name matches the file name.
+
+## Examples
+
+You can find examples of fully implemented QueryFilter classes in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-queryfilters.html).
+Select the QueryFilter class you are interested in to view the class's PHPDoc documentation, and then click on the
+`<>` symbol next to the class name to view the class's source code.

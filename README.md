@@ -17,7 +17,7 @@ provide you with the information you need to configure and use the package effec
 - Customizable authentication options
 - Built-in Swagger documentation
 
-## Quick Start
+## Getting Started
 
 - [Installation and Configuration](https://pfrest.org/INSTALL_AND_CONFIG/)
 - [Authentication and Authorization](https://pfrest.org/AUTHENTICATION_AND_AUTHORIZATION/)

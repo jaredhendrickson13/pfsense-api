@@ -4,7 +4,7 @@
 
 After installation, an interactive Swagger documentation site is available on your pfSense instance under
 'System' -> 'REST API' -> 'Documentation'. This site provides full documentation for all API endpoints and their
-associated parameters, as well as provides a quick and interactive way to try out API calls. Alternatively, a simplified
+associated parameters, as well as provides a quick and interactive way to try out API calls. Alternatively, a non-interactive
 version of the Swagger documentation is available publicly [here](https://pfrest.org/api-docs/).
 
 !!! Note

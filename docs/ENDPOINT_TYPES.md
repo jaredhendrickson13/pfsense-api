@@ -4,8 +4,7 @@
 
 Singular endpoints are endpoints that interact with and return a single object. For example, a singular endpoint might 
 return a single user or a single firewall rule. These endpoints will always return the `data` of the response as an 
-associative array. With the exception of `POST` requests, singular endpoints will typically require an 
-[object ID](./WORKING_WITH_OBJECT_IDS.md).
+associative array. Singular endpoints will often require an [object ID](./WORKING_WITH_OBJECT_IDS.md).
 
 Some examples of singular endpoints are:
 

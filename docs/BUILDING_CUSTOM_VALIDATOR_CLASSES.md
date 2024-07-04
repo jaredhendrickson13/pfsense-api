@@ -144,10 +144,10 @@ You can assign a label by calling the `set_label()` method in the `validate()` m
  * @param string $field_name The name of the Field object being validated.
  */
 public function validate(mixed $value, string $field_name = ''): void {
-    if ($this-is_ipaddrv4($value)) {
+    if (is_ipaddrv4($value)) {
         $this->set_label('is_ipaddr');
         $this->set_label('is_ipaddrv4');
-    } elseif ($this-is_ipaddrv6($value)) {
+    } elseif (is_ipaddrv6($value)) {
         $this->set_label('is_ipaddr');
         $this->set_label('is_ipaddrv6');
     }
@@ -176,3 +176,9 @@ $this->field_name->has_label('is_ipaddrv4');
 
 In the event that you need to access the entire Field object that is being validated, or the Model object that Field
 object belongs to, you can use the `$this->field_context` and `$this->model_context` properties, respectively.
+
+## Examples
+
+You can find examples of fully implemented Validator classes in the [PHP reference](https://pfrest.org/php-docs/namespaces/restapi-validators.html). 
+Select the Validator class you are interested in to view the class's PHPDoc documentation, and then click on the
+`<>` symbol next to the class name to view the class's source code.
