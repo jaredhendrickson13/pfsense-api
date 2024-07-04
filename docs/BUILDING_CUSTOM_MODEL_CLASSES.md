@@ -27,13 +27,24 @@ use RESTAPI\Core\Model;
  * TODO: Add a description of your Model class here.
  */
 class MyCustomModel extends Model {
-
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
+        # TODO: Define Model attributes here
+        
+        # TODO: Define Model fields here
+        
+        parent::__construct($id, $parent_id, $data, ...$options);
+    }
 }
 ```
 
 !!! Important
-    Be sure to place this class file within `/usr/local/pkg/RESTAPI/Models/` directory and name the file after your 
+    - Be sure to place this class file within `/usr/local/pkg/RESTAPI/Models/` directory and name the file after your 
     Model class name with a `.inc` extension.
+!!! Warning
+    The `__construct()` method signature and the parent constructor call MUST remain exactly as shown in the template.
+    The parent constructor call also must be the last line in the `__construct()` method. Failure to do so will result in
+    unexpected behavior and errors.
+    
 
 ## Define __construct() Method Properties
 
@@ -344,7 +355,7 @@ class MyCustomModel extends Model {
     public IntegerField $timeout;
     public BooleanField $enabled;
     
-    public function __construct() {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'path/to/model/objects/in/config';
         $this->many = true;
@@ -365,6 +376,8 @@ class MyCustomModel extends Model {
             indicates_false: "off", // The value stored in the XML configuration when the field is false
             help_text: 'Demonstrates an example BooleanField.',
         );
+        
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 }
 ```
@@ -711,7 +724,7 @@ class MyCustomModel extends Model {
     public IntegerField $timeout;
     public BooleanField $enabled;
     
-    public function __construct() {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'path/to/model/objects/in/config';
         $this->many = true;
@@ -732,6 +745,8 @@ class MyCustomModel extends Model {
             indicates_false: "off", // The value stored in the XML configuration when the field is false
             help_text: 'Demonstrates an example BooleanField.',
         );
+        
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
     
     /**
@@ -791,7 +806,7 @@ class MyCustomModel extends Model {
     public IntegerField $timeout;
     public BooleanField $enabled;
     
-    public function __construct() {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'path/to/model/objects/in/config';
         $this->many = true;
@@ -812,6 +827,8 @@ class MyCustomModel extends Model {
             indicates_false: "off", // The value stored in the XML configuration when the field is false
             help_text: 'Demonstrates an example BooleanField.',
         );
+        
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
     
     /**
@@ -994,7 +1011,7 @@ use RESTAPI\Core\Model;
 TODO: Add a description of your Model class here.
 */
 class MyCustomModel extends Model {
-    public function __construct() {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'fetch_data';
         $this->many = true;
@@ -1015,6 +1032,8 @@ class MyCustomModel extends Model {
             indicates_false: "off", // The value stored in the XML configuration when the field is false
             help_text: 'Demonstrates an example BooleanField.',
         );
+        
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
@@ -1056,7 +1075,7 @@ use RESTAPI\Core\Model;
 TODO: Add a description of your Model class here.
 */
 class MyCustomModel extends Model {
-    public function __construct() {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->internal_callable = 'fetch_data';
         $this->many = true;
@@ -1077,6 +1096,8 @@ class MyCustomModel extends Model {
             indicates_false: "off", // The value stored in the XML configuration when the field is false
             help_text: 'Demonstrates an example BooleanField.',
         );
+        
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
