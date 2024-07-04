@@ -26,13 +26,19 @@ use RESTAPI\Core\Endpoint;
  * TODO: Add a description of your Endpoint class here.
  */
 class MyCustomEndpoint extends Endpoint {
-
+    public function __construct() {
+        # TODO: Set endpoint attributes here
+    
+        parent::__construct();
+    }
 }
 ```
 
 !!! Important
     Be sure to place this class file within `/usr/local/pkg/RESTAPI/Endpoints/` directory and name the file after your
-    Model class name with a `.inc` extension.
+    Endpoint class name with a `.inc` extension.
+!!! Warning
+    The parent constructor must be called at the end of the `__construct` method to initialize the Endpoint class.
 
 ## Define __construct() Method Properties
 
