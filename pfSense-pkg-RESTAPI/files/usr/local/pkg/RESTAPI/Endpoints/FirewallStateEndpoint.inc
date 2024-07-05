@@ -16,6 +16,15 @@ class FirewallStateEndpoint extends Endpoint {
         $this->model_name = 'FirewallState';
         $this->request_method_options = ['GET', 'DELETE'];
 
+        # Set documentation help text
+        $this->get_help_text =
+            'Reads an existing Firewall State. Please note that the firewall state table changes very quickly which may '.
+            'result in the state\'s `id` suddenly changing. It is recommended to use the /api/v2/firewall/states '.
+            'endpoint with a query to find the state you are looking for.';
+        $this->delete_help_text =
+            'Kills an existing Firewall State. Please note that the firewall state table changes very quickly which may '.
+            'result in the state\'s `id` suddenly changing. Use caution when deleting states.';
+
         # Construct the parent Endpoint object
         parent::__construct();
     }
