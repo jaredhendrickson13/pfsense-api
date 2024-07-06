@@ -700,8 +700,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that the skip_init property correctly skips loading a Model's values from internal in the Model's
      * __construct() method when set to true.
      */
-    public function test_skip_init(): void
-    {
+    public function test_skip_init(): void {
         # Create a new Test model object with skip_init set to true
         $test_model = new SystemStatus(skip_init: true);
 
