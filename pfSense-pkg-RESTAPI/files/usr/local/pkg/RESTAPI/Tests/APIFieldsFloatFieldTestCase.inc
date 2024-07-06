@@ -24,8 +24,7 @@ class APIFieldsFloatFieldTestCase extends TestCase {
     /**
      * Checks to ensure FloatField value's internal values can be comma separated decimals
      */
-    public function test_float_field_from_internal_comma_separated(): void
-    {
+    public function test_float_field_from_internal_comma_separated(): void {
         # Create an example float field and ensure its value is always an float
         $test_string_field = new FloatField();
         $test_string_field->from_internal('20,15');

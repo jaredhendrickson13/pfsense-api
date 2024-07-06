@@ -343,7 +343,7 @@ class Model {
         unset($options['client']);
 
         # Obtain the skip_init flag if given. Ensure this defaults to false.
-        $this->skip_init = ($options['skip_init']) ?? false;
+        $this->skip_init = $options['skip_init'] ?? false;
 
         return $options;
     }
