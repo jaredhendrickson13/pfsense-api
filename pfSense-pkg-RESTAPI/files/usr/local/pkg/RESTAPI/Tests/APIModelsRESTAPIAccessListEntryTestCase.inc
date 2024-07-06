@@ -63,20 +63,15 @@ class APIModelsRESTAPIAccessListEntryTestCase extends TestCase {
         $entry->update();
 
         # Ensure the entry was updated
-        $this->assert_equals(
-            RESTAPIAccessListEntry::query(id: $entry->id)
-                ->first()
-                ->to_representation(),
-            [
-                'id' => $entry->id,
-                'type' => 'deny',
-                'weight' => 15,
-                'network' => '1.2.3.4/32',
-                'users' => ['admin'],
-                'sched' => $sched2->name->value,
-                'descr' => 'New test entry',
-            ],
-        );
+        $this->assert_equals(RESTAPIAccessListEntry::query(id: $entry->id)->first()->to_representation(), [
+            'id' => $entry->id,
+            'type' => 'deny',
+            'weight' => 15,
+            'network' => '1.2.3.4/32',
+            'users' => ['admin'],
+            'sched' => $sched2->name->value,
+            'descr' => 'New test entry',
+        ]);
 
         # Update the entry again
         $entry->from_representation(
@@ -90,20 +85,15 @@ class APIModelsRESTAPIAccessListEntryTestCase extends TestCase {
         $entry->update();
 
         # Ensure the entry was updated
-        $this->assert_equals(
-            RESTAPIAccessListEntry::query(id: $entry->id)
-                ->first()
-                ->to_representation(),
-            [
-                'id' => $entry->id,
-                'type' => 'allow',
-                'weight' => 20,
-                'network' => '4.3.2.1/24',
-                'users' => [],
-                'sched' => '',
-                'descr' => 'Another test entry',
-            ],
-        );
+        $this->assert_equals(RESTAPIAccessListEntry::query(id: $entry->id)->first()->to_representation(), [
+            'id' => $entry->id,
+            'type' => 'allow',
+            'weight' => 20,
+            'network' => '4.3.2.1/24',
+            'users' => [],
+            'sched' => '',
+            'descr' => 'Another test entry',
+        ]);
 
         # Delete the entry and associated schedules
         $entry->delete();
