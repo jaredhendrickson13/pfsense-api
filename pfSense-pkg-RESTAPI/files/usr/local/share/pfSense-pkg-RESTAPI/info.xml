@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<pfsensepkgs>
+    <package>
+        <name>RESTAPI</name>
+        <internal_name>restapi</internal_name>
+        <descr><![CDATA[The missing REST API package for pfSense]]></descr>
+        <website>https://github.com/jaredhendrickson13/pfsense-api</website>
+        <category>System</category>
+        <version>%%PKGVERSION%%</version>
+        <configurationfile>restapi.xml</configurationfile>
+        <maintainer>github@jaredhendrickson.com</maintainer>
+        <conf>
+            <enabled>enabled</enabled>
+            <read_only>disabled</read_only>
+            <keep_backup>enabled</keep_backup>
+            <login_protection>enabled</login_protection>
+            <log_successful_auth>disabled</log_successful_auth>
+            <hateoas>disabled</hateoas>
+            <allow_pre_releases>disabled</allow_pre_releases>
+            <allowed_interfaces></allowed_interfaces>
+            <represent_interfaces_as>id</represent_interfaces_as>
+            <auth_methods>BasicAuth</auth_methods>
+            <ha_sync>disabled</ha_sync>
+            <ha_sync_hosts></ha_sync_hosts>
+            <ha_sync_username></ha_sync_username>
+            <ha_sync_password></ha_sync_password>
+            <ha_sync_validate_certs></ha_sync_validate_certs>
+            <server_key></server_key>
+            <jwt_exp>3600</jwt_exp>
+            <keys></keys>
+            <access_list>
+                <item>
+                    <type>allow</type>
+                    <weight>10</weight>
+                    <network>0.0.0.0/0</network>
+                    <users></users>
+                    <sched></sched>
+                    <descr><![CDATA[Default allow all IPv4]]></descr>
+                </item>
+                <item>
+                    <type>allow</type>
+                    <weight>10</weight>
+                    <network>0::/0</network>
+                    <users></users>
+                    <sched></sched>
+                    <descr><![CDATA[Default allow all IPv6]]></descr>
+                </item>
+            </access_list>
+        </conf>
+    </package>
+</pfsensepkgs>

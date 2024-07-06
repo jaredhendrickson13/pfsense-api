@@ -1,0 +1,5 @@
+paths:
+  - "pfSense-pkg-RESTAPI/files"
+extensions:
+  - "inc"
+  - "php"
