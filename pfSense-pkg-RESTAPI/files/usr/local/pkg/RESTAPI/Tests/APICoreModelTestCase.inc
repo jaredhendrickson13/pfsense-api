@@ -8,6 +8,7 @@ use RESTAPI;
 use RESTAPI\Caches\RESTAPIVersionReleasesCache;
 use RESTAPI\Core\Model;
 use RESTAPI\Models\FirewallAlias;
+use RESTAPI\Models\SystemStatus;
 use RESTAPI\Models\Test;
 
 class APICoreModelTestCase extends RESTAPI\Core\TestCase {
@@ -693,5 +694,24 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             $this->assert_is_true(in_array('data', $param_names), "$model_class is missing 'data' parameter");
             $this->assert_is_true(in_array('options', $param_names), "$model_class is missing 'options' parameter");
         }
+    }
+
+    /**
+     * Checks that the skip_init property correctly skips loading a Model's values from internal in the Model's
+     * __construct() method when set to true.
+     */
+    public function test_skip_init(): void
+    {
+        # Create a new Test model object with skip_init set to true
+        $test_model = new SystemStatus(skip_init: true);
+
+        # Ensure the object's values are not loaded from internal
+        foreach ($test_model->get_fields() as $field) {
+            $this->assert_equals($test_model->$field->value, null);
+        }
+
+        # Ensure the object's values are loaded from internal when skip_init is set to false
+        $test_model = new SystemStatus(skip_init: false);
+        $this->assert_is_not_empty($test_model->cpu_load_avg->value);
     }
 }
