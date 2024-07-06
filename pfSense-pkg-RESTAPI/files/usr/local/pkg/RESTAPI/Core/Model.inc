@@ -236,6 +236,15 @@ class Model {
     public string $update_strategy = 'merge';
 
     /**
+     * @var bool $skip_init
+     * If set to `true`, this Model object will not be loaded from its internal representation during construction. This
+     * is useful when you need to create a Model object to be used as a reference without trigger logic that would normally
+     * occur by loading the object from its internal representation. This must be set as a parameter during object construction
+     * to have an effect.
+     */
+    public bool $skip_init = false;
+
+    /**
      * @var string $verbose_name
      * Sets the human-readable name for this Model. This value is primarily used where this Model is referenced in Forms
      * and the API documentation. By default, this property will attempt to be determined using the Model class name by
@@ -333,6 +342,9 @@ class Model {
         $this->client = $options['client'] ?: $this->get_default_client();
         unset($options['client']);
 
+        # Obtain the skip_init flag if given. Ensure this defaults to false.
+        $this->skip_init = ($options['skip_init']) ?? false;
+
         return $options;
     }
 
@@ -341,6 +353,11 @@ class Model {
      * @param mixed $id The ID of the internal object to construct this object from
      */
     private function construct_from_internal(mixed $id = null, mixed $parent_id = null): void {
+        # Do not try to load the object from internal if the skip_init flag is set
+        if ($this->skip_init) {
+            return;
+        }
+
         # Obtain the parent Model if a parent_id was provided and this Model has a parent Model class assigned
         if (isset($parent_id) and $this->parent_model_class) {
             $this->parent_id = $parent_id;
