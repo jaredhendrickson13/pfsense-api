@@ -167,7 +167,7 @@ working directory.
 
 Below are the supported environment variables to customize the build process:
 
-- `FREEBSD_VERSION`: The version of FreeBSD to use for the build. This must be an existing Vagrant box name including the `freebsd/` prefix. The default value is `freebsd/FreeBSD-14.0-STABLE`. For a list of available boxes, see the [Vagrant Cloud](https://app.vagrantup.com/freebsd) page.
+- `FREEBSD_VERSION`: The version of FreeBSD to use for the build. This must be an existing Vagrant box name including the `freebsd/` prefix. The default value is `freebsd/FreeBSD-14.0-CURRENT`. For a list of available boxes, see the [Vagrant Cloud](https://app.vagrantup.com/freebsd) page.
 - `BUILD_VERSION`: The version tag to give the build, this must be in a FreeBSD package version format (e.g. `0.0_0`). The default value is `0.0_0-dev`.
 
 ## Testing
