@@ -412,7 +412,13 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
             response_id: 'LENGTH_VALIDATOR_MINIMUM_CONSTRAINT',
             code: 400,
             callable: function () {
-                $test_field = new Field(type: 'string', required: true, allow_empty: false, many: true, many_minimum: 1);
+                $test_field = new Field(
+                    type: 'string',
+                    required: true,
+                    allow_empty: false,
+                    many: true,
+                    many_minimum: 1,
+                );
                 $test_field->name = 'test_field';
                 $test_field->value = [];
                 $test_field->validate();
