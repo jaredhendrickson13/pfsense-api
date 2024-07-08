@@ -240,6 +240,14 @@ class Field {
                 response_id: 'FIELD_WITH_CHOICES_AND_CHOICES_CALLABLE',
             );
         }
+
+        # For `many` Fields, automatically set `many_minimum` to 0 if `allow_empty` is enabled and vice versa
+        if ($this->many and $this->allow_empty) {
+            $this->many_minimum = 0;
+        }
+        if ($this->many and $this->many_minimum === 0) {
+            $this->allow_empty = true;
+        }
     }
 
     /**
