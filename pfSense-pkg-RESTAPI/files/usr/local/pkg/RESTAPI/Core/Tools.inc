@@ -263,7 +263,7 @@ function generate_documentation(): bool {
             $required_packages_str = $model->packages ? implode(', ', $model->packages) : 'None';
             $requires_auth_str = $endpoint->requires_auth ? 'Yes' : 'No';
             $auth_method_str = implode(', ', $endpoint->auth_methods ?: $auth_classes_short);
-            $applies_immediately = $model->always_appy ? 'Yes' : 'No';
+            $applies_immediately = $model->always_apply ? 'Yes' : 'No';
             $cache_class = $model->cache_class ?: 'None';
             $operation_id = "$request_method{$endpoint->get_class_shortname()}";
 
