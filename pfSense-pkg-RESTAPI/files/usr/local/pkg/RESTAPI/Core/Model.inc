@@ -828,9 +828,14 @@ class Model {
         $this->from_internal_object($internal_object);
     }
 
-    public function from_internal_object(array $internal_object) {
+    public function from_internal_object(mixed $internal_object) {
         # Variables
         $custom_from_internal_fields = [];
+
+        # Default to an empty array if the internal object is not an array
+        if (!is_array($internal_object)) {
+            $internal_object = [];
+        }
 
         # Loop through each of this Model's Fields and convert the internal value to the representation value
         foreach ($this->get_fields() as $field) {

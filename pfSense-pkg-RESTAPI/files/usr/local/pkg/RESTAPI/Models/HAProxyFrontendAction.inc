@@ -231,7 +231,7 @@ class HAProxyFrontendAction extends Model {
      * Extends the default `from_internal_object()` method to automatically set the internal names of fields before calling.
      * @param array $internal_object The internal representation of this model to load from.
      */
-    public function from_internal_object(array $internal_object): void {
+    public function from_internal_object(mixed $internal_object): void {
         # Do an initial load of the object to ensure the `action` is obtained first
         parent::from_internal_object($internal_object);
 
