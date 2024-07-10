@@ -729,7 +729,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
                 'type' => 'host',
                 'address' => '1.2.3.4',
                 'detail' => 'Example',
-            ]
+            ],
         );
         $this->assert_equals($alias->name->value, 'test_alias');
         $this->assert_equals($alias->type->value, 'host');
