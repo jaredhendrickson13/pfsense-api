@@ -14,15 +14,6 @@ class JSONContentHandler extends ContentHandler {
     public string $mime_type = 'application/json';
 
     /**
-     * Obtains the client's raw request body content.
-     *
-     * @return string The raw content from the request body.
-     */
-    public function get_content(): string {
-        return file_get_contents('php://input') ?: '';
-    }
-
-    /**
      * Encodes the given content as JSON.
      * @param mixed|null $content The content to encode.
      * @return mixed The encoded content.

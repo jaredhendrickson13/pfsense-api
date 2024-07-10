@@ -7,18 +7,6 @@ use RESTAPI\Core\TestCase;
 
 class APIContentHandlersJSONContentHandlerTestCase extends TestCase {
     /**
-     * Checks that the `get_content()` method correctly obtains a client's unprocessed request body.
-     */
-    public function test_get_content(): void {
-        # Create a handler to test with
-        $handler = new JSONContentHandler();
-
-        # Manually set php://input and ensure the handler obtains the set value exactly
-        file_put_contents('php://input', 'test_value');
-        $this->assert_equals($handler->get_content(), file_get_contents('php://input'));
-    }
-
-    /**
      * Checks that the `_encode()` method correctly converts a provide value into a JSON encoded string
      */
     public function test_encode(): void {

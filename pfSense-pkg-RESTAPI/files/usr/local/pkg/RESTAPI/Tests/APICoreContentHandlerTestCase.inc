@@ -7,21 +7,6 @@ use RESTAPI\Core\TestCase;
 
 class APICoreContentHandlerTestCase extends TestCase {
     /**
-     * Checks that attempts to run the `get_content()` method throw a server error if its not overridden by a child
-     * class.
-     */
-    public function test_get_content_throws_error_if_not_overridden(): void {
-        $this->assert_throws_response(
-            response_id: 'CONTENT_HANDLER_GET_CONTENT_NOT_OVERRIDDEN',
-            code: 500,
-            callable: function () {
-                $handler = new ContentHandler();
-                $handler->get_content();
-            },
-        );
-    }
-
-    /**
      * Checks that attempts to run the `encode()` method when the protected `_encode()` method has not been overridden
      * by a child class results in an error being thrown.
      */
