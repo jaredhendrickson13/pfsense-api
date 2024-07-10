@@ -828,7 +828,13 @@ class Model {
         $this->from_internal_object($internal_object);
     }
 
-    public function from_internal_object(mixed $internal_object) {
+    /**
+     * Converts an internal object to this Model object's representation. This method is used to convert the internal
+     * object obtained from the pfSense configuration to the representation values used by this Model object.
+     * @param mixed $internal_object The internal object obtained from the pfSense configuration. This should be an
+     * associative array, in the event that it's not (uninitialized configuration), it will become an empty array.
+     */
+    public function from_internal_object(mixed $internal_object): void {
         # Variables
         $custom_from_internal_fields = [];
 
