@@ -713,4 +713,35 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $test_model = new SystemStatus(skip_init: false);
         $this->assert_is_not_empty($test_model->cpu_load_avg->value);
     }
+
+    /**
+     * Checks that the Model::from_internal_object() correctly loads the Model object using the internal configuration
+     * values.
+     */
+    public function check_from_internal_object(): void {
+        # Use a FirewallAlias model to test this
+        $alias = new FirewallAlias();
+
+        # Load the FirewallAlias object's properties using an internal config and ensure it was loaded successfully
+        $alias->from_internal_object(
+            internal_object: [
+                'name' => 'test_alias',
+                'type' => 'host',
+                'address' => '1.2.3.4',
+                'detail' => 'Example',
+            ]
+        );
+        $this->assert_equals($alias->name->value, 'test_alias');
+        $this->assert_equals($alias->type->value, 'host');
+        $this->assert_equals($alias->address->value, ['1.2.3.4']);
+        $this->assert_equals($alias->detail->value, ['Example']);
+
+        # Ensure attempts to load a non-array internal object just results in the default values being loaded
+        $alias = new FirewallAlias();
+        $alias->from_internal_object('');
+        $this->assert_equals($alias->name->value, null);
+        $this->assert_equals($alias->type->value, null);
+        $this->assert_equals($alias->address->value, []);
+        $this->assert_equals($alias->detail->value, []);
+    }
 }
