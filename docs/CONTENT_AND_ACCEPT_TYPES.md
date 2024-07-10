@@ -13,11 +13,18 @@ Content types are used to specify the format of the data being sent in your requ
 
 ### application/x-www-form-urlencoded
 - MIME Type: `application/x-www-form-urlencoded`
-- Description: Use this content type to send form data in the URL of the request. The data is sent as key-value pairs separated by an ampersand `&`.
-- Example: ```https://pfsense.example.com?key=value&key2=value2```
+- Description: Use this content type to send form data in the URL query string or body of the request. The data is sent as key-value pairs separated by an ampersand `&`.
+- Examples:
+    - URL query string: ```https://pfsense.example.com?key=value&key2=value2```
+    - Request body: ```key=value&key2=value2```
+
+!!! Note
+    In the case that both the URL query string and request body contain form data, the data in the URL query string will take precedence.
 
 !!! Warning
-    The `application/x-www-form-urlencoded` content-type is not fully suitable for requests other than `GET` and `DELETE` requests. It is recommended to use `application/json` for all other request types.
+    The `application/x-www-form-urlencoded` content-type can only infer the type of the data submitted, and therefor 
+    may not be fully suitable for requests other than `GET` and `DELETE` requests. It is recommended to use 
+    `application/json` for requests that require full control over the data type being sent.
 
 ## Accept Types
 
