@@ -126,9 +126,12 @@ class FloatField extends RESTAPI\Core\Field {
     /**
      * Converts the field value to its representation form from it's internal pfSense configuration value.
      * @param string $internal_value The internal value from the pfSense configuration.
-     * @return int The field value in its representation form.
+     * @return float|null The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value): mixed {
+    protected function _from_internal(mixed $internal_value): ?float {
+        # Allow commas as the decimal separator, but convert them to points so it passes the is_numeric() check
+        $internal_value = str_replace(',', '.', $internal_value);
+
         # Return the value as an integer if it's numeric
         if (is_numeric($internal_value)) {
             return floatval($internal_value);

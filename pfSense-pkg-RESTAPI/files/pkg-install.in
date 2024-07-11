@@ -21,5 +21,3 @@ fi
 
 # Restart the web GUI in the background to apply nginx changes
 /usr/local/bin/php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php restartwebgui
-
-
