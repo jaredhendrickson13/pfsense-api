@@ -80,6 +80,33 @@ Search for objects whose field value is greater than or equal to a given integer
 - Name: `gte`
 - Example: `https://pfsense.example.com/api/v2/examples?fieldname__gte=5`
 
+### Format (format)
+
+Search for objects whose field value matches a given format.
+
+- Name: `format`
+- Examples: 
+  - `https://pfsense.example.com/api/v2/examples?fieldname__format=ipv4`
+  - `https://pfsense.example.com/api/v2/examples?fieldname__format=email`
+
+#### Supported Formats
+
+- `ipv4`: Search for objects whose field value is a valid IPv4 address.
+- `ipv6`: Search for objects whose field value is a valid IPv6 address.
+- `ip`: Search for objects whose field value is a valid IP address (IPv4 or IPv6).
+- `subnetv4`: Search for objects whose field value is a valid IPv4 subnet.
+- `subnetv6`: Search for objects whose field value is a valid IPv6 subnet.
+- `subnet`: Search for objects whose field value is a valid IP subnet (IPv4 or IPv6).
+- `numeric`: Search for objects whose field value is a valid numeric value.
+- `email`: Search for objects whose field value is a valid email address.
+- `url`: Search for objects whose field value is a valid URL.
+- `mac`: Search for objects whose field value is a valid MAC address.
+- `fqdn`: Search for objects whose field value is a valid Fully Qualified Domain Name (FQDN).
+- `hostname`: Search for objects whose field value is a valid hostname (without domain).
+- `port`: Search for objects whose field value is a valid port number.
+- `portrange`: Search for objects whose field value is a valid port range (separated by a colon `:`).
+- `alias`: Search for objects whose field value is an existing firewall alias's name.
+
 ### Regex (regex)
 
 Search for objects whose field value matches a given PCRE regular expression.
