@@ -43,8 +43,7 @@ class URLContentHandler extends ContentHandler {
      * @param string $value The value to infer the data type of.
      * @return mixed The inferred value converted to the appropriate data type.
      */
-    public function infer_type(mixed $value): mixed
-    {
+    public function infer_type(mixed $value): mixed {
         # If value is an array, recursively infer the type of each element
         if (is_array($value)) {
             return array_map([$this, 'infer_type'], $value);
@@ -53,17 +52,13 @@ class URLContentHandler extends ContentHandler {
         # Convert primitive data types
         if ($value === 'true') {
             return true;
-        }
-        elseif ($value === 'false') {
+        } elseif ($value === 'false') {
             return false;
-        }
-        elseif ($value === 'null') {
+        } elseif ($value === 'null') {
             return null;
-        }
-        elseif (ctype_digit($value)) {
+        } elseif (ctype_digit($value)) {
             return intval($value);
-        }
-        elseif (is_numeric($value) and str_contains($value, '.')) {
+        } elseif (is_numeric($value) and str_contains($value, '.')) {
             return floatval($value);
         }
 

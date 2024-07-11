@@ -13,7 +13,7 @@ class APIContentHandlersURLContentHandlerTestCase extends TestCase {
         # Create a handler to test with
         $handler = new URLContentHandler();
         $_SERVER['QUERY_STRING'] = 'somedata=somevalue';
-        $this->assert_equals($handler->get_content(),'somedata=somevalue');
+        $this->assert_equals($handler->get_content(), 'somedata=somevalue');
         $_SERVER['QUERY_STRING'] = 'somedata=somevalue&otherdata=othervalue';
         $this->assert_equals($handler->get_content(), 'somedata=somevalue&otherdata=othervalue');
     }
@@ -41,10 +41,9 @@ class APIContentHandlersURLContentHandlerTestCase extends TestCase {
         $this->assert_equals($handler->decode('test=null'), ['test' => null]);
 
         # Ensure that arrays are correctly decoded
-        $this->assert_equals(
-            $handler->decode('test[]=1&test[]=true&test[]=null&test[]=0.5'),
-            ['test' => [1, true, null, 0.5]]
-        );
+        $this->assert_equals($handler->decode('test[]=1&test[]=true&test[]=null&test[]=0.5'), [
+            'test' => [1, true, null, 0.5],
+        ]);
     }
 
     /**

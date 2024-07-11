@@ -26,7 +26,7 @@ provide you with the information you need to configure and use the package effec
 
 ## Quickstart
 
-For new users, it is recommended to refer to the links in the [Getting Started section](#getting-started) to begin. Otherwise, the install 
+For new users, it is recommended to refer to the links in the [Getting Started section](#getting-started) to begin. Otherwise, the install
 command is included below for quick reference:
 
 ```bash
