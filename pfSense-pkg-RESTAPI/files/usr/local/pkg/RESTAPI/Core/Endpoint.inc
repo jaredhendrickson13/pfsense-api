@@ -269,7 +269,7 @@ class Endpoint {
 
         # Initialize the assigned model
         $model_class = 'RESTAPI\\Models\\' . $this->model_name;
-        $this->model = new $model_class();
+        $this->model = new $model_class(skip_init: true);
 
         # Set the default OpenAPI tag for this endpoint if no tag was explicitly assigned
         $this->set_default_tag();
@@ -650,6 +650,7 @@ class Endpoint {
         $resp_data = null;
         $content_handler = new JSONContentHandler();
         $this->restapi_settings = new RESTAPISettings();
+        $this->model = new $this->model();
 
         try {
             # First, ensure the API is enabled before allowing the call

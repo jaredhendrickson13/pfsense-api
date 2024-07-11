@@ -400,7 +400,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
             response_id: 'FIELD_EMPTY_NOT_ALLOWED',
             code: 400,
             callable: function () {
-                $test_field = new Field(type: 'string', required: true);
+                $test_field = new Field(type: 'string', required: true, allow_empty: false);
                 $test_field->name = 'test_field';
                 $test_field->value = '';
                 $test_field->validate();
@@ -409,10 +409,16 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
 
         # Check an array (field has `many` set).
         $this->assert_throws_response(
-            response_id: 'FIELD_EMPTY_NOT_ALLOWED',
+            response_id: 'LENGTH_VALIDATOR_MINIMUM_CONSTRAINT',
             code: 400,
             callable: function () {
-                $test_field = new Field(type: 'string', required: true, many: true, many_minimum: 0);
+                $test_field = new Field(
+                    type: 'string',
+                    required: true,
+                    allow_empty: false,
+                    many: true,
+                    many_minimum: 1,
+                );
                 $test_field->name = 'test_field';
                 $test_field->value = [];
                 $test_field->validate();
@@ -574,5 +580,18 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase {
         $field = new Field(default_callable: '__invoke');
         $field->value = 'test';
         $this->assert_equals($field->get_default(), $field->value);
+    }
+
+    /**
+     * Checks that a Field with allow_empty set to true automatically sets many_minimum to 0 and vice versa.
+     */
+    public function test_allow_empty_sets_many_minimum(): void {
+        # Ensure that the `many_minimum` value is automatically changed to 0 when `allow_empty` is enabled
+        $test_field = new Field(type: 'string', required: true, allow_empty: true, many: true, many_minimum: 3);
+        $this->assert_equals($test_field->many_minimum, 0);
+
+        # Ensure that the `allow_empty` value is automatically changed to true when `many_minimum` is set to 0
+        $test_field = new Field(type: 'string', required: true, allow_empty: false, many: true, many_minimum: 0);
+        $this->assert_equals($test_field->allow_empty, true);
     }
 }

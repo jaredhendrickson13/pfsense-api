@@ -96,3 +96,20 @@ be assigned to users the same way as any other privilege in pfSense.
     The REST API will respect the `WebCfg - All pages` and `User - Config: Deny Config Write` privileges. Users with
     the `WebCfg - All pages` privilege will have full access to the REST API. Users with the `User - Config: Deny
     Config Write` privilege will be allowed to make API calls but attempts to modify the configuration will be denied.
+
+## Login Protection
+
+The REST API supports pfSense's login protection feature, which automatically blocks IP addresses that have too many
+failed login attempts within a period of time. The REST API will respect the settings configured in the pfSense 
+webConfigurator under 'System > Advanced > Login Protection'. This feature is enabled by default, but can be disabled a few different ways:
+
+1. By setting the `login_protection` field in the REST API settings to `false` via a `PATCH` request to the
+   [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint) endpoint.
+2. By unchecking the 'Login Protection' setting in 'System > REST API > Settings' in the pfSense webConfigurator.
+3. By disabling the Login Protection feature in the pfSense webConfigurator under 'System > Advanced > Login Protection'. This will disable login protection for all services, not just the REST API.
+
+!!! Warning
+    Disabling login protection for the REST API will prevent the REST API from logging authentication failures.
+!!! Danger
+    It is strongly recommended to leave the login protection feature enabled at all times to prevent brute force attacks 
+    against the API. Disabling this feature may pose a serious security risk to your pfSense system.
