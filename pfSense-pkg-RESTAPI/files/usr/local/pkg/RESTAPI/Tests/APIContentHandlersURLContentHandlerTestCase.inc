@@ -7,18 +7,15 @@ use RESTAPI\Core\TestCase;
 
 class APIContentHandlersURLContentHandlerTestCase extends TestCase {
     /**
-     * Checks that the `get_content()` method correctly obtains content from the PHP $_GET variable.
+     * Checks that the `get_content()` method correctly obtains content from the PHP $_SERVER['QUERY_STRING'] variable.
      */
     public function test_get_content(): void {
         # Create a handler to test with
         $handler = new URLContentHandler();
-
-        # Ensure the value is an empty array if no data was provided
-        $this->assert_equals($handler->get_content(), []);
-
-        # Set the value to $_GET manually and ensure the handler picks it up
-        $_GET = ['somedata' => 'somevalue'];
-        $this->assert_equals($handler->get_content(), ['somedata' => 'somevalue']);
+        $_SERVER['QUERY_STRING'] = 'somedata=somevalue';
+        $this->assert_equals($handler->get_content(),'somedata=somevalue');
+        $_SERVER['QUERY_STRING'] = 'somedata=somevalue&otherdata=othervalue';
+        $this->assert_equals($handler->get_content(), 'somedata=somevalue&otherdata=othervalue');
     }
 
     /**
@@ -29,12 +26,25 @@ class APIContentHandlersURLContentHandlerTestCase extends TestCase {
         $handler = new URLContentHandler();
 
         # Ensure boolean strings are converted to booleans
-        $this->assert_equals($handler->decode(['test' => 'true']), ['test' => true]);
-        $this->assert_equals($handler->decode(['test' => 'false']), ['test' => false]);
+        $this->assert_equals($handler->decode('test=true'), ['test' => true]);
+        $this->assert_equals($handler->decode('test=false'), ['test' => false]);
 
         # Ensure numeric values are converted to integers
-        $this->assert_equals($handler->decode(['test' => '0']), ['test' => 0]);
-        $this->assert_equals($handler->decode(['test' => '25']), ['test' => 25]);
+        $this->assert_equals($handler->decode('test=0'), ['test' => 0]);
+        $this->assert_equals($handler->decode('test=25'), ['test' => 25]);
+
+        # Ensure that floats are correctly decoded
+        $this->assert_equals($handler->decode('test=1.5'), ['test' => 1.5]);
+        $this->assert_equals($handler->decode('test=0.52'), ['test' => 0.52]);
+
+        # Ensure that null is correctly decoded
+        $this->assert_equals($handler->decode('test=null'), ['test' => null]);
+
+        # Ensure that arrays are correctly decoded
+        $this->assert_equals(
+            $handler->decode('test[]=1&test[]=true&test[]=null&test[]=0.5'),
+            ['test' => [1, true, null, 0.5]]
+        );
     }
 
     /**
