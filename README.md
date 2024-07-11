@@ -24,6 +24,22 @@ provide you with the information you need to configure and use the package effec
 - [Swagger and OpenAPI](https://pfrest.org/SWAGGER_AND_OPENAPI/)
 - [Queries and Filters](https://pfrest.org/QUERIES_AND_FILTERS/)
 
+## Quickstart
+
+For new users, it is recommended to refer to the links in the [Getting Started section](#getting-started) to begin. Otherwise, the install 
+command is included below for quick reference:
+
+```bash
+pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7.2-pkg-RESTAPI.pkg
+```
+
+> [!NOTE]
+> You may need to customize the installation command to reference the package built for your pfSense version. Check
+> the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
+> your version of pfSense.
+
+## Disclaimers
+
 > [!CAUTION]
 > This package is not affiliated or supported by Netgate or the pfSense team. This package is developed and maintained
 > by the community.
