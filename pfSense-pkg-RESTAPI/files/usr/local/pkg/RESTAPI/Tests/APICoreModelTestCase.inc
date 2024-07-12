@@ -744,4 +744,49 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($alias->address->value, []);
         $this->assert_equals($alias->detail->value, []);
     }
+    
+    /**
+     * Checks that the 'delete_many()' method correctly deletes all Model objects that match the query.
+     */
+    public function test_delete_many(): void
+    {
+        # Create FirewallAlias models
+        $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
+        $host_alias_0->create();
+        $host_alias_1 = new FirewallAlias(name: 'host1', type: 'host');
+        $host_alias_1->create();
+        $host_alias_2 = new FirewallAlias(name: 'host2', type: 'host');
+        $host_alias_2->create();
+        $port_alias_0 = new FirewallAlias(name: 'port0', type: 'port');
+        $port_alias_0->create();
+        $port_alias_1 = new FirewallAlias(name: 'port1', type: 'port');
+        $port_alias_1->create();
+        $port_alias_2 = new FirewallAlias(name: 'port2', type: 'port');
+        $port_alias_2->create();
+
+        # Delete all the aliases with type 'port'
+        $deleted_aliases = FirewallAlias::delete_many(type: 'port');
+
+        # Loop through the aliases that were deleted and ensure they correctly matched the query and were really deleted
+        foreach ($deleted_aliases->model_objects as $deleted_alias) {
+            $this->assert_equals($deleted_alias->type->value, 'port');
+            $this->assert_is_false(FirewallAlias::query(name: $deleted_alias->name->value)->exists());
+        }
+
+        # Ensure the host aliases were not deleted
+        $this->assert_equals(FirewallAlias::query(name__startswith: 'host')->count(), 3);
+    }
+
+    /**
+     * Checks that the 'delete_many()' method throws an error if no query parameters were given.
+     */
+    public function test_delete_many_no_query(): void {
+        $this->assert_throws_response(
+            response_id: 'MODEL_DELETE_MANY_REQUIRES_QUERY_PARAMS',
+            code: 400,
+            callable: function () {
+                FirewallAlias::delete_many();
+            },
+        );
+    }
 }

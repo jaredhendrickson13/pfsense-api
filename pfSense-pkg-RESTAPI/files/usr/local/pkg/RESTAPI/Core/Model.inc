@@ -2108,6 +2108,53 @@ class Model {
     }
 
     /**
+     * Uses a query to delete many Model objects at once. This method is only available for $many Models.
+     * @param array $query_params An array of query parameters.
+     * @param array $excluded An array of field names to exclude from the query. This is helpful when
+     *  query data may have extra values that you do not want to include in the query.
+     * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
+     *  $many Models with a $parent_model_class. This value has no affect otherwise.
+     * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many
+     *  enabled Models.
+     * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
+     *  enabled Models.
+     * @param mixed ...$vl_query_params Qyery parameters that are passed in using variable-length arguments
+     *  https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
+     * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
+     */
+    public static function delete_many(
+        array $query_params = [],
+        array $excluded = [],
+        mixed $parent_id = null,
+        int $limit = 0,
+        int $offset = 0,
+        ...$vl_query_params,
+    ): ModelSet {
+        # Merge the $query_params and any provided variable-length arguments into a single variable
+        $query_params = array_merge($query_params, $vl_query_params);
+
+        # As a safety net, always require at least one query parameter to perform mass deletion.
+        if (!$query_params) {
+            throw new ValidationError(
+                message: 'At least one query parameter is required to perform mass deletion.',
+                response_id: 'MODEL_DELETE_MANY_REQUIRES_QUERY_PARAMS',
+            );
+        }
+
+        # Obtain all Model objects that match the query of objects to be deleted
+        $model_objects = self::query(
+            query_params: $query_params,
+            excluded: $excluded,
+            parent_id: $parent_id,
+            limit: $limit,
+            offset: $offset,
+        );
+
+        # Delete the Model objects that matched the query
+        return $model_objects->delete();
+    }
+
+    /**
      * Obtains an array of all Model classes.
      * @param $shortnames bool Set to true to obtain the shortnames of all Model classes.
      * @return array An array of all Model classes.
