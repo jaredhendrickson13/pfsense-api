@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Endpoints\DiagnosticsARPTableEndpoint;
 use RESTAPI\Endpoints\FirewallAliasEndpoint;
@@ -287,10 +288,10 @@ class APICoreEndpointTestCase extends TestCase {
         # Ensure the request data is correctly obtained and decoded
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['HTTP_CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
-        $_GET = ['key' => 'value'];
+        $_SERVER['QUERY_STRING'] = 'key=value';
         $endpoint = new FirewallAliasEndpoint();
         $endpoint->process_request();
-        $this->assert_equals($endpoint->request_data, ['key' => 'value', 'async' => true, 'limit' => 0, 'offset' => 0]);
+        $this->assert_equals($endpoint->request_data, ['key' => 'value']);
     }
 
     /**
@@ -306,17 +307,17 @@ class APICoreEndpointTestCase extends TestCase {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['HTTP_CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
 
-        $_GET = ['async' => 'invalid'];
+        $_SERVER['QUERY_STRING'] = 'async=invalid';
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_equals($json_resp->response_id, 'ENDPOINT_ASYNC_FIELD_INVALID_TYPE');
 
-        $_GET = ['limit' => 'invalid'];
+        $_SERVER['QUERY_STRING'] = 'limit=invalid';
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_equals($json_resp->response_id, 'ENDPOINT_LIMIT_FIELD_INVALID_TYPE');
 
-        $_GET = ['offset' => 'invalid'];
+        $_SERVER['QUERY_STRING'] = 'offset=invalid';
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_equals($json_resp->response_id, 'ENDPOINT_OFFSET_FIELD_INVALID_TYPE');
@@ -334,7 +335,7 @@ class APICoreEndpointTestCase extends TestCase {
         # Mock an example POST request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['HTTP_CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
-        $_GET = ['name' => 'test_alias', 'type' => 'host', 'descr' => 'test description'];
+        $_SERVER['QUERY_STRING'] = 'name=test_alias&type=host&descr=test description';
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request(), associative: true);
         $this->assert_equals($json_resp['data'], $endpoint->model->to_representation());
@@ -343,14 +344,14 @@ class APICoreEndpointTestCase extends TestCase {
 
         # Mock an example GET request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_GET = ['id' => $id];
+        $_SERVER['QUERY_STRING'] = "id=$id";
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request(), associative: true);
         $this->assert_equals($json_resp['data'], $alias->to_representation());
 
         # Mock an example PATCH request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'PATCH';
-        $_GET = ['id' => $id, 'descr' => 'new description'];
+        $_SERVER['QUERY_STRING'] = "id=$id&descr=new description";
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request(), associative: true);
         $alias = new FirewallAlias(id: $id);
@@ -359,7 +360,7 @@ class APICoreEndpointTestCase extends TestCase {
 
         # Mock an example DELETE request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $_GET = ['id' => $id];
+        $_SERVER['QUERY_STRING'] = "id=$id";
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request(), associative: true);
         $this->assert_equals($json_resp['data'], $alias->to_representation());
@@ -438,6 +439,43 @@ class APICoreEndpointTestCase extends TestCase {
         );
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->code, 200);
+    }
+
+    /**
+     * Ensures we can make a DELETE request to `many` endpoints and receive a successful response.
+     */
+    public function test_delete_many_e2e(): void {
+        # Use a PUT request to create new aliases
+        \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'PUT',
+            data: [
+                ['name' => 'host_alias', 'type' => 'host'],
+                ['name' => 'network_alias1', 'type' => 'network'],
+                ['name' => 'network_alias2', 'type' => 'network'],
+                ['name' => 'port_alias', 'type' => 'port']
+            ],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure we can make a successful DELETE request to a `many` endpoint
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'DELETE',
+            data: ['type' => 'network'],
+            headers: ['Content-Type' => 'application/x-www-form-urlencoded'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+        $this->assert_equals(count($resp->data), 2);
+        $this->assert_equals($resp->data[0]->name, 'network_alias1');
+        $this->assert_equals($resp->data[1]->name, 'network_alias2');
     }
 
     /**
