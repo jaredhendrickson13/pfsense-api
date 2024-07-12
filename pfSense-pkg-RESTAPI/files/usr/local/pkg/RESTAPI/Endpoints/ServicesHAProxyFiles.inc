@@ -15,7 +15,7 @@ class ServicesHAProxyFiles extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/services/haproxy/files';
         $this->model_name = 'HAProxyFile';
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
         $this->many = true;
 
         # Construct the parent Endpoint object

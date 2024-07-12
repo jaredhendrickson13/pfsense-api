@@ -15,7 +15,7 @@ class VPNOpenVPNCSOsEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/vpn/openvpn/csos';
         $this->model_name = 'OpenVPNClientSpecificOverride';
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
         $this->many = true;
 
         # Construct the parent Endpoint object

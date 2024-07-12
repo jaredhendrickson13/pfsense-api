@@ -16,7 +16,7 @@ class ServicesDNSResolverHostOverridesEndpoint extends Endpoint {
         $this->url = '/api/v2/services/dns_resolver/host_overrides';
         $this->model_name = 'DNSResolverHostOverride';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

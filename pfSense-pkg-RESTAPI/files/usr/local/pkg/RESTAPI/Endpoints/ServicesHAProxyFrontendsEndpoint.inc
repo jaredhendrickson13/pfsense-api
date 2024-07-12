@@ -15,7 +15,7 @@ class ServicesHAProxyFrontendsEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/services/haproxy/frontends';
         $this->model_name = 'HAProxyFrontend';
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
         $this->many = true;
 
         # Construct the parent Endpoint object

@@ -15,7 +15,7 @@ class FirewallTrafficShapersEndpoint extends Endpoint {
         $this->url = '/api/v2/firewall/traffic_shapers';
         $this->model_name = 'TrafficShaper';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

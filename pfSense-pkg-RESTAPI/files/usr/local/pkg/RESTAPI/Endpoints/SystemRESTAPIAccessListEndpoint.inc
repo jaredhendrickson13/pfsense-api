@@ -15,7 +15,7 @@ class SystemRESTAPIAccessListEndpoint extends Endpoint {
         $this->url = '/api/v2/system/restapi/access_list';
         $this->model_name = 'RESTAPIAccessListEntry';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

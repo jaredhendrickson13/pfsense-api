@@ -15,7 +15,7 @@ class FirewallNATOneToOneMappingsEndpoint extends Endpoint {
         $this->url = '/api/v2/firewall/nat/one_to_one/mappings';
         $this->model_name = 'OneToOneNATMapping';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

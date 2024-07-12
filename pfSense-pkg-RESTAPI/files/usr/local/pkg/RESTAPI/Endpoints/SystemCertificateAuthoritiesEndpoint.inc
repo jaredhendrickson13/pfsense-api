@@ -16,7 +16,7 @@ class SystemCertificateAuthoritiesEndpoint extends Endpoint {
         $this->url = '/api/v2/system/certificate_authorities';
         $this->model_name = 'CertificateAuthority';
         $this->many = true;
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

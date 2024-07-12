@@ -15,7 +15,7 @@ class FirewallAliasesEndpoint extends Endpoint {
         $this->url = '/api/v2/firewall/aliases';
         $this->model_name = 'FirewallAlias';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

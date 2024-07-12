@@ -16,7 +16,7 @@ class ServicesNTPTimeServersEndpoint extends Endpoint {
         $this->url = '/api/v2/services/ntp/time_servers';
         $this->model_name = 'NTPTimeServer';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();
