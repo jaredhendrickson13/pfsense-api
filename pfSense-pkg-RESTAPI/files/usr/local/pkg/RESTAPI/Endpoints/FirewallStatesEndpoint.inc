@@ -17,7 +17,6 @@ class FirewallStatesEndpoint extends Endpoint {
         $this->request_method_options = ['GET', 'DELETE'];
         $this->many = true;
         $this->limit = 100; # Set default limit to 100
-
         # Set documentation help text
         $this->get_help_text .=
             'Reads all current Firewall States. A normal firewall may have thousands, millions, ' .

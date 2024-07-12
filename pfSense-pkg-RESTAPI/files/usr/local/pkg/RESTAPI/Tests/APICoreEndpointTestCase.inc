@@ -453,7 +453,7 @@ class APICoreEndpointTestCase extends TestCase {
                 ['name' => 'host_alias', 'type' => 'host'],
                 ['name' => 'network_alias1', 'type' => 'network'],
                 ['name' => 'network_alias2', 'type' => 'network'],
-                ['name' => 'port_alias', 'type' => 'port']
+                ['name' => 'port_alias', 'type' => 'port'],
             ],
             headers: ['Content-Type' => 'application/json'],
             username: 'admin',

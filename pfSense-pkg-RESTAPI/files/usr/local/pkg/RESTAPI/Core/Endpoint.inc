@@ -368,8 +368,10 @@ class Endpoint {
         elseif ($this->many and $this->model->many) {
             $this->get_help_text = $this->get_help_text ?: "Reads all existing $model_verbose_name_plural.";
             $this->put_help_text = $this->put_help_text ?: "Replaces all existing $model_verbose_name_plural.";
-            $this->delete_help_text = $this->delete_help_text ?: "Deletes multiple existing $model_verbose_name_plural ".
-                "using a query.<br><br>WARNING: This will delete all objects that match the query, use with caution.";
+            $this->delete_help_text =
+                $this->delete_help_text ?:
+                "Deletes multiple existing $model_verbose_name_plural " .
+                    'using a query.<br><br>WARNING: This will delete all objects that match the query, use with caution.';
         }
         # Set default help text with an applicable context for non `many` Models
         else {
@@ -805,15 +807,8 @@ class Endpoint {
     protected function get(): Model|ModelSet {
         # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
         if ($this->many) {
-            $this->get_pagination_resource_links(
-                limit: $this->limit,
-                offset: $this->offset,
-            );
-            return $this->model->query(
-                query_params: $this->request_data,
-                limit: $this->limit,
-                offset: $this->offset,
-            );
+            $this->get_pagination_resource_links(limit: $this->limit, offset: $this->offset);
+            return $this->model->query(query_params: $this->request_data, limit: $this->limit, offset: $this->offset);
         }
         # For GET requests on many Endpoints, obtain all objects from the assigned Model.
         else {
@@ -855,10 +850,7 @@ class Endpoint {
     protected function delete(): Model|ModelSet {
         # Delete multiple objects using a query if this is a many Endpoint
         if ($this->many) {
-            $this->get_pagination_resource_links(
-                limit: $this->limit,
-                offset: $this->offset,
-            );
+            $this->get_pagination_resource_links(limit: $this->limit, offset: $this->offset);
             return $this->model->delete_many(
                 query_params: $this->request_data,
                 limit: $this->limit,

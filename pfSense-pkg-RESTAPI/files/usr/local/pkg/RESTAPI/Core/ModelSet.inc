@@ -109,7 +109,7 @@ class ModelSet {
     private function run_model_method(string $method_name, bool $use_id_as_key = false, bool $reverse = false): array {
         # Variables
         $results = [];
-        $model_objects = ($reverse) ? array_reverse($this->model_objects) : $this->model_objects;
+        $model_objects = $reverse ? array_reverse($this->model_objects) : $this->model_objects;
 
         # Loop through each model object and call its to_representation() method
         foreach ($model_objects as $loop_count => $model_object) {

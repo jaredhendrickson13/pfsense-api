@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallAlias;
 
-class APIQueryFiltersFormatQueryFilterTestCase extends TestCase
-{
+class APIQueryFiltersFormatQueryFilterTestCase extends TestCase {
     /**
      * Checks that the evaluate method correctly identifies values that match the requested formats.
      */

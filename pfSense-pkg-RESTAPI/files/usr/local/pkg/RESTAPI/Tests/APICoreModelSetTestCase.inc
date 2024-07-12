@@ -253,8 +253,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the ModelSet count() method correctly identifies the number of Model objects set.
      */
-    public function test_count(): void
-    {
+    public function test_count(): void {
         $test_model1 = new RESTAPI\Models\Test();
         $test_model2 = new RESTAPI\Models\Test();
 
@@ -288,8 +287,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the 'delete()' method correctly deletes all Model objects in the ModelSet
      */
-    public function test_delete_many(): void
-    {
+    public function test_delete_many(): void {
         # Create FirewallAlias models
         $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
         $host_alias_0->create();

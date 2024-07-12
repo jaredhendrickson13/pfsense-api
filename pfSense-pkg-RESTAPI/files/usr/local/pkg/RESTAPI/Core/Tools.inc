@@ -437,7 +437,8 @@ function generate_documentation(): bool {
                         'name' => 'query',
                         'style' => 'form',
                         'explode' => true,
-                        'description' => 'The arbitrary query parameters to include in the request.<br><br>' .
+                        'description' =>
+                            'The arbitrary query parameters to include in the request.<br><br>' .
                             'Note: This does not define an real parameter, rather it allows for any arbitrary query ' .
                             'parameters to be included in the request.',
                         'schema' => [
@@ -445,7 +446,7 @@ function generate_documentation(): bool {
                             'default' => '{}',
                             'additionalProperties' => ['type' => 'string'],
                         ],
-                    ]
+                    ],
                 ];
             }
 
@@ -469,7 +470,8 @@ function generate_documentation(): bool {
                         'name' => 'query',
                         'style' => 'form',
                         'explode' => true,
-                        'description' => 'The arbitrary query parameters to include in the request.<br><br>' .
+                        'description' =>
+                            'The arbitrary query parameters to include in the request.<br><br>' .
                             'Note: This does not define an actual parameter, rather it allows for any arbitrary query ' .
                             'parameters to be included in the request.',
                         'schema' => [
@@ -477,7 +479,7 @@ function generate_documentation(): bool {
                             'default' => '{}',
                             'additionalProperties' => ['type' => 'string'],
                         ],
-                    ]
+                    ],
                 ];
             }
 

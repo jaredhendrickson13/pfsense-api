@@ -744,12 +744,11 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($alias->address->value, []);
         $this->assert_equals($alias->detail->value, []);
     }
-    
+
     /**
      * Checks that the 'delete_many()' method correctly deletes all Model objects that match the query.
      */
-    public function test_delete_many(): void
-    {
+    public function test_delete_many(): void {
         # Create FirewallAlias models
         $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
         $host_alias_0->create();
