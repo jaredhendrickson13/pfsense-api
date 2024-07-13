@@ -127,7 +127,7 @@ parameter specifies the starting index of the items to return. Pagination is use
 reduce the amount of data returned in a single request.
 
 !!! Important
-    - By default, the REST API does not paginate responses. If you want to paginate the response, you must include the
-    `limit` and `offset` query parameters in your request.
+    - Most endpoints do not impose a limit on the number of items returned by default. Refer to the endpoint's
+      [documentation](https://pfrest.org/api-docs/) to determine if a limit is imposed by default.
     - Pagination is only available for `GET` and `DELETE` requests to [plural endpoints](./ENDPOINT_TYPES.md#plural-many-endpoints).
     - If combined with a query, pagination will be applied after the initial query is executed.
