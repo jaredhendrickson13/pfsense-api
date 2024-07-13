@@ -1697,7 +1697,7 @@ class Model {
         if (!$model->many and $requests_pagination) {
             throw new ValidationError(
                 message: "Model `$model->verbose_name` does not support pagination. Please remove the `limit` and/or. " .
-                '`offset`parameters and try again.',
+                    '`offset`parameters and try again.',
                 response_id: 'MODEL_DOES_NOT_SUPPORT_PAGINATION',
             );
         }
