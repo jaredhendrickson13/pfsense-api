@@ -255,6 +255,12 @@ class Endpoint {
     public string $delete_help_text = '';
 
     /**
+     * @var bool $deprecated
+     * Marks this Endpoint as deprecated in the OpenAPI documentation.
+     */
+    public bool $deprecated = false;
+
+    /**
      * @var integer $limit
      * Sets the default limit for the number of Model objects to retrieve in a single call to this Endpoint. This
      * value is used for pagination purposes and can be overridden by the client in the request data.

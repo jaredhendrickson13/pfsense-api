@@ -272,6 +272,7 @@ function generate_documentation(): bool {
             $openapi_config['paths'][$endpoint->url][$request_method] = [
                 'responses' => [],
                 'operationId' => $operation_id,
+                'deprecated' => $endpoint->deprecated,
                 'description' =>
                     '<h3>Description:</h3>' .
                     "$help_text<br>" .
