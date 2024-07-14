@@ -11,6 +11,8 @@ use RESTAPI\Responses\NotFoundError;
 trait LogFileTraits {
     /**
      * Checks if a given log file exists.
+     * @param string $filepath The path to the log file.
+     * @throws NotFoundError If the log file does not exist.
      */
     private function check_file_exists(string $filepath): void {
         # Check if the file exists
@@ -24,6 +26,8 @@ trait LogFileTraits {
 
     /**
      * Reads a given log file with no compression and returns the contents as an array of lines.
+     * @param string $filepath The path to the log file.
+     * @return array An array of log file contents.
      */
     private function read_uncompressed_log(string $filepath): array {
         # Check if the file exists
@@ -35,6 +39,8 @@ trait LogFileTraits {
 
     /**
      * Decompresses a bzip2 compressed log file and returns the contents as an array of lines.
+     * @param string $filepath The path to the log file.
+     * @return array An array of log file contents.
      */
     private function read_bzip2_log(string $filepath): array {
         # Check if the file exists
@@ -46,6 +52,8 @@ trait LogFileTraits {
 
     /**
      * Decompresses a gzip compressed log file and returns the contents as an array of lines.
+     * @param string $filepath The path to the log file.
+     * @return array An array of log file contents.
      */
     private function read_gzip_log(string $filepath): array {
         # Check if the file exists
@@ -57,6 +65,8 @@ trait LogFileTraits {
 
     /**
      * Decompresses a xz compressed log file and returns the contents as an array of lines.
+     * @param string $filepath The path to the log file.
+     * @return array An array of log file contents.
      */
     private function read_xz_log(string $filepath): array {
         # Check if the file exists
