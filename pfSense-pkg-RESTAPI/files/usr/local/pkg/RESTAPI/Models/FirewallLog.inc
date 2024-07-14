@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Models;
 
+use RESTAPI\Core\LogFileTraits;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
 
@@ -9,6 +10,8 @@ use RESTAPI\Fields\StringField;
  * Defines a Model for interacting with the firewall log at /var/log/filter.log.
  */
 class FirewallLog extends Model {
+    use LogFileTraits;
+
     public StringField $text;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
@@ -26,14 +29,6 @@ class FirewallLog extends Model {
      * @return array The firewall log as an array of objects.
      */
     protected function get_firewall_log(): array {
-        $firewall_log = [];
-        $log = file_get_contents('/var/log/filter.log');
-        $log_lines = explode("\n", $log);
-        $log = array_filter($log_lines);
-        unset($log[count($log_lines) - 1]);
-        foreach ($log_lines as $line) {
-            $firewall_log[] = ['text' => $line];
-        }
-        return $firewall_log;
+        return $this->read_log('/var/log/filter.log');
     }
 }

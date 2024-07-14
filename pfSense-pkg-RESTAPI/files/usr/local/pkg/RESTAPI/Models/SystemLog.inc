@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Models;
 
+use RESTAPI\Core\LogFileTraits;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
 
@@ -9,6 +10,8 @@ use RESTAPI\Fields\StringField;
  * Defines a Model for interacting with the system log at /var/log/system.log.
  */
 class SystemLog extends Model {
+    use LogFileTraits;
+
     public StringField $text;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
@@ -26,14 +29,6 @@ class SystemLog extends Model {
      * @return array The system log as an array of objects.
      */
     protected function get_system_log(): array {
-        $system_log = [];
-        $log = file_get_contents('/var/log/system.log');
-        $log_lines = explode("\n", $log);
-        $log = array_filter($log_lines);
-        unset($log[count($log_lines) - 1]);
-        foreach ($log_lines as $line) {
-            $system_log[] = ['text' => $line];
-        }
-        return $system_log;
+        return $this->read_log('/var/log/system.log');
     }
 }
