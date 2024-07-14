@@ -36,8 +36,7 @@ trait LogFileTraits {
     /**
      * Decompresses a bzip2 compressed log file and returns the contents as an array of lines.
      */
-    private function read_bzip2_log(string $filepath): array
-    {
+    private function read_bzip2_log(string $filepath): array {
         # Check if the file exists
         $this->check_file_exists($filepath);
 
@@ -59,13 +58,12 @@ trait LogFileTraits {
     /**
      * Decompresses a xz compressed log file and returns the contents as an array of lines.
      */
-    private function read_xz_log(string $filepath): array
-    {
+    private function read_xz_log(string $filepath): array {
         # Check if the file exists
         $this->check_file_exists($filepath);
 
         # Run xz to read the compressed file
-        $xz_decompress = new Command("xz -dc ".escapeshellarg($filepath));
+        $xz_decompress = new Command('xz -dc ' . escapeshellarg($filepath));
 
         # Decompress the file and return the contents as an array of lines
         return explode(PHP_EOL, $xz_decompress->output);
@@ -76,8 +74,7 @@ trait LogFileTraits {
      * @param string $base_log The base log file path.
      * @return array An array of all log file paths for the given base log.
      */
-    private function gather_log_filepaths(string $base_log): array
-    {
+    private function gather_log_filepaths(string $base_log): array {
         # Variables
         $log_filepaths = [];
 
@@ -97,8 +94,7 @@ trait LogFileTraits {
      * @param string $base_log The base log file path.
      * @return array An array of all log file contents for the given base log.
      */
-    public function read_log(string $base_log): array
-    {
+    public function read_log(string $base_log): array {
         # Variables
         $log_contents = [];
 
