@@ -1,14 +1,15 @@
 <?php
 
-namespace RESTAPI\Core;
+namespace RESTAPI\ModelTraits;
 
+use RESTAPI\Core\Command;
 use RESTAPI\Responses\NotAcceptableError;
 use RESTAPI\Responses\NotFoundError;
 
 /**
  * Defines a set of traits that are intended to be used by Models to read, decompress and process log files.
  */
-trait LogFileTraits {
+trait LogFileModelTraits {
     /**
      * Checks if a given log file exists.
      * @param string $filepath The path to the log file.
@@ -108,6 +109,9 @@ trait LogFileTraits {
         # Variables
         $log_contents = [];
 
+        # Ensurethe base log file exists
+        $this->check_file_exists($base_log);
+
         # Gather all log file paths
         $log_filepaths = $this->gather_log_filepaths($base_log);
 
@@ -129,8 +133,9 @@ trait LogFileTraits {
             };
         }
 
-        # Clear out empty array elements
+        # Clear out empty array elements and reindex the array
         $log_contents = array_filter($log_contents);
+        $log_contents = array_values($log_contents);
 
         # Map the log contents so each entry is an object with a 'text' property
         return array_map(fn($line) => ['text' => $line], $log_contents);
