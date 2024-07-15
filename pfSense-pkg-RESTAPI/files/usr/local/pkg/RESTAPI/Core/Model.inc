@@ -1684,7 +1684,7 @@ class Model {
     public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0): ModelSet|Model {
         # Variables
         $model_name = get_called_class();
-        $model = new $model_name(parent_id: $parent_id, skip_init: true);
+        $model = new $model_name(parent_id: $parent_id);
         $model_objects = [];
         $is_parent_model_many = $model->is_parent_model_many();
         $requests_pagination = ($limit or $offset);
@@ -1723,6 +1723,9 @@ class Model {
 
             # Create a new Model object for this internal object and assign its ID
             $model_object = new $model(id: $internal_id, parent_id: $parent_id, skip_init: true);
+
+            # Obtain the parent Model object if this Model has a parent Model class assigned
+            $model_object->get_parent_model();
 
             # Populate the Model object using its current internal values and add it to the array of all Model objects
             $model_object->from_internal_object($internal_object);
