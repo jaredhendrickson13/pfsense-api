@@ -1675,17 +1675,23 @@ class Model {
      * enabled Models.
      * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
      * enabled Models.
+     * @param bool $reverse Set to true to reverse the order of the ModelSet. This is only applicable to $many enabled
+     * Models.
      * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
      * not enabled.
      */
-    public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0): ModelSet|Model {
+    public static function read_all(
+        mixed $parent_id = null,
+        int $limit = 0,
+        int $offset = 0,
+        bool $reverse = false
+    ): ModelSet|Model {
         # Variables
         $model_name = get_called_class();
         $model = new $model_name(parent_id: $parent_id);
         $model_objects = [];
         $is_parent_model_many = $model->is_parent_model_many();
         $requests_pagination = ($limit or $offset);
-        $offset_counter = 0;
 
         # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
         if ($is_parent_model_many and !isset($parent_id)) {
@@ -1710,13 +1716,14 @@ class Model {
         # For non `many` Models, wrap the internal object in an array so we can loop
         $internal_objects = $model->many ? $internal_objects : [$internal_objects];
 
+        # Reverse the order we read the objects and/or paginate if requested
+        $internal_objects = $reverse ? array_reverse($internal_objects, preserve_keys: true) : $internal_objects;
+        $internal_objects = self::paginate($internal_objects, $limit, $offset, preserve_keys: true);
+
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id => $internal_object) {
-            # Do not include this object if we have not reached our offset
-            if ($offset_counter < $offset) {
-                $offset_counter++;
-                continue;
-            }
+            # Ensure numeric IDs are converted to integers
+            $internal_id = is_numeric($internal_id) ? (int) $internal_id : $internal_id;
 
             # Create a new Model object for this internal object and assign its ID
             $model_object = new $model(id: $internal_id, parent_id: $parent_id, skip_init: true);
@@ -1727,18 +1734,10 @@ class Model {
             # Populate the Model object using its current internal values and add it to the array of all Model objects
             $model_object->from_internal_object($internal_object);
             $model_objects[] = $model_object;
-
-            # Break the loop if $limit is set, and we've met our limit of objects to obtain
-            if ($limit and $limit === count($model_objects)) {
-                break;
-            }
-
-            # Increase the offset counter
-            $offset_counter++;
         }
 
-        # Unwrap the array for non `many` Models, otherwise return all objects
-        return $model->many ? new ModelSet($model_objects) : $model_objects[0];
+        # For many enabled Models return a ModelSet, otherwise return a single Model object
+        return $model->many ? new ModelSet(model_objects: $model_objects) : $model_objects[0];
     }
 
     /**
@@ -1753,6 +1752,8 @@ class Model {
      * enabled Models.
      * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
      * enabled Models.
+     * @param bool $reverse Set to true to reverse the order of the ModelSet. This is only applicable to $many enabled
+     * Models.
      * @param mixed ...$vl_query_params Qyery parameters that are passed in using variable-length arguments
      * https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
      * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
@@ -1763,6 +1764,7 @@ class Model {
         mixed $parent_id = null,
         int $limit = 0,
         int $offset = 0,
+        bool $reverse = false,
         ...$vl_query_params,
     ): ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
@@ -1770,24 +1772,27 @@ class Model {
 
         # If no query parameters were provided, just run read_all() with pagination for optimal performance
         if (!$query_params) {
-            return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset);
+            return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset, reverse: $reverse);
         }
 
         # Perform the query against all Model objects for this Model first
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
 
-        # Apply pagination to limit the number of objects returned if requested
+        # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);
-        return $modelset;
+        return ($reverse) ? $modelset->reverse() : $modelset;
     }
 
     /**
      * Paginates a given array but obtaining a smaller subset of the array based on the provided limit and offset values.
+     * @param array $array The array to paginate.
      * @param int $limit The maximum number of items to return in the paginated array. Use 0 to impose no limit.
      * @param int $offset The starting point in the array to begin the paginated array.
+     * @param bool $preserve_keys Set to true to preserve the keys of the array. This is useful when the array is
+     * associative and you want to maintain the key-value pairs.
      * @return array The paginated array containing only the subset of items that match the limit and offset values.
      */
-    public static function paginate(array $array, int $limit, int $offset): array {
+    public static function paginate(array $array, int $limit, int $offset, bool $preserve_keys = false): array {
         # Return the entire array if no limit or offset is set
         if (!$limit and !$offset) {
             return $array;
@@ -1804,7 +1809,7 @@ class Model {
         }
 
         # Return the subset of the array that matches the limit and offset values
-        return array_slice($array, $offset, $limit);
+        return array_slice($array, $offset, $limit, preserve_keys: $preserve_keys);
     }
 
     /**

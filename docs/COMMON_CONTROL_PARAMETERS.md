@@ -35,6 +35,18 @@ parameters you can use:
     changes immediately or requires a separate apply call. If an endpoint applies changes immediately, this parameter
     will have no effect.
 
+## reverse
+
+- Type: Boolean
+- Default: `false`
+- Description: This parameter allows you to reverse the order of the objects returned in the data section of the API 
+  response. This enables you to paginate through objects in reverse order, which is particularly useful if you are 
+  looking for an object near the end of the list. Additionally, it is helpful for time-sorted objects, such as logs, 
+  where you may want to view the most recent entries first.
+
+!!! Note
+    This parameter is only available for `GET` requests to [plural endpoints](ENDPOINT_TYPES.md#plural-many-endpoints).
+
 ## placement
 
 - Type: Integer

@@ -7,6 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI;
 use RESTAPI\Core\ModelSet;
 use RESTAPI\Models\FirewallAlias;
+use RESTAPI\Models\FirewallRule;
 
 /**
  * Defines test case for testing RESTAPI\Core\ModelSet.
@@ -303,5 +304,42 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         # Ensure all aliases were deleted
         $this->assert_equals($deleted_aliases->count(), 3);
         $this->assert_is_false(FirewallAlias::query(type: 'host')->exists());
+    }
+
+    /**
+     * Checks that the 'reverse()' method correctly reverses the order of the Model objects in the ModelSet.
+     */
+    public function test_reverse(): void
+    {
+        # Create three firewall aliases
+        $alias_a = new FirewallAlias(name: 'alias_a', type: 'host');
+        $alias_b = new FirewallAlias(name: 'alias_b', type: 'host');
+        $alias_c = new FirewallAlias(name: 'alias_c', type: 'host');
+        $alias_a->create();
+        $alias_b->create();
+        $alias_c->create();
+
+        # Read all firewall aliases and ensure they are in the correct (normal) order
+        $modelset = FirewallAlias::read_all();
+        $this->assert_equals($modelset->model_objects[0]->name->value, 'alias_a');
+        $this->assert_equals($modelset->model_objects[0]->id, 0);
+        $this->assert_equals($modelset->model_objects[1]->name->value, 'alias_b');
+        $this->assert_equals($modelset->model_objects[1]->id, 1);
+        $this->assert_equals($modelset->model_objects[2]->name->value, 'alias_c');
+        $this->assert_equals($modelset->model_objects[2]->id, 2);
+
+        # Reverse the order of the firewall aliases and ensure they are in the correct (reversed) order
+        $reversed_modelset = $modelset->reverse();
+        $this->assert_equals($reversed_modelset->model_objects[0]->name->value, 'alias_c');
+        $this->assert_equals($reversed_modelset->model_objects[0]->id, 2);
+        $this->assert_equals($reversed_modelset->model_objects[1]->name->value, 'alias_b');
+        $this->assert_equals($reversed_modelset->model_objects[1]->id, 1);
+        $this->assert_equals($reversed_modelset->model_objects[2]->name->value, 'alias_a');
+        $this->assert_equals($reversed_modelset->model_objects[2]->id, 0);
+
+        # Delete the firewall aliases
+        $alias_a->delete();
+        $alias_b->delete();
+        $alias_c->delete();
     }
 }

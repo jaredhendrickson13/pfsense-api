@@ -72,6 +72,15 @@ class ModelSet {
     }
 
     /**
+     * Reverse the order of the Model objects in this ModelSet.
+     * @return ModelSet A new ModelSet object with the Model objects in reverse order.
+     */
+    public function reverse(): ModelSet
+    {
+        return new ModelSet(array_reverse($this->model_objects));
+    }
+
+    /**
      * Runs the to_representation() method for each model object within the model set and returns them all in an array.
      * @return array A serializable representation of all model objects within this model set.
      */

@@ -831,4 +831,55 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($port_aliases->count(), 1);
         $this->assert_equals($port_aliases->model_objects[0]->name->value, 'alias4');
     }
+
+    /**
+     * Ensures the read_all() method can be reversed to read the objects in reverse order.
+     */
+    public function test_read_all_reverse(): void {
+        # Create FirewallAlias models to test this
+        $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
+        $alias_alias_0->create();
+        $alias_alias_1 = new FirewallAlias(name: 'alias1', type: 'port');
+        $alias_alias_1->create();
+        $alias_alias_2 = new FirewallAlias(name: 'alias2', type: 'network');
+        $alias_alias_2->create();
+        $alias_alias_3 = new FirewallAlias(name: 'alias3', type: 'host');
+        $alias_alias_3->create();
+        $alias_alias_4 = new FirewallAlias(name: 'alias4', type: 'port');
+        $alias_alias_4->create();
+
+        # Read all the aliases in reverse order
+        $reversed_aliases = FirewallAlias::read_all(reverse: true);
+        $this->assert_equals($reversed_aliases->model_objects[0]->name->value, 'alias4');
+        $this->assert_equals($reversed_aliases->model_objects[1]->name->value, 'alias3');
+        $this->assert_equals($reversed_aliases->model_objects[2]->name->value, 'alias2');
+        $this->assert_equals($reversed_aliases->model_objects[3]->name->value, 'alias1');
+        $this->assert_equals($reversed_aliases->model_objects[4]->name->value, 'alias0');
+    }
+
+    /**
+     * Ensures the query() method can be reversed to read the objects in reverse order.
+     */
+    public function test_query_reverse(): void
+    {
+        # Create FirewallAlias models to test this
+        $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
+        $alias_alias_0->create();
+        $alias_alias_1 = new FirewallAlias(name: 'alias1', type: 'port');
+        $alias_alias_1->create();
+        $alias_alias_2 = new FirewallAlias(name: 'alias2', type: 'network');
+        $alias_alias_2->create();
+        $alias_alias_3 = new FirewallAlias(name: 'alias3', type: 'host');
+        $alias_alias_3->create();
+        $alias_alias_4 = new FirewallAlias(name: 'alias4', type: 'port');
+        $alias_alias_4->create();
+
+        # Query for all aliases in reverse order
+        $reversed_aliases = FirewallAlias::query(reverse: true);
+        $this->assert_equals($reversed_aliases->model_objects[0]->name->value, 'alias4');
+        $this->assert_equals($reversed_aliases->model_objects[1]->name->value, 'alias3');
+        $this->assert_equals($reversed_aliases->model_objects[2]->name->value, 'alias2');
+        $this->assert_equals($reversed_aliases->model_objects[3]->name->value, 'alias1');
+        $this->assert_equals($reversed_aliases->model_objects[4]->name->value, 'alias0');
+    }
 }

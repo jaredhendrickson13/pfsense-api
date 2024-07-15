@@ -283,6 +283,14 @@ class Endpoint {
     public bool $async = true;
 
     /**
+     * @var bool $reverse
+     * Sets the default value for the `reverse` field in the request data. This value is used to control the order of
+     * the Model objects returned by this Endpoint. This value can be overridden by the client in the request data.
+     * If set to `true`, the Model objects in the `data` section of the response will be reversed.
+     */
+    public bool $reverse = false;
+
+    /**
      * Sets values whenever the Endpoint object is crated.
      */
     public function __construct() {
@@ -654,6 +662,29 @@ class Endpoint {
     }
 
     /**
+     * Validates the $reverse common control parameter for this request.
+     * @note If the `reverse` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $reverse property value.
+     * @throws ValidationError When the `reverse` field is not a boolean.
+     */
+    private function validate_reverse(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['reverse'])) {
+            # Ensure value is a bool
+            if (!is_bool($this->request_data['reverse'])) {
+                throw new ValidationError(
+                    message: 'Field `reverse` must be of type `boolean`.',
+                    response_id: 'ENDPOINT_REVERSE_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the reverse property to use the client's requested value and remove it from the request data
+            $this->reverse = $this->request_data['reverse'];
+            unset($this->request_data['reverse']);
+        }
+    }
+
+    /**
      * Validates the $limit common control parameter for this request.
      * @note If the `limit` field was not provided in the request data, the request will default to the Endpoint's
      * assigned $limit property value.
@@ -714,6 +745,7 @@ class Endpoint {
 
         # Ensure the $async, $limit and $offset parameters are of the correct type if the client requested them
         $this->validate_async();
+        $this->validate_reverse();
         $this->validate_limit();
         $this->validate_offset();
     }
@@ -814,7 +846,12 @@ class Endpoint {
         # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
         if ($this->many) {
             $this->get_pagination_resource_links(limit: $this->limit, offset: $this->offset);
-            return $this->model->query(query_params: $this->request_data, limit: $this->limit, offset: $this->offset);
+            return $this->model->query(
+                query_params: $this->request_data,
+                limit: $this->limit,
+                offset: $this->offset,
+                reverse: $this->reverse,
+            );
         }
         # For GET requests on many Endpoints, obtain all objects from the assigned Model.
         else {
@@ -860,7 +897,7 @@ class Endpoint {
             return $this->model->delete_many(
                 query_params: $this->request_data,
                 limit: $this->limit,
-                offset: $this->offset,
+                offset: $this->offset
             );
         }
 

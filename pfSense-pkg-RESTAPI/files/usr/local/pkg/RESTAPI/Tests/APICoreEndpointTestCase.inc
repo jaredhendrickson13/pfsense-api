@@ -507,4 +507,51 @@ class APICoreEndpointTestCase extends TestCase {
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_equals($json_resp->code, 200);
     }
+
+    /**
+     * Ensures the Endpoint's $reverse flag correctly reverses the order of the returned data.
+     */
+    public function test_reverse(): void {
+        # Use a PUT request to create new aliases
+        \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'PUT',
+            data: [
+                ['name' => 'host_alias', 'type' => 'host'],
+                ['name' => 'network_alias1', 'type' => 'network'],
+                ['name' => 'network_alias2', 'type' => 'network'],
+                ['name' => 'port_alias', 'type' => 'port'],
+            ],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure the 'reverse' flag does not reverse the order of the returned data by default
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->data[0]->id, 0);
+
+        # Ensure the 'reverse' flag correctly reverses the order of the returned data
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['reverse' => true],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->data[0]->id, 3);
+
+    }
 }
