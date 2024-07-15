@@ -1768,6 +1768,11 @@ class Model {
         # Merge the $query_params and any provided variable-length arguments into a single variable
         $query_params = array_merge($query_params, $vl_query_params);
 
+        # If no query parameters were provided, just run read_all() with pagination for optimal performance
+        if (!$query_params) {
+            return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset);
+        }
+
         # Perform the query against all Model objects for this Model first
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
 
