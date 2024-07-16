@@ -6,8 +6,7 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\SystemLog;
 
-class APIModelTraitsLogFileModelTraitsTestCase extends TestCase
-{
+class APIModelTraitsLogFileModelTraitsTestCase extends TestCase {
     /**
      * Checks that the LogFileModelTraits::check_file_exists() method throws a NotFoundError when the file does not exist.
      */
@@ -22,7 +21,7 @@ class APIModelTraitsLogFileModelTraitsTestCase extends TestCase
 
                 # LogFileModelTraits::check_file_exists() is private, call it via read_log() instead
                 $model->read_log('/var/log/does_not_exist.log');
-            }
+            },
         );
 
         # Ensure no error is thrown when the requested log file exists
@@ -33,15 +32,14 @@ class APIModelTraitsLogFileModelTraitsTestCase extends TestCase
 
                 # LogFileModelTraits::check_file_exists() is private, call it via read_log() instead
                 $model->read_log('/var/log/system.log');
-            }
+            },
         );
     }
 
     /**
      * Checks that the LogFileModelTraits::read_uncompressed_log() method reads an uncompressed log file correctly.
      */
-    public function test_read_uncompressed_log(): void
-    {
+    public function test_read_uncompressed_log(): void {
         # Use the SystemLog Model to test the LogFileModelTraits::read_uncompressed_log() method
         $model = new SystemLog();
 
@@ -50,32 +48,30 @@ class APIModelTraitsLogFileModelTraitsTestCase extends TestCase
         file_put_contents('/tmp/test_uncompressed.log.0', "Line 4\nLine 5\nLine 6\n");
         file_put_contents('/tmp/test_uncompressed.log.1', "Line 1\nLine 2\nLine 3\n");
 
-
         # Read the system log file
         $log = $model->read_log('/tmp/test_uncompressed.log');
 
         # Ensure all log files were read correctly and in the correct order
         $this->assert_equals(
             [
-                ["text" => "Line 1"],
-                ["text" => "Line 2"],
-                ["text" => "Line 3"],
-                ["text" => "Line 4"],
-                ["text" => "Line 5"],
-                ["text" => "Line 6"],
-                ["text" => "Line 7"],
-                ["text" => "Line 8"],
-                ["text" => "Line 9"]
+                ['text' => 'Line 1'],
+                ['text' => 'Line 2'],
+                ['text' => 'Line 3'],
+                ['text' => 'Line 4'],
+                ['text' => 'Line 5'],
+                ['text' => 'Line 6'],
+                ['text' => 'Line 7'],
+                ['text' => 'Line 8'],
+                ['text' => 'Line 9'],
             ],
-            $log
+            $log,
         );
     }
 
     /**
      * Checks that the LogFileModelTraits::read_bzip2_log() method reads a bzip2 compressed log file correctly.
      */
-    public function test_read_bzip2_log(): void
-    {
+    public function test_read_bzip2_log(): void {
         # Use the SystemLog Model to test the LogFileModelTraits::read_bzip2_log() method
         $model = new SystemLog();
 
@@ -90,25 +86,24 @@ class APIModelTraitsLogFileModelTraitsTestCase extends TestCase
         # Ensure all log files were read correctly and in the correct order
         $this->assert_equals(
             [
-                ["text" => "Line 1"],
-                ["text" => "Line 2"],
-                ["text" => "Line 3"],
-                ["text" => "Line 4"],
-                ["text" => "Line 5"],
-                ["text" => "Line 6"],
-                ["text" => "Line 7"],
-                ["text" => "Line 8"],
-                ["text" => "Line 9"]
+                ['text' => 'Line 1'],
+                ['text' => 'Line 2'],
+                ['text' => 'Line 3'],
+                ['text' => 'Line 4'],
+                ['text' => 'Line 5'],
+                ['text' => 'Line 6'],
+                ['text' => 'Line 7'],
+                ['text' => 'Line 8'],
+                ['text' => 'Line 9'],
             ],
-            $log
+            $log,
         );
     }
 
     /**
      * Checks that the LogFileModelTraits::read_gzip_log() method reads a gzip compressed log file correctly.
      */
-    public function test_read_gzip_log(): void
-    {
+    public function test_read_gzip_log(): void {
         # Use the SystemLog Model to test the LogFileModelTraits::read_gzip_log() method
         $model = new SystemLog();
 
@@ -123,25 +118,24 @@ class APIModelTraitsLogFileModelTraitsTestCase extends TestCase
         # Ensure all log files were read correctly and in the correct order
         $this->assert_equals(
             [
-                ["text" => "Line 1"],
-                ["text" => "Line 2"],
-                ["text" => "Line 3"],
-                ["text" => "Line 4"],
-                ["text" => "Line 5"],
-                ["text" => "Line 6"],
-                ["text" => "Line 7"],
-                ["text" => "Line 8"],
-                ["text" => "Line 9"]
+                ['text' => 'Line 1'],
+                ['text' => 'Line 2'],
+                ['text' => 'Line 3'],
+                ['text' => 'Line 4'],
+                ['text' => 'Line 5'],
+                ['text' => 'Line 6'],
+                ['text' => 'Line 7'],
+                ['text' => 'Line 8'],
+                ['text' => 'Line 9'],
             ],
-            $log
+            $log,
         );
     }
 
     /**
      * Checks that the LogFileModelTraits::read_xz_log() method reads an xz compressed log file correctly.
      */
-    public function test_read_xz_log(): void
-    {
+    public function test_read_xz_log(): void {
         # Use the SystemLog Model to test the LogFileModelTraits::read_xz_log() method
         $model = new SystemLog();
 
@@ -156,17 +150,17 @@ class APIModelTraitsLogFileModelTraitsTestCase extends TestCase
         # Ensure all log files were read correctly and in the correct order
         $this->assert_equals(
             [
-                ["text" => "Line 1"],
-                ["text" => "Line 2"],
-                ["text" => "Line 3"],
-                ["text" => "Line 4"],
-                ["text" => "Line 5"],
-                ["text" => "Line 6"],
-                ["text" => "Line 7"],
-                ["text" => "Line 8"],
-                ["text" => "Line 9"]
+                ['text' => 'Line 1'],
+                ['text' => 'Line 2'],
+                ['text' => 'Line 3'],
+                ['text' => 'Line 4'],
+                ['text' => 'Line 5'],
+                ['text' => 'Line 6'],
+                ['text' => 'Line 7'],
+                ['text' => 'Line 8'],
+                ['text' => 'Line 9'],
             ],
-            $log
+            $log,
         );
     }
 }

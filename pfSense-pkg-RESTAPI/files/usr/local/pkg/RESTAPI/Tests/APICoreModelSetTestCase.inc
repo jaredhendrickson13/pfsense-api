@@ -309,8 +309,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the 'reverse()' method correctly reverses the order of the Model objects in the ModelSet.
      */
-    public function test_reverse(): void
-    {
+    public function test_reverse(): void {
         # Create three firewall aliases
         $alias_a = new FirewallAlias(name: 'alias_a', type: 'host');
         $alias_b = new FirewallAlias(name: 'alias_b', type: 'host');

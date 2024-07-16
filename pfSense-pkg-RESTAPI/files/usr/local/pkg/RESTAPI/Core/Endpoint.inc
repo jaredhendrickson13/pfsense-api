@@ -897,7 +897,7 @@ class Endpoint {
             return $this->model->delete_many(
                 query_params: $this->request_data,
                 limit: $this->limit,
-                offset: $this->offset
+                offset: $this->offset,
             );
         }
 

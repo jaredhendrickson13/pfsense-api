@@ -860,8 +860,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures the query() method can be reversed to read the objects in reverse order.
      */
-    public function test_query_reverse(): void
-    {
+    public function test_query_reverse(): void {
         # Create FirewallAlias models to test this
         $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
         $alias_alias_0->create();

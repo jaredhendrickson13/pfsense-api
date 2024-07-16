@@ -75,8 +75,7 @@ class ModelSet {
      * Reverse the order of the Model objects in this ModelSet.
      * @return ModelSet A new ModelSet object with the Model objects in reverse order.
      */
-    public function reverse(): ModelSet
-    {
+    public function reverse(): ModelSet {
         return new ModelSet(array_reverse($this->model_objects));
     }
 

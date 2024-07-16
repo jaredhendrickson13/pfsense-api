@@ -1684,7 +1684,7 @@ class Model {
         mixed $parent_id = null,
         int $limit = 0,
         int $offset = 0,
-        bool $reverse = false
+        bool $reverse = false,
     ): ModelSet|Model {
         # Variables
         $model_name = get_called_class();
@@ -1780,7 +1780,7 @@ class Model {
 
         # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);
-        return ($reverse) ? $modelset->reverse() : $modelset;
+        return $reverse ? $modelset->reverse() : $modelset;
     }
 
     /**

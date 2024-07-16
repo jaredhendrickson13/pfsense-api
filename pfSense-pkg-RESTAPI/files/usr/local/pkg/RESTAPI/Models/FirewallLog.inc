@@ -16,7 +16,7 @@ class FirewallLog extends Model {
      * @var string $log_file The path to the base firewall log file this Model will read. Any log files that have been rotated
      * will be read as well.
      */
-    public string $log_file = "/var/log/filter.log";
+    public string $log_file = '/var/log/filter.log';
     public StringField $text;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {

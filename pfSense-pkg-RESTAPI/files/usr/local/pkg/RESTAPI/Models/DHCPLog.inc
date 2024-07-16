@@ -16,7 +16,7 @@ class DHCPLog extends Model {
      * @var string $log_file The path to the base DHCP log file this Model will read. Any log files that have been rotated
      * will be read as well.
      */
-    public string $log_file = "/var/log/dhcpd.log";
+    public string $log_file = '/var/log/dhcpd.log';
     public StringField $text;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {

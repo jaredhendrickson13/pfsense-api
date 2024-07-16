@@ -552,6 +552,5 @@ class APICoreEndpointTestCase extends TestCase {
         );
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->data[0]->id, 3);
-
     }
 }
