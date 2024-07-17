@@ -881,4 +881,32 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($reversed_aliases->model_objects[3]->name->value, 'alias1');
         $this->assert_equals($reversed_aliases->model_objects[4]->name->value, 'alias0');
     }
+
+    /**
+     * Checks that updates using the $append flag correctly append values to the existing values instead of replacing
+     * them.
+     */
+    public function test_update_append(): void {
+        # Use a FirewallAlias model to test this
+        $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ["127.0.0.1"]);
+        $alias->create();
+
+        # Ensure 'address' values set during the update are appended to the existing values instead of replacing them
+        $alias->address->value = ["127.0.0.2"];
+        $alias->update(append: true);
+        $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.2']);
+
+        # Ensure no action is taken if append is requested but no new values were given
+        # In other words, ensure we don't perpetually append the existing values over again
+        $alias->update(append: true);
+        $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.2']);
+
+        # Ensure the 'address' values are replaced if append is not requested
+        $alias->address->value = ["127.0.0.3"];
+        $alias->update();
+        $this->assert_equals($alias->address->value, ['127.0.0.3']);
+
+        # Delete the alias
+        $alias->delete();
+    }
 }

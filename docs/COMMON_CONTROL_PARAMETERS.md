@@ -4,21 +4,24 @@ The API utilizes a set of common parameters to control certain behaviors of API 
 all endpoints and requests, but some endpoints may not support all parameters. Below are the available control
 parameters you can use:
 
-## async
+## append
 
 - Type: Boolean
-- Default: `true`
-- Description: This parameter allows you to control the API's default behavior of applying changes in the background. Setting
-  this parameter to `false` will force the API to wait for the changes to be made on the backend before responding. This
-  parameter may not be supported by all endpoints.
+- Default: `false`
+- Description: This parameter allows you to control the behavior of updates to array fields. When set to `true`, any
+  array values submitted in your request will be appended to the existing array values instead of replacing them. This
+  is useful when you want to add additional values to an array field without needing to retrieve the existing values
+  first.
 
-!!! Tip
-    Instead of forcing the API to wait for changes to apply, it is recommended to leave this parameter set to `true`
-    and periodically check the status of the changes using a `GET` request to the applicable apply endpoint.
 !!! Warning
-    Setting this parameter to `false` may cause the API to hang if the changes take a long time to apply. In severe cases,
-    this may result in your API request receiving a timeout. It is recommended to use this parameter with caution and
-    only when necessary.
+    If you set this parameter to `true`, it will apply to all array fields. You can't choose to append to some array 
+    fields and replace others at the same time. To work around this, first make a request with the data for the fields 
+    you want to append to. Then, make another request for the fields you want to replace.
+
+!!! Notes
+    - This parameter is only available for `PATCH` requests.
+    - This parameter is only applicable to array fields.
+    - If the new array values match the existing array values exactly, the API will not make any changes to that field.
 
 ## apply
 
@@ -35,17 +38,21 @@ parameters you can use:
     changes immediately or requires a separate apply call. If an endpoint applies changes immediately, this parameter
     will have no effect.
 
-## reverse
+## async
 
 - Type: Boolean
-- Default: `false`
-- Description: This parameter allows you to reverse the order of the objects returned in the data section of the API 
-  response. This enables you to paginate through objects in reverse order, which is particularly useful if you are 
-  looking for an object near the end of the list. Additionally, it is helpful for time-sorted objects, such as logs, 
-  where you may want to view the most recent entries first.
+- Default: `true`
+- Description: This parameter allows you to control the API's default behavior of applying changes in the background. Setting
+  this parameter to `false` will force the API to wait for the changes to be made on the backend before responding. This
+  parameter may not be supported by all endpoints.
 
-!!! Note
-    This parameter is only available for `GET` requests to [plural endpoints](ENDPOINT_TYPES.md#plural-many-endpoints).
+!!! Tip
+    Instead of forcing the API to wait for changes to apply, it is recommended to leave this parameter set to `true`
+    and periodically check the status of the changes using a `GET` request to the applicable apply endpoint.
+!!! Warning
+    Setting this parameter to `false` may cause the API to hang if the changes take a long time to apply. In severe cases,
+    this may result in your API request receiving a timeout. It is recommended to use this parameter with caution and
+    only when necessary.
 
 ## placement
 
@@ -59,3 +66,15 @@ parameters you can use:
 !!! Warning
     Use caution when setting placement of objects which may be sensitive to order such as firewall rules. Placing the
     object in the wrong location may have unintended consequences such as blocking all traffic or allowing all traffic.
+
+## reverse
+
+- Type: Boolean
+- Default: `false`
+- Description: This parameter allows you to reverse the order of the objects returned in the data section of the API
+  response. This enables you to paginate through objects in reverse order, which is particularly useful if you are
+  looking for an object near the end of the list. Additionally, it is helpful for time-sorted objects, such as logs,
+  where you may want to view the most recent entries first.
+
+!!! Note
+    This parameter is only available for `GET` requests to [plural endpoints](ENDPOINT_TYPES.md#plural-many-endpoints).

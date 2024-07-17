@@ -20,6 +20,7 @@ use Error;
 use Exception;
 use RESTAPI;
 use RESTAPI\ContentHandlers\JSONContentHandler;
+use RESTAPI\Endpoints\FirewallAliasEndpoint;
 use RESTAPI\Models\RESTAPIAccessListEntry;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\VirtualIP;
@@ -289,6 +290,15 @@ class Endpoint {
      * If set to `true`, the Model objects in the `data` section of the response will be reversed.
      */
     public bool $reverse = false;
+
+    /**
+     * @var bool $append
+     * Sets the default value for the `append` field in the request data. This value is used to control how Model objects
+     * apply updates to array fields on existing objects. If set to `true`, any requested updates to array fields will
+     * be appended to the existing array instead of replacing it. This value can be overridden by the client in the request
+     * data.
+     */
+    public bool $append = false;
 
     /**
      * Sets values whenever the Endpoint object is crated.
@@ -685,6 +695,29 @@ class Endpoint {
     }
 
     /**
+     * Validates the $append common control parameter for this request.
+     * @note If the `append` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $append property value.
+     * @throws ValidationError When the `append` field is not a boolean.
+     */
+    private function validate_append(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['append'])) {
+            # Ensure value is a bool
+            if (!is_bool($this->request_data['append'])) {
+                throw new ValidationError(
+                    message: 'Field `append` must be of type `boolean`.',
+                    response_id: 'ENDPOINT_APPEND_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the append property to use the client's requested value and remove it from the request data
+            $this->append = $this->request_data['append'];
+            unset($this->request_data['append']);
+        }
+    }
+
+    /**
      * Validates the $limit common control parameter for this request.
      * @note If the `limit` field was not provided in the request data, the request will default to the Endpoint's
      * assigned $limit property value.
@@ -746,6 +779,7 @@ class Endpoint {
         # Ensure the $async, $limit and $offset parameters are of the correct type if the client requested them
         $this->validate_async();
         $this->validate_reverse();
+        $this->validate_append();
         $this->validate_limit();
         $this->validate_offset();
     }
@@ -884,7 +918,10 @@ class Endpoint {
     protected function patch(): Model|ModelSet {
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
-        return $this->model->update(apply: $this->request_data['apply'] === true);
+        return $this->model->update(
+            apply: $this->request_data['apply'] === true,
+            append: $this->append,
+        );
     }
 
     /**

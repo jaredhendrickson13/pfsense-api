@@ -553,4 +553,51 @@ class APICoreEndpointTestCase extends TestCase {
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->data[0]->id, 3);
     }
+
+    /**
+     * Ensure API calls submitted with the 'append' control parameter correctly append the requested array field values
+     * to the existing array field values.
+     */
+    public function test_append(): void
+    {
+        # Use a POST request to create a new alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'POST',
+            data: ['name' => 'host_alias', 'type' => 'host', 'address' => ['127.0.0.1']],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+
+        # Make a PATCH request with 'append' enabled to append a new address to the alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'PATCH',
+            data: ['id' => 0, 'address' => ['127.0.0.2'], 'append' => true],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+        $this->assert_equals($resp->data->address, ['127.0.0.1', '127.0.0.2']);
+
+        # Delete the alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'DELETE',
+            data: ['id' => 0],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+    }
 }
