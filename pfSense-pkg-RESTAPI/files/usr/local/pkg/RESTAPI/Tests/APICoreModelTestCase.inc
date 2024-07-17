@@ -758,21 +758,13 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $client->ip_address = '1.2.3.4';
 
         # Create a new alias with the authenticated user
-        $alias = new FirewallAlias(
-            name: "test_alias",
-            type: "host",
-            client: $client
-        );
+        $alias = new FirewallAlias(name: 'test_alias', type: 'host', client: $client);
         $alias->create();
 
         # Ensure the 'revision' section of the config contains the authenticated username
-        $this->assert_equals(
-            $alias->get_config('revision/username'),
-            'test_user@1.2.3.4'
-        );
+        $this->assert_equals($alias->get_config('revision/username'), 'test_user@1.2.3.4');
 
         # Delete the alias
         $alias->delete();
     }
-
 }
