@@ -3,13 +3,10 @@
 namespace RESTAPI\Tests;
 
 use ReflectionClass;
-use ReflectionException;
 use RESTAPI;
-use RESTAPI\Auth\BasicAuth;
 use RESTAPI\Caches\RESTAPIVersionReleasesCache;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
-use RESTAPI\Models\ConfigHistoryRevision;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\SystemStatus;
 use RESTAPI\Models\Test;
