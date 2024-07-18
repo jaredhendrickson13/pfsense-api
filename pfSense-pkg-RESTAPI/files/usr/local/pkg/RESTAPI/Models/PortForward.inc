@@ -16,7 +16,8 @@ use RESTAPI\Validators\IPAddressValidator;
 /**
  * Defines a Model that represents port forward rules.
  */
-class PortForward extends Model {
+class PortForward extends Model
+{
     public InterfaceField $interface;
     public StringField $protocol;
     public FilterAddressField $source;
@@ -36,7 +37,8 @@ class PortForward extends Model {
     public UnixTimeField $updated_time;
     public StringField $updated_by;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+    {
         # Set model attributes
         $this->config_path = 'nat/rule';
         $this->many = true;
@@ -131,7 +133,7 @@ class PortForward extends Model {
             help_text: 'The associated firewall rule mode. Use `pass` to automatically pass traffic matching this ' .
                 'port forward rule without the need for a firewall rule. Use an empty string to require a separate ' .
                 'firewall rule to be created to pass traffic matching this port forward rule.' .
-                'Use `new` to create rule associated with this port forward',
+                'Use `new` to create new rule associated with this port forward',
         );
         $this->created_time = new UnixTimeField(
             editable: false,
@@ -171,7 +173,8 @@ class PortForward extends Model {
     /**
      * Applies port forward changes.
      */
-    public function apply() {
+    public function apply()
+    {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
