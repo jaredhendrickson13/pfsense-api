@@ -628,8 +628,11 @@ class Model {
                 file_put_contents($lock_file, microtime());
 
                 # Start a temporary session to write the config that contains the user's username in the config history
+                session_start();
                 $_SESSION['Username'] = $this->client->username;
+                $_SERVER['REMOTE_ADDR'] = $this->client->ip_address;
                 write_config(sprintf(gettext(' ' . $change_note)));
+                session_destroy();
 
                 # If a subsystem is specified for this Model, mark it as dirty
                 if ($this->subsystem) {
