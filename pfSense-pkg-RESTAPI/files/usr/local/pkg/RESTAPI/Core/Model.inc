@@ -717,9 +717,9 @@ class Model {
 
     /**
      * Converts this Model object into it's internal pfSense configuration form.
-     * @return array The internal value suitable for writing to the pfSense configuration.
+     * @return array|string The internal value suitable for writing to the pfSense configuration.
      */
-    public function to_internal(): array {
+    public function to_internal(): array|string {
         # Variables
         $internal_object = [];
 
