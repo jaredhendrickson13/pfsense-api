@@ -7,8 +7,8 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with multiple RoutingGatewayGroup Model objects at
- * /api/v2/routing/gateway/groups.
+ * Defines an Endpoint for interacting with a single RoutingGatewayGroup Model object at
+ * /api/v2/routing/gateway/group.
  */
 class RoutingGatewayGroupEndpoint extends Endpoint {
     public function __construct() {
