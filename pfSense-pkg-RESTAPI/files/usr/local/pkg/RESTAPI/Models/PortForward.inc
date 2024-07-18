@@ -125,12 +125,13 @@ class PortForward extends Model {
         );
         $this->associated_rule_id = new StringField(
             default: '',
-            choices: ['', 'pass'],
+            choices: ['', 'pass', 'new'],
             allow_empty: true,
             internal_name: 'associated-rule-id',
             help_text: 'The associated firewall rule mode. Use `pass` to automatically pass traffic matching this ' .
                 'port forward rule without the need for a firewall rule. Use an empty string to require a separate ' .
-                'firewall rule to be created to pass traffic matching this port forward rule.',
+                'firewall rule to be created to pass traffic matching this port forward rule.' .
+                'Use `new` to create rule associated with this port forward',
         );
         $this->created_time = new UnixTimeField(
             editable: false,
