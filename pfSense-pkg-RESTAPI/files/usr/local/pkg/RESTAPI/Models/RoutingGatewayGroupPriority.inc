@@ -21,12 +21,7 @@ class RoutingGatewayGroupPriority extends Model {
     public IntegerField $tier;
     public ForeignModelField $virtual_ip;
 
-    public function __construct(
-        mixed $id = null,
-        mixed $parent_id = null,
-        mixed $data = [],
-        mixed ...$options,
-    ) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->parent_model_class = 'GatewayGroup';
         $this->config_path = 'item';
@@ -38,20 +33,20 @@ class RoutingGatewayGroupPriority extends Model {
             model_field: 'name',
             required: true,
             unique: true,
-            help_text: "The name of the gateway to prioritize in this gateway group."
+            help_text: 'The name of the gateway to prioritize in this gateway group.',
         );
         $this->tier = new IntegerField(
             required: true,
             minimum: 1,
             maximum: 5,
-            help_text: "The priority of this gateway in the group. Lower numbered tiers are higher priority."
+            help_text: 'The priority of this gateway in the group. Lower numbered tiers are higher priority.',
         );
         $this->virtual_ip = new ForeignModelField(
             model_name: 'VirtualIP',
             model_field: 'uniqid',
             allowed_keywords: ['address'],
             default: 'address',
-            help_text: "The virtual IP to use for this gateway group. Use `address` to use the interface's current IP."
+            help_text: "The virtual IP to use for this gateway group. Use `address` to use the interface's current IP.",
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
@@ -60,17 +55,16 @@ class RoutingGatewayGroupPriority extends Model {
     /**
      * Provide extra validation for the entire Model.
      */
-    public function validate_extra(): void
-    {
+    public function validate_extra(): void {
         # Ensure all the gateway priorities for the parent gateway group are of the same IP type
         $expected_ipprotocol = $this->gateway->get_related_model()->ipprotocol->value;
         foreach ($this->parent_model->priorities->value as $priority) {
-            $gw_obj = RoutingGateway::query(name: $priority["gateway"])->first();
+            $gw_obj = RoutingGateway::query(name: $priority['gateway'])->first();
             if ($gw_obj->ipprotocol->value !== $expected_ipprotocol) {
                 throw new ValidationError(
-                    message: "Field `gateway` must be a gateway of the same IP protocol as all other gateways in the ".
-                        "parent gateway group.",
-                    response_id: "ROUTING_GATEWAY_GROUP_PRIORITY_IPPROTO_MISMATCH"
+                    message: 'Field `gateway` must be a gateway of the same IP protocol as all other gateways in the ' .
+                        'parent gateway group.',
+                    response_id: 'ROUTING_GATEWAY_GROUP_PRIORITY_IPPROTO_MISMATCH',
                 );
             }
         }
@@ -89,8 +83,7 @@ class RoutingGatewayGroupPriority extends Model {
      * they are a pipe delimited string which is inconsistent with other Models.
      * @return string The pipe delimited string internal representation of the object.
      */
-    public function to_internal(): string
-    {
+    public function to_internal(): string {
         # Ensure the _vip prefix is added to the virtual IP if not 'address'
         if ($this->virtual_ip->value !== 'address') {
             $this->virtual_ip->value = "_vip{$this->virtual_ip->value}";
@@ -106,20 +99,19 @@ class RoutingGatewayGroupPriority extends Model {
      * @param mixed $internal_object The internal object to convert from. This should be a pipe delimited string where
      * the first field is the gateway name, the second field is the tier, and the third field is the virtual IP value.
      */
-    public function from_internal_object(mixed $internal_object): void
-    {
+    public function from_internal_object(mixed $internal_object): void {
         # Ensure the internal object is a pipe delimited string
         if (!is_string($internal_object) or count(explode('|', $internal_object)) !== 3) {
             throw new ServerError(
                 message: "{$this->get_class_shortname()} object with ID $this->id has an invalid internal object.",
-                response_id: "ROUTING_GATEWAY_GROUP_PRIORITY_INTERNAL_OBJECT_INVALID"
+                response_id: 'ROUTING_GATEWAY_GROUP_PRIORITY_INTERNAL_OBJECT_INVALID',
             );
         }
 
         # Otherwise, set the fields based on the expanded internal object (pipe delimited string)
-        list($gateway, $tier, $virtual_ip) = explode('|', $internal_object);
+        [$gateway, $tier, $virtual_ip] = explode('|', $internal_object);
         $this->gateway->value = $gateway;
         $this->tier->value = (int) $tier;
-        $this->virtual_ip->value = str_replace("_vip", "", $virtual_ip);
+        $this->virtual_ip->value = str_replace('_vip', '', $virtual_ip);
     }
 }

@@ -558,8 +558,7 @@ class APICoreEndpointTestCase extends TestCase {
      * Ensure API calls submitted with the 'append' control parameter correctly append the requested array field values
      * to the existing array field values.
      */
-    public function test_append(): void
-    {
+    public function test_append(): void {
         # Use a POST request to create a new alias
         $json_resp = \RESTAPI\Core\Tools\http_request(
             url: 'https://localhost/api/v2/firewall/alias',

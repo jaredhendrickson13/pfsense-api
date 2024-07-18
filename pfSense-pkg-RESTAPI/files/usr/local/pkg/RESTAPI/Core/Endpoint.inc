@@ -918,10 +918,7 @@ class Endpoint {
     protected function patch(): Model|ModelSet {
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
-        return $this->model->update(
-            apply: $this->request_data['apply'] === true,
-            append: $this->append,
-        );
+        return $this->model->update(apply: $this->request_data['apply'] === true, append: $this->append);
     }
 
     /**

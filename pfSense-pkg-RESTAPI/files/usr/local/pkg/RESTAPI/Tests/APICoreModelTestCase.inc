@@ -888,11 +888,11 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_update_append(): void {
         # Use a FirewallAlias model to test this
-        $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ["127.0.0.1"]);
+        $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['127.0.0.1']);
         $alias->create();
 
         # Ensure 'address' values set during the update are appended to the existing values instead of replacing them
-        $alias->address->value = ["127.0.0.2"];
+        $alias->address->value = ['127.0.0.2'];
         $alias->update(append: true);
         $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.2']);
 
@@ -902,7 +902,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.2']);
 
         # Ensure the 'address' values are replaced if append is not requested
-        $alias->address->value = ["127.0.0.3"];
+        $alias->address->value = ['127.0.0.3'];
         $alias->update();
         $this->assert_equals($alias->address->value, ['127.0.0.3']);
 
