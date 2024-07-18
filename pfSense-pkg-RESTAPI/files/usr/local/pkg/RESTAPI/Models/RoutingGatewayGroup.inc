@@ -58,7 +58,7 @@ class RoutingGatewayGroup extends Model {
     }
 
     /**
-     * Apply changes to cron.
+     * Apply changes to gateway groups.
      */
     public function apply(): void {
         (new RoutingApplyDispatcher(async: $this->async))->spawn_process();

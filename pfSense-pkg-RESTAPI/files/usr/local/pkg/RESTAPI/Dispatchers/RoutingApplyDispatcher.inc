@@ -33,7 +33,7 @@ class RoutingApplyDispatcher extends Dispatcher {
         system_resolvconf_generate();
         filter_configure();
         setup_gateways_monitor();
-        send_multiple_events(["service reload dyndnsall", "service reload ipsecdns", "filter reload"]);
+        send_multiple_events(['service reload dyndnsall', 'service reload ipsecdns', 'filter reload']);
 
         # Check if any gateway groups are dirty, if so, resync them with OpenVPN
         foreach (RoutingGatewayGroup::read_all()->model_objects as $gateway_group) {
