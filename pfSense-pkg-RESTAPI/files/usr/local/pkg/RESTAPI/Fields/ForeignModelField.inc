@@ -16,15 +16,15 @@ use RESTAPI\Responses\ServerError;
  * For example, a ForeignModelField can be used to relate a static route to its parent Gateway model object.
  */
 class ForeignModelField extends Field {
-    /**
-     * @var Model $model Contains the Model object of the foreign Model this Field's value relates to.
-     */
-    public Model $model;
-
+    const MODELS_NAMESPACE = 'RESTAPI\\Models\\';
+    public array $models = [];
     /**
      * Defines the ForeignModelField object and sets its options.
-     * @param string $model_name The name of the foreign Model class this field relates to. This should be the name of an
-     * existing Model class in the \RESTAPI\Models namespace, but should not include the \RESTAPI\Models namespace prefix.
+     * @param string|array $model_name The name(s) of the foreign Model class(es) this field relates to. This should be
+     * the name(s) of existing Model class(es) in the \RESTAPI\Models namespace, but should not include the \RESTAPI\Models
+     * namespace prefix. If multiple Model classes are specified as an array, they must all contain the $model_field
+     * and $model_field_internal values specified. Only use multiple Model classes if the Model objects that are
+     * similar in structure and can be used interchangeably.
      * @param string $model_field The field on the assigned $model_name class that this field's value relates to. For
      * example, if this Fields value must be an existing Gateway model object's `name`, you would set $model_name to
      * `Gateway` and $model_field to `name`. Note: If this field is not a unique field, related models will be matched
@@ -97,7 +97,7 @@ class ForeignModelField extends Field {
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        public string $model_name,
+        public string|array $model_name,
         public string $model_field,
         public string $model_field_internal = '',
         public array $model_query = [],
@@ -129,15 +129,18 @@ class ForeignModelField extends Field {
         string $help_text = '',
     ) {
         # Assign properties unique to this Field object
-        $model_name = "\\RESTAPI\\Models\\$model_name";
         $this->model_field_internal = $model_field_internal ?: $model_field;
+        $this->model_name = is_array($model_name) ? $model_name : [$model_name];
 
-        # Ensure the properties assigned are allowed and that the assigned $model_name can be constructed
-        $this->check_construct($model_name);
+        # Create reference Model objects for each assigned $model_name
+        foreach ($this->model_name as $model_name) {
+            # Ensure the properties assigned are allowed and that the assigned $model_name can be constructed
+            $this->check_construct(self::MODELS_NAMESPACE.$model_name);
+        }
 
         # Construct the parent Field object
         parent::__construct(
-            type: $model_field === 'id' ? 'integer' : $this->model->$model_field->type,
+            type: $model_field === 'id' ? 'integer' : $this->models[0]->$model_field->type,
             required: $required,
             unique: $unique,
             default: $default,
@@ -180,10 +183,11 @@ class ForeignModelField extends Field {
         }
 
         # Create a new object using the assigned foreign Model class
-        $this->model = new $model_name();
+        $model = new $model_name(skip_init: true);
+        $this->models[] = $model;
 
         # Ensure the foreign Model class is a `many` Model
-        if (!$this->model->many) {
+        if (!$model->many) {
             throw new ServerError(
                 message: 'ForeignModelField `model_name` must be a Model class with `many` enabled.',
                 response_id: 'FOREIGN_MODEL_FIELD_ASSIGNED_NON_MANY_MODEL',
@@ -191,7 +195,7 @@ class ForeignModelField extends Field {
         }
 
         # Ensure the `model_field` exists on this Model class
-        if (!in_array($this->model_field, $this->model->get_fields()) and $this->model_field !== 'id') {
+        if (!in_array($this->model_field, $model->get_fields()) and $this->model_field !== 'id') {
             throw new ServerError(
                 message: "ForeignModelField's `model_field` does not exist in class `$model_name`.",
                 response_id: 'FOREIGN_MODEL_FIELD_WITH_UNKNOWN_MODEL_FIELD',
@@ -200,7 +204,7 @@ class ForeignModelField extends Field {
 
         # Ensure the `model_field_internal` exists on this Model class
         if (
-            !in_array($this->model_field_internal, $this->model->get_fields()) and
+            !in_array($this->model_field_internal, $model->get_fields()) and
             $this->model_field_internal !== 'id'
         ) {
             throw new ServerError(
@@ -218,7 +222,7 @@ class ForeignModelField extends Field {
     protected function _from_internal(mixed $internal_value): mixed {
         # Ensure the internal field value is converted to its representation value before querying
         if ($this->model_field_internal !== 'id') {
-            $internal_value = $this->model->{$this->model_field_internal}->_from_internal($internal_value);
+            $internal_value = $this->models[0]->{$this->model_field_internal}->_from_internal($internal_value);
         }
 
         # Query for the Model object this value relates to.
@@ -265,10 +269,13 @@ class ForeignModelField extends Field {
         # Obtain Models that match this Field's criteria
         $query_modelset = $this->__get_matches($this->model_field, $value);
 
+        # Format a string containing the in scope class names
+        $model_names = implode(' or ', array_map(fn($model) => $model->verbose_name, $this->models));
+
         # If the model object exists, return the existing `model_field_internal` value.
         if (!$query_modelset->exists()) {
             throw new NotFoundError(
-                message: "Field `$this->name` could not locate `{$this->model->verbose_name}` object with " .
+                message: "Field `$this->name` could not locate `$model_names` object with " .
                     "`$this->model_field` set to `$value`",
                 response_id: 'FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND',
             );
@@ -282,27 +289,37 @@ class ForeignModelField extends Field {
      */
     public function get_in_scope_models(): ModelSet {
         # Variables
-        $models = new ModelSet();
+        $in_scope_models = new ModelSet();
 
-        # Obtain the parent Models if the assigned $model has a $parent_model_class assigned to it.
-        if ($this->model->parent_model_class) {
-            $parent_model_class = $this->model->get_parent_model();
-            $parent_model = new $parent_model_class();
-            $parent_models = $parent_model->query($this->parent_model_query);
+        # Get in scope Models from all assigned $model_name classes
+        foreach ($this->models as $model) {
+            # Create a new ModelSet to store the in-scope Models for this model class
+            $models = new ModelSet();
 
-            # Loop through each identified parent and add its children into the ModelSet
-            foreach ($parent_models->model_objects as $parent) {
-                $parent_children = $this->model->query(parent_id: $parent->id);
-                $models->model_objects = array_merge($models->model_objects, $parent_children->model_objects);
+            # Obtain the parent Models if the assigned $model has a $parent_model_class assigned to it.
+            if ($model->parent_model_class) {
+                $parent_model_class = $model->get_parent_model();
+                $parent_model = new $parent_model_class();
+                $parent_models = $parent_model->query($this->parent_model_query);
+
+                # Loop through each identified parent and add its children into the ModelSet
+                foreach ($parent_models->model_objects as $parent) {
+                    $parent_children = $model->query(parent_id: $parent->id);
+                    $models->model_objects = array_merge($models->model_objects, $parent_children->model_objects);
+                }
             }
+            # Otherwise, just use all of this $model's current objects
+            else {
+                $models = $model->read_all();
+            }
+
+            # Add the in-scope Models to the ModelSet
+            $in_scope_models->model_objects = array_merge($in_scope_models->model_objects, $models->model_objects);
         }
-        # Otherwise, just use all of this $model's current objects
-        else {
-            $models = $this->model->read_all();
-        }
+
 
         # Query for the Model object this value relates to.
-        return $models->query($this->model_query);
+        return $in_scope_models->query($this->model_query);
     }
 
     /**
