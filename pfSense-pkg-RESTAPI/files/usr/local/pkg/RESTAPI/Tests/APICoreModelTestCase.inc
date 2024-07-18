@@ -3,9 +3,9 @@
 namespace RESTAPI\Tests;
 
 use ReflectionClass;
-use ReflectionException;
 use RESTAPI;
 use RESTAPI\Caches\RESTAPIVersionReleasesCache;
+use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\SystemStatus;
@@ -743,5 +743,25 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($alias->type->value, null);
         $this->assert_equals($alias->address->value, []);
         $this->assert_equals($alias->detail->value, []);
+    }
+
+    /**
+     * Ensures the authenticated username is properly retained whenever running Model::write_config() (#512)
+     */
+    public function test_write_config_retains_authenticated_username(): void {
+        # Authenticate a user
+        $client = new Auth();
+        $client->username = 'test_user';
+        $client->ip_address = '1.2.3.4';
+
+        # Create a new alias with the authenticated user
+        $alias = new FirewallAlias(name: 'test_alias', type: 'host', client: $client);
+        $alias->create();
+
+        # Ensure the 'revision' section of the config contains the authenticated username
+        $this->assert_equals($alias->get_config('revision/username'), 'test_user@1.2.3.4');
+
+        # Delete the alias
+        $alias->delete();
     }
 }
