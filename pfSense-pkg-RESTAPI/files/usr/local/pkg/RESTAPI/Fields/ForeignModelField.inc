@@ -135,7 +135,7 @@ class ForeignModelField extends Field {
         # Create reference Model objects for each assigned $model_name
         foreach ($this->model_name as $model_name) {
             # Ensure the properties assigned are allowed and that the assigned $model_name can be constructed
-            $this->check_construct(self::MODELS_NAMESPACE.$model_name);
+            $this->check_construct(self::MODELS_NAMESPACE . $model_name);
         }
 
         # Construct the parent Field object
@@ -203,10 +203,7 @@ class ForeignModelField extends Field {
         }
 
         # Ensure the `model_field_internal` exists on this Model class
-        if (
-            !in_array($this->model_field_internal, $model->get_fields()) and
-            $this->model_field_internal !== 'id'
-        ) {
+        if (!in_array($this->model_field_internal, $model->get_fields()) and $this->model_field_internal !== 'id') {
             throw new ServerError(
                 message: "ForeignModelField's `model_field_internal` does not exist in class `$model_name`.",
                 response_id: 'FOREIGN_MODEL_FIELD_WITH_UNKNOWN_MODEL_FIELD_INTERNAL',
@@ -316,7 +313,6 @@ class ForeignModelField extends Field {
             # Add the in-scope Models to the ModelSet
             $in_scope_models->model_objects = array_merge($in_scope_models->model_objects, $models->model_objects);
         }
-
 
         # Query for the Model object this value relates to.
         return $in_scope_models->query($this->model_query);

@@ -63,7 +63,7 @@ class RoutingGatewayGroupPriority extends Model {
         $parent_ipprotocol = $this->parent_model->ipprotocol->value;
 
         # If we know the IP protocol of the parent gateway group, ensure the gateway being added matches it
-        if ($parent_ipprotocol !== "unknown" and $parent_ipprotocol !== $gw_ipprotocol) {
+        if ($parent_ipprotocol !== 'unknown' and $parent_ipprotocol !== $gw_ipprotocol) {
             throw new ValidationError(
                 message: "Field `gateway` must be a gateway of the same IP protocol as all other gateways in the ' .
                     'parent gateway group. Expected $parent_ipprotocol, got $gw_ipprotocol.",

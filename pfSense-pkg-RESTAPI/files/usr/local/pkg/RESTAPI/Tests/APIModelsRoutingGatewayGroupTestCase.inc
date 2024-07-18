@@ -7,41 +7,38 @@ use RESTAPI\Models\RoutingGateway;
 use RESTAPI\Models\RoutingGatewayGroup;
 use RESTAPI\Models\VirtualIP;
 
-class APIModelsRoutingGatewayGroupTestCase extends TestCase
-{
+class APIModelsRoutingGatewayGroupTestCase extends TestCase {
     /**
      * Ensures that RoutingGatewayGroup objects can be created, updated and deleted.
      */
     public function test_crud(): void {
         # First, create a RoutingGateway object and VirtualIP object we can test with
         $gateway = new RoutingGateway(
-            name: "testgw",
-            interface: "wan",
-            ipprotocol: "inet",
-            gateway: "1.2.3.4",
+            name: 'testgw',
+            interface: 'wan',
+            ipprotocol: 'inet',
+            gateway: '1.2.3.4',
             nonlocalgateway: true,
-            async: false
+            async: false,
         );
         $gateway->create();
         $vip = new VirtualIP(
-            name: "testvip",
-            interface: "wan",
-            mode: "ipalias",
-            subnet: "1.2.3.4",
+            name: 'testvip',
+            interface: 'wan',
+            mode: 'ipalias',
+            subnet: '1.2.3.4',
             subnet_bits: 24,
-            async: false
+            async: false,
         );
         $vip->create(apply: true);
 
         # Create a gateway group object
         $gateway_group = new RoutingGatewayGroup(
-            name: "testgwgroup",
-            trigger: "down",
-            descr: "Test Gateway Group",
-            priorities: [
-                ['gateway' => $gateway->name->value, 'tier' => 1, 'virtual_ip' => $vip->uniqid->value]
-            ],
-            async: false
+            name: 'testgwgroup',
+            trigger: 'down',
+            descr: 'Test Gateway Group',
+            priorities: [['gateway' => $gateway->name->value, 'tier' => 1, 'virtual_ip' => $vip->uniqid->value]],
+            async: false,
         );
         $gateway_group->create(apply: true);
 
@@ -53,13 +50,13 @@ class APIModelsRoutingGatewayGroupTestCase extends TestCase
         $this->assert_str_contains($pfctl_output, "GW$name = \"  route-to { ( $if $gw )  }  \"");
 
         # Ensure the IP protocol is set correctly
-        $this->assert_equals($gateway_group->ipprotocol->value, "inet");
+        $this->assert_equals($gateway_group->ipprotocol->value, 'inet');
 
         # Update the gateway group object with new values
-        $gateway_group->trigger->value = "downloss";
-        $gateway_group->descr->value = "Updated Gateway Group";
+        $gateway_group->trigger->value = 'downloss';
+        $gateway_group->descr->value = 'Updated Gateway Group';
         $gateway_group->priorities->value = [
-            ['gateway' => $gateway->name->value, 'tier' => 2, 'virtual_ip' => 'address']
+            ['gateway' => $gateway->name->value, 'tier' => 2, 'virtual_ip' => 'address'],
         ];
         $gateway_group->update(apply: true);
 
@@ -78,19 +75,18 @@ class APIModelsRoutingGatewayGroupTestCase extends TestCase
      */
     public function test_priorities_required(): void {
         $this->assert_throws_response(
-            response_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
+            response_id: 'LENGTH_VALIDATOR_MINIMUM_CONSTRAINT',
             code: 400,
             callable: function () {
                 # Try to create a gateway group object with no priorities
                 $gwg = new RoutingGatewayGroup(
-                    name: "testgwgroup",
-                    trigger: "down",
-                    descr: "Test Gateway Group",
-                    priorities: []
+                    name: 'testgwgroup',
+                    trigger: 'down',
+                    descr: 'Test Gateway Group',
+                    priorities: [],
                 );
                 $gwg->validate();
-            }
+            },
         );
     }
-
 }

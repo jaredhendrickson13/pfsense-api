@@ -70,8 +70,7 @@ class RoutingGatewayGroup extends Model {
      * `ipprotocol` field's value.
      * @return string The IP protocol of the gateways in this group or 'unknown' if the IP protocol cannot be determined.
      */
-    protected function from_internal_ipprotocol(): string
-    {
+    protected function from_internal_ipprotocol(): string {
         # Check the IP protocol of the gateways in this group
         foreach ($this->priorities->value as $priority) {
             $gw_obj = RoutingGateway::query(name: $priority['gateway'])->first();
@@ -87,8 +86,7 @@ class RoutingGatewayGroup extends Model {
     /**
      * Defines the pre-apply method to ensure the 'ipprotocol' field is set after creation.
      */
-    public function pre_apply(): void
-    {
+    public function pre_apply(): void {
         # Ensure the IP protocol is always up to date after changes are made
         $this->ipprotocol->value = $this->from_internal_ipprotocol();
     }
