@@ -3,6 +3,8 @@
 namespace RESTAPI\Dispatchers;
 
 use RESTAPI\Core\Dispatcher;
+use RESTAPI\Models\RoutingGateway;
+use RESTAPI\Models\RoutingGatewayGroup;
 
 /**
  * Defines a Dispatcher for applying changes to the routing configuration.
@@ -31,7 +33,17 @@ class RoutingApplyDispatcher extends Dispatcher {
         system_resolvconf_generate();
         filter_configure();
         setup_gateways_monitor();
-        send_event('service reload dyndnsall');
+        send_multiple_events(["service reload dyndnsall", "service reload ipsecdns", "filter reload"]);
+
+        # Check if any gateway groups are dirty, if so, resync them with OpenVPN
+        foreach (RoutingGatewayGroup::read_all()->model_objects as $gateway_group) {
+            $gw_subsystem = "gwgroup.{$gateway_group->name->value}";
+            if (is_subsystem_dirty($gw_subsystem)) {
+                openvpn_resync_gwgroup($gateway_group->name->value);
+                clear_subsystem_dirty($gw_subsystem);
+            }
+        }
+
         clear_subsystem_dirty('staticroutes');
     }
 }
