@@ -106,7 +106,7 @@ class NestedModelField extends Field {
         # Assign the IDs and parent manually using this Field's context in case it does not yet exist in config
         $model->parent_id = $this->context->id;
         $model->parent_model = $this->context;
-        $model->id = count($this->validation_modelset->model_objects);
+        $model->id = $this->validation_modelset->count();
 
         # Try to validate the nested Model object
         try {
