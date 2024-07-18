@@ -23,9 +23,11 @@ class RoutingGatewayGroupPriority extends Model {
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
-        $this->parent_model_class = 'GatewayGroup';
+        $this->parent_model_class = 'RoutingGatewayGroup';
         $this->config_path = 'item';
+        $this->subsystem = 'staticroutes';
         $this->many = true;
+        $this->many_minimum = 1;
 
         # Set model fields
         $this->gateway = new ForeignModelField(
@@ -56,17 +58,17 @@ class RoutingGatewayGroupPriority extends Model {
      * Provide extra validation for the entire Model.
      */
     public function validate_extra(): void {
-        # Ensure all the gateway priorities for the parent gateway group are of the same IP type
-        $expected_ipprotocol = $this->gateway->get_related_model()->ipprotocol->value;
-        foreach ($this->parent_model->priorities->value as $priority) {
-            $gw_obj = RoutingGateway::query(name: $priority['gateway'])->first();
-            if ($gw_obj->ipprotocol->value !== $expected_ipprotocol) {
-                throw new ValidationError(
-                    message: 'Field `gateway` must be a gateway of the same IP protocol as all other gateways in the ' .
-                        'parent gateway group.',
-                    response_id: 'ROUTING_GATEWAY_GROUP_PRIORITY_IPPROTO_MISMATCH',
-                );
-            }
+        # Check the IP protocol of the gateway being added vs the IP protocol of the parent gateway group
+        $gw_ipprotocol = $this->gateway->get_related_model()->ipprotocol->value;
+        $parent_ipprotocol = $this->parent_model->ipprotocol->value;
+
+        # If we know the IP protocol of the parent gateway group, ensure the gateway being added matches it
+        if ($parent_ipprotocol !== "unknown" and $parent_ipprotocol !== $gw_ipprotocol) {
+            throw new ValidationError(
+                message: "Field `gateway` must be a gateway of the same IP protocol as all other gateways in the ' .
+                    'parent gateway group. Expected $parent_ipprotocol, got $gw_ipprotocol.",
+                response_id: 'ROUTING_GATEWAY_GROUP_PRIORITY_IPPROTOCOL_MISMATCH',
+            );
         }
     }
 
