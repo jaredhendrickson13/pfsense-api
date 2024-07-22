@@ -199,7 +199,7 @@ class FirewallRule extends Model {
             help_text: 'The TCP flags that must be set for this rule to match.',
         );
         $this->gateway = new ForeignModelField(
-            model_name: 'RoutingGateway',
+            model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
             model_field: 'name',
             default: null,
             allow_null: true,

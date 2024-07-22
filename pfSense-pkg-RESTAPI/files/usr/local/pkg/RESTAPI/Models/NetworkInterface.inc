@@ -5,13 +5,13 @@ namespace RESTAPI\Models;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\InterfaceApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
+use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\FilterNameValidator;
-use RESTAPI\Validators\GatewayValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\MACAddressValidator;
 use RESTAPI\Validators\SubnetValidator;
@@ -35,7 +35,7 @@ class NetworkInterface extends Model {
     public StringField $typev4;
     public StringField $ipaddr;
     public IntegerField $subnet;
-    public StringField $gateway;
+    public ForeignModelField $gateway;
     public StringField $dhcphostname;
     public StringField $alias_address;
     public IntegerField $alias_subnet;
@@ -57,7 +57,7 @@ class NetworkInterface extends Model {
     public StringField $typev6;
     public StringField $ipaddrv6;
     public IntegerField $subnetv6;
-    public StringField $gatewayv6;
+    public ForeignModelField $gatewayv6;
     public BooleanField $ipv6usev4iface;
     public BooleanField $slaacusev4iface;
     public StringField $prefix_6rd;
@@ -161,10 +161,12 @@ class NetworkInterface extends Model {
             conditions: ['typev4' => 'static'],
             help_text: 'Sets the subnet bit count to assign this interface.',
         );
-        $this->gateway = new StringField(
+        $this->gateway = new ForeignModelField(
+            model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
+            model_field: 'name',
+            model_query: ['ipprotocol' => 'inet', 'interface' => &$this->id],
             allow_null: true,
             conditions: ['typev4' => 'static'],
-            validators: [new GatewayValidator(allow_ipv4: true, allow_ipv6: false, interface: $this->id)],
             help_text: 'Sets the upstream gateway this interface will use. This is only applicable for WAN-type interfaces.',
         );
         $this->dhcphostname = new StringField(
@@ -307,11 +309,13 @@ class NetworkInterface extends Model {
             conditions: ['typev6' => 'staticv6'],
             help_text: 'Sets the subnet bit count to assign this interface.',
         );
-        $this->gatewayv6 = new StringField(
+        $this->gatewayv6 = new ForeignModelField(
+            model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
+            model_field: 'name',
+            model_query: ['ipprotocol' => 'inet6', 'interface' => &$this->id],
             allow_null: true,
             conditions: ['typev6' => 'staticv6'],
-            validators: [new GatewayValidator(allow_ipv4: false, allow_ipv6: true, interface: $this->id)],
-            help_text: 'Sets the upstream gateway this interface will use. This is only applicable for WAN-type interfaces.',
+            help_text: 'Sets the upstream IPv6 gateway this interface will use. This is only applicable for WAN-type interfaces.',
         );
         $this->ipv6usev4iface = new BooleanField(
             default: false,
