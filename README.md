@@ -1,5 +1,10 @@
 # pfSense-API
 
+> [!NOTE]
+> You are currently viewing the documentation for the legacy v1 package. While this package is still supported and
+> maintained, it is recommended to use the new v2 package for new installations to continue receiving the latest
+> features and updates. You can find the documentation for the new v2 package [here](https://pfrest.org).
+
 [![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
 [![Quality](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml)
 [![Release](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/release.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/release.yml)
@@ -43,7 +48,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 
 ```
-pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7-pkg-API.pkg && /etc/rc.restart_webgui
+pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v1.7.5/pfSense-2.7-pkg-API.pkg && /etc/rc.restart_webgui
 ```
 
 <br>
