@@ -1693,6 +1693,31 @@ class Model {
     }
 
     /**
+     * Removes changes between the current object and the initial object for `many` enabled fields. This allows for
+     * changes to array field values to be removed from the existing array during updates instead of being replaced.
+     */
+    private function remove_array_changes(): void
+    {
+        # Loop through each field in this Model object and remove changes from array fields
+        foreach ($this->get_fields() as $field) {
+            # Skip this field if it is not a `many` Field
+            if (!$this->$field->many) {
+                continue;
+            }
+
+            # Skip this field if it is not an array
+            if (!is_array($this->$field->value)) {
+                continue;
+            }
+
+            # Remove the changes from the existing array if they are not the same
+            if ($this->$field->value !== $this->initial_object->$field->value) {
+                $this->$field->value = array_diff($this->initial_object->$field->value, $this->$field->value);
+            }
+        }
+    }
+
+    /**
      * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
      * load Model objects for each object stored at the config path. If `internal_callable` is set, this will create
      * Model objects for each object returned by the specified callable.
@@ -1970,12 +1995,19 @@ class Model {
      * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
      * @param bool $append Set to `true` if you would like to append changes to arrays in the existing object instead
      * of replacing the entire array. This only applies to `many` enabled Fields.
+     * @param bool $remove Set to `true` if you would like to remove values from arrays in the existing object instead
+     * of replacing the entire array. This only applies to `many` enabled Fields.
      * @return Model Returns the updated Model object (this object).
      */
-    final public function update(bool $apply = false, bool $append = false): Model {
+    final public function update(bool $apply = false, bool $append = false, bool $remove = false): Model {
         # Append changes to the many enabled fields if requested. This must be done before validation.
         if ($append) {
             $this->append_array_changes();
+        }
+
+        # Remove changes from the many enabled fields if requested. This must be done before validation.
+        if ($remove) {
+            $this->remove_array_changes();
         }
 
         # Ensure all object Fields and validations succeed for proceeding.

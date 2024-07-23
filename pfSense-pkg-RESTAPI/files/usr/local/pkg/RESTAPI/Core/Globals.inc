@@ -14,5 +14,6 @@ const RESERVED_FIELD_NAMES = [
     'extra',
     'placement',
     'append',
+    'remove',
     'reverse',
 ];

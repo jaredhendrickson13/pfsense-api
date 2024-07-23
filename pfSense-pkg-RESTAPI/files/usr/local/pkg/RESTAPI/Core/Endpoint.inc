@@ -301,6 +301,15 @@ class Endpoint {
     public bool $append = false;
 
     /**
+     * @var bool $remove
+     * Sets the default value for the `remove` field in the request data. This value is used to control how Model objects
+     * apply updates to array fields on existing objects. If set to `true`, any requested updates to array fields will
+     * remove the specified values from the existing array. This value can be overridden by the client in the request
+     * data.
+     */
+    public bool $remove = false;
+
+    /**
      * Sets values whenever the Endpoint object is crated.
      */
     public function __construct() {
@@ -718,6 +727,30 @@ class Endpoint {
     }
 
     /**
+     * Validates the $remove common control parameter for this request.
+     * @note If the `remove` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $remove property value.
+     * @throws ValidationError When the `remove` field is not a boolean.
+     */
+    private function validate_remove(): void
+    {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['remove'])) {
+            # Ensure value is a bool
+            if (!is_bool($this->request_data['remove'])) {
+                throw new ValidationError(
+                    message: 'Field `remove` must be of type `boolean`.',
+                    response_id: 'ENDPOINT_REMOVE_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the remove property to use the client's requested value and remove it from the request data
+            $this->remove = $this->request_data['remove'];
+            unset($this->request_data['remove']);
+        }
+    }
+
+    /**
      * Validates the $limit common control parameter for this request.
      * @note If the `limit` field was not provided in the request data, the request will default to the Endpoint's
      * assigned $limit property value.
@@ -776,10 +809,11 @@ class Endpoint {
             );
         }
 
-        # Ensure the $async, $limit and $offset parameters are of the correct type if the client requested them
+        # Ensure control parameters are of the correct type if the client requested them
         $this->validate_async();
         $this->validate_reverse();
         $this->validate_append();
+        $this->validate_remove();
         $this->validate_limit();
         $this->validate_offset();
     }
@@ -918,7 +952,11 @@ class Endpoint {
     protected function patch(): Model|ModelSet {
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
-        return $this->model->update(apply: $this->request_data['apply'] === true, append: $this->append);
+        return $this->model->update(
+            apply: $this->request_data['apply'] === true,
+            append: $this->append,
+            remove: $this->remove,
+        );
     }
 
     /**

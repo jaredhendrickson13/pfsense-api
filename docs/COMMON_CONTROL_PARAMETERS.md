@@ -67,6 +67,14 @@ parameters you can use:
     Use caution when setting placement of objects which may be sensitive to order such as firewall rules. Placing the
     object in the wrong location may have unintended consequences such as blocking all traffic or allowing all traffic.
 
+## remove
+
+- Type: Boolean
+- Default: `false`
+- Description: This parameter allows you to control the behavior of array fields. When set to `true`, any array values
+  submitted in your request will be removed from the existing array values. This is useful when you want to remove
+  specific values from an array field without needing to retrieve the existing values first.
+
 ## reverse
 
 - Type: Boolean
