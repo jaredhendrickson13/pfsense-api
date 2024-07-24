@@ -934,8 +934,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that updates using the $remove flag correctly remove array values from the existing array values instead of
      * replacing them.
      */
-    public function test_update_remove(): void
-    {
+    public function test_update_remove(): void {
         # Use a FirewallAlias model to test this
         $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['127.0.0.1', '127.0.0.2', '127.0.0.3']);
         $alias->create();

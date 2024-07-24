@@ -1696,8 +1696,7 @@ class Model {
      * Removes changes between the current object and the initial object for `many` enabled fields. This allows for
      * changes to array field values to be removed from the existing array during updates instead of being replaced.
      */
-    private function remove_array_changes(): void
-    {
+    private function remove_array_changes(): void {
         # Loop through each field in this Model object and remove changes from array fields
         foreach ($this->get_fields() as $field) {
             # Skip this field if it is not a `many` Field

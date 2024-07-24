@@ -732,8 +732,7 @@ class Endpoint {
      * $remove property value.
      * @throws ValidationError When the `remove` field is not a boolean.
      */
-    private function validate_remove(): void
-    {
+    private function validate_remove(): void {
         # Only validate this field if the client specifically requested it in the request data
         if (isset($this->request_data['remove'])) {
             # Ensure value is a bool
