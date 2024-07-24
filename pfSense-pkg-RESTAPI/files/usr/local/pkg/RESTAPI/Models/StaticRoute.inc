@@ -117,7 +117,7 @@ class StaticRoute extends Model {
         }
 
         # Fetch the gateway object of the value assigned
-        $gateway_obj = $this->gateway->get_model_object();
+        $gateway_obj = $this->gateway->get_related_model();
 
         # Ensure the upstream gateways IP version matches the `network` assigned
         if ($gateway_obj->ipprotocol->value === 'inet' and !$this->network->has_label('is_subnetv4')) {
