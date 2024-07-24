@@ -929,4 +929,32 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         # Delete the alias
         $alias->delete();
     }
+
+    /**
+     * Checks that updates using the $remove flag correctly remove array values from the existing array values instead of
+     * replacing them.
+     */
+    public function test_update_remove(): void
+    {
+        # Use a FirewallAlias model to test this
+        $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['127.0.0.1', '127.0.0.2', '127.0.0.3']);
+        $alias->create();
+
+        # Ensure 'address' values set during the update are removed from the existing values instead of replacing them
+        $alias->address->value = ['127.0.0.2'];
+        $alias->update(remove: true);
+        $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.3']);
+
+        # Ensure no action is taken if remove is requested but no new values were given
+        # In other words, ensure we don't perpetually remove the existing values over again
+        $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.3']);
+
+        # Ensure the 'address' values are replaced if remove is not requested
+        $alias->address->value = ['127.0.0.3', '127.0.0.2', '127.0.0.1'];
+        $alias->update();
+        $this->assert_equals($alias->address->value, ['127.0.0.3', '127.0.0.2', '127.0.0.1']);
+
+        # Delete the alias
+        $alias->delete();
+    }
 }

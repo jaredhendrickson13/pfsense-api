@@ -558,7 +558,7 @@ class APICoreEndpointTestCase extends TestCase {
      * Ensure API calls submitted with the 'append' control parameter correctly append the requested array field values
      * to the existing array field values.
      */
-    public function test_append(): void {
+    public function test_patch_append(): void {
         # Use a POST request to create a new alias
         $json_resp = \RESTAPI\Core\Tools\http_request(
             url: 'https://localhost/api/v2/firewall/alias',
@@ -585,6 +585,52 @@ class APICoreEndpointTestCase extends TestCase {
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->code, 200);
         $this->assert_equals($resp->data->address, ['127.0.0.1', '127.0.0.2']);
+
+        # Delete the alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'DELETE',
+            data: ['id' => 0],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+    }
+
+    /**
+     * Ensure API calls submitted with the 'remove' control parameter correctly remove the requested array field values
+     * in the existing array field values.
+     */
+    public function test_patch_remove(): void {
+        # Use a POST request to create a new alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'POST',
+            data: ['name' => 'host_alias', 'type' => 'host', 'address' => ['127.0.0.1', '127.0.0.2', '127.0.0.3']],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+
+        # Make a PATCH request with 'remove' enabled to remove a new address to the alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'PATCH',
+            data: ['id' => 0, 'address' => ['127.0.0.2'], 'remove' => true],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+        $this->assert_equals($resp->data->address, ['127.0.0.1', '127.0.0.3']);
 
         # Delete the alias
         $json_resp = \RESTAPI\Core\Tools\http_request(
