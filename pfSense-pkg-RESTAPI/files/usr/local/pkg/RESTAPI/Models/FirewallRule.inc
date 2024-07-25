@@ -271,6 +271,7 @@ class FirewallRule extends Model {
             default: null,
             allow_null: true,
             editable: false,
+            internal_name: 'associated-rule-id',
             help_text: 'The internal rule ID for the NAT rule associated with this rule.',
         );
         $this->created_time = new UnixTimeField(
