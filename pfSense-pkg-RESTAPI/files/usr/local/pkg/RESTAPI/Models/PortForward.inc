@@ -137,10 +137,10 @@ class PortForward extends Model {
             default: '',
             allow_empty: true,
             internal_name: 'associated-rule-id',
-            help_text: 'The associated firewall rule mode. Use an empty string to require a separate firewall rule '.
-                'to be created to pass traffic matching this port forward rule. Use `new` to create a new associated '.
-                'firewall rule to pass traffic matching this port forward rule. Use `pass` to automatically pass '.
-                'traffic matching this port forward rule without the need for a firewall rule.   Otherwise, you can '.
+            help_text: 'The associated firewall rule mode. Use an empty string to require a separate firewall rule ' .
+                'to be created to pass traffic matching this port forward rule. Use `new` to create a new associated ' .
+                'firewall rule to pass traffic matching this port forward rule. Use `pass` to automatically pass ' .
+                'traffic matching this port forward rule without the need for a firewall rule.   Otherwise, you can ' .
                 'specify the `associated_rule_id` of an existing firewall rule to associate with this port forward rule.',
         );
         $this->created_time = new UnixTimeField(
@@ -193,8 +193,7 @@ class PortForward extends Model {
     /**
      * Creates an associated firewall rule for this port forward rule if requested after creation.
      */
-    public function pre_apply_create(): void
-    {
+    public function pre_apply_create(): void {
         # Only create a new associated rule if the associated_rule_id is not pass or empty
         if ($this->associated_rule_id->value and $this->associated_rule_id->value !== 'pass') {
             $firewall_rule = new FirewallRule(
@@ -217,8 +216,7 @@ class PortForward extends Model {
     /**
      * Updates the associated firewall rule for this port forward rule if assigned after updates
      */
-    public function pre_apply_update(): void
-    {
+    public function pre_apply_update(): void {
         # Skip this method if the associated_rule_id is not set or is set to pass
         if (!$this->associated_rule_id->value or $this->associated_rule_id->value === 'pass') {
             return;
@@ -247,8 +245,7 @@ class PortForward extends Model {
     /**
      * Deletes the associated firewall rule for this port forward rule if assigned after deletion.
      */
-    public function pre_apply_delete(): void
-    {
+    public function pre_apply_delete(): void {
         # Skip this method if the associated_rule_id is not set or is set to pass
         if (!$this->associated_rule_id->value or $this->associated_rule_id->value === 'pass') {
             return;
