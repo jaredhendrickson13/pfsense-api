@@ -102,5 +102,5 @@ reduce the amount of data returned in a single request.
 !!! Important
     - By default, the REST API does not paginate responses. If you want to paginate the response, you must include the
     `limit` and `offset` query parameters in your request.
-    - Pagination is only available for `GET` and `DELETE` requests to [plural endpoints](./ENDPOINT_TYPES.md#plural-many-endpoints).
+    - Pagination is only available for `GET` requests to [plural endpoints](./ENDPOINT_TYPES.md#plural-many-endpoints).
     - If combined with a query, pagination will be applied after the initial query is executed.
