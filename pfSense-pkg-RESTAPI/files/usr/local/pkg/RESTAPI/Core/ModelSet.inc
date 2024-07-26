@@ -46,6 +46,14 @@ class ModelSet {
     }
 
     /**
+     * Returns the number of Model objects in this ModelSet.
+     * @return int The number of Model objects in this ModelSet.
+     */
+    public function count(): int {
+        return count($this->model_objects);
+    }
+
+    /**
      * Returns the first Model object in the ModelSet. This is helpful when locating the first Model object that matched
      * a query.
      */

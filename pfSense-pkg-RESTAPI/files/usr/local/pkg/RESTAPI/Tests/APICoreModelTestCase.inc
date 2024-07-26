@@ -764,4 +764,47 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         # Delete the alias
         $alias->delete();
     }
+
+    /**
+     * Checks that the 'paginate()' method works correctly.
+     */
+    public function test_paginate(): void {
+        # Ensure the paginate method correctly returns the paginated subset of a given array
+        $this->assert_equals(Model::paginate([1, 2, 3, 4, 5], limit: 2, offset: 1), [2, 3]);
+        $this->assert_equals(Model::paginate([1, 2, 3, 4, 5], limit: 2, offset: 3), [4, 5]);
+        $this->assert_equals(Model::paginate([1, 2, 3, 4, 5], limit: 2, offset: 5), []);
+        $this->assert_equals(Model::paginate([1, 2, 3, 4, 5], limit: 4, offset: 0), [1, 2, 3, 4]);
+        $this->assert_equals(Model::paginate([1, 2, 3, 4, 5], limit: 4, offset: 1), [2, 3, 4, 5]);
+
+        # Ensure a limit of 0 imposes no limit
+        $this->assert_equals(Model::paginate([1, 2, 3, 4, 5], 0, 0), [1, 2, 3, 4, 5]);
+    }
+
+    /**
+     * Ensures that queries are performed before pagination is applied.
+     */
+    public function test_paginate_with_query(): void {
+        # Create FirewallAlias models to test this
+        $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
+        $alias_alias_0->create();
+        $alias_alias_1 = new FirewallAlias(name: 'alias1', type: 'port');
+        $alias_alias_1->create();
+        $alias_alias_2 = new FirewallAlias(name: 'alias2', type: 'network');
+        $alias_alias_2->create();
+        $alias_alias_3 = new FirewallAlias(name: 'alias3', type: 'host');
+        $alias_alias_3->create();
+        $alias_alias_4 = new FirewallAlias(name: 'alias4', type: 'port');
+        $alias_alias_4->create();
+
+        # Query for only port aliases, but limit it to 2
+        $port_aliases = FirewallAlias::query(limit: 2, type: 'port');
+        $this->assert_equals($port_aliases->count(), 2);
+        $this->assert_equals($port_aliases->model_objects[0]->name->value, 'alias1');
+        $this->assert_equals($port_aliases->model_objects[1]->name->value, 'alias4');
+
+        # Query again but change to offset to exclude the first port alias
+        $port_aliases = FirewallAlias::query(limit: 2, offset: 1, type: 'port');
+        $this->assert_equals($port_aliases->count(), 1);
+        $this->assert_equals($port_aliases->model_objects[0]->name->value, 'alias4');
+    }
 }

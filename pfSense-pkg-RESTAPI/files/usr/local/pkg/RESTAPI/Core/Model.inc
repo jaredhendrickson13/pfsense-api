@@ -356,6 +356,8 @@ class Model {
     private function construct_from_internal(mixed $id = null, mixed $parent_id = null): void {
         # Do not try to load the object from internal if the skip_init flag is set
         if ($this->skip_init) {
+            $this->id = $id;
+            $this->parent_id = $parent_id;
             return;
         }
 
@@ -1568,79 +1570,6 @@ class Model {
     }
 
     /**
-     * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
-     * load Model objects for each object stored at the config path. If `internal_callable` is set, this will create
-     * Model objects for each object returned by the specified callable.
-     * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
-     * $many Models with a $parent_model_class. This value has no affect otherwise.
-     * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many
-     * enabled Models.
-     * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
-     * enabled Models.
-     * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
-     * not enabled.
-     */
-    public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0): ModelSet|Model {
-        # Variables
-        $model_name = get_called_class();
-        $model = new $model_name(parent_id: $parent_id);
-        $model_objects = [];
-        $is_parent_model_many = $model->is_parent_model_many();
-        $requests_pagination = ($limit or $offset);
-        $offset_counter = 0;
-
-        # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
-        if ($is_parent_model_many and !isset($parent_id)) {
-            throw new ValidationError(
-                message: 'Field `parent_id` is required to read all.',
-                response_id: 'MODEL_PARENT_ID_REQUIRED',
-            );
-        }
-
-        # Throw an error if pagination was requested on a Model without $many enabled
-        if (!$model->many and $requests_pagination) {
-            throw new ValidationError(
-                message: "Model `$model->verbose_name` does not support pagination. Please remove the `limit` and/or. " .
-                    '`offset`parameters and try again.',
-                response_id: 'MODEL_DOES_NOT_SUPPORT_PAGINATION',
-            );
-        }
-
-        # Obtain all of this Model's internally stored objects
-        $internal_objects = $model->get_internal_objects();
-
-        # For non `many` Models, wrap the internal object in an array so we can loop
-        $internal_objects = $model->many ? $internal_objects : [$internal_objects];
-
-        # Loop through each internal object and create a Model object for it
-        foreach ($internal_objects as $internal_id => $internal_object) {
-            # Do not include this object if we have not reached our offset
-            if ($offset_counter < $offset) {
-                $offset_counter++;
-                continue;
-            }
-
-            # Create a new Model object for this internal object and assign its ID
-            $model_object = new $model(id: $internal_id, parent_id: $parent_id);
-
-            # Populate the Model object using its current internal values and add it to the array of all Model objects
-            $model_object->from_internal_object($internal_object);
-            $model_objects[] = $model_object;
-
-            # Break the loop if $limit is set, and we've met our limit of objects to obtain
-            if ($limit and $limit === count($model_objects)) {
-                break;
-            }
-
-            # Increase the offset counter
-            $offset_counter++;
-        }
-
-        # Unwrap the array for non `many` Models, otherwise return all objects
-        return $model->many ? new ModelSet($model_objects) : $model_objects[0];
-    }
-
-    /**
      * Sorts `many` Model entries internally before writing the changes to config. This is useful for Model's whose
      * internal objects must be written in a specific order.
      */
@@ -1740,6 +1669,82 @@ class Model {
     }
 
     /**
+     * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
+     * load Model objects for each object stored at the config path. If `internal_callable` is set, this will create
+     * Model objects for each object returned by the specified callable.
+     * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
+     * $many Models with a $parent_model_class. This value has no affect otherwise.
+     * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many
+     * enabled Models.
+     * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
+     * enabled Models.
+     * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
+     * not enabled.
+     */
+    public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0): ModelSet|Model {
+        # Variables
+        $model_name = get_called_class();
+        $model = new $model_name(parent_id: $parent_id);
+        $model_objects = [];
+        $is_parent_model_many = $model->is_parent_model_many();
+        $requests_pagination = ($limit or $offset);
+        $offset_counter = 0;
+
+        # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
+        if ($is_parent_model_many and !isset($parent_id)) {
+            throw new ValidationError(
+                message: 'Field `parent_id` is required to read all.',
+                response_id: 'MODEL_PARENT_ID_REQUIRED',
+            );
+        }
+
+        # Throw an error if pagination was requested on a Model without $many enabled
+        if (!$model->many and $requests_pagination) {
+            throw new ValidationError(
+                message: "Model `$model->verbose_name` does not support pagination. Please remove the `limit` and/or. " .
+                    '`offset`parameters and try again.',
+                response_id: 'MODEL_DOES_NOT_SUPPORT_PAGINATION',
+            );
+        }
+
+        # Obtain all of this Model's internally stored objects
+        $internal_objects = $model->get_internal_objects();
+
+        # For non `many` Models, wrap the internal object in an array so we can loop
+        $internal_objects = $model->many ? $internal_objects : [$internal_objects];
+
+        # Loop through each internal object and create a Model object for it
+        foreach ($internal_objects as $internal_id => $internal_object) {
+            # Do not include this object if we have not reached our offset
+            if ($offset_counter < $offset) {
+                $offset_counter++;
+                continue;
+            }
+
+            # Create a new Model object for this internal object and assign its ID
+            $model_object = new $model(id: $internal_id, parent_id: $parent_id, skip_init: true);
+
+            # Obtain the parent Model object if this Model has a parent Model class assigned
+            $model_object->get_parent_model();
+
+            # Populate the Model object using its current internal values and add it to the array of all Model objects
+            $model_object->from_internal_object($internal_object);
+            $model_objects[] = $model_object;
+
+            # Break the loop if $limit is set, and we've met our limit of objects to obtain
+            if ($limit and $limit === count($model_objects)) {
+                break;
+            }
+
+            # Increase the offset counter
+            $offset_counter++;
+        }
+
+        # Unwrap the array for non `many` Models, otherwise return all objects
+        return $model->many ? new ModelSet($model_objects) : $model_objects[0];
+    }
+
+    /**
      * Performs a query on all Model objects for this Model. This is essentially a shorthand way of calling
      * `query()`. This method is only applicable to `many` Models.
      * @param array $query_params An array of query parameters.
@@ -1766,10 +1771,43 @@ class Model {
         # Merge the $query_params and any provided variable-length arguments into a single variable
         $query_params = array_merge($query_params, $vl_query_params);
 
-        return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset)->query(
-            query_params: $query_params,
-            excluded: $excluded,
-        );
+        # If no query parameters were provided, just run read_all() with pagination for optimal performance
+        if (!$query_params) {
+            return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset);
+        }
+
+        # Perform the query against all Model objects for this Model first
+        $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
+
+        # Apply pagination to limit the number of objects returned if requested
+        $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);
+        return $modelset;
+    }
+
+    /**
+     * Paginates a given array but obtaining a smaller subset of the array based on the provided limit and offset values.
+     * @param int $limit The maximum number of items to return in the paginated array. Use 0 to impose no limit.
+     * @param int $offset The starting point in the array to begin the paginated array.
+     * @return array The paginated array containing only the subset of items that match the limit and offset values.
+     */
+    public static function paginate(array $array, int $limit, int $offset): array {
+        # Return the entire array if no limit or offset is set
+        if (!$limit and !$offset) {
+            return $array;
+        }
+
+        # Return an empty array if the offset is greater than the array length
+        if ($offset >= count($array)) {
+            return [];
+        }
+
+        # Return the entire array if the limit is set to 0
+        if (!$limit) {
+            return array_slice($array, $offset);
+        }
+
+        # Return the subset of the array that matches the limit and offset values
+        return array_slice($array, $offset, $limit);
     }
 
     /**
