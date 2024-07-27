@@ -49,7 +49,7 @@ class FirewallRule extends Model {
     public BooleanField $quick;
     public StringField $direction;
     public UnixTimeField $tracker;
-    public ForeignModelField $associated_rule_id;
+    public StringField $associated_rule_id;
     public UnixTimeField $created_time;
     public StringField $created_by;
     public UnixTimeField $updated_time;
@@ -265,12 +265,11 @@ class FirewallRule extends Model {
             auto_add_now: true,
             help_text: 'The internal tracking ID for this firewall rule.',
         );
-        $this->associated_rule_id = new ForeignModelField(
-            model_name: 'PortForward',
-            model_field: 'associated_rule_id',
+        $this->associated_rule_id = new StringField(
             default: null,
             allow_null: true,
             editable: false,
+            read_only: true,
             internal_name: 'associated-rule-id',
             help_text: 'The internal rule ID for the NAT rule associated with this rule.',
         );

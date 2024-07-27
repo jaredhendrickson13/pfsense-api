@@ -205,10 +205,10 @@ class PortForward extends Model {
                 source_port: $this->source_port->value,
                 destination: $this->destination->value,
                 destination_port: $this->destination_port->value,
-                associated_rule_id: $this->associated_rule_id->value,
                 descr: "Associated rule for port forward rule {$this->associated_rule_id->value}",
                 client: $this->client,
             );
+            $firewall_rule->associated_rule_id->value = $this->associated_rule_id->value;
             $firewall_rule->create();
         }
     }
