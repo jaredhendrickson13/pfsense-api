@@ -4,6 +4,7 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Core\Response;
 use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\FilterAddressField;
@@ -12,6 +13,7 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
+use RESTAPI\Responses\ServerError;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**
@@ -198,7 +200,7 @@ class PortForward extends Model {
         if ($this->associated_rule_id->value and $this->associated_rule_id->value !== 'pass') {
             $firewall_rule = new FirewallRule(
                 type: 'pass',
-                interface: $this->interface->value,
+                interface: [$this->interface->value],
                 ipprotocol: $this->ipprotocol->value,
                 protocol: $this->protocol->value,
                 source: $this->source->value,
@@ -209,7 +211,16 @@ class PortForward extends Model {
                 client: $this->client,
             );
             $firewall_rule->associated_rule_id->value = $this->associated_rule_id->value;
-            $firewall_rule->create();
+
+            # Format any errors that occur during the creation of the rule so its clear that its associated with the linked rule
+            try {
+                $firewall_rule->create();
+            } catch (Response $e) {
+                throw new ServerError(
+                    message: "Failed to create associated firewall rule for port forward rule: $e->message",
+                    response_id: 'PORT_FORWARD_ASSOCIATED_FIREWALL_RULE_CREATION_FAILED',
+                );
+            }
         }
     }
 
@@ -227,10 +238,10 @@ class PortForward extends Model {
 
         # If the associated rule exists, update it
         if ($rule_q->exists()) {
-            $rule = $rule_q->first();
-            $rule->from_representation(
+            $firewall_rule = $rule_q->first();
+            $firewall_rule->from_representation(
                 type: 'pass',
-                interface: $this->interface->value,
+                interface: [$this->interface->value],
                 ipprotocol: $this->ipprotocol->value,
                 protocol: $this->protocol->value,
                 source: $this->source->value,
@@ -238,7 +249,16 @@ class PortForward extends Model {
                 destination: $this->destination->value,
                 destination_port: $this->destination_port->value,
             );
-            $rule->update();
+
+            # Format any errors that occur during the update of the rule so its clear that its associated with the linked rule
+            try {
+                $firewall_rule->update();
+            } catch (Response $e) {
+                throw new ServerError(
+                    message: "Failed to update associated firewall rule for port forward rule: $e->message",
+                    response_id: 'PORT_FORWARD_ASSOCIATED_FIREWALL_RULE_UPDATE_FAILED',
+                );
+            }
         }
     }
 
