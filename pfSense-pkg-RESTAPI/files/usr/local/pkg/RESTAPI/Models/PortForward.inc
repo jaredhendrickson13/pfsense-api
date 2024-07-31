@@ -98,7 +98,7 @@ class PortForward extends Model {
         );
         $this->target = new StringField(
             required: true,
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_alias: true)],
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_alias: true)],
             help_text: 'The IP address or alias of the internal host to forward matching traffic to.',
         );
         $this->local_port = new PortField(
