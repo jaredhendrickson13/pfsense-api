@@ -14,7 +14,8 @@ NO_BUILD=yes
 NO_MTREE=yes
 SUB_FILES=pkg-install pkg-deinstall
 SUB_LIST=PORTNAME=${PORTNAME}
-ONLY_FOR_ARCHS=amd64 aarch64
+NO_ARCH=yes
+NOT_FOR_ARCHS=armv6 armv7
 
 do-extract:
     ${MKDIR} ${WRKSRC}
