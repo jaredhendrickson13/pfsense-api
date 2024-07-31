@@ -98,7 +98,7 @@ class APIModelsPortForwardTestCase extends TestCase {
         $purenat_rule = "rdr on {$this->env['PFREST_LAN_IF']} inet proto tcp from any to 127.3.2.1 port 8443 -> 127.1.2.3";
         $purenat_rule_ovpn = "rdr on { {$this->env['PFREST_LAN_IF']} openvpn } inet proto tcp from any to 127.3.2.1 port 8443 -> 127.1.2.3";
         $this->assert_is_true(
-            str_contains($rules_debug, $purenat_rule) or str_contains($rules_debug, $purenat_rule_ovpn)
+            str_contains($rules_debug, $purenat_rule) or str_contains($rules_debug, $purenat_rule_ovpn),
         );
 
         # Update the NAT reflection mode NAT + proxy (enable)
@@ -110,10 +110,10 @@ class APIModelsPortForwardTestCase extends TestCase {
         $natproxy_rule = "rdr on {$this->env['PFREST_LAN_IF']} proto tcp from any to 127.3.2.1 port 8443 tag PFREFLECT -> 127.0.0.1 port 19000";
         $natproxy_rule_ovpn = "rdr on { {$this->env['PFREST_LAN_IF']} openvpn } proto tcp from any to 127.3.2.1 port 8443 tag PFREFLECT -> 127.0.0.1 port 19000";
         $this->assert_is_false(
-            str_contains($rules_debug, $purenat_rule) or str_contains($rules_debug, $purenat_rule_ovpn)
+            str_contains($rules_debug, $purenat_rule) or str_contains($rules_debug, $purenat_rule_ovpn),
         );
         $this->assert_is_true(
-            str_contains($rules_debug, $natproxy_rule) or str_contains($rules_debug, $natproxy_rule_ovpn)
+            str_contains($rules_debug, $natproxy_rule) or str_contains($rules_debug, $natproxy_rule_ovpn),
         );
 
         # Delete the port forward and ensure the previous reflection rule is no longer present
@@ -185,54 +185,51 @@ class APIModelsPortForwardTestCase extends TestCase {
     public function test_associated_firewall_rules() {
         # Create a port forward to test with
         $port_forward = new PortForward(
-            interface: "wan",
-            ipprotocol: "inet",
-            protocol: "tcp",
-            source: "1.2.3.4",
-            source_port: "1234",
-            destination: "4.3.2.1",
-            destination_port: "4321",
-            target: "127.0.0.1",
-            local_port: "1234",
-            associated_rule_id: "new"
+            interface: 'wan',
+            ipprotocol: 'inet',
+            protocol: 'tcp',
+            source: '1.2.3.4',
+            source_port: '1234',
+            destination: '4.3.2.1',
+            destination_port: '4321',
+            target: '127.0.0.1',
+            local_port: '1234',
+            associated_rule_id: 'new',
         );
         $port_forward->create();
 
         # Ensure the associated rule was created
         $rule_q = FirewallRule::query(associated_rule_id: $port_forward->associated_rule_id->value);
-        $this->assert_not_equals($port_forward->associated_rule_id->value, "new");
+        $this->assert_not_equals($port_forward->associated_rule_id->value, 'new');
         $this->assert_is_not_empty($port_forward->associated_rule_id->value);
-        $this->assert_equals(
-            $rule_q->count(),
-            1
-        );
-        $this->assert_equals($rule_q->first()->interface->value, ["wan"]);
-        $this->assert_equals($rule_q->first()->ipprotocol->value, "inet");
-        $this->assert_equals($rule_q->first()->protocol->value, "tcp");
-        $this->assert_equals($rule_q->first()->source->value, "1.2.3.4");
-        $this->assert_equals($rule_q->first()->source_port->value, "1234");
-        $this->assert_equals($rule_q->first()->destination->value, "4.3.2.1");
-        $this->assert_equals($rule_q->first()->destination_port->value, "4321");
+        $this->assert_equals($rule_q->count(), 1);
+        $this->assert_equals($rule_q->first()->interface->value, ['wan']);
+        $this->assert_equals($rule_q->first()->ipprotocol->value, 'inet');
+        $this->assert_equals($rule_q->first()->protocol->value, 'tcp');
+        $this->assert_equals($rule_q->first()->source->value, '1.2.3.4');
+        $this->assert_equals($rule_q->first()->source_port->value, '1234');
+        $this->assert_equals($rule_q->first()->destination->value, '4.3.2.1');
+        $this->assert_equals($rule_q->first()->destination_port->value, '4321');
 
         # Update the port forward and ensure the associated rule is updated
         $port_forward->from_representation(
-            interface: "wan",
-            ipprotocol: "inet6",
-            protocol: "udp",
-            source: "4321::1",
-            source_port: "4321",
-            destination: "1234::1",
-            destination_port: "1234",
-            target: "fe80::1",
-            local_port: "4321",
+            interface: 'wan',
+            ipprotocol: 'inet6',
+            protocol: 'udp',
+            source: '4321::1',
+            source_port: '4321',
+            destination: '1234::1',
+            destination_port: '1234',
+            target: 'fe80::1',
+            local_port: '4321',
         );
         $port_forward->update();
         $rule_q = FirewallRule::query(associated_rule_id: $port_forward->associated_rule_id->value);
-        $this->assert_equals($rule_q->first()->protocol->value, "udp");
-        $this->assert_equals($rule_q->first()->source->value, "4321::1");
-        $this->assert_equals($rule_q->first()->source_port->value, "4321");
-        $this->assert_equals($rule_q->first()->destination->value, "1234::1");
-        $this->assert_equals($rule_q->first()->destination_port->value, "1234");
+        $this->assert_equals($rule_q->first()->protocol->value, 'udp');
+        $this->assert_equals($rule_q->first()->source->value, '4321::1');
+        $this->assert_equals($rule_q->first()->source_port->value, '4321');
+        $this->assert_equals($rule_q->first()->destination->value, '1234::1');
+        $this->assert_equals($rule_q->first()->destination_port->value, '1234');
 
         # Delete the port forward and ensure the associated rule is deleted
         $port_forward->delete();
