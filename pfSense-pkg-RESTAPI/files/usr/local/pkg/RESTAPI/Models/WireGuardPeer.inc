@@ -61,6 +61,10 @@ class WireGuardPeer extends Model {
             conditions: ['!endpoint' => null],
             help_text: 'The port used by the remote peer.',
         );
+        $this->descr = new StringField(
+            default: '',
+            help_text: 'The description for this peer.',
+        );
         $this->persistentkeepalive = new IntegerField(
             default: null,
             allow_null: true,
