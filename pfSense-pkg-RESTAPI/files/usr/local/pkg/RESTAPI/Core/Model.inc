@@ -1236,6 +1236,8 @@ class Model {
         # Use a variable to keep track of Fields with custom validate methods
         $custom_validate_fields = [];
 
+        $modelset = $modelset ?: $this->read_all(parent_id: $this->parent_id);
+
         # Loop through each of this object's assigned Fields and validate them.
         foreach ($this->get_fields() as $field) {
             # Assign this object as the Fields parent Model context
@@ -1780,7 +1782,7 @@ class Model {
             $model_object = new $model(id: $internal_id, parent_id: $parent_id, skip_init: true);
 
             # Obtain the parent Model object if this Model has a parent Model class assigned
-            $model_object->get_parent_model();
+            $model_object->parent_model = $model->parent_model;
 
             # Populate the Model object using its current internal values and add it to the array of all Model objects
             $model_object->from_internal_object($internal_object);
