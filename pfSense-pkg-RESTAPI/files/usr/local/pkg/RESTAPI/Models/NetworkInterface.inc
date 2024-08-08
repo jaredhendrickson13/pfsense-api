@@ -388,10 +388,10 @@ class NetworkInterface extends Model {
      * Obtains an array of the (real) interfaces available to this system. This populates the `choices` available to
      * the `if` field.
      * @returns array An array of the (real) interfaces available to this system where the array key is the real
-     * interface ID/name and the value is verbose description of the interface including its MAC.
+     * interface ID/name and the value is an array of interface attributes
      */
     public function get_interface_ports(): array {
-        return get_interface_ports();
+        return self::get_all_avail_interfaces();
     }
 
     /**
