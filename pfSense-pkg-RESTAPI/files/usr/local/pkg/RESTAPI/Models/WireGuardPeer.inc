@@ -63,6 +63,7 @@ class WireGuardPeer extends Model {
         );
         $this->descr = new StringField(
             default: '',
+            allow_empty: true,
             help_text: 'The description for this peer.',
         );
         $this->persistentkeepalive = new IntegerField(
