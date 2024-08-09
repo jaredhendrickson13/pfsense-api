@@ -91,6 +91,24 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
     }
 
     /**
+     * Checks that the `ipaddr` field cannot be assigned a value that is not within the parent interface's subnet.
+     */
+    public function test_ipaddr_must_be_within_interface_subnet(): void {
+        $this->assert_throws_response(
+            response_id: 'DHCP_SERVER_STATIC_MAPPING_IPADDR_NOT_WITHIN_SUBNET',
+            code: 400,
+            callable: function () {
+                $static_mapping = new DHCPServerStaticMapping(
+                    parent_id: 'lan',
+                    mac: '11:22:33:44:55:66',
+                    ipaddr: '1.2.3.4',
+                );
+                $static_mapping->validate();
+            }
+        );
+    }
+
+    /**
      * Checks that the `maxleasetime` field cannot be assigned a value less than `defaultleasetime`.
      */
     public function test_maxleasetime_cannot_be_less_than_defaultleasetime(): void {
