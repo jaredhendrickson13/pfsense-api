@@ -1236,7 +1236,10 @@ class Model {
         # Use a variable to keep track of Fields with custom validate methods
         $custom_validate_fields = [];
 
-        $modelset = $modelset ?: $this->read_all(parent_id: $this->parent_id);
+        # For 'many' Models, capture all current Models in a ModelSet if one was not already given
+        if ($this->many and !$modelset) {
+            $modelset = $this->read_all(parent_id: $this->parent_id);
+        }
 
         # Loop through each of this object's assigned Fields and validate them.
         foreach ($this->get_fields() as $field) {
