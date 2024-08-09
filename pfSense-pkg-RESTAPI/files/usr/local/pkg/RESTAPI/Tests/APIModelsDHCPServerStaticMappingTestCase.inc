@@ -104,7 +104,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
                     ipaddr: '1.2.3.4',
                 );
                 $static_mapping->validate();
-            }
+            },
         );
     }
 
