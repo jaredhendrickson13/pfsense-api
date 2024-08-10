@@ -165,7 +165,7 @@ class DHCPServerStaticMapping extends Model {
         }
 
         # Do not allow this $ipaddr to be outside the interface's subnet
-        if (!$this->parent_model->interface->is_ipv4_in_cidr($ipaddr)) {
+        if (!$this->parent_model->interface->get_related_model()->is_ipv4_in_cidr($ipaddr)) {
             throw new ValidationError(
                 message: 'Field `ipaddr` must be within the interface\'s subnet.',
                 response_id: 'DHCP_SERVER_STATIC_MAPPING_IPADDR_NOT_WITHIN_SUBNET',
