@@ -21,7 +21,7 @@ class DHCPServerCustomOption extends Model {
         # Set model attributes
         $this->parent_model_class = 'DHCPServer';
         $this->config_path = 'numberoptions/item';
-        $this->subsystem = "dhcpd";
+        $this->subsystem = 'dhcpd';
         $this->many = true;
 
         # Define model fields

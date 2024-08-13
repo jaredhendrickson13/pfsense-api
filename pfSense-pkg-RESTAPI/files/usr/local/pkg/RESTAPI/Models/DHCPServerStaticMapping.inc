@@ -39,7 +39,7 @@ class DHCPServerStaticMapping extends Model {
         # Define model attributes
         $this->parent_model_class = 'DHCPServer';
         $this->config_path = 'staticmap';
-        $this->subsystem = "dhcpd";
+        $this->subsystem = 'dhcpd';
         $this->many = true;
 
         # Define model Fields

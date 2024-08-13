@@ -53,7 +53,7 @@ class DHCPServer extends Model {
         # Define Model attributes
         $this->config_path = 'dhcpd';
         $this->many = true;
-        $this->subsystem = "dhcpd";
+        $this->subsystem = 'dhcpd';
         $this->update_strategy = 'merge';
         $this->verbose_name = 'DHCP Server';
 
