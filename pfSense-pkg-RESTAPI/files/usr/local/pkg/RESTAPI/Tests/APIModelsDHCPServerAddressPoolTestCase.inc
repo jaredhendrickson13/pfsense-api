@@ -17,7 +17,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
     public function test_address_pool_cannot_overlap_primary_address_pool(): void {
         # Define the parent DHCPServer's address pool
         $dhcp_server = new DHCPServer(id: 'lan', range_from: '192.168.1.15', range_to: '192.168.1.30', async: false);
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
 
         # Ensure an error is thrown if we try to create a DHCPServerAddressPool that overlaps with the primary pool
         $this->assert_throws_response(
@@ -45,7 +45,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
             range_to: '192.168.1.210',
             async: false,
         );
-        $pool->create();
+        $pool->create(apply: true);
 
         # Ensure an error is thrown if we try to create a DHCPServerAddressPool that overlaps with another address pool
         $this->assert_throws_response(
@@ -62,7 +62,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
         );
 
         # Delete the address pool
-        $pool->delete();
+        $pool->delete(apply: true);
     }
 
     /**
@@ -76,7 +76,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
             ipaddr: '192.168.1.205',
             async: false,
         );
-        $static_mapping->create();
+        $static_mapping->create(apply: true);
 
         # Ensure an error is thrown if we try to create a DHCPServerAddressPool that overlaps with the static mapping
         $this->assert_throws_response(
@@ -93,7 +93,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
         );
 
         # Delete the static mapping
-        $static_mapping->delete();
+        $static_mapping->delete(apply: true);
     }
 
     /**
@@ -255,7 +255,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
     public function test_crud_dhcpd(): void {
         # Switch the DHCP server backend to ISC DHCP (dhcpd)
         $backend = new DHCPServerBackend(dhcpbackend: 'isc', async: false);
-        $backend->update();
+        $backend->update(apply: true);
 
         # Create an address pool to test with
         $pool = new DHCPServerAddressPool(
@@ -277,7 +277,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
             denyunknown: 'enabled',
             async: false,
         );
-        $pool->create();
+        $pool->create(apply: true);
 
         # Ensure the pool is found in dhcpd.conf
         $dhcpd_conf = file_get_contents('/var/dhcpd/etc/dhcpd.conf');
@@ -316,7 +316,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
             denyunknown: 'class',
             async: false,
         );
-        $pool->update();
+        $pool->update(apply: true);
 
         # Ensure the updated pool is found in dhcpd.conf
         $dhcpd_conf = file_get_contents('/var/dhcpd/etc/dhcpd.conf');
@@ -336,7 +336,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
         $this->assert_str_contains($dhcpd_conf, 'option domain-name-servers 127.0.1.53;');
 
         # Delete the pool and ensure it's no longer found in dhcpd.conf
-        $pool->delete();
+        $pool->delete(apply: true);
         $dhcpd_conf = file_get_contents('/var/dhcpd/etc/dhcpd.conf');
         $this->assert_str_does_not_contain($dhcpd_conf, 'range 192.168.1.205 192.168.1.210;');
     }
@@ -347,7 +347,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
     public function test_crud_kea(): void {
         # Switch the DHCP server backend to Kea DHCP (kea-dhcp4)
         $backend = new DHCPServerBackend(dhcpbackend: 'kea', async: false);
-        $backend->update();
+        $backend->update(apply: true);
 
         # Create an address pool to test with
         # TODO: A current bug in pfSense prevents us from apply address pools with winsservers set. Once this bug
@@ -367,7 +367,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
             ntpserver: ['127.0.0.123'],
             async: false,
         );
-        $pool->create();
+        $pool->create(apply: true);
 
         # Ensure the pool is found in kea-dhcp4.conf
         $kea_conf = file_get_contents('/usr/local/etc/kea/kea-dhcp4.conf');
@@ -409,7 +409,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
             dnsserver: ['127.0.1.53'],
             ntpserver: ['127.0.1.123'],
         );
-        $pool->update();
+        $pool->update(apply: true);
 
         # Ensure the updated pool is found in kea-dhcp4.conf
         $kea_conf = file_get_contents('/usr/local/etc/kea/kea-dhcp4.conf');
@@ -437,7 +437,7 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
         );
 
         # Delete this DHCP pool and ensure it is no longe present in kea-dhcp4.conf
-        $pool->delete();
+        $pool->delete(apply: true);
         $kea_conf = file_get_contents('/usr/local/etc/kea/kea-dhcp4.conf');
         $this->assert_str_does_not_contain($kea_conf, $pool->range_from->value . ' - ' . $pool->range_to->value);
     }

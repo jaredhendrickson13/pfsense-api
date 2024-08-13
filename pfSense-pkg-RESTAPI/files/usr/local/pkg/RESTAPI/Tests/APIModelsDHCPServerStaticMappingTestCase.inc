@@ -16,7 +16,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
     public function test_ipaddr_cannot_overlap_vip(): void {
         # Create a virtual IP to test with
         $vip = new VirtualIP(interface: 'lan', mode: 'ipalias', subnet: '192.168.1.205', subnet_bits: 24);
-        $vip->create();
+        $vip->create(apply: true);
 
         # Ensure an error is thrown if we try to create a DHCPServerStaticMapping with the IP assigned to the virtual IP
         $this->assert_throws_response(
@@ -33,7 +33,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
         );
 
         # Delete the vip
-        $vip->delete();
+        $vip->delete(apply: true);
     }
 
     /**
@@ -47,7 +47,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
             range_to: '192.168.1.215',
             async: false,
         );
-        $pool->create();
+        $pool->create(apply: true);
 
         # Ensure an error is thrown if we try to create a DHCPServerStaticMapping with the IP within the address pool
         $this->assert_throws_response(
@@ -64,7 +64,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
         );
 
         # Delete the pool
-        $pool->delete();
+        $pool->delete(apply: true);
     }
 
     /**
@@ -73,7 +73,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
     public function test_ipaddr_cannot_overlap_primary_pool(): void {
         # Update the DHCP server primary pool
         $dhcp_server = new DHCPServer(id: 'lan', range_from: '192.168.1.10', range_to: '192.168.1.15', async: false);
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
 
         # Ensure an error is thrown if we try to create a DHCPServerStaticMapping within the primary pool
         $this->assert_throws_response(
@@ -153,7 +153,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
     public function test_crud_dhcpd(): void {
         # Switch our DHCP backend to ISC DHCP
         $dhcp_backend = new DHCPServerBackend(dhcpbackend: 'isc', async: false);
-        $dhcp_backend->update();
+        $dhcp_backend->update(apply: true);
 
         # Create a new static mapping to test with
         $static_mapping = new DHCPServerStaticMapping(
@@ -173,7 +173,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
             arp_table_static_entry: true,
             async: false,
         );
-        $static_mapping->create();
+        $static_mapping->create(apply: true);
 
         # Ensure each field is correctly represented in dhcpd.conf
         $dhcp_conf = file_get_contents('/var/dhcpd/etc/dhcpd.conf');
@@ -207,7 +207,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
             winsserver: ['127.0.1.42'],
             ntpserver: ['127.0.1.123'],
         );
-        $static_mapping->update();
+        $static_mapping->update(apply: true);
 
         # Ensure each field is correctly represented in dhcpd.conf
         $dhcp_conf = file_get_contents('/var/dhcpd/etc/dhcpd.conf');
@@ -225,7 +225,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
         $this->assert_str_contains($dhcp_conf, 'option ntp-servers 127.0.1.123;');
 
         # Delete the static mapping and ensure it no longer exists
-        $static_mapping->delete();
+        $static_mapping->delete(apply: true);
         $dhcp_conf = file_get_contents('/var/dhcpd/etc/dhcpd.conf');
         $this->assert_str_does_not_contain($dhcp_conf, "host s_$static_mapping->parent_id\_$static_mapping->id {");
     }
@@ -236,7 +236,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
     public function test_crud_kea(): void {
         # Switch our DHCP backend to Kea DHCP
         $dhcp_backend = new DHCPServerBackend(dhcpbackend: 'kea', async: false);
-        $dhcp_backend->update();
+        $dhcp_backend->update(apply: true);
 
         # Create a new static mapping to test with
         $static_mapping = new DHCPServerStaticMapping(
@@ -256,7 +256,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
             arp_table_static_entry: true,
             async: false,
         );
-        $static_mapping->create();
+        $static_mapping->create(apply: true);
 
         # Read the kea-dhcp4.conf and ensure each field is correctly represented in kea-dhcp4.conf reservations
         $kea_conf = json_decode(file_get_contents('/usr/local/etc/kea/kea-dhcp4.conf'), associative: true);
@@ -289,7 +289,7 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase {
         );
 
         # Delete the static mapping and ensure there are no more Kea reservations registered
-        $static_mapping->delete();
+        $static_mapping->delete(apply: true);
         $kea_conf = json_decode(file_get_contents('/usr/local/etc/kea/kea-dhcp4.conf'), associative: true);
         $this->assert_is_empty($kea_conf['Dhcp4']['subnet4'][0]['reservations']);
     }
