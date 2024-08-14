@@ -33,4 +33,13 @@ trait BaseTraits {
     public function get_classes_in_namespace(bool $shortnames = false): array {
         return get_classes_from_namespace((new ReflectionClass($this))->getNamespaceName(), shortnames: $shortnames);
     }
+
+    /**
+     * Logs an error to the syslog.
+     * @param string $message The error message to write to the syslog
+     */
+    public static function log_error(string $message): void {
+        # Call the pfSense `log_error` function
+        log_error($message);
+    }
 }

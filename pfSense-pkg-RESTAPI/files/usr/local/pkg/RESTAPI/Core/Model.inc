@@ -710,15 +710,6 @@ class Model {
     }
 
     /**
-     * Logs an error to the syslog.
-     * @param string $message The error message to write to the syslog
-     */
-    public static function log_error(string $message): void {
-        # Call the pfSense `log_error` function
-        log_error($message);
-    }
-
-    /**
      * Converts this Model object into it's internal pfSense configuration form.
      * @return array|string The internal value suitable for writing to the pfSense configuration.
      */
