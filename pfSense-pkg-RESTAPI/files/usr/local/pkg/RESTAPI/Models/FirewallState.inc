@@ -3,6 +3,8 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Core\ModelSet;
+use RESTAPI\Dispatchers\FirewallStateTableResetDispatcher;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
@@ -119,6 +121,18 @@ class FirewallState extends Model {
      */
     protected function get_pf_states(): array {
         return pfSense_get_pf_states();
+    }
+
+    /**
+     * Resets the entire state table.
+     * @note This action is performed in the background and on a delay to prevent the API from hanging or timing out.
+     */
+    public static function delete_all(): ModelSet|Model
+    {
+        # Initiate the state table reset in the background
+        $dispatcher = new FirewallStateTableResetDispatcher(async: true);
+        $dispatcher->spawn_process();
+        return new ModelSet();
     }
 
     /**
