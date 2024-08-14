@@ -92,6 +92,10 @@ This is useful when you need to remove a large number of objects from the system
 cleaning up old data, or removing objects that are no longer needed. This is primarily used as a method of deleting
 objects without requiring an ID.
 
+At least one query parameter must be provided in the DELETE request. This is to ensure that you are
+intentionally deleting objects, and to prevent accidental deletions of all objects in the system. If the desired action is
+to delete all objects, you can set the `all` query parameter to `true`.
+
 !!! Warning
     - This will delete all objects that match the query. Be sure to use caution when
     deleting objects in this way to avoid disruptions.
@@ -101,6 +105,7 @@ objects without requiring an ID.
 !!! Note
     - Not all plural endpoints support DELETE requests. Please refer to the [documentation](https://pfrest.org/api-docs/) for
     the specific endpoint you are working with to determine if PUT requests are supported.
+    - The `all` query parameter is exclusive to DELETE requests to plural endpoints.
     - The [`apply` control parameter](COMMON_CONTROL_PARAMETERS.md#apply) has no effect on DELETE requests to plural endpoints.
     Unless the endpoint always applies changes immediately, you must make a separate call to the applicable apply endpoint
     to apply the change.
