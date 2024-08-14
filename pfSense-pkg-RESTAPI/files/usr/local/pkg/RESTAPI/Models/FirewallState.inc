@@ -65,6 +65,11 @@ class FirewallState extends Model {
             help_text: 'The destination address listed in the state. Note: Depending on the `protocol`, this value may ' .
                 'contain the destination port as well.',
         );
+        $this->state = new StringField(
+            default: null,
+            allow_null: true,
+            help_text: 'The current status of the firewall state.',
+        );
         $this->age = new StringField(
             default: null,
             allow_null: true,
