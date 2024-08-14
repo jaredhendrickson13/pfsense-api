@@ -956,4 +956,31 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         # Delete the alias
         $alias->delete();
     }
+
+    /**
+     * Checks that the 'delete_all()' actually deletes all Model objects.
+     */
+    public function test_delete_all(): void
+    {
+        # Create FirewallAlias models
+        $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
+        $host_alias_0->create();
+        $host_alias_1 = new FirewallAlias(name: 'host1', type: 'host');
+        $host_alias_1->create();
+        $host_alias_2 = new FirewallAlias(name: 'host2', type: 'host');
+        $host_alias_2->create();
+        $port_alias_0 = new FirewallAlias(name: 'port0', type: 'port');
+        $port_alias_0->create();
+        $port_alias_1 = new FirewallAlias(name: 'port1', type: 'port');
+        $port_alias_1->create();
+        $port_alias_2 = new FirewallAlias(name: 'port2', type: 'port');
+        $port_alias_2->create();
+
+        # Delete all the aliases
+        $deleted_aliases = FirewallAlias::delete_all();
+
+        # Ensure all the aliases were deleted
+        $this->assert_equals($deleted_aliases->count(), 6);
+        $this->assert_equals(FirewallAlias::read_all()->count(), 0);
+    }
 }

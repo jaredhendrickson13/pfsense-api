@@ -645,4 +645,40 @@ class APICoreEndpointTestCase extends TestCase {
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->code, 200);
     }
+
+    /**
+     * Checks that a DELETE request to a plural endpoint with the 'all' query parameter deletes all Model objects.
+     */
+    public function test_delete_all(): void
+    {
+        # Use a PUT request to create new aliases
+        \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'PUT',
+            data: [
+                ['name' => 'host_alias', 'type' => 'host'],
+                ['name' => 'network_alias1', 'type' => 'network'],
+                ['name' => 'network_alias2', 'type' => 'network'],
+                ['name' => 'port_alias', 'type' => 'port'],
+            ],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure we can make a successful DELETE request to a `many` endpoint
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'DELETE',
+            data: ['all' => true],
+            headers: ['Content-Type' => 'application/x-www-form-urlencoded'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+        $this->assert_equals(count($resp->data), 4);
+    }
 }
