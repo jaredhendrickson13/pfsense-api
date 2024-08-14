@@ -964,6 +964,12 @@ class Endpoint {
     protected function delete(): Model|ModelSet {
         # Delete multiple objects using a query if this is a many Endpoint
         if ($this->many) {
+            # Run the delete_all method if the request data contains the 'all' parameter
+            if (isset($this->request_data['all']) and $this->request_data['all'] === true) {
+                $this->get_pagination_resource_links(limit: 0, offset: 0);
+                return $this->model->delete_all();
+            }
+
             $this->get_pagination_resource_links(limit: $this->limit, offset: $this->offset);
             return $this->model->delete_many(
                 query_params: $this->request_data,

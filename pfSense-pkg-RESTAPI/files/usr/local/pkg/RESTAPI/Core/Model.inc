@@ -2268,6 +2268,17 @@ class Model {
     }
 
     /**
+     * Deletes all Model objects for this Model. This method is only available for $many Models without a $parent_model_class.
+     */
+    public static function delete_all(): ModelSet|Model {
+        # Obtain all Model objects for this Model
+        $model_objects = self::read_all();
+
+        # Delete all Model objects for this Model
+        return $model_objects->delete();
+    }
+
+    /**
      * Obtains an array of all Model classes.
      * @param $shortnames bool Set to true to obtain the shortnames of all Model classes.
      * @return array An array of all Model classes.
