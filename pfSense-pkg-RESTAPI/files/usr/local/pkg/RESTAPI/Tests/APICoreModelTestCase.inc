@@ -960,8 +960,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the 'delete_all()' actually deletes all Model objects.
      */
-    public function test_delete_all(): void
-    {
+    public function test_delete_all(): void {
         # Create FirewallAlias models
         $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
         $host_alias_0->create();

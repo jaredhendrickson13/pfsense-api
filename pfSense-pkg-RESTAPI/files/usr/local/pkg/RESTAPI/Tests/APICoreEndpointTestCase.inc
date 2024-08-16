@@ -649,8 +649,7 @@ class APICoreEndpointTestCase extends TestCase {
     /**
      * Checks that a DELETE request to a plural endpoint with the 'all' query parameter deletes all Model objects.
      */
-    public function test_delete_all(): void
-    {
+    public function test_delete_all(): void {
         # Use a PUT request to create new aliases
         \RESTAPI\Core\Tools\http_request(
             url: 'https://localhost/api/v2/firewall/aliases',
