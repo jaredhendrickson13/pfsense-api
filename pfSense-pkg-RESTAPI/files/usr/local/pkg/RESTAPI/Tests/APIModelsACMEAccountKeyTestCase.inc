@@ -96,4 +96,13 @@ class APIModelsACMEAccountKeyTestCase extends TestCase
         $rsa_key_4096 = ACMEAccountKey::generate_rsa_key(key_bits: 4096);
         $this->assert_is_greater_than(strlen($rsa_key_4096), strlen($rsa_key_2048));
     }
+
+    /**
+     * Ensure the get_acme_server_url() method works correctly
+     */
+    public function test_get_acme_server_url(): void {
+        $account_key = new ACMEAccountKey(acmeserver: 'letsencrypt-staging-2');
+        $this->assert_equals($account_key->get_acme_server_url(), 'https://acme-staging-v02.api.letsencrypt.org/directory');
+
+    }
 }

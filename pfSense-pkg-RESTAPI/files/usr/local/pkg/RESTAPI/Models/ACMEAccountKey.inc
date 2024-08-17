@@ -19,6 +19,7 @@ class ACMEAccountKey extends Model {
     public StringField $descr;
     public StringField $email;
     public StringField $acmeserver;
+    public StringField $url;
     public Base64Field $accountkey;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
@@ -73,6 +74,16 @@ class ACMEAccountKey extends Model {
     public function get_acmeserver_choices(): array {
         global $a_acmeserver;
         return array_keys($a_acmeserver);
+    }
+
+    /**
+     * Obtains the URL of the ACME server based on the 'acmeserver' field.
+     * @return string|null The modified internal value for the 'url' field.
+     */
+    public function get_acme_server_url(): ?string
+    {
+        global $a_acmeserver;
+        return $a_acmeserver[$this->acmeserver->value]['url'];
     }
 
     /**
