@@ -56,6 +56,34 @@ bSIrTCXwoMS91HTKG5P1OhjHP7WH5hhKOlWc8SFPMn1ivu760n7F1qBkj4BOiDvy
 4qYNpDCL82eUEfRtCiFmfsERhOnXRcaud8zQj/fNIOcvx5qADI1ErAJBzgp5ZGJp
 E0InZI+5q1RzueYy8+j0FX/o
 -----END PRIVATE KEY-----";
+    const EXAMPLE_RSA = "-----BEGIN RSA PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCw47cAGZKjA70v
+Fhvic3pBJqPbCsQkvLJdbSzDfA9iSyRD4sVIIrWcF8klfM8vcmp4FiSwimmPJUIF
+YdKNsM3gMLLjNaF4FaI1fQ0wwTJGAJ59ybImHDQYJwbctB0HiXCU05CI1Dtx3sft
+OXi58hZqrgZl4mUXRUO/Bvuy4O+EQHVSC1choDLb4kAWn6FX/Hk9xoqemm7Y6BYw
+QZdjSkwLdxGr9x8+8OiWtAiuU7ETX5dOUvvHKW79JWD9ocIeOBEpr0biakxC4Mye
++fpNollHAXQr6OYKmOTqpNhSrG5z5RrU4wKpQc7d9URjSz5QuRUvmcUi1ppQZ0py
+s+fyES87AgMBAAECggEAAeQ3wDxO6VDnRsNDQlr+wgbf9mKU31mxe22NpXwNn3zz
+NUCgKZCpczLqxTXHO/OT5gSwT+PQuG7GfL0++Q+cktGifcYyQFD5MLUWr4T96o62
+IyZXxGazO56Y7a/zE817pTPCOtMwb0B+PcuBLFWOlM68ATVTm0Lhj6RLQpMNmlMN
+2w/AKGTzK4e4mzsgH/8N2b9uwgCtrDeB1HWQ8nKC9ZGeL0ZYmNvVKo5Umlsh+Y/1
+PRwmaGciaap9Rrki4fHM+tHU33roIC3B6MRLdma0sLE4UoJ6IGgApL2ox4gX+qJy
+qvitGzu9Oq3f0ZVuXM/Tk9zAIiZhFiY3ISNRvDppgQKBgQDfji4HO8/4geKhLf8K
+UZxfpkVxTLj4J8b6T0olPsfe4Cj3vJu3PCjn3bT8+n6Px72Ub6HMbomSRZAnJUW2
+i5VNWRT6NQhcLN566n9O4HJLoT7OkXoJ1SRAT6X3hsxcyZtjDNGgIhsOJ64dHce/
+uu161aB1cqj0Jk1yoJiTfcEOuwKBgQDKj75jzlenbaJduCp3dbpOyjRHUdNjNmZR
+Ja6GC/iO54NRKUXLt18gEzpFdPCxrQl9t7/lHi+6m6WU1Sfss3+Xxx8fIp8Pwggh
+w1R2uZrzHzRhtAaEG9ZRTjJ7pEk/I/YBQ2OTdaWoUZKdl+B1O7sgWWJj16cUHFFf
+MYWnVcGZgQKBgQCqFD2oezTqV8bX4WqbqyNREerbHAfNpFWZsiEy3OSrB9ejQvcl
+HLvyS5aasOkA8nGlMJjkM2SuyAW4An9bNi7Mve1bvmUx22EYGrfohpHuQCrMdZln
+SaVe2Dnoa8GnBisV3HbPYaM7zayFslZ54/kw7r45HJa1yT466zupWo86aQKBgQC7
+t2ZbG9gDYwh7DbbdKg7UAXNdPKlHYhyDywXnV6Sq2kXJqxPxbCgNk4QG5g5Aufj3
+tpdw/v6AUsmqGbd8FgSCZZejxPPfKJNcpqXZuLut3xcuDCWVvC5q/qquBluS1gKe
+vRLEjtxMFfxna14phoctvWf+2tUNQAjwzPXtUv2tAQKBgAUsNWjqUE4WnI/Gu0II
+bSIrTCXwoMS91HTKG5P1OhjHP7WH5hhKOlWc8SFPMn1ivu760n7F1qBkj4BOiDvy
+4qYNpDCL82eUEfRtCiFmfsERhOnXRcaud8zQj/fNIOcvx5qADI1ErAJBzgp5ZGJp
+E0InZI+5q1RzueYy8+j0FX/o
+-----END RSA PRIVATE KEY-----";
     const EXAMPLE_ECPRV = "-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEIM52UGyF/b3kF1wcPGeEf0/npV7YpgUJBhU4zsOfRowvoAoGCCqGSM49
 AwEHoUQDQgAE1RtITpFIce3jjv2AkBqYaVRU0swODWO+DREC/xsYnaNSyVGT5hy6
@@ -121,6 +149,29 @@ H0t+b8M07WqCw6FuSkg/UcMgMMshSooVSIemL+YhK7tYQ9oQKcVdy34Xt69NDh2T
             callable: function () {
                 $validator = new X509Validator(allow_prv: true);
                 $validator->validate('not a private key!');
+            },
+        );
+    }
+
+    /**
+     * Checks that the `allow_rsa` parameter allows X509 encoded RSA private key strings.
+     */
+    public function test_allow_rsa() {
+        # Ensure valid X509 RSA private key strings are accepted
+        $this->assert_does_not_throw(
+            callable: function () {
+                $validator = new X509Validator(allow_crt: false, allow_rsa: true);
+                $validator->validate(self::EXAMPLE_RSA);
+            },
+        );
+
+        # Ensure non X509 RSA private key strings are rejected
+        $this->assert_throws_response(
+            response_id: 'X509_VALIDATOR_INVALID_VALUE',
+            code: 400,
+            callable: function () {
+                $validator = new X509Validator(allow_rsa: true);
+                $validator->validate('not an RSA private key!');
             },
         );
     }
