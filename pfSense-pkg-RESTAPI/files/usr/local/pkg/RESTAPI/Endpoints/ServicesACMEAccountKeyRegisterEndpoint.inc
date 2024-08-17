@@ -16,6 +16,9 @@ class ServicesACMEAccountKeyRegisterEndpoint extends Endpoint {
         $this->model_name = 'ACMEAccountKeyRegister';
         $this->request_method_options = ['POST'];
 
+        # Set help text
+        $this->post_help_text = "Registers an existing ACME Account Key.";
+
         # Construct the parent Endpoint object
         parent::__construct();
     }
