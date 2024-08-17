@@ -6,8 +6,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\ACMEAccountKey;
 use RESTAPI\Models\ACMEAccountKeyRegister;
 
-class APIModelsACMEAccountKeyRegisterTestCase extends TestCase
-{
+class APIModelsACMEAccountKeyRegisterTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-acme'];
 
     /**
@@ -26,12 +25,11 @@ class APIModelsACMEAccountKeyRegisterTestCase extends TestCase
     /**
      * Checks that failed registration correctly populates the success field.
      */
-    public function test_register_failure(): void
-    {
+    public function test_register_failure(): void {
         # Google's ACME servers requires an email address to register an account. Try to register one without an email
         # to trigger a failure.
         $this->assert_throws_response(
-            response_id: "ACME_SERVER_ACCOUNT_KEY_REGISTER_FAILED",
+            response_id: 'ACME_SERVER_ACCOUNT_KEY_REGISTER_FAILED',
             code: 500,
             callable: function () {
                 $account_key = new ACMEAccountKey(name: 'test', acmeserver: 'google-staging');
@@ -39,7 +37,7 @@ class APIModelsACMEAccountKeyRegisterTestCase extends TestCase
 
                 $register = new ACMEAccountKeyRegister(name: $account_key->name->value);
                 $register->create();
-            }
+            },
         );
     }
 }

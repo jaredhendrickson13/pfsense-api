@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\ACMEAccountKey;
 
-class APIModelsACMEAccountKeyTestCase extends TestCase
-{
+class APIModelsACMEAccountKeyTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-acme'];
 
     /**
@@ -18,7 +17,7 @@ class APIModelsACMEAccountKeyTestCase extends TestCase
             name: 'test_key',
             descr: 'A test key',
             email: 'test@example.com',
-            acmeserver: 'letsencrypt-staging-2'
+            acmeserver: 'letsencrypt-staging-2',
         );
         $account_key->create();
 
@@ -37,7 +36,7 @@ class APIModelsACMEAccountKeyTestCase extends TestCase
             descr: 'An updated test key',
             email: 'updated@example.com',
             acmeserver: 'google-production',
-            accountkey: $new_key
+            accountkey: $new_key,
         );
         $account_key->update();
 
@@ -57,8 +56,7 @@ class APIModelsACMEAccountKeyTestCase extends TestCase
     /**
      * Ensure the 'email' field can be empty
      */
-    public function test_email_field_can_be_empty(): void
-    {
+    public function test_email_field_can_be_empty(): void {
         $this->assert_does_not_throw(
             callable: function () {
                 # Create a new ACMEAccountKey object with an empty email field
@@ -66,10 +64,10 @@ class APIModelsACMEAccountKeyTestCase extends TestCase
                     name: 'test_key',
                     descr: 'A test key',
                     email: '',
-                    acmeserver: 'letsencrypt-staging-2'
+                    acmeserver: 'letsencrypt-staging-2',
                 );
                 $account_key->validate();
-            }
+            },
         );
     }
 
@@ -85,8 +83,7 @@ class APIModelsACMEAccountKeyTestCase extends TestCase
     /**
      * Ensure the generate_rsa_key method generates a valid RSA key.
      */
-    public function test_generate_rsa_key(): void
-    {
+    public function test_generate_rsa_key(): void {
         $rsa_key = ACMEAccountKey::generate_rsa_key();
         $this->assert_str_contains($rsa_key, '-----BEGIN PRIVATE KEY-----');
         $this->assert_str_contains($rsa_key, '-----END PRIVATE KEY-----');
@@ -102,7 +99,9 @@ class APIModelsACMEAccountKeyTestCase extends TestCase
      */
     public function test_get_acme_server_url(): void {
         $account_key = new ACMEAccountKey(acmeserver: 'letsencrypt-staging-2');
-        $this->assert_equals($account_key->get_acme_server_url(), 'https://acme-staging-v02.api.letsencrypt.org/directory');
-
+        $this->assert_equals(
+            $account_key->get_acme_server_url(),
+            'https://acme-staging-v02.api.letsencrypt.org/directory',
+        );
     }
 }

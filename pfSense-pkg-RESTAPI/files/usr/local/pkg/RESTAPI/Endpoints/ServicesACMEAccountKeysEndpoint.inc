@@ -21,7 +21,8 @@ class ServicesACMEAccountKeysEndpoint extends Endpoint {
         parent::__construct();
 
         # Set help text. This must be done after constructing the parent model to append to default help text.
-        $this->put_help_text .= '<br><br>Note: You may need to register the account keys with the ACME server after '.
+        $this->put_help_text .=
+            '<br><br>Note: You may need to register the account keys with the ACME server after ' .
             'replacing. You can register account keys using the /api/v2/services/acme/account_key/register endpoint.';
     }
 }

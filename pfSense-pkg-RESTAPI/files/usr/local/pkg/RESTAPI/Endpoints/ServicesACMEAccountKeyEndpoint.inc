@@ -20,10 +20,12 @@ class ServicesACMEAccountKeyEndpoint extends Endpoint {
         parent::__construct();
 
         # Set help text. This must be done after constructing the parent model to append to default help text.
-        $this->post_help_text .= '<br><br>Note: You must register the account key with the ACME server after creating '.
+        $this->post_help_text .=
+            '<br><br>Note: You must register the account key with the ACME server after creating ' .
             'it. You can register the account key using the /api/v2/services/acme/account_key/register endpoint.';
-        $this->patch_help_text .= '<br><br>Note: You may need to re-register the account key with the ACME server '.
-            'after updating. You can register the account key using the /api/v2/services/acme/account_key/register '.
+        $this->patch_help_text .=
+            '<br><br>Note: You may need to re-register the account key with the ACME server ' .
+            'after updating. You can register the account key using the /api/v2/services/acme/account_key/register ' .
             'endpoint.';
     }
 }

@@ -37,11 +37,7 @@ class ACMEAccountKey extends Model {
         ];
 
         # Define model Fields
-        $this->name = new StringField(
-            required: true,
-            unique: true,
-            help_text: 'The name of the ACME account key.',
-        );
+        $this->name = new StringField(required: true, unique: true, help_text: 'The name of the ACME account key.');
         $this->descr = new StringField(
             default: '',
             allow_empty: true,
@@ -81,8 +77,7 @@ class ACMEAccountKey extends Model {
      * Obtains the URL of the ACME server based on the 'acmeserver' field.
      * @return string|null The modified internal value for the 'url' field.
      */
-    public function get_acme_server_url(): ?string
-    {
+    public function get_acme_server_url(): ?string {
         global $a_acmeserver;
         return $a_acmeserver[$this->acmeserver->value]['url'];
     }
@@ -90,11 +85,11 @@ class ACMEAccountKey extends Model {
     /**
      * Generates a new RSA private key as the 'accountkey' field's default value.
      */
-    public static function generate_rsa_key(int $key_bits=self::RSA_KEY_BITS): string {
+    public static function generate_rsa_key(int $key_bits = self::RSA_KEY_BITS): string {
         # Define the rsa key configuration
         $config = [
-            "private_key_bits" => $key_bits,
-            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+            'private_key_bits' => $key_bits,
+            'private_key_type' => OPENSSL_KEYTYPE_RSA,
         ];
 
         # Generate a new rsa key

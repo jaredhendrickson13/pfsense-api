@@ -41,7 +41,7 @@ class ACMEAccountKeyRegister extends Model {
      * since the registration status is not stored and works in real-time.
      */
     protected function get_internal(): array {
-        return ["success" => null];
+        return ['success' => null];
     }
 
     /**
@@ -49,7 +49,6 @@ class ACMEAccountKeyRegister extends Model {
      */
     protected function _create(): void {
     }
-
 
     /**
      * Registers the ACME account key with the upstream ACME server
@@ -64,15 +63,15 @@ class ACMEAccountKeyRegister extends Model {
             name: $account_key->name->value,
             ca: $ca,
             key: $account_key->accountkey->value,
-            email: $account_key->email->value
+            email: $account_key->email->value,
         );
 
         # Throw an error if the registration failed
         if (!$success) {
             throw new ServerError(
-                message: "Failed to register the ACME account key with the upstream ACME server. You can view the log ".
+                message: 'Failed to register the ACME account key with the upstream ACME server. You can view the log ' .
                     "file at /tmp/acme/{$account_key->name->value}/acme_issuecert.log for more information.",
-                response_id: "ACME_SERVER_ACCOUNT_KEY_REGISTER_FAILED"
+                response_id: 'ACME_SERVER_ACCOUNT_KEY_REGISTER_FAILED',
             );
         }
     }
