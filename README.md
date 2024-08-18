@@ -48,7 +48,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 
 ```
-pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v1.7.5/pfSense-2.7-pkg-API.pkg && /etc/rc.restart_webgui
+pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v1.7.6/pfSense-2.7-pkg-API.pkg && /etc/rc.restart_webgui
 ```
 
 <br>
