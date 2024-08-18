@@ -4167,6 +4167,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall rules can only be applied to one interface unless it is a floating rule"
         ],
+        4249 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Port forward associated rule ID must be a valid option. Options are pass or an empty string"
+        ],
 
         //5000-5999 reserved for /api/v1/user API calls
         5000 => [

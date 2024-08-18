@@ -1920,6 +1920,13 @@ paths:
                 target:
                   description: IP address or alias to forward traffic to.
                   type: string
+                associated-rule-id:
+                  description: The associated rule ID mode for this port forward rule.
+                  type: string
+                  default: 'pass'
+                  enum:
+                    - ''
+                    - 'pass'
                 top:
                   default: false
                   description: Place this firewall rule at the top of the access control
@@ -2050,6 +2057,13 @@ paths:
                 target:
                   description: IP address or alias to forward traffic to.
                   type: string
+                associated-rule-id:
+                  description: The associated rule ID mode for this port forward rule.
+                  type: string
+                  default: 'pass'
+                  enum:
+                    - ''
+                    - 'pass'
                 top:
                   default: false
                   description: Place this firewall rule at the top of the access control

@@ -249,6 +249,19 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         }
     }
 
+    private function __validate_associated_rule_id() {
+        # Optionally allow client to specify an associated rule ID
+        if (isset($this->initial_data["associated-rule-id"])) {
+            # Ensure the associated rule id is a valid option
+            if (in_array($this->initial_data["associated-rule-id"], ["pass", ""])) {
+                $this->validated_data["associated-rule-id"] = $this->initial_data["associated-rule-id"];
+            }
+            else {
+                $this->errors[] = APIResponse\get(4249);
+            }
+        }
+    }
+
     public function validate_payload() {
         # Run each field validator method
         $this->__validate_id();
@@ -265,10 +278,10 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         $this->__validate_nosync();
         $this->__validate_descr();
         $this->__validate_natreflection();
+        $this->__validate_associated_rule_id();
 
         # Add static field values
         $this->updated_by_msg = $this->client->username."@".$this->client->ip_address." (API)";
-        $this->validated_data["associated-rule-id"] = "pass";
         $this->validated_data["updated"] = array("time" => time(), "username" => $this->updated_by_msg);
     }
 }
