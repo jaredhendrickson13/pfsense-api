@@ -2,12 +2,22 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\ACMEAccountKey;
 use RESTAPI\Models\ACMEAccountKeyRegister;
 
 class APIModelsACMEAccountKeyRegisterTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-acme'];
+
+    /**
+     * Sets up the test case.
+     */
+    public function setup(): void {
+        # This test requires system time to be accurate so ntp must be synced
+        new Command('pkill ntpd');
+        new Command('ntpdate pool.ntp.org');
+    }
 
     /**
      * Checks that we can successfully register an ACME account key.
