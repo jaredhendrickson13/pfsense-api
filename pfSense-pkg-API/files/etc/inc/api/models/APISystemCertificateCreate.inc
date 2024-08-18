@@ -63,7 +63,6 @@ class APISystemCertificateCreate extends APIModel {
         if ($this->cert_method === "existing") {
             $this->__validate_crt();
             $this->__validate_prv();
-            $this->validated_data["type"] = "server";
         }
 
         # Validate 'internal' method fields
