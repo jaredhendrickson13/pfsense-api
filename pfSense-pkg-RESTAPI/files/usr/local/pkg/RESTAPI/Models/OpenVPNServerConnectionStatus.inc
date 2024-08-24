@@ -8,6 +8,7 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\ServerError;
 
 class OpenVPNServerConnectionStatus extends Model {
     public StringField $common_name;
@@ -120,5 +121,26 @@ class OpenVPNServerConnectionStatus extends Model {
      */
     protected function get_openvpn_conn_statuses(): array {
         return openvpn_get_active_servers()[$this->parent_id]['conns'];
+    }
+
+    /**
+     * Kills this OpenVPN server connection.
+     */
+    public function _delete(): void
+    {
+        # Attempt to kill the OpenVPN server connection
+        $result = openvpn_kill_client(
+            port: $this->parent_model->mgmt->value,
+            remipp: $this->remote_host->value,
+            client_id: $this->client_id->value
+        );
+
+        # Throw an error if the connection failed to be killed
+        if ($result !== 0) {
+            throw new ServerError(
+                message: "OpenVPN Server Connection failed to be killed. Check the OpenVPN logs for more info.",
+                response_id: "OPENVPN_SERVER_CONNECTION_STATUS_CLIENT_FAILED_TO_BE_KILLED"
+            );
+        }
     }
 }
