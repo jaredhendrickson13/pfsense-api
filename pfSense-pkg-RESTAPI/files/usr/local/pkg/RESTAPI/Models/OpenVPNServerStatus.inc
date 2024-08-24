@@ -54,6 +54,13 @@ class OpenVPNServerStatus extends Model {
             read_only: true,
             help_text: 'The management interface of the OpenVPN server.',
         );
+        $this->mode = new StringField(
+            default: null,
+            allow_empty: true,
+            allow_null: true,
+            read_only: true,
+            help_text: 'The mode of the OpenVPN server.',
+        );
         $this->conns = new NestedModelField(
             model_class: 'OpenVPNServerConnectionStatus',
             allow_empty: true,
