@@ -3,7 +3,6 @@
 namespace RESTAPI\Dispatchers;
 
 use RESTAPI\Core\Dispatcher;
-use RESTAPI\Models\RoutingGateway;
 use RESTAPI\Models\RoutingGatewayGroup;
 
 /**

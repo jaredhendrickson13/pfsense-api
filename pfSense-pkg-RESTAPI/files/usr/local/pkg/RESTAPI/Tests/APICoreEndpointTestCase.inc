@@ -2,7 +2,6 @@
 
 namespace RESTAPI\Tests;
 
-use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Endpoints\DiagnosticsARPTableEndpoint;
 use RESTAPI\Endpoints\FirewallAliasEndpoint;

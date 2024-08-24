@@ -2,16 +2,12 @@
 
 namespace RESTAPI\Models;
 
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\RoutingApplyDispatcher;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
-use RESTAPI\Fields\StringField;
-use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
-use RESTAPI\Validators\RegexValidator;
 
 /**
  * Defines a Model for interacting with a Gateway Group priority item.

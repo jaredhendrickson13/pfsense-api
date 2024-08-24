@@ -4,7 +4,6 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\OpenVPNClientStatus;
-use RESTAPI\Models\OpenVPNServerStatus;
 
 class APIModelsOpenVPNClientStatusTestCase extends TestCase {
     const MOCK_DATA = [

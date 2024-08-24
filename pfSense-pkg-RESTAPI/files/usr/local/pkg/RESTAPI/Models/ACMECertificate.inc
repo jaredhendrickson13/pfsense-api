@@ -4,13 +4,11 @@ namespace RESTAPI\Models;
 
 use RESTAPI;
 use RESTAPI\Core\Model;
-use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\RegexValidator;
 use RESTAPI\Validators\X509Validator;
 

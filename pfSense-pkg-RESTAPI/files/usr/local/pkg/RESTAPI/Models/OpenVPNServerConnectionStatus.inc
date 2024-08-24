@@ -3,10 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
-use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
-use RESTAPI\Fields\NestedModelField;
-use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ServerError;
 

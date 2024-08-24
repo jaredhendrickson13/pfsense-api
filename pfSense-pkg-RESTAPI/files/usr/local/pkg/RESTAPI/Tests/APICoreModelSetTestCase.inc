@@ -7,7 +7,6 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI;
 use RESTAPI\Core\ModelSet;
 use RESTAPI\Models\FirewallAlias;
-use RESTAPI\Models\FirewallRule;
 
 /**
  * Defines test case for testing RESTAPI\Core\ModelSet.

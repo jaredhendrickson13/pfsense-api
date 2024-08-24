@@ -6,7 +6,6 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\RoutingGateway;
 use RESTAPI\Models\RoutingGatewayGroup;
 use RESTAPI\Models\RoutingGatewayGroupPriority;
-use RESTAPI\Models\VirtualIP;
 
 class APIModelsRoutingGatewayGroupPriorityTestCase extends TestCase {
     /**

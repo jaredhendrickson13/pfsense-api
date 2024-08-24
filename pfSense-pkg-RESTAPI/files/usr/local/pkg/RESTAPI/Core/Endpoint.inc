@@ -20,7 +20,6 @@ use Error;
 use Exception;
 use RESTAPI;
 use RESTAPI\ContentHandlers\JSONContentHandler;
-use RESTAPI\Endpoints\FirewallAliasEndpoint;
 use RESTAPI\Models\RESTAPIAccessListEntry;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\VirtualIP;
