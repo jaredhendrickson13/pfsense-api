@@ -14,7 +14,7 @@ class OpenVPNServerConnectionStatus extends Model {
     public StringField $remote_host;
     public StringField $virtual_addr;
     public StringField $virtual_addr6;
-    public IntegerField $bytes_received;
+    public IntegerField $bytes_recv;
     public IntegerField $bytes_sent;
     public StringField $connect_time;
     public IntegerField $connect_time_unix;
@@ -59,7 +59,7 @@ class OpenVPNServerConnectionStatus extends Model {
             read_only: true,
             help_text: 'The virtual IPv6 address of the OpenVPN server connection.',
         );
-        $this->bytes_received = new IntegerField(
+        $this->bytes_recv = new IntegerField(
             default: null,
             allow_null: true,
             read_only: true,
