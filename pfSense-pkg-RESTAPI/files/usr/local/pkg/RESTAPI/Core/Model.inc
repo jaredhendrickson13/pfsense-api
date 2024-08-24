@@ -756,12 +756,18 @@ class Model {
      * @return array The array of internal objects without any additional processing performed.
      */
     public function get_internal_objects(): array {
+        global $mock_internal_objects;
+
         # Throw an error if both `config_path` and `internal_callable` are set.
         if ($this->config_path and $this->internal_callable) {
             throw new ServerError(
                 message: 'Models cannot define both a config path and an internal callable.',
                 response_id: 'MODEL_WITH_CONFIG_PATH',
             );
+        }
+        # Use mock data if the $mock_internal_objects global is set
+        elseif ($mock_internal_objects) {
+            $internal_objects = $mock_internal_objects;
         }
         # Obtain the internal objects from the config path if specified
         elseif ($this->config_path) {
