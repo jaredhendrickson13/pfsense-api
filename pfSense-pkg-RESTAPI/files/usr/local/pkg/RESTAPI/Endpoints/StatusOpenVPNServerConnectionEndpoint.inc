@@ -18,7 +18,7 @@ class StatusOpenVPNServerConnectionEndpoint extends Endpoint {
         $this->request_method_options = ['GET', 'DELETE'];
 
         # Set help text
-        $this->delete_help_text = "Kills an existing OpenVPN Server Connection";
+        $this->delete_help_text = 'Kills an existing OpenVPN Server Connection';
 
         # Construct the parent Endpoint object
         parent::__construct();
