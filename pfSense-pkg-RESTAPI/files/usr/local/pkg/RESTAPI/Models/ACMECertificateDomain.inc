@@ -411,7 +411,7 @@ class ACMECertificateDomain extends Model {
         );
         $this->nsupdate_keyalgo = new StringField(
             default: '',
-            choices: ['', 157, 165, 164, 163, 162, 161],
+            choices: ['', '157', '165', '164', '163', '162', '161'],
             allow_empty: true,
             internal_name: 'dns_nsupdatensupdate_keyalgo',
             conditions: ['method' => 'dns_nsupdate'],
