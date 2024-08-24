@@ -63,12 +63,14 @@ class OpenVPNServerStatus extends Model {
         );
         $this->conns = new NestedModelField(
             model_class: 'OpenVPNServerConnectionStatus',
+            default: [],
             allow_empty: true,
             read_only: true,
             help_text: 'The current connections to the OpenVPN server.',
         );
         $this->routes = new NestedModelField(
             model_class: 'OpenVPNServerRouteStatus',
+            default: [],
             allow_empty: true,
             read_only: true,
             help_text: 'The current routes of the OpenVPN server.',
