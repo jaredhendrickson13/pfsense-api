@@ -852,11 +852,7 @@ class Endpoint {
 
             # Assign the authenticated client object context to the Model
             $this->model->client = $this->client;
-
-            # Set this Model's async property if specified in the request data
-            if (isset($this->request_data['async'])) {
-                $this->model->async = $this->request_data['async'];
-            }
+            $this->model->async = $this->async;
 
             # Perform the appropriate action based on the request method
             switch ($this->request_method) {
