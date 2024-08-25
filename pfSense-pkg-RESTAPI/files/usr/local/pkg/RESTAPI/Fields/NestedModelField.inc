@@ -229,6 +229,9 @@ class NestedModelField extends Field {
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
      */
     public function to_openapi_property(): array {
+        # Variables
+        $required_fields = $this->model->get_fields(required_only: true);
+
         # Assign primitive property attributes
         $openapi_property = [];
         $openapi_property['description'] = $this->help_text . '<br>' . $this->get_conditions_text();
@@ -244,17 +247,17 @@ class NestedModelField extends Field {
             $openapi_property['items'] = [
                 'allOf' => [['$ref' => "#/components/schemas/$this->model_class_short"], ['type' => 'object']],
             ];
+            if ($required_fields) {
+                $openapi_property['items']['allOf'][1]['required'] = $required_fields;
+            }
         } else {
             $openapi_property['allOf'] = [
                 ['$ref' => "#/components/schemas/$this->model_class_short"],
                 ['type' => 'object'],
             ];
-        }
-
-        # Only add required fields if there are any
-        $required_fields = $this->model->get_fields(required_only: true);
-        if ($required_fields) {
-            $openapi_property['allOf'][1]['required'] = $required_fields;
+            if ($required_fields) {
+                $openapi_property['allOf']['required'] = $required_fields;
+            }
         }
 
         return $openapi_property;
