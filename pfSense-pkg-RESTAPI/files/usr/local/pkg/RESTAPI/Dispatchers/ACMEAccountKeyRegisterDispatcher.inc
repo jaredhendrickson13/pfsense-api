@@ -26,7 +26,7 @@ class ACMEAccountKeyRegisterDispatcher extends Dispatcher {
         if (!isset($arguments['id'])) {
             throw new ServerError(
                 message: 'Failed to spawn new ACME account key registration process: No id was provided.',
-                response_id: "ACME_ACCOUNT_KEY_REGISTER_DISPATCHER_NO_ID_PROVIDED",
+                response_id: 'ACME_ACCOUNT_KEY_REGISTER_DISPATCHER_NO_ID_PROVIDED',
             );
         }
 
@@ -48,8 +48,7 @@ class ACMEAccountKeyRegisterDispatcher extends Dispatcher {
         # Throw an error if the registration failed
         if ($success) {
             file_put_contents("/tmp/acme/{$account_key->name->value}/.registered", 'registered');
-        }
-        else {
+        } else {
             file_put_contents("/tmp/acme/{$account_key->name->value}/.registered", 'failed');
         }
 

@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Dispatchers\ACMEAccountKeyRegisterDispatcher;
 
-class APIDispatchersACMEAccountKeyRegisterDispatcherTestCase extends TestCase
-{
+class APIDispatchersACMEAccountKeyRegisterDispatcherTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-acme'];
     public array $package_includes = [
         'acme/acme.inc',
@@ -25,7 +24,7 @@ class APIDispatchersACMEAccountKeyRegisterDispatcherTestCase extends TestCase
             callable: function () {
                 $dispatcher = new ACMEAccountKeyRegisterDispatcher();
                 $dispatcher->process();
-            }
+            },
         );
     }
 }

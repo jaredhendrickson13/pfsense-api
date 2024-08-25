@@ -54,12 +54,12 @@ class ACMECertificateRenew extends Model {
         $this->status = new StringField(
             default: 'pending',
             read_only: true,
-            help_text: "The status of the ACME certificate renew process. This will show 'pending' if the renew ".
-            "process is still running or 'completed' if the renew process has finished. This status only ".
-            "indicates whether the renew process has completed, not whether it was successful. You will need" .
-            "to refer to the result log for that information. Note: This log is only populated when the " .
-            'renew process is initiated via REST API, not when it is initiated via the pfSense webConfigurator ' .
-            'or auto-renewals.',
+            help_text: "The status of the ACME certificate renew process. This will show 'pending' if the renew " .
+                "process is still running or 'completed' if the renew process has finished. This status only " .
+                'indicates whether the renew process has completed, not whether it was successful. You will need' .
+                'to refer to the result log for that information. Note: This log is only populated when the ' .
+                'renew process is initiated via REST API, not when it is initiated via the pfSense webConfigurator ' .
+                'or auto-renewals.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
@@ -83,15 +83,15 @@ class ACMECertificateRenew extends Model {
             if (file_exists("/tmp/.RESTAPI.acme.{$cert->name->value}.renewal_result.json")) {
                 $renewal_json = json_decode(
                     file_get_contents("/tmp/.RESTAPI.acme.{$cert->name->value}.renewal_result.json"),
-                    associative: true
+                    associative: true,
                 );
             }
 
             $renewals[$cert->id] = [];
             $renewals[$cert->id]['certificate'] = $cert->name->value;
-            $renewals[$cert->id]['result_log'] = ($renewal_json['result_log'] ?? null);
-            $renewals[$cert->id]['last_updated'] = ($renewal_json['last_updated'] ?? null);
-            $renewals[$cert->id]['status'] = ($renewal_json['status'] ?? null);
+            $renewals[$cert->id]['result_log'] = $renewal_json['result_log'] ?? null;
+            $renewals[$cert->id]['last_updated'] = $renewal_json['last_updated'] ?? null;
+            $renewals[$cert->id]['status'] = $renewal_json['status'] ?? null;
         }
 
         return $renewals;
@@ -118,5 +118,4 @@ class ACMECertificateRenew extends Model {
         # Update the model data with the new renewal details
         $this->from_internal();
     }
-
 }

@@ -50,10 +50,10 @@ class ACMECertificateIssue extends Model {
         $this->status = new StringField(
             default: 'pending',
             read_only: true,
-            help_text: "The status of the ACME certificate issue process. This will show 'pending' if the issue ".
-                "process is still running or 'completed' if the issue process has finished. This status only ".
-                "indicates whether the issue process has completed, not whether it was successful. You will need" .
-                "to refer to the result log for that information.",
+            help_text: "The status of the ACME certificate issue process. This will show 'pending' if the issue " .
+                "process is still running or 'completed' if the issue process has finished. This status only " .
+                'indicates whether the issue process has completed, not whether it was successful. You will need' .
+                'to refer to the result log for that information.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
@@ -77,15 +77,15 @@ class ACMECertificateIssue extends Model {
             if (file_exists("/tmp/.RESTAPI.acme.{$cert->name->value}.issuance_result.json")) {
                 $issuance_json = json_decode(
                     file_get_contents("/tmp/.RESTAPI.acme.{$cert->name->value}.issuance_result.json"),
-                    associative: true
+                    associative: true,
                 );
             }
 
             $issuances[$cert->id] = [];
             $issuances[$cert->id]['certificate'] = $cert->name->value;
-            $issuances[$cert->id]['result_log'] = ($issuance_json['result_log'] ?? null);
-            $issuances[$cert->id]['last_updated'] = ($issuance_json['last_updated'] ?? null);
-            $issuances[$cert->id]['status'] = ($issuance_json['status'] ?? null);
+            $issuances[$cert->id]['result_log'] = $issuance_json['result_log'] ?? null;
+            $issuances[$cert->id]['last_updated'] = $issuance_json['last_updated'] ?? null;
+            $issuances[$cert->id]['status'] = $issuance_json['status'] ?? null;
         }
 
         return $issuances;
@@ -112,5 +112,4 @@ class ACMECertificateIssue extends Model {
         # Update the model data with the new issuance details
         $this->from_internal();
     }
-
 }

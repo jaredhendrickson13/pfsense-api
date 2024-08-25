@@ -6,8 +6,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Dispatchers\ACMEAccountKeyRegisterDispatcher;
 use RESTAPI\Dispatchers\ACMECertificateIssueDispatcher;
 
-class APIDispatchersACMECertificateIssueDispatcherTestCase extends TestCase
-{
+class APIDispatchersACMECertificateIssueDispatcherTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-acme'];
     public array $package_includes = [
         'acme/acme.inc',
@@ -26,7 +25,7 @@ class APIDispatchersACMECertificateIssueDispatcherTestCase extends TestCase
             callable: function () {
                 $dispatcher = new ACMECertificateIssueDispatcher();
                 $dispatcher->process();
-            }
+            },
         );
     }
 }

@@ -221,7 +221,9 @@ class Dispatcher {
         # Spawn the process in the background if this Dispatcher is asynchronous
         if ($this->async) {
             $spawn_process = new Command(
-                command: 'nohup sh ' . self::DISPATCH_SCRIPT . " $this->short_name $this->pid_file $this->timeout $arguments_json",
+                command: 'nohup sh ' .
+                    self::DISPATCH_SCRIPT .
+                    " $this->short_name $this->pid_file $this->timeout $arguments_json",
                 redirect: ">/dev/null & echo $!",
             );
             $pid = is_numeric($spawn_process->output) ? (int) $spawn_process->output : null;

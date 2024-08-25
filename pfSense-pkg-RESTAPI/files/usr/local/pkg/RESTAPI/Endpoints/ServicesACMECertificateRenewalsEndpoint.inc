@@ -19,8 +19,9 @@ class ServicesACMECertificateRenewalsEndpoint extends Endpoint {
         $this->many = true;
 
         # Set help text
-        $this->get_help_text = 'Reads all existing ACME certificate renewals. This endpoint is primarily intended to '.
-            'check the result of the ACME certificate renewal process initiated by the POST '.
+        $this->get_help_text =
+            'Reads all existing ACME certificate renewals. This endpoint is primarily intended to ' .
+            'check the result of the ACME certificate renewal process initiated by the POST ' .
             '/api/v2/services/acme/certificate/renew endpoint. This endpoint is unable to determine the status of ' .
             'renewals that were initiated outside of the REST API.';
 

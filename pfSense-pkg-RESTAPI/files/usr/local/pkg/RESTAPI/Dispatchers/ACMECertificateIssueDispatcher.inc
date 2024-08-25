@@ -26,7 +26,7 @@ class ACMECertificateIssueDispatcher extends Dispatcher {
         if (!isset($arguments['certificate'])) {
             throw new ServerError(
                 message: 'Failed to spawn new ACME certificate issue process: No certificate name was provided.',
-                response_id: "ACME_CERTIFICATE_ISSUE_DISPATCHER_NO_CERTIFICATE_PROVIDED",
+                response_id: 'ACME_CERTIFICATE_ISSUE_DISPATCHER_NO_CERTIFICATE_PROVIDED',
             );
         }
 
@@ -65,9 +65,7 @@ class ACMECertificateIssueDispatcher extends Dispatcher {
     private function set_issuance_result(string $cert, int $last_updated, string $status, string $result_log): void {
         file_put_contents(
             "/tmp/.RESTAPI.acme.$cert.issuance_result.json",
-            json_encode(
-                ['last_updated' => $last_updated, 'status' => $status, 'result_log' => $result_log,]
-            )
+            json_encode(['last_updated' => $last_updated, 'status' => $status, 'result_log' => $result_log]),
         );
     }
 }

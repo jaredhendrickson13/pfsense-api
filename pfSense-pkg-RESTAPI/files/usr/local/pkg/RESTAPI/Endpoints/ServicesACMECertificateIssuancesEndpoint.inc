@@ -19,8 +19,9 @@ class ServicesACMECertificateIssuancesEndpoint extends Endpoint {
         $this->many = true;
 
         # Set help text
-        $this->get_help_text = 'Reads all existing ACME certificate issuances. This endpoint is primarily intended to '.
-            'check the result of the ACME certificate issuance process initiated by the POST '.
+        $this->get_help_text =
+            'Reads all existing ACME certificate issuances. This endpoint is primarily intended to ' .
+            'check the result of the ACME certificate issuance process initiated by the POST ' .
             '/api/v2/services/acme/certificate/issue endpoint. This endpoint is unable to determine the status of ' .
             'issuances that were initiated outside of the REST API.';
 

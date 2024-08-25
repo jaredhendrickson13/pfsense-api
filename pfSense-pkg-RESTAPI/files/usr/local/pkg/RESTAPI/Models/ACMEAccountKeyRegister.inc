@@ -42,8 +42,8 @@ class ACMEAccountKeyRegister extends Model {
             read_only: true,
             help_text: "The registration status of the ACME account key. This will show 'pending' if the registration " .
                 "process is still running, 'registered' if the registration was successful, 'failed' if the registration " .
-                "failed, and 'unknown' if the registration status is not known. Note: This status can only be ".
-                "determined for registrations initiated through the REST API.",
+                "failed, and 'unknown' if the registration status is not known. Note: This status can only be " .
+                'determined for registrations initiated through the REST API.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
@@ -63,8 +63,10 @@ class ACMEAccountKeyRegister extends Model {
             $reg_log = "$reg_dir/acme_issuecert.log";
             $registrations[$account_key->id] = [];
             $registrations[$account_key->id]['name'] = $account_key->name->value;
-            $registrations[$account_key->id]['status'] = (file_exists($reg_file) ? file_get_contents($reg_file) : 'unknown');
-            $registrations[$account_key->id]['log'] = (file_exists($reg_log) ? file_get_contents($reg_log) : '');
+            $registrations[$account_key->id]['status'] = file_exists($reg_file)
+                ? file_get_contents($reg_file)
+                : 'unknown';
+            $registrations[$account_key->id]['log'] = file_exists($reg_log) ? file_get_contents($reg_log) : '';
         }
 
         return $registrations;
@@ -88,7 +90,7 @@ class ACMEAccountKeyRegister extends Model {
         (new ACMEAccountKeyRegisterDispatcher(async: $this->async))->spawn_process(id: $this->id);
 
         # Reload the model data in case the registration status has changed and is not unknown
-        $post_apply_status = $this->get_registrations()[$this->id]["status"];
+        $post_apply_status = $this->get_registrations()[$this->id]['status'];
         if ($post_apply_status !== 'unknown') {
             $this->status->value = $post_apply_status;
         }

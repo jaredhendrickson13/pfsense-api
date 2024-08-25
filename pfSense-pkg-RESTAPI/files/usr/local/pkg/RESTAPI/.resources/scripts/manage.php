@@ -424,8 +424,8 @@ elseif ($argv[1] == 'generatedocs') {
 # NOTIFY_DISPATCHER COMMAND
 elseif ($argv[1] == 'notifydispatcher') {
     # Decode JSON arguments if they were provided and notify the Dispatcher
-    $arguments = ($argv[3]) ? json_decode($argv[3], associative: true) : [];
-    notify_dispatcher(dispatcher_name: $argv[2],arguments: $arguments);
+    $arguments = $argv[3] ? json_decode($argv[3], associative: true) : [];
+    notify_dispatcher(dispatcher_name: $argv[2], arguments: $arguments);
 }
 # SCHEDULE_DISPATCHER COMMAND
 elseif ($argv[1] == 'scheduledispatchers') {

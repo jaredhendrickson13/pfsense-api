@@ -18,8 +18,9 @@ class ServicesACMEAccountKeyRegistrationsEndpoint extends Endpoint {
         $this->many = true;
 
         # Set help text
-        $this->get_help_text = 'Reads all existing ACME account registrations. This endpoint is primarily intended to '.
-            'check the result of the ACME account key registration process initiated by the POST '.
+        $this->get_help_text =
+            'Reads all existing ACME account registrations. This endpoint is primarily intended to ' .
+            'check the result of the ACME account key registration process initiated by the POST ' .
             '/api/v2/services/acme/account_key/register endpoint. This endpoint is unable to determine the status of ' .
             'registrations that were initiated outside of the REST API.';
         # Construct the parent Endpoint object
