@@ -204,6 +204,10 @@ class Dispatcher {
         # Ensure required packages are present and required files are included
         $this->check_required_packages();
 
+        # Convert the arguments to JSON so they can be passed to the spawned process
+        $arguments_json = json_encode($arguments);
+        $arguments_json = escapeshellarg($arguments_json);
+
         # Before we spawn a new process, ensure we don't have too many concurrent processes running now
         if ($this->max_queue and count($this->get_running_processes()) >= $this->max_queue) {
             throw new ServiceUnavailableError(
@@ -217,7 +221,7 @@ class Dispatcher {
         # Spawn the process in the background if this Dispatcher is asynchronous
         if ($this->async) {
             $spawn_process = new Command(
-                command: 'nohup sh ' . self::DISPATCH_SCRIPT . " $this->short_name $this->pid_file $this->timeout",
+                command: 'nohup sh ' . self::DISPATCH_SCRIPT . " $this->short_name $this->pid_file $this->timeout $arguments_json",
                 redirect: ">/dev/null & echo $!",
             );
             $pid = is_numeric($spawn_process->output) ? (int) $spawn_process->output : null;
@@ -243,7 +247,7 @@ class Dispatcher {
         file_put_contents($this->pid_file, $pid);
 
         # Call the process directly and remove the PID file after its done
-        $this->process();
+        $this->process(...$arguments);
         unlink($this->pid_file);
 
         # Set the PID file name for the next process and return the PID.
