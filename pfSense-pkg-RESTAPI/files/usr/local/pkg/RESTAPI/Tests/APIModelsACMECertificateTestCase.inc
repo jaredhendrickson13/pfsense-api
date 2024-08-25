@@ -73,18 +73,20 @@ class APIModelsACMECertificateTestCase extends TestCase {
         $this->assert_equals($cert->keylength->value, '2048');
 
         # Ensure we can issue the ACME certificate
-        $issue = new ACMECertificateIssue(certificate: $cert->name->value);
+        $issue = new ACMECertificateIssue(certificate: $cert->name->value, async: false);
         $issue->create();
-        $this->assert_str_contains($issue->result->value, 'TXT value:');
+        $this->assert_equals($issue->status->value, 'completed');
+        $this->assert_str_contains($issue->result_log->value, 'TXT value:');
         $this->assert_str_contains(
-            $issue->result->value,
+            $issue->result_log->value,
             "Domain: '_acme-challenge.{$cert->a_domainlist->value[0]['name']}'",
         );
 
         # Ensure the renew process is actually initiated
-        $renew = new ACMECertificateRenew(certificate: $cert->name->value);
+        $renew = new ACMECertificateRenew(certificate: $cert->name->value, async: false);
         $renew->create();
-        $this->assert_str_contains($renew->result->value, "Renew: '{$cert->a_domainlist->value[0]['name']}'");
+        $this->assert_equals($renew->status->value, 'completed');
+        $this->assert_str_contains($renew->result_log->value, "Renew: '{$cert->a_domainlist->value[0]['name']}'");
 
         # Delete the ACME certificate
         $cert->delete();

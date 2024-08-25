@@ -5,6 +5,7 @@ namespace RESTAPI\Models;
 use RESTAPI;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\Base64Field;
+use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\X509Validator;
@@ -21,6 +22,7 @@ class ACMEAccountKey extends Model {
     public StringField $acmeserver;
     public StringField $url;
     public Base64Field $accountkey;
+    public BooleanField $registered;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define model attributes
