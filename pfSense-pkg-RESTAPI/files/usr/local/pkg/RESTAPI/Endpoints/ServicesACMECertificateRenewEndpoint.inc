@@ -18,7 +18,7 @@ class ServicesACMECertificateRenewEndpoint extends Endpoint {
         $this->request_method_options = ['POST'];
 
         $this->post_help_text =
-            'Issue an ACME Certificate.<br><br>Note: This endpoint simply starts the renew ' .
+            'Renew an ACME Certificate.<br><br>Note: This endpoint simply starts the renew ' .
             'process but does not attempt to determine whether the outcome was successful. You must manually parse ' .
             'the result to determine the outcome.';
 
