@@ -244,14 +244,20 @@ class NestedModelField extends Field {
             $openapi_property['items'] = [
                 'allOf' => [
                     ['$ref' => "#/components/schemas/$this->model_class_short"],
-                    ['type' => 'object', 'required' => $this->model->get_fields(required_only: true)],
+                    ['type' => 'object'],
                 ],
             ];
         } else {
             $openapi_property['allOf'] = [
                 ['$ref' => "#/components/schemas/$this->model_class_short"],
-                ['type' => 'object', 'required' => $this->model->get_fields(required_only: true)],
+                ['type' => 'object'],
             ];
+        }
+
+        # Only add required fields if there are any
+        $required_fields = $this->model->get_fields(required_only: true);
+        if ($required_fields) {
+            $openapi_property['allOf'][1]['required'] = $required_fields;
         }
 
         return $openapi_property;
