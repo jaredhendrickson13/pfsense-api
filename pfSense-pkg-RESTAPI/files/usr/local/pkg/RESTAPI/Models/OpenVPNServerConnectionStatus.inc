@@ -30,7 +30,7 @@ class OpenVPNServerConnectionStatus extends Model {
 
         # Set model fields
         $this->common_name = new StringField(
-            default: null,
+            required: true,
             allow_empty: true,
             allow_null: true,
             read_only: true,
