@@ -5,7 +5,6 @@ namespace RESTAPI\Models;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\ACMECertificateRenewDispatcher;
 use RESTAPI\Fields\ForeignModelField;
-use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
 

@@ -3,7 +3,6 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\Dispatchers\ACMEAccountKeyRegisterDispatcher;
 use RESTAPI\Dispatchers\ACMECertificateIssueDispatcher;
 
 class APIDispatchersACMECertificateIssueDispatcherTestCase extends TestCase {

@@ -5,10 +5,8 @@ namespace RESTAPI\Models;
 use RESTAPI;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\ACMEAccountKeyRegisterDispatcher;
-use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Responses\ServerError;
 
 /**
  * Defines a Model used to register a given ACME account key with the ACME package.
