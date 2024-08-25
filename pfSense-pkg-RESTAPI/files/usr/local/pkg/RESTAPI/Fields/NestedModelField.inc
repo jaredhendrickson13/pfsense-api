@@ -242,10 +242,7 @@ class NestedModelField extends Field {
             $openapi_property['minItems'] = $this->many_minimum;
             $openapi_property['maxItems'] = $this->many_maximum;
             $openapi_property['items'] = [
-                'allOf' => [
-                    ['$ref' => "#/components/schemas/$this->model_class_short"],
-                    ['type' => 'object'],
-                ],
+                'allOf' => [['$ref' => "#/components/schemas/$this->model_class_short"], ['type' => 'object']],
             ];
         } else {
             $openapi_property['allOf'] = [
