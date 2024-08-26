@@ -110,6 +110,7 @@ jobs:
   release_docs:
     needs: [build_openapi]
     runs-on: ubuntu-latest
+    if: ${{ !github.event.release.prerelease }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
