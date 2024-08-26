@@ -2087,13 +2087,13 @@ class Model {
         $initial_objects = $this->read_all(parent_id: $this->parent_id);
 
         # Obtain any Models that are deemed protected to ensure they do not removed in the next step.
-        $protected_models = new ModelSet();
+        $new_objects = new ModelSet();
         if ($this->protected_model_query) {
-            $protected_models = $initial_objects->query(query_params: $this->protected_model_query);
+            $new_objects = $initial_objects->query(query_params: $this->protected_model_query);
         }
 
         # Before beginning validation, empty the stored values in the config path. Retain protected Models (if any).
-        $this->set_config($this->get_config_path(), $protected_models->to_internal());
+        $this->set_config($this->get_config_path(), $new_objects->to_internal());
 
         # Loop through each Model representation included in the array
         foreach ($data as $representation_object) {
@@ -2101,21 +2101,20 @@ class Model {
             unset($representation_object['id']);
 
             # Define a new Model object using this representation and validate
-            $model_object = new $this(data: $representation_object);
+            $model_object = new $this(data: $representation_object, skip_init: true);
             $model_object->id = $model_object->get_next_id();
-            $model_object->validate();
+            $model_object->validate(modelset: $new_objects);
 
             # If an error was not thrown during Model object creation or validation, give it an ID and set the config
-            $model_object->id = $model_object->get_next_id();
             $this->set_config("{$this->get_config_path()}/$model_object->id", $model_object->to_internal());
+
+            # Add the new Model object to the ModelSet
+            $new_objects->model_objects[] = $model_object;
         }
 
         # Sort and write the changes to config
         $this->sort();
         $this->write_config("Replaced all $this->verbose_name_plural via API");
-
-        # Read all new objects for this Model so it can be passed into `apply_replace_all()`.
-        $new_objects = $this->read_all(parent_id: $this->parent_id);
 
         # Mark the subsystem as dirty if set
         if ($this->subsystem) {
