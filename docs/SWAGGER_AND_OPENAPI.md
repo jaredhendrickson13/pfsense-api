@@ -67,8 +67,8 @@ has been installed.
 #### Applies immediately
 
 Indicates whether any associated backend services will be restarted/reloaded immediately after the endpoint is called
-to apply the changes that were written to config. If this field is set to `true`, the changes will be written to config
-and applied immediately. If this field is set to `false`, the changes will be written to config only. If there is an 
+to apply the changes that were written to config. If this field is set to 'Yes', the changes will be written to config
+and applied immediately. If this field is 'No', the changes will be written to config only. If there is an 
 associated service that needs to be restarted/reloaded, the changes will not take effect until the service is 
 restarted/reloaded. This is typically done by calling the relevant service's `apply` endpoint.
 
