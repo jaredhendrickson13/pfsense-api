@@ -16,7 +16,7 @@ class InterfaceGroupsEndpoint extends Endpoint {
         $this->url = '/api/v2/interface/groups';
         $this->model_name = 'InterfaceGroup';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

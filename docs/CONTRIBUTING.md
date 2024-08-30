@@ -91,6 +91,11 @@ Contains the [\RESTAPI\Core\Form](https://pfrest.org/php-docs/classes/RESTAPI-Co
 
 Contains the [\RESTAPI\Core\Model](https://pfrest.org/php-docs/classes/RESTAPI-Core-Model.html) child classes. [Model classes](BUILDING_CUSTOM_MODEL_CLASSES.md) are used to define and manage the data structure of the object's the REST API package interacts with (i.e. firewall rules, static routes, etc.).
 
+### ModelTraits/
+
+Contains PHP Traits that can be used to extend the functionality of Model classes. Traits are used to define and manage common functionality that can be shared across multiple Model classes. For example, Models that
+interact with log files can use the `LogFileTrait` to add log file specific functionality to the Model.
+
 ### QueryFilters/
 
 Contains the [\RESTAPI\Core\QueryFilter](https://pfrest.org/php-docs/classes/RESTAPI-Core-QueryFilter.html) child classes. [QueryFilter classes](BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md) are used to define and manage the query filters that are used to filter data returned by the REST API. For information about writing query filters, see the [Building Custom Query Filter Classes](BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md) documentation.

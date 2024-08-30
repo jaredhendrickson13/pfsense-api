@@ -16,7 +16,7 @@ class FirewallVirtualIPsEndpoint extends Endpoint {
         $this->url = '/api/v2/firewall/virtual_ips';
         $this->many = true;
         $this->model_name = 'VirtualIP';
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

@@ -16,7 +16,7 @@ class SystemPackagesEndpoint extends Endpoint {
         $this->url = '/api/v2/system/packages';
         $this->model_name = 'Package';
         $this->many = true;
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
         $this->get_help_text = 'Reads all installed Packages.';
 
         # Construct the parent Endpoint object

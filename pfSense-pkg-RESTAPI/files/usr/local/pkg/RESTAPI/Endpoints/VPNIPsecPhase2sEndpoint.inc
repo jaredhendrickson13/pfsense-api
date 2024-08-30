@@ -16,7 +16,7 @@ class VPNIPsecPhase2sEndpoint extends Endpoint {
         $this->url = '/api/v2/vpn/ipsec/phase2s';
         $this->model_name = 'IPsecPhase2';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

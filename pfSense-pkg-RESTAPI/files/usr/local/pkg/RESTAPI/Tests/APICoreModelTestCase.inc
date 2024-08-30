@@ -766,6 +766,50 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     }
 
     /**
+     * Checks that the 'delete_many()' method correctly deletes all Model objects that match the query.
+     */
+    public function test_delete_many(): void {
+        # Create FirewallAlias models
+        $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
+        $host_alias_0->create();
+        $host_alias_1 = new FirewallAlias(name: 'host1', type: 'host');
+        $host_alias_1->create();
+        $host_alias_2 = new FirewallAlias(name: 'host2', type: 'host');
+        $host_alias_2->create();
+        $port_alias_0 = new FirewallAlias(name: 'port0', type: 'port');
+        $port_alias_0->create();
+        $port_alias_1 = new FirewallAlias(name: 'port1', type: 'port');
+        $port_alias_1->create();
+        $port_alias_2 = new FirewallAlias(name: 'port2', type: 'port');
+        $port_alias_2->create();
+
+        # Delete all the aliases with type 'port'
+        $deleted_aliases = FirewallAlias::delete_many(type: 'port');
+
+        # Loop through the aliases that were deleted and ensure they correctly matched the query and were really deleted
+        foreach ($deleted_aliases->model_objects as $deleted_alias) {
+            $this->assert_equals($deleted_alias->type->value, 'port');
+            $this->assert_is_false(FirewallAlias::query(name: $deleted_alias->name->value)->exists());
+        }
+
+        # Ensure the host aliases were not deleted
+        $this->assert_equals(FirewallAlias::query(name__startswith: 'host')->count(), 3);
+    }
+
+    /**
+     * Checks that the 'delete_many()' method throws an error if no query parameters were given.
+     */
+    public function test_delete_many_no_query(): void {
+        $this->assert_throws_response(
+            response_id: 'MODEL_DELETE_MANY_REQUIRES_QUERY_PARAMS',
+            code: 400,
+            callable: function () {
+                FirewallAlias::delete_many();
+            },
+        );
+    }
+
+    /**
      * Checks that the 'paginate()' method works correctly.
      */
     public function test_paginate(): void {
@@ -806,5 +850,136 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $port_aliases = FirewallAlias::query(limit: 2, offset: 1, type: 'port');
         $this->assert_equals($port_aliases->count(), 1);
         $this->assert_equals($port_aliases->model_objects[0]->name->value, 'alias4');
+    }
+
+    /**
+     * Ensures the read_all() method can be reversed to read the objects in reverse order.
+     */
+    public function test_read_all_reverse(): void {
+        # Create FirewallAlias models to test this
+        $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
+        $alias_alias_0->create();
+        $alias_alias_1 = new FirewallAlias(name: 'alias1', type: 'port');
+        $alias_alias_1->create();
+        $alias_alias_2 = new FirewallAlias(name: 'alias2', type: 'network');
+        $alias_alias_2->create();
+        $alias_alias_3 = new FirewallAlias(name: 'alias3', type: 'host');
+        $alias_alias_3->create();
+        $alias_alias_4 = new FirewallAlias(name: 'alias4', type: 'port');
+        $alias_alias_4->create();
+
+        # Read all the aliases in reverse order
+        $reversed_aliases = FirewallAlias::read_all(reverse: true);
+        $this->assert_equals($reversed_aliases->model_objects[0]->name->value, 'alias4');
+        $this->assert_equals($reversed_aliases->model_objects[1]->name->value, 'alias3');
+        $this->assert_equals($reversed_aliases->model_objects[2]->name->value, 'alias2');
+        $this->assert_equals($reversed_aliases->model_objects[3]->name->value, 'alias1');
+        $this->assert_equals($reversed_aliases->model_objects[4]->name->value, 'alias0');
+    }
+
+    /**
+     * Ensures the query() method can be reversed to read the objects in reverse order.
+     */
+    public function test_query_reverse(): void {
+        # Create FirewallAlias models to test this
+        $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
+        $alias_alias_0->create();
+        $alias_alias_1 = new FirewallAlias(name: 'alias1', type: 'port');
+        $alias_alias_1->create();
+        $alias_alias_2 = new FirewallAlias(name: 'alias2', type: 'network');
+        $alias_alias_2->create();
+        $alias_alias_3 = new FirewallAlias(name: 'alias3', type: 'host');
+        $alias_alias_3->create();
+        $alias_alias_4 = new FirewallAlias(name: 'alias4', type: 'port');
+        $alias_alias_4->create();
+
+        # Query for all aliases in reverse order
+        $reversed_aliases = FirewallAlias::query(reverse: true);
+        $this->assert_equals($reversed_aliases->model_objects[0]->name->value, 'alias4');
+        $this->assert_equals($reversed_aliases->model_objects[1]->name->value, 'alias3');
+        $this->assert_equals($reversed_aliases->model_objects[2]->name->value, 'alias2');
+        $this->assert_equals($reversed_aliases->model_objects[3]->name->value, 'alias1');
+        $this->assert_equals($reversed_aliases->model_objects[4]->name->value, 'alias0');
+    }
+
+    /**
+     * Checks that updates using the $append flag correctly append values to the existing values instead of replacing
+     * them.
+     */
+    public function test_update_append(): void {
+        # Use a FirewallAlias model to test this
+        $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['127.0.0.1']);
+        $alias->create();
+
+        # Ensure 'address' values set during the update are appended to the existing values instead of replacing them
+        $alias->address->value = ['127.0.0.2'];
+        $alias->update(append: true);
+        $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.2']);
+
+        # Ensure no action is taken if append is requested but no new values were given
+        # In other words, ensure we don't perpetually append the existing values over again
+        $alias->update(append: true);
+        $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.2']);
+
+        # Ensure the 'address' values are replaced if append is not requested
+        $alias->address->value = ['127.0.0.3'];
+        $alias->update();
+        $this->assert_equals($alias->address->value, ['127.0.0.3']);
+
+        # Delete the alias
+        $alias->delete();
+    }
+
+    /**
+     * Checks that updates using the $remove flag correctly remove array values from the existing array values instead of
+     * replacing them.
+     */
+    public function test_update_remove(): void {
+        # Use a FirewallAlias model to test this
+        $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['127.0.0.1', '127.0.0.2', '127.0.0.3']);
+        $alias->create();
+
+        # Ensure 'address' values set during the update are removed from the existing values instead of replacing them
+        $alias->address->value = ['127.0.0.2'];
+        $alias->update(remove: true);
+        $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.3']);
+
+        # Ensure no action is taken if remove is requested but no new values were given
+        # In other words, ensure we don't perpetually remove the existing values over again
+        $this->assert_equals($alias->address->value, ['127.0.0.1', '127.0.0.3']);
+
+        # Ensure the 'address' values are replaced if remove is not requested
+        $alias->address->value = ['127.0.0.3', '127.0.0.2', '127.0.0.1'];
+        $alias->update();
+        $this->assert_equals($alias->address->value, ['127.0.0.3', '127.0.0.2', '127.0.0.1']);
+
+        # Delete the alias
+        $alias->delete();
+    }
+
+    /**
+     * Checks that the 'delete_all()' actually deletes all Model objects.
+     */
+    public function test_delete_all(): void {
+        # Create FirewallAlias models
+        $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
+        $host_alias_0->create();
+        $host_alias_1 = new FirewallAlias(name: 'host1', type: 'host');
+        $host_alias_1->create();
+        $host_alias_2 = new FirewallAlias(name: 'host2', type: 'host');
+        $host_alias_2->create();
+        $port_alias_0 = new FirewallAlias(name: 'port0', type: 'port');
+        $port_alias_0->create();
+        $port_alias_1 = new FirewallAlias(name: 'port1', type: 'port');
+        $port_alias_1->create();
+        $port_alias_2 = new FirewallAlias(name: 'port2', type: 'port');
+        $port_alias_2->create();
+
+        # Delete all the aliases
+        $deleted_aliases = FirewallAlias::delete_all();
+
+        # Ensure all the aliases were deleted
+        $this->assert_equals($deleted_aliases->count(), 6);
+        $this->assert_equals(FirewallAlias::read_all()->count(), 0);
     }
 }

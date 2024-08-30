@@ -19,6 +19,8 @@ class X509Validator extends Validator {
     const CSR_END_NEW = 'END NEW CERTIFICATE REQUEST';
     const PRV_BEGIN = 'BEGIN PRIVATE KEY';
     const PRV_END = 'END PRIVATE KEY';
+    const RSA_BEGIN = 'BEGIN RSA PRIVATE KEY';
+    const RSA_END = 'END RSA PRIVATE KEY';
     const ECPRV_BEGIN = 'BEGIN EC PRIVATE KEY';
     const ECPRV_END = 'END EC PRIVATE KEY';
 
@@ -27,12 +29,14 @@ class X509Validator extends Validator {
      * @param bool $allow_crt Set to true to consider X509 Certificate strings to be valid.
      * @param bool $allow_csr Set to true to consider X509 Certificate Signing Request strings to be valid.
      * @param bool $allow_prv Set to true to consider X509 Private Key strings to be valid.
+     * @param bool $allow_rsa Set to true to consider X509 RSA Private Key strings to be valid.
      * @param bool $allow_ecprv Set to true to consider X509 EC Private Key strings to be valid.
      */
     public function __construct(
         public bool $allow_crt = true,
         public bool $allow_csr = false,
         public bool $allow_prv = false,
+        public bool $allow_rsa = false,
         public bool $allow_ecprv = false,
     ) {
     }
@@ -64,6 +68,10 @@ class X509Validator extends Validator {
         if ($this->allow_prv and str_contains($value, self::PRV_BEGIN) and str_contains($value, self::PRV_END)) {
             return;
         }
+        # Accept X509 RSA Private Keys if allowed
+        if ($this->allow_rsa and str_contains($value, self::RSA_BEGIN) and str_contains($value, self::RSA_END)) {
+            return;
+        }
         # Accept X509 EC Private Keys if allowed
         if ($this->allow_ecprv and str_contains($value, self::ECPRV_BEGIN) and str_contains($value, self::ECPRV_END)) {
             return;
@@ -81,10 +89,23 @@ class X509Validator extends Validator {
      */
     private function get_options_str(): string {
         $options = [];
-        $options += $this->allow_crt ? ['certificate'] : [];
-        $options += $this->allow_csr ? ['certificate signing request'] : [];
-        $options += $this->allow_prv ? ['private key'] : [];
-        $options += $this->allow_ecprv ? ['EC private key'] : [];
+
+        if ($this->allow_crt) {
+            $options[] = 'certificate';
+        }
+        if ($this->allow_csr) {
+            $options[] = 'certificate signing request';
+        }
+        if ($this->allow_prv) {
+            $options[] = 'private key';
+        }
+        if ($this->allow_rsa) {
+            $options[] = 'RSA private key';
+        }
+        if ($this->allow_ecprv) {
+            $options[] = 'EC private key';
+        }
+
         return implode(', ', $options);
     }
 

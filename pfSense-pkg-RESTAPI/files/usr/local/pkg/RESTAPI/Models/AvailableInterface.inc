@@ -51,7 +51,7 @@ class AvailableInterface extends Model {
      * Obtains all available interfaces on the system
      * @return array Returns all available interfaces on the system
      */
-    protected function get_all_avail_interfaces(): array {
+    public static function get_all_avail_interfaces(): array {
         // Local variables
         global $ipsec_descrs;
         $base_ifs = get_interface_list();

@@ -16,7 +16,7 @@ class ServicesDNSForwarderHostOverridesEndpoint extends Endpoint {
         $this->url = '/api/v2/services/dns_forwarder/host_overrides';
         $this->model_name = 'DNSForwarderHostOverride';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

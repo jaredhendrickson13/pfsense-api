@@ -15,7 +15,7 @@ class SystemCRLsEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/system/crls';
         $this->model_name = 'CertificateRevocationList';
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
         $this->many = true;
 
         # Construct the parent Endpoint object

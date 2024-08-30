@@ -14,7 +14,7 @@ class FirewallNATPortForwardsEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/firewall/nat/port_forwards';
         $this->model_name = 'PortForward';
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
         $this->many = true;
 
         # Construct the parent Endpoint object

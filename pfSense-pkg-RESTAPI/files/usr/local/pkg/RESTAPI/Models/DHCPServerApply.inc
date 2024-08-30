@@ -37,6 +37,12 @@ class DHCPServerApply extends Model {
     }
 
     /**
+     * Overrides the default _create() method but does nothing. This model is only intended to apply pending changes.
+     */
+    protected function _create(): void {
+    }
+
+    /**
      * Applies changes to the DHCP server configuration.
      */
     public function apply(): void {

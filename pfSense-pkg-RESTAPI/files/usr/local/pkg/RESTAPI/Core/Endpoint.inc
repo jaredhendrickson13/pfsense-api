@@ -108,12 +108,12 @@ class Endpoint {
     /**
      * @var array $request_method_options
      * Sets the allowed HTTP request methods for this Endpoint. For $many=true, only
-     * GET and PUT methods can be specified here. GET will use the Model's `read_all()`
-     * method, and PUT will use the Model's `replace_all()` method. For Endpoints with
-     * $many=false, GET, POST, PATCH, and DELETE methods can be specified here. GET will
-     * use the Model's `read()` method, POST will use the Model's `create()` method.
-     * PATCH will use the Model's `update()` method, and DELETE will use the Model's
-     * `delete()` method.
+     * GET, PUT and DELETE methods can be specified here. GET will use the Model's `read_all()`
+     * method, PUT will use the Model's `replace_all()` method and DELETE will use the Model's
+     * `delete_many()` method. For Endpoints with $many=false, GET, POST, PATCH, and DELETE
+     * methods can be specified here. GET will use the Model's `read()` method, POST will
+     * use the Model's `create()` method. PATCH will use the Model's `update()` method, and
+     * DELETE will use the Model's `delete()` method.
      */
     public array $request_method_options = [];
 
@@ -255,6 +255,60 @@ class Endpoint {
     public string $delete_help_text = '';
 
     /**
+     * @var bool $deprecated
+     * Marks this Endpoint as deprecated in the OpenAPI documentation.
+     */
+    public bool $deprecated = false;
+
+    /**
+     * @var integer $limit
+     * Sets the default limit for the number of Model objects to retrieve in a single call to this Endpoint. This
+     * value is used for pagination purposes and can be overridden by the client in the request data.
+     */
+    public int $limit = 0;
+
+    /**
+     * @var integer $offset
+     * Sets the default offset for the starting point in the dataset requested for pagination. This value is used for
+     * pagination purposes and can be overridden by the client in the request data.
+     */
+    public int $offset = 0;
+
+    /**
+     * @var bool $async
+     * Sets the default value for the `async` field in the request data. This value is used to determine if the API
+     * call should be processed asynchronously when available. This value can be overridden by the client in the request
+     * data.
+     */
+    public bool $async = true;
+
+    /**
+     * @var bool $reverse
+     * Sets the default value for the `reverse` field in the request data. This value is used to control the order of
+     * the Model objects returned by this Endpoint. This value can be overridden by the client in the request data.
+     * If set to `true`, the Model objects in the `data` section of the response will be reversed.
+     */
+    public bool $reverse = false;
+
+    /**
+     * @var bool $append
+     * Sets the default value for the `append` field in the request data. This value is used to control how Model objects
+     * apply updates to array fields on existing objects. If set to `true`, any requested updates to array fields will
+     * be appended to the existing array instead of replacing it. This value can be overridden by the client in the request
+     * data.
+     */
+    public bool $append = false;
+
+    /**
+     * @var bool $remove
+     * Sets the default value for the `remove` field in the request data. This value is used to control how Model objects
+     * apply updates to array fields on existing objects. If set to `true`, any requested updates to array fields will
+     * remove the specified values from the existing array. This value can be overridden by the client in the request
+     * data.
+     */
+    public bool $remove = false;
+
+    /**
      * Sets values whenever the Endpoint object is crated.
      */
     public function __construct() {
@@ -297,7 +351,7 @@ class Endpoint {
         }
 
         # Do not allow Endpoints to allow unsupported request methods
-        $supported_methods = $this->many ? ['GET', 'PUT'] : ['GET', 'POST', 'PATCH', 'DELETE'];
+        $supported_methods = $this->many ? ['GET', 'PUT', 'DELETE'] : ['GET', 'POST', 'PATCH', 'DELETE'];
         foreach ($this->request_method_options as $method_option) {
             if (!in_array($method_option, $supported_methods)) {
                 throw new ServerError(
@@ -342,10 +396,14 @@ class Endpoint {
             $this->patch_help_text = $this->patch_help_text ?: "Updates an existing $model_verbose_name.";
             $this->delete_help_text = $this->delete_help_text ?: "Deletes an existing $model_verbose_name.";
         }
-        # For `many` Vies, set default help text with an applicable context for `many` Models
+        # For `many` Endpoints, set default help text with an applicable context for `many` Models
         elseif ($this->many and $this->model->many) {
             $this->get_help_text = $this->get_help_text ?: "Reads all existing $model_verbose_name_plural.";
             $this->put_help_text = $this->put_help_text ?: "Replaces all existing $model_verbose_name_plural.";
+            $this->delete_help_text =
+                $this->delete_help_text ?:
+                "Deletes multiple existing $model_verbose_name_plural " .
+                    'using a query.<br><br>WARNING: This will delete all objects that match the query, use with caution.';
         }
         # Set default help text with an applicable context for non `many` Models
         else {
@@ -599,6 +657,144 @@ class Endpoint {
     }
 
     /**
+     * Validates the $async common control parameter for this request.
+     * @note If the `async` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $async property value.
+     * @throws ValidationError When the `async` field is not a boolean.
+     */
+    private function validate_async(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['async'])) {
+            # Ensure value is a bool
+            if (!is_bool($this->request_data['async'])) {
+                throw new ValidationError(
+                    message: 'Field `async` must be of type `boolean`.',
+                    response_id: 'ENDPOINT_ASYNC_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the async property to use the client's requested value and remove it from the request data
+            $this->async = $this->request_data['async'];
+            unset($this->request_data['async']);
+        }
+    }
+
+    /**
+     * Validates the $reverse common control parameter for this request.
+     * @note If the `reverse` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $reverse property value.
+     * @throws ValidationError When the `reverse` field is not a boolean.
+     */
+    private function validate_reverse(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['reverse'])) {
+            # Ensure value is a bool
+            if (!is_bool($this->request_data['reverse'])) {
+                throw new ValidationError(
+                    message: 'Field `reverse` must be of type `boolean`.',
+                    response_id: 'ENDPOINT_REVERSE_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the reverse property to use the client's requested value and remove it from the request data
+            $this->reverse = $this->request_data['reverse'];
+            unset($this->request_data['reverse']);
+        }
+    }
+
+    /**
+     * Validates the $append common control parameter for this request.
+     * @note If the `append` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $append property value.
+     * @throws ValidationError When the `append` field is not a boolean.
+     */
+    private function validate_append(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['append'])) {
+            # Ensure value is a bool
+            if (!is_bool($this->request_data['append'])) {
+                throw new ValidationError(
+                    message: 'Field `append` must be of type `boolean`.',
+                    response_id: 'ENDPOINT_APPEND_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the append property to use the client's requested value and remove it from the request data
+            $this->append = $this->request_data['append'];
+            unset($this->request_data['append']);
+        }
+    }
+
+    /**
+     * Validates the $remove common control parameter for this request.
+     * @note If the `remove` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $remove property value.
+     * @throws ValidationError When the `remove` field is not a boolean.
+     */
+    private function validate_remove(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['remove'])) {
+            # Ensure value is a bool
+            if (!is_bool($this->request_data['remove'])) {
+                throw new ValidationError(
+                    message: 'Field `remove` must be of type `boolean`.',
+                    response_id: 'ENDPOINT_REMOVE_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the remove property to use the client's requested value and remove it from the request data
+            $this->remove = $this->request_data['remove'];
+            unset($this->request_data['remove']);
+        }
+    }
+
+    /**
+     * Validates the $limit common control parameter for this request.
+     * @note If the `limit` field was not provided in the request data, the request will default to the Endpoint's
+     * assigned $limit property value.
+     * @throws ValidationError When the `limit` field is not an integer.
+     */
+    private function validate_limit(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['limit'])) {
+            # Ensure value is an integer
+            if (!is_integer($this->request_data['limit'])) {
+                throw new ValidationError(
+                    message: 'Field `limit` must be of type `integer`.',
+                    response_id: 'ENDPOINT_LIMIT_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the limit property to use the client's requested value and remove it from the request data
+            $this->limit = $this->request_data['limit'];
+            unset($this->request_data['limit']);
+        }
+    }
+
+    /**
+     * Validates the $offset common control parameter for this request.
+     * @note If the `offset` field was not provided in the request data, the request will default to the Endpoint's
+     * assigned $offset property value.
+     * @throws ValidationError When the `offset` field is not an integer.
+     */
+    private function validate_offset(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['offset'])) {
+            # Ensure value is an integer
+            if (!is_integer($this->request_data['offset'])) {
+                throw new ValidationError(
+                    message: 'Field `offset` must be of type `integer`.',
+                    response_id: 'ENDPOINT_OFFSET_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Update the offset property to use the client's requested value and remove it from the request data
+            $this->offset = $this->request_data['offset'];
+            unset($this->request_data['offset']);
+        }
+    }
+
+    /**
      * Performs validation on non-Model fields. These fields control how Models are initially obtained/constructed.
      * @throws ValidationError When one or more Endpoint releated fields fail validation.
      */
@@ -611,34 +807,13 @@ class Endpoint {
             );
         }
 
-        # Ensure the special async, limit and offset parameters are of the correct type
-        if (!isset($this->request_data['async'])) {
-            $this->request_data['async'] = true;
-        }
-        if (!is_bool($this->request_data['async'])) {
-            throw new ValidationError(
-                message: 'Field `async` must be of type `boolean`.',
-                response_id: 'ENDPOINT_ASYNC_FIELD_INVALID_TYPE',
-            );
-        }
-        if (!isset($this->request_data['limit'])) {
-            $this->request_data['limit'] = 0;
-        }
-        if (!is_integer($this->request_data['limit'])) {
-            throw new ValidationError(
-                message: 'Field `limit` must be of type `integer`.',
-                response_id: 'ENDPOINT_LIMIT_FIELD_INVALID_TYPE',
-            );
-        }
-        if (!isset($this->request_data['offset'])) {
-            $this->request_data['offset'] = 0;
-        }
-        if (!is_integer($this->request_data['offset'])) {
-            throw new ValidationError(
-                message: 'Field `offset` must be of type `integer`.',
-                response_id: 'ENDPOINT_OFFSET_FIELD_INVALID_TYPE',
-            );
-        }
+        # Ensure control parameters are of the correct type if the client requested them
+        $this->validate_async();
+        $this->validate_reverse();
+        $this->validate_append();
+        $this->validate_remove();
+        $this->validate_limit();
+        $this->validate_offset();
     }
 
     /**
@@ -677,11 +852,7 @@ class Endpoint {
 
             # Assign the authenticated client object context to the Model
             $this->model->client = $this->client;
-
-            # Set this Model's async property if specified in the request data
-            if (isset($this->request_data['async'])) {
-                $this->model->async = $this->request_data['async'];
-            }
+            $this->model->async = $this->async;
 
             # Perform the appropriate action based on the request method
             switch ($this->request_method) {
@@ -736,15 +907,12 @@ class Endpoint {
     protected function get(): Model|ModelSet {
         # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
         if ($this->many) {
-            $this->get_pagination_resource_links(
-                limit: $this->request_data['limit'],
-                offset: $this->request_data['offset'],
-            );
+            $this->get_pagination_resource_links(limit: $this->limit, offset: $this->offset);
             return $this->model->query(
                 query_params: $this->request_data,
-                excluded: ['async', 'limit', 'offset'],
-                limit: $this->request_data['limit'],
-                offset: $this->request_data['offset'],
+                limit: $this->limit,
+                offset: $this->offset,
+                reverse: $this->reverse,
             );
         }
         # For GET requests on many Endpoints, obtain all objects from the assigned Model.
@@ -769,10 +937,6 @@ class Endpoint {
      * Replaces all existing objects for the assigned Model using the data submitted in a PUT request.
      */
     protected function put(): Model|ModelSet {
-        # Remove magic parameters
-        unset($this->request_data['async']);
-        unset($this->request_data['limit']);
-        unset($this->request_data['offset']);
         return $this->model->replace_all(data: $this->request_data);
     }
 
@@ -782,13 +946,34 @@ class Endpoint {
     protected function patch(): Model|ModelSet {
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
-        return $this->model->update(apply: $this->request_data['apply'] === true);
+        return $this->model->update(
+            apply: $this->request_data['apply'] === true,
+            append: $this->append,
+            remove: $this->remove,
+        );
     }
 
     /**
      * Deletes an existing object for the assigned Model using the data submitted in a DELETE request.
      */
     protected function delete(): Model|ModelSet {
+        # Delete multiple objects using a query if this is a many Endpoint
+        if ($this->many) {
+            # Run the delete_all method if the request data contains the 'all' parameter
+            if (isset($this->request_data['all']) and $this->request_data['all'] === true) {
+                $this->get_pagination_resource_links(limit: 0, offset: 0);
+                return $this->model->delete_all();
+            }
+
+            $this->get_pagination_resource_links(limit: $this->limit, offset: $this->offset);
+            return $this->model->delete_many(
+                query_params: $this->request_data,
+                limit: $this->limit,
+                offset: $this->offset,
+            );
+        }
+
+        # Otherwise, delete a single object
         $this->model->from_representation(data: $this->request_data);
         return $this->model->delete(apply: $this->request_data['apply'] === true);
     }

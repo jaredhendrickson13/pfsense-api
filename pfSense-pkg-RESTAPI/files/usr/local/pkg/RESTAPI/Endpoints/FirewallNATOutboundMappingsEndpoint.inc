@@ -15,7 +15,7 @@ class FirewallNATOutboundMappingsEndpoint extends Endpoint {
         $this->url = '/api/v2/firewall/nat/outbound/mappings';
         $this->model_name = 'OutboundNATMapping';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

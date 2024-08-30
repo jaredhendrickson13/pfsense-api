@@ -34,10 +34,7 @@ class ContentHandler {
      * @throws ServerError When this method is called but not overridden by the child class.
      */
     public function get_content(): mixed {
-        throw new ServerError(
-            message: 'Child ContentHanlder classes must override the get_content() method.',
-            response_id: 'CONTENT_HANDLER_GET_CONTENT_NOT_OVERRIDDEN',
-        );
+        return file_get_contents('php://input');
     }
 
     /**

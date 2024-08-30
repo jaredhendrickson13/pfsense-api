@@ -18,6 +18,7 @@ namespace RESTAPI\Core\Tools;
 use RESTAPI\Core\Response;
 use RESTAPI\Models\RESTAPIVersion;
 use RESTAPI\Responses\ServerError;
+use stdClass;
 
 require_once 'RESTAPI/autoloader.inc';
 
@@ -258,6 +259,7 @@ function generate_documentation(): bool {
 
             # Assign endpoint details to variables
             $help_text = $endpoint->$help_text_property;
+            $endpoint_type = $endpoint->many ? 'Plural' : 'Singular';
             $parent_model_class = $model->parent_model_class ?: 'None';
             $priv_options_str = implode(', ', $endpoint->$privilege_property);
             $required_packages_str = $model->packages ? implode(', ', $model->packages) : 'None';
@@ -271,10 +273,12 @@ function generate_documentation(): bool {
             $openapi_config['paths'][$endpoint->url][$request_method] = [
                 'responses' => [],
                 'operationId' => $operation_id,
+                'deprecated' => $endpoint->deprecated,
                 'description' =>
                     '<h3>Description:</h3>' .
                     "$help_text<br>" .
                     '<h3>Details:</h3>' .
+                    "**Endpoint type**: $endpoint_type<br>" .
                     "**Associated model**: $endpoint->model_name<br>" .
                     "**Parent model**: $parent_model_class<br>" .
                     "**Requires authentication**: $requires_auth_str<br>" .
@@ -422,13 +426,61 @@ function generate_documentation(): bool {
                         'in' => 'query',
                         'name' => 'limit',
                         'description' => 'The number of objects to obtain at once. Set to 0 for no limit.',
-                        'schema' => ['type' => 'integer', 'default' => 0],
+                        'schema' => ['type' => 'integer', 'default' => $endpoint->limit],
                     ],
                     [
                         'in' => 'query',
                         'name' => 'offset',
                         'description' => 'The starting point in the dataset to begin fetching objects.',
-                        'schema' => ['type' => 'integer', 'default' => 0],
+                        'schema' => ['type' => 'integer', 'default' => $endpoint->offset],
+                    ],
+                    [
+                        'in' => 'query',
+                        'name' => 'query',
+                        'style' => 'form',
+                        'explode' => true,
+                        'description' =>
+                            'The arbitrary query parameters to include in the request.<br><br>' .
+                            'Note: This does not define an real parameter, rather it allows for any arbitrary query ' .
+                            'parameters to be included in the request.',
+                        'schema' => [
+                            'type' => 'object',
+                            'default' => new stdClass(),
+                            'additionalProperties' => ['type' => 'string'],
+                        ],
+                    ],
+                ];
+            }
+
+            # Assign the limit and offset to DELETE endpoints with $many enabled
+            if ($endpoint->many and $request_method === 'delete') {
+                $openapi_config['paths'][$endpoint->url][$request_method]['parameters'] = [
+                    [
+                        'in' => 'query',
+                        'name' => 'limit',
+                        'description' => 'The maximum number of objects to delete at once. Set to 0 for no limit.',
+                        'schema' => ['type' => 'integer', 'default' => $endpoint->limit],
+                    ],
+                    [
+                        'in' => 'query',
+                        'name' => 'offset',
+                        'description' => 'The starting point in the dataset to begin fetching objects.',
+                        'schema' => ['type' => 'integer', 'default' => $endpoint->offset],
+                    ],
+                    [
+                        'in' => 'query',
+                        'name' => 'query',
+                        'style' => 'form',
+                        'explode' => true,
+                        'description' =>
+                            'The arbitrary query parameters to include in the request.<br><br>' .
+                            'Note: This does not define an actual parameter, rather it allows for any arbitrary query ' .
+                            'parameters to be included in the request.',
+                        'schema' => [
+                            'type' => 'object',
+                            'default' => new stdClass(),
+                            'additionalProperties' => ['type' => 'string'],
+                        ],
                     ],
                 ];
             }

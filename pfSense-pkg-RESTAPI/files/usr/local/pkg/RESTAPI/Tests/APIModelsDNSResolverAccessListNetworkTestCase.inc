@@ -68,8 +68,20 @@ class APIModelsDNSResolverAccessListNetworkTestCase extends TestCase {
      * Checks that IPv4 network entries cannot use a `mask` greater than `32`
      */
     public function test_validate_mask() {
+        # Create an access list to test with
+        $access_list = new DNSResolverAccessList(
+            data: [
+                'name' => 'test',
+                'action' => 'allow snoop',
+                'networks' => [],
+            ],
+            async: false,
+        );
+        $access_list->create(apply: true);
+
         # Try to create an IPv4 access list network entry with a mask greater than 32
         $access_list_network = new DNSResolverAccessListNetwork(
+            parent_id: $access_list->id,
             data: ['network' => '4.3.2.1', 'mask' => 33],
             async: false,
         );

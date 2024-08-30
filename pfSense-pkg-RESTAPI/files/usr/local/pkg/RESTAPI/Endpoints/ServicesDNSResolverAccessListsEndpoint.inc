@@ -16,7 +16,7 @@ class ServicesDNSResolverAccessListsEndpoint extends Endpoint {
         $this->url = '/api/v2/services/dns_resolver/access_lists';
         $this->many = true;
         $this->model_name = 'DNSResolverAccessList';
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

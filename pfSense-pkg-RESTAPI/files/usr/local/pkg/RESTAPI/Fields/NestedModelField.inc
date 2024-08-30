@@ -106,7 +106,7 @@ class NestedModelField extends Field {
         # Assign the IDs and parent manually using this Field's context in case it does not yet exist in config
         $model->parent_id = $this->context->id;
         $model->parent_model = $this->context;
-        $model->id = count($this->validation_modelset->model_objects);
+        $model->id = $this->validation_modelset->count();
 
         # Try to validate the nested Model object
         try {
@@ -229,6 +229,9 @@ class NestedModelField extends Field {
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
      */
     public function to_openapi_property(): array {
+        # Variables
+        $required_fields = $this->model->get_fields(required_only: true);
+
         # Assign primitive property attributes
         $openapi_property = [];
         $openapi_property['description'] = $this->help_text . '<br>' . $this->get_conditions_text();
@@ -242,16 +245,19 @@ class NestedModelField extends Field {
             $openapi_property['minItems'] = $this->many_minimum;
             $openapi_property['maxItems'] = $this->many_maximum;
             $openapi_property['items'] = [
-                'allOf' => [
-                    ['$ref' => "#/components/schemas/$this->model_class_short"],
-                    ['type' => 'object', 'required' => $this->model->get_fields(required_only: true)],
-                ],
+                'allOf' => [['$ref' => "#/components/schemas/$this->model_class_short"], ['type' => 'object']],
             ];
+            if ($required_fields) {
+                $openapi_property['items']['allOf'][1]['required'] = $required_fields;
+            }
         } else {
             $openapi_property['allOf'] = [
                 ['$ref' => "#/components/schemas/$this->model_class_short"],
-                ['type' => 'object', 'required' => $this->model->get_fields(required_only: true)],
+                ['type' => 'object'],
             ];
+            if ($required_fields) {
+                $openapi_property['allOf']['required'] = $required_fields;
+            }
         }
 
         return $openapi_property;

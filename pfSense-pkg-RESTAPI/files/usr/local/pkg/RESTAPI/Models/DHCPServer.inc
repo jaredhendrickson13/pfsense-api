@@ -53,7 +53,7 @@ class DHCPServer extends Model {
         # Define Model attributes
         $this->config_path = 'dhcpd';
         $this->many = true;
-        $this->always_apply = true;
+        $this->subsystem = 'dhcpd';
         $this->update_strategy = 'merge';
         $this->verbose_name = 'DHCP Server';
 
@@ -464,7 +464,7 @@ class DHCPServer extends Model {
         # Do not allow `staticarp` to be enabled if there are any configured static mappings without IPs
         $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->id);
         foreach ($static_mappings->model_objects as $static_mapping) {
-            if (empty($static_mapping->ipaddr->value)) {
+            if ($staticarp and !$static_mapping->ipaddr->value) {
                 throw new ValidationError(
                     'DHCP server `staticarp` cannot be enabled while there are DHCP server static mappings ' .
                         'configured without an assigned IP.',

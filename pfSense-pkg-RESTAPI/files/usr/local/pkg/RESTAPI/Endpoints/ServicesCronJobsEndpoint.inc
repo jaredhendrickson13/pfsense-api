@@ -16,7 +16,7 @@ class ServicesCronJobsEndpoint extends Endpoint {
         $this->url = '/api/v2/services/cron/jobs';
         $this->model_name = 'CronJob';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

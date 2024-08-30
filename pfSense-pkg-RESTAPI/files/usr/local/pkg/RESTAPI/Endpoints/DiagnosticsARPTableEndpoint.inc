@@ -15,7 +15,7 @@ class DiagnosticsARPTableEndpoint extends Endpoint {
         $this->url = '/api/v2/diagnostics/arp_table';
         $this->model_name = 'ARPTable';
         $this->many = true;
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

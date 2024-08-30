@@ -16,7 +16,7 @@ class UserAuthServersEndpoint extends Endpoint {
         $this->url = '/api/v2/user/auth_servers';
         $this->model_name = 'AuthServer';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

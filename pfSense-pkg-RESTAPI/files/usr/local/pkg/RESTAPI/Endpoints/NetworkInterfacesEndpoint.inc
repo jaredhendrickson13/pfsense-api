@@ -17,7 +17,7 @@ class NetworkInterfacesEndpoint extends Endpoint {
         $this->model_name = 'NetworkInterface';
         $this->tag = 'INTERFACE';
         $this->many = true;
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

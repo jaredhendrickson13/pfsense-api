@@ -20,20 +20,20 @@ class DHCPServerApplyDispatcher extends Dispatcher {
             $retvaldns |= services_dnsmasq_configure();
             if ($retvaldns == 0) {
                 clear_subsystem_dirty('hosts');
-                clear_subsystem_dirty('staticmaps');
+                clear_subsystem_dirty('dhcpd');
             }
             if (Model::is_config_enabled('unbound') && Model::is_config_enabled('unbound', 'regdhcpstatic')) {
                 $retvaldns |= services_unbound_configure();
                 if ($retvaldns == 0) {
                     clear_subsystem_dirty('unbound');
                     clear_subsystem_dirty('hosts');
-                    clear_subsystem_dirty('staticmaps');
+                    clear_subsystem_dirty('dhcpd');
                 }
             }
         } else {
             $retvaldhcp |= services_dhcpd_configure();
             if ($retvaldhcp == 0) {
-                clear_subsystem_dirty('staticmaps');
+                clear_subsystem_dirty('dhcpd');
             }
         }
         /* BIND package - Bug #3710 */

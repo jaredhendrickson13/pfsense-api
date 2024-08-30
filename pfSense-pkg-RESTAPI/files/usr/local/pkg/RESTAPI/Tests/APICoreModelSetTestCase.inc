@@ -15,7 +15,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a ServerError is thrown in a ModelSet is assigned non-Model objects during construction.
      */
-    public function test_throws_server_error_with_non_models() {
+    public function test_throws_server_error_with_non_models(): void {
         $this->assert_throws_response(
             response_id: 'MODEL_SET_CONTAINS_NON_MODEL',
             code: 500,
@@ -29,7 +29,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
      * Checks that the ModelSet's `to_representation()` method correctly returns the representations of all
      * contained Model objects.
      */
-    public function test_modelset_to_representation() {
+    public function test_modelset_to_representation(): void {
         # Use the FirewallAlias model to test with
         $test_model1 = new FirewallAlias(data: ['name' => 'test_model1', 'type' => 'port', 'address' => [80]]);
         $test_model2 = new FirewallAlias(
@@ -47,7 +47,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using exact matches works as expected.
      */
-    public function test_query_exact_match() {
+    public function test_query_exact_match(): void {
         # Create two Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_bool' => true]);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_bool' => false]);
@@ -70,7 +70,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using except matches works as expected.
      */
-    public function test_query_except() {
+    public function test_query_except(): void {
         # Create two Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_bool' => true]);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_bool' => false]);
@@ -87,7 +87,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using the 'startswith' filer works as expected.
      */
-    public function test_query_startswith() {
+    public function test_query_startswith(): void {
         # Create three Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_string_unique' => "Don't find me!"]);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_string_unique' => 'Find me!']);
@@ -105,7 +105,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using the 'endswith' filer works as expected.
      */
-    public function test_query_endswith() {
+    public function test_query_endswith(): void {
         # Create three Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_string_unique' => 'I match!']);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_string_unique' => "I don't!"]);
@@ -123,7 +123,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using the 'contains' filer works as expected.
      */
-    public function test_query_contains() {
+    public function test_query_contains(): void {
         # Create three Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_string_unique' => 'I match!']);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_string_unique' => 'I match!']);
@@ -141,7 +141,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using the 'lt' (less than) filer works as expected.
      */
-    public function test_query_lt() {
+    public function test_query_lt(): void {
         # Create three Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_integer' => 10]);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_integer' => 30]);
@@ -159,7 +159,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using the 'lte' (less than or equal to) filter works as expected.
      */
-    public function test_query_lte() {
+    public function test_query_lte(): void {
         # Create three Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_integer' => 10]);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_integer' => 31]);
@@ -178,7 +178,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using the 'gt' (greater than) filer works as expected.
      */
-    public function test_query_gt() {
+    public function test_query_gt(): void {
         # Create three Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_integer' => 10]);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_integer' => 30]);
@@ -196,7 +196,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that ModelSet queries using the 'gte' (greater than or equal to) filter works as expected.
      */
-    public function test_query_gte() {
+    public function test_query_gte(): void {
         # Create three Models with unique values to add to the ModelSet
         $test_model1 = new RESTAPI\Models\Test(data: ['test_integer' => 10]);
         $test_model2 = new RESTAPI\Models\Test(data: ['test_integer' => 5]);
@@ -216,7 +216,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
      * Checks that the ModelSet queries using the `has` (checks if an array field has a given value) filter works
      * as expected.
      */
-    public function test_query_array_contains() {
+    public function test_query_array_contains(): void {
         # Create firewall alias objects to test with
         $alias_a = new FirewallAlias(data: ['name' => 'alias_a', 'type' => 'host', 'address' => ['a.co']]);
         $alias_b = new FirewallAlias(data: ['name' => 'alias_b', 'type' => 'host', 'address' => ['b.co']]);
@@ -238,7 +238,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the ModelSet exists() method correctly identifies when Model objects are set.
      */
-    public function test_exists() {
+    public function test_exists(): void {
         $test_model = new RESTAPI\Models\Test();
 
         # Ensure exists() returns true when at least one Model is assigned
@@ -251,9 +251,21 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     }
 
     /**
+     * Checks that the ModelSet count() method correctly identifies the number of Model objects set.
+     */
+    public function test_count(): void {
+        $test_model1 = new RESTAPI\Models\Test();
+        $test_model2 = new RESTAPI\Models\Test();
+
+        # Ensure count() returns the correct number of Model objects assigned
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2]);
+        $this->assert_equals($test_modelset->count(), 2);
+    }
+
+    /**
      * Checks that the ModelSet first() method correctly identifies the first Model object set.
      */
-    public function test_first() {
+    public function test_first(): void {
         $test_model1 = new RESTAPI\Models\Test();
         $test_model2 = new RESTAPI\Models\Test();
 
@@ -270,5 +282,62 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
                 $test_modelset->first();
             },
         );
+    }
+
+    /**
+     * Checks that the 'delete()' method correctly deletes all Model objects in the ModelSet
+     */
+    public function test_delete_many(): void {
+        # Create FirewallAlias models
+        $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
+        $host_alias_0->create();
+        $host_alias_1 = new FirewallAlias(name: 'host1', type: 'host');
+        $host_alias_1->create();
+        $host_alias_2 = new FirewallAlias(name: 'host2', type: 'host');
+        $host_alias_2->create();
+
+        # Delete all the aliases in the ModelSet
+        $modelset = new ModelSet([$host_alias_0, $host_alias_1, $host_alias_2]);
+        $deleted_aliases = $modelset->delete();
+
+        # Ensure all aliases were deleted
+        $this->assert_equals($deleted_aliases->count(), 3);
+        $this->assert_is_false(FirewallAlias::query(type: 'host')->exists());
+    }
+
+    /**
+     * Checks that the 'reverse()' method correctly reverses the order of the Model objects in the ModelSet.
+     */
+    public function test_reverse(): void {
+        # Create three firewall aliases
+        $alias_a = new FirewallAlias(name: 'alias_a', type: 'host');
+        $alias_b = new FirewallAlias(name: 'alias_b', type: 'host');
+        $alias_c = new FirewallAlias(name: 'alias_c', type: 'host');
+        $alias_a->create();
+        $alias_b->create();
+        $alias_c->create();
+
+        # Read all firewall aliases and ensure they are in the correct (normal) order
+        $modelset = FirewallAlias::read_all();
+        $this->assert_equals($modelset->model_objects[0]->name->value, 'alias_a');
+        $this->assert_equals($modelset->model_objects[0]->id, 0);
+        $this->assert_equals($modelset->model_objects[1]->name->value, 'alias_b');
+        $this->assert_equals($modelset->model_objects[1]->id, 1);
+        $this->assert_equals($modelset->model_objects[2]->name->value, 'alias_c');
+        $this->assert_equals($modelset->model_objects[2]->id, 2);
+
+        # Reverse the order of the firewall aliases and ensure they are in the correct (reversed) order
+        $reversed_modelset = $modelset->reverse();
+        $this->assert_equals($reversed_modelset->model_objects[0]->name->value, 'alias_c');
+        $this->assert_equals($reversed_modelset->model_objects[0]->id, 2);
+        $this->assert_equals($reversed_modelset->model_objects[1]->name->value, 'alias_b');
+        $this->assert_equals($reversed_modelset->model_objects[1]->id, 1);
+        $this->assert_equals($reversed_modelset->model_objects[2]->name->value, 'alias_a');
+        $this->assert_equals($reversed_modelset->model_objects[2]->id, 0);
+
+        # Delete the firewall aliases
+        $alias_a->delete();
+        $alias_b->delete();
+        $alias_c->delete();
     }
 }

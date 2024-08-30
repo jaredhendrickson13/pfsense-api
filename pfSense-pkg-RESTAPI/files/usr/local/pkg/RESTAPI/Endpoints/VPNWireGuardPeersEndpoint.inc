@@ -16,7 +16,7 @@ class VPNWireGuardPeersEndpoint extends Endpoint {
         $this->url = '/api/v2/vpn/wireguard/peers';
         $this->model_name = 'WireGuardPeer';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

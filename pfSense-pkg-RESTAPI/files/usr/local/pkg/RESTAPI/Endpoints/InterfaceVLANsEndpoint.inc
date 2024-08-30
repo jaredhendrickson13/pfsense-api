@@ -16,7 +16,7 @@ class InterfaceVLANsEndpoint extends Endpoint {
         $this->url = '/api/v2/interface/vlans';
         $this->model_name = 'InterfaceVLAN';
         $this->many = true;
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();
