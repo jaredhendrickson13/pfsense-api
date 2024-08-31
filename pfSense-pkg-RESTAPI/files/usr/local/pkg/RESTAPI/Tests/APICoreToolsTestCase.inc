@@ -7,12 +7,13 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\TestCase;
 use function RESTAPI\Core\Tools\bandwidth_to_bits;
 use function RESTAPI\Core\Tools\is_assoc_array;
+use function RESTAPI\Core\Tools\to_upper_camel_case;
 
 class APICoreToolsTestCase extends TestCase {
     /**
      * Checks that the is_assoc_array() function correctly identifies associative arrays from indexed arrays.
      */
-    public function test_is_assoc_array() {
+    public function test_is_assoc_array(): void {
         $this->assert_is_true(is_assoc_array(['test' => 'this is an associative array']));
         $this->assert_is_false(is_assoc_array([0 => 'this is not an associative array']));
     }
@@ -21,7 +22,7 @@ class APICoreToolsTestCase extends TestCase {
      * Checks that the bandwidth_to_bits() function correctly converts a provided bandwidth and scale into the
      * total number of bits of the bandwidth.
      */
-    public function test_bandwidth_to_bits() {
+    public function test_bandwidth_to_bits(): void {
         # Set scale factors we can use to convert various bandwidth values into total bit count
         $gigabit_scale_factor = 1024 * 1024 * 1024;
         $megabit_scale_factor = 1024 * 1024;
@@ -40,5 +41,16 @@ class APICoreToolsTestCase extends TestCase {
                 bandwidth_to_bits(500, 'invalid!');
             },
         );
+    }
+
+    /**
+     * Checks that the to_upper_camel_case() function correctly converts a provided string into upper camel case.
+     */
+    public function test_to_upper_camel_case(): void
+    {
+        $this->assert_equals(to_upper_camel_case('this_is_a_test'), 'ThisIsATest');
+        $this->assert_equals(to_upper_camel_case('this-is-a-test'), 'ThisIsATest');
+        $this->assert_equals(to_upper_camel_case('this is a test'), 'ThisIsATest');
+        $this->assert_equals(to_upper_camel_case('_this is-a test'), 'ThisIsATest');
     }
 }

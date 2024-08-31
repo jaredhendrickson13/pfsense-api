@@ -46,6 +46,20 @@ function is_assoc_array(array $array): bool {
 }
 
 /**
+ * Converts a string to UpperCamelCase.
+ * @param string $string The string to convert to UpperCamelCase.
+ * @return string The string converted to UpperCamelCase.
+ */
+function to_upper_camel_case($string): string {
+    # Remove non-alphanumeric characters and convert to lowercase
+    $string = preg_replace('/[^a-zA-Z0-9]+/', ' ', $string);
+    $string = trim($string);
+
+    # Capitalize the first letter of each word and remove whitespace
+    return str_replace(' ', '', ucwords($string));
+}
+
+/**
  * Conditionally prints a message to the console. The specified $message will only be printed if $condition is true.
  * @param string $message The message to be printed if the $condition is true.
  * @param bool $condition A true or false condition. If the condition is true, the $message will be printed. Otherwise
