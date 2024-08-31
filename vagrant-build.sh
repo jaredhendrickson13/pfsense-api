@@ -13,7 +13,7 @@ SSH_CONFIG_FILE=$(mktemp)
 vagrant ssh-config > "$SSH_CONFIG_FILE"
 
 # Copy the source code to the vagrant box using SCP (vagrant upload skips hidden files)
-rsync -avz --progress -e "ssh -F $SSH_CONFIG_FILE" ../pfsense-api vagrant@default:/home/vagrant/build/ --exclude node_modules --exclude .git --exclude .phpdoc --exclude vendor --exclude .vagrant
+rsync -avz --progress -e "ssh -F $SSH_CONFIG_FILE" ../pfsense-api vagrant@default:/home/vagrant/build/ --exclude node_modules --exclude .git --exclude .phpdoc --exclude ./vendor --exclude .vagrant
 
 # Run the build script on the vagrant box
 cat << END | vagrant ssh
