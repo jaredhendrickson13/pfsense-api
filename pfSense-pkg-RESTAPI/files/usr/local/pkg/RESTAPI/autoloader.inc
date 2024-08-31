@@ -18,20 +18,6 @@ require_once 'pkg-utils.inc';
 require_once 'firewall_virtual_ip.inc';
 require_once 'includes/functions.inc.php';
 
-# Check if the php-jwt dependency has already been installed. This is necessary to concurrently run v1 and v2 on the
-# same system since both packages install this dependency, which creates conflicts.
-# TODO: Look into the feasibility of making php-jwt its own pfSense package that both packages can share
-$jwt_path_prefix = !is_dir('/etc/inc/firebase/php-jwt/src') ? 'RESTAPI/.resources/includes/' : '';
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWT.php";
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWK.php";
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/Key.php";
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/CachedKeySet.php";
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php";
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/ExpiredException.php";
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/SignatureInvalidException.php";
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/BeforeValidException.php";
-require_once "{$jwt_path_prefix}firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php";
-
 # Ensure the RESTAPI BaseTraits is imported before any other libraries
 require_once 'RESTAPI/Core/BaseTraits.inc';
 
@@ -65,3 +51,6 @@ foreach (RESTAPI_LIBRARIES as $library) {
 # the Endpoint classes to auto-generate Endpoint privileges
 require_once 'priv.defs.inc';
 require_once 'priv.inc';
+
+# Include the Composer autoloader
+require_once '/usr/local/pkg/RESTAPI/.resources/vendor/autoload.php';
