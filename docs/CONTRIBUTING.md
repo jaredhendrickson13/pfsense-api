@@ -47,7 +47,7 @@ While not a PHP namespace, this directory contains common resources and tools us
 
 Contains the cache files for the REST API package. Cache files are typically JSON datasets populated by [\RESTAPI\Core\Cache](https://pfrest.org/php-docs/classes/RESTAPI-Core-Cache.html) child classes and are refreshed on the schedule defined in the class.
 
-#### includes/
+#### vendor/
 
 Contains additional PHP libraries and classes required by the REST API package. Because pfSense does not include a PHP package manager, these libraries are installed to this directory via composer when the package is built.
 
