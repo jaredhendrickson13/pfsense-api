@@ -139,7 +139,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_primary_dhcp_pool_cannot_conflict_with_vip() {
         # Create a virtual IP to use for testing
         $vip = new VirtualIP(interface: 'lan', mode: 'ipalias', subnet: '192.168.1.2', subnet_bits: 24);
-        $vip->create();
+        $vip->create(apply: true);
 
         # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the vip
         $this->assert_throws_response(
@@ -155,7 +155,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
         );
 
         # Delete the virtual IP
-        $vip->delete();
+        $vip->delete(apply: true);
     }
 
     /**
@@ -169,7 +169,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
             ipaddr: '192.168.1.2',
             async: false,
         );
-        $static_map->create();
+        $static_map->create(apply: true);
 
         # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the static mapping
         $this->assert_throws_response(
@@ -185,7 +185,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
         );
 
         # Delete the static map
-        $static_map->delete();
+        $static_map->delete(apply: true);
     }
 
     /**
@@ -241,7 +241,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_no_staticarp_with_no_ip_static_mappings() {
         # Add a DHCP static mapping
         $static_mapping = new DHCPServerStaticMapping(parent_id: 'lan', mac: '00:00:00:00:00:00', async: false);
-        $static_mapping->create();
+        $static_mapping->create(apply: true);
 
         # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the static mapping
         $this->assert_throws_response(
@@ -255,7 +255,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
         );
 
         # Delete the static mapping
-        $static_mapping->delete();
+        $static_mapping->delete(apply: true);
     }
 
     /**
@@ -266,7 +266,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
         # Disable the DHCP server and ensure the `dhcpd` process is no longer running
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->enable->value = false;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_does_not_contain(
             (new Command('ps aux'))->output,
             "-pf /var/run/dhcpd.pid {$this->env['PFREST_LAN_IF']}",
@@ -274,7 +274,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
 
         # Enable the DHCP server and ensure the `dhcpd` process is now running
         $dhcp_server->enable->value = true;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('ps aux'))->output,
             "-pf /var/run/dhcpd.pid {$this->env['PFREST_LAN_IF']}",
@@ -288,12 +288,12 @@ class APIModelsDHCPServerTestCase extends TestCase {
         # Enable `ignorebootp` and ensure it is set in the dhcpd.conf
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->ignorebootp->value = true;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'ignore bootp;');
 
         # Disable `ignorebootp` and ensure it is removed from the dhcpd.conf
         $dhcp_server->ignorebootp->value = false;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_does_not_contain((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'ignore bootp;');
     }
 
@@ -304,7 +304,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
         # Set `denyunknown` to `enabled` and ensure dhcpd.conf denies all unknown clients
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->denyunknown->value = 'enabled';
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'deny unknown-clients;');
         $this->assert_str_does_not_contain(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
@@ -313,13 +313,13 @@ class APIModelsDHCPServerTestCase extends TestCase {
 
         # Set `denyunknown` to `class` and ensure dhcpd.conf only allows clients known to this interface
         $dhcp_server->denyunknown->value = 'class';
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'allow members of "s_lan";');
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'deny unknown-clients;');
 
         # Unset `denyunknown` and ensure no 'deny' settings are configured in dhcpd.conf
         $dhcp_server->denyunknown->value = null;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_does_not_contain(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'allow members of "s_lan";',
@@ -337,12 +337,12 @@ class APIModelsDHCPServerTestCase extends TestCase {
         # Enable `ignoreclientuids` and ensure it is set in the dhcpd.conf
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->ignoreclientuids->value = true;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'ignore-client-uids true;');
 
         # Disable `ignoreclientuids` and ensure it is removed from the dhcpd.conf
         $dhcp_server->ignoreclientuids->value = false;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_does_not_contain(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'ignore-client-uids true;',
@@ -355,11 +355,11 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_disablepingcheck_sets_dhcpd_ping_check() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->disablepingcheck->value = true;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'ping-check false;');
 
         $dhcp_server->disablepingcheck->value = false;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'ping-check true;');
     }
 
@@ -370,7 +370,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->range_from->value = '192.168.1.105';
         $dhcp_server->range_to->value = '192.168.1.108';
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'range 192.168.1.105 192.168.1.108;',
@@ -383,7 +383,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_winsserver_sets_dhcpd_netbios_nameservers() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->winsserver->value = ['192.168.1.100', '192.168.1.101'];
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'option netbios-name-servers 192.168.1.100,192.168.1.101;',
@@ -396,7 +396,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_dnsserver_sets_dhcpd_dns_servers() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->dnsserver->value = ['192.168.1.100', '192.168.1.101'];
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'option domain-name-servers 192.168.1.100,192.168.1.101;',
@@ -409,7 +409,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_ntpserver_sets_dhcpd_ntp_servers() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->ntpserver->value = ['192.168.1.100', '192.168.1.101'];
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'option ntp-servers 192.168.1.100,192.168.1.101;',
@@ -422,7 +422,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_mac_allow_sets_dhcpd_allow_members() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->mac_allow->value = ['11:22:33:aa:bb:cc'];
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'match if substring (hardware, 1, 6) = 11:22:33:aa:bb:cc;',
@@ -439,7 +439,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_mac_deny_sets_dhcpd_deny_members() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->mac_deny->value = ['11:22:33:aa:bb:cc'];
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'match if substring (hardware, 1, 6) = 11:22:33:aa:bb:cc;',
@@ -456,7 +456,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_gateway_sets_dhcpd_router() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->gateway->value = '192.168.1.2';
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'option routers 192.168.1.2;',
@@ -469,7 +469,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_domain_sets_dhcpd_domain_name() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->domain->value = 'example.com';
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'option domain-name "example.com";',
@@ -482,7 +482,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_domainsearchlist_sets_dhcpd_domain_search() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->domainsearchlist->value = ['example.com'];
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains(
             (new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output,
             'option domain-search "example.com";',
@@ -495,7 +495,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_defaultleasetime_sets_dhcpd_default_lease_time() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->defaultleasetime->value = 7201;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'default-lease-time 7201;');
     }
 
@@ -505,7 +505,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_maxleasetime_sets_dhcpd_max_lease_time() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->maxleasetime->value = 86401;
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'max-lease-time 86401;');
     }
 
@@ -515,7 +515,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     public function test_failover_peerip_sets_dhcpd_peer_address() {
         $dhcp_server = new DHCPServer(id: 'lan', async: false);
         $dhcp_server->failover_peerip->value = '192.168.1.2';
-        $dhcp_server->update();
+        $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'peer address 192.168.1.2;');
     }
 }

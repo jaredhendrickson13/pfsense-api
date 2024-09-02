@@ -49,6 +49,7 @@ class FirewallRule extends Model {
     public BooleanField $quick;
     public StringField $direction;
     public UnixTimeField $tracker;
+    public StringField $associated_rule_id;
     public UnixTimeField $created_time;
     public StringField $created_by;
     public UnixTimeField $updated_time;
@@ -199,7 +200,7 @@ class FirewallRule extends Model {
             help_text: 'The TCP flags that must be set for this rule to match.',
         );
         $this->gateway = new ForeignModelField(
-            model_name: 'RoutingGateway',
+            model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
             model_field: 'name',
             default: null,
             allow_null: true,
@@ -263,6 +264,14 @@ class FirewallRule extends Model {
             read_only: true,
             auto_add_now: true,
             help_text: 'The internal tracking ID for this firewall rule.',
+        );
+        $this->associated_rule_id = new StringField(
+            default: null,
+            allow_null: true,
+            editable: false,
+            read_only: true,
+            internal_name: 'associated-rule-id',
+            help_text: 'The internal rule ID for the NAT rule associated with this rule.',
         );
         $this->created_time = new UnixTimeField(
             editable: false,

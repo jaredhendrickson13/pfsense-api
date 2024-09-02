@@ -42,7 +42,7 @@ class ModelSet {
      * @return bool true if Model objects exist in this ModelSet, false if they do not.
      */
     public function exists(): bool {
-        return count($this->model_objects) > 0;
+        return $this->count() > 0;
     }
 
     /**
@@ -72,6 +72,14 @@ class ModelSet {
     }
 
     /**
+     * Reverse the order of the Model objects in this ModelSet.
+     * @return ModelSet A new ModelSet object with the Model objects in reverse order.
+     */
+    public function reverse(): ModelSet {
+        return new ModelSet(array_reverse($this->model_objects));
+    }
+
+    /**
      * Runs the to_representation() method for each model object within the model set and returns them all in an array.
      * @return array A serializable representation of all model objects within this model set.
      */
@@ -88,18 +96,31 @@ class ModelSet {
     }
 
     /**
+     * Deletes all Model objects within this ModelSet.
+     * @return ModelSet The ModelSet object with all Model objects that were deleted.
+     */
+    public function delete(): ModelSet {
+        # Run the delete method for each model object in this ModelSet
+        # Note: We have to do this in reverse order to avoid index issues when deleting objects.
+        $this->run_model_method(method_name: 'delete', reverse: true);
+        return $this;
+    }
+
+    /**
      * Runs a specified Model object method for each model object within this ModelSet.
      * @param string $method_name The name of the Model method to run for each model object in this model set.
      * @param bool $use_id_as_key Use each Model object's `id` property value as the return array keys.
+     * @param bool $reverse Reverse the order of which the model objects are processed.
      * @return array The return value of method call for each model object. Results are stored in the same order as
      * the model objects were passed in during construction.
      */
-    private function run_model_method(string $method_name, bool $use_id_as_key = false): array {
+    private function run_model_method(string $method_name, bool $use_id_as_key = false, bool $reverse = false): array {
         # Variables
         $results = [];
+        $model_objects = $reverse ? array_reverse($this->model_objects) : $this->model_objects;
 
         # Loop through each model object and call its to_representation() method
-        foreach ($this->model_objects as $loop_count => $model_object) {
+        foreach ($model_objects as $loop_count => $model_object) {
             $id = $use_id_as_key ? $model_object->id : $loop_count;
             $results[$id] = $model_object->$method_name();
         }

@@ -15,7 +15,7 @@ class ServicesServiceWatchdogsEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/services/service_watchdogs';
         $this->model_name = 'ServiceWatchdog';
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
         $this->many = true;
 
         # Construct the parent Endpoint object

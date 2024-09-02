@@ -5,6 +5,8 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Models\FirewallAlias;
+use RESTAPI\Models\RoutingGateway;
+use RESTAPI\Models\RoutingGatewayGroup;
 use RESTAPI\Models\TrafficShaper;
 
 class APIFieldsForeignModelFieldTestCase extends TestCase {
@@ -319,5 +321,38 @@ class APIFieldsForeignModelFieldTestCase extends TestCase {
                 $field->validate();
             },
         );
+    }
+
+    /**
+     * Checks that multiple $model_name classes can be checked for the same $model_field.
+     */
+    public function test_multiple_model_names(): void {
+        # Create a Gateway and GatewayGroup object to use for testing purposes
+        $gateway = new RoutingGateway(
+            name: 'test_gw',
+            interface: 'wan',
+            ipprotocol: 'inet',
+            gateway: '1.1.1.1',
+            nonlocalgateway: true,
+        );
+        $gateway->create();
+        $gateway_group = new RoutingGatewayGroup(
+            name: 'test_gw_group',
+            trigger: 'down',
+            descr: 'Test Gateway Group',
+            priorities: [['gateway' => 'test_gw', 'tier' => 1, 'virtual_ip' => 'address']],
+        );
+        $gateway_group->create();
+
+        # Create a ForeignModelField object for testing
+        $field = new ForeignModelField(model_name: ['RoutingGateway', 'RoutingGatewayGroup'], model_field: 'name');
+        $field->value = 'test_gw';
+        $this->assert_equals($field->get_related_model()->get_class_shortname(), 'RoutingGateway');
+        $field->value = 'test_gw_group';
+        $this->assert_equals($field->get_related_model()->get_class_shortname(), 'RoutingGatewayGroup');
+
+        # Delete the gateway and gateway group used for testing
+        $gateway_group->delete();
+        $gateway->delete();
     }
 }

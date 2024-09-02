@@ -16,7 +16,7 @@ class UserGroupsEndpoint extends Endpoint {
         $this->url = '/api/v2/user/groups';
         $this->model_name = 'UserGroup';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

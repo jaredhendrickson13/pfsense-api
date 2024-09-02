@@ -710,19 +710,10 @@ class Model {
     }
 
     /**
-     * Logs an error to the syslog.
-     * @param string $message The error message to write to the syslog
-     */
-    public static function log_error(string $message): void {
-        # Call the pfSense `log_error` function
-        log_error($message);
-    }
-
-    /**
      * Converts this Model object into it's internal pfSense configuration form.
-     * @return array The internal value suitable for writing to the pfSense configuration.
+     * @return array|string The internal value suitable for writing to the pfSense configuration.
      */
-    public function to_internal(): array {
+    public function to_internal(): array|string {
         # Variables
         $internal_object = [];
 
@@ -765,12 +756,18 @@ class Model {
      * @return array The array of internal objects without any additional processing performed.
      */
     public function get_internal_objects(): array {
+        global $mock_internal_objects;
+
         # Throw an error if both `config_path` and `internal_callable` are set.
         if ($this->config_path and $this->internal_callable) {
             throw new ServerError(
                 message: 'Models cannot define both a config path and an internal callable.',
                 response_id: 'MODEL_WITH_CONFIG_PATH',
             );
+        }
+        # Use mock data if the $mock_internal_objects global is set
+        elseif ($mock_internal_objects) {
+            $internal_objects = $mock_internal_objects;
         }
         # Obtain the internal objects from the config path if specified
         elseif ($this->config_path) {
@@ -1236,6 +1233,11 @@ class Model {
         # Use a variable to keep track of Fields with custom validate methods
         $custom_validate_fields = [];
 
+        # For 'many' Models, capture all current Models in a ModelSet if one was not already given
+        if ($this->many and !$modelset) {
+            $modelset = $this->read_all(parent_id: $this->parent_id);
+        }
+
         # Loop through each of this object's assigned Fields and validate them.
         foreach ($this->get_fields() as $field) {
             # Assign this object as the Fields parent Model context
@@ -1669,6 +1671,54 @@ class Model {
     }
 
     /**
+     * Appends changes between the current object and the initial object for `many` enabled fields. This allows for
+     * changes to array field values to be appended to the existing array during updates instead of replaced.
+     */
+    private function append_array_changes(): void {
+        # Loop through each field in this Model object and append changes to array fields
+        foreach ($this->get_fields() as $field) {
+            # Skip this field if it is not a `many` Field
+            if (!$this->$field->many) {
+                continue;
+            }
+
+            # Skip this field if it is not an array
+            if (!is_array($this->$field->value)) {
+                continue;
+            }
+
+            # Append the changes to the existing array if they are not the same
+            if ($this->$field->value !== $this->initial_object->$field->value) {
+                $this->$field->value = array_merge($this->initial_object->$field->value, $this->$field->value);
+            }
+        }
+    }
+
+    /**
+     * Removes changes between the current object and the initial object for `many` enabled fields. This allows for
+     * changes to array field values to be removed from the existing array during updates instead of being replaced.
+     */
+    private function remove_array_changes(): void {
+        # Loop through each field in this Model object and remove changes from array fields
+        foreach ($this->get_fields() as $field) {
+            # Skip this field if it is not a `many` Field
+            if (!$this->$field->many) {
+                continue;
+            }
+
+            # Skip this field if it is not an array
+            if (!is_array($this->$field->value)) {
+                continue;
+            }
+
+            # Remove the changes from the existing array if they are not the same
+            if ($this->$field->value !== $this->initial_object->$field->value) {
+                $this->$field->value = array_diff($this->initial_object->$field->value, $this->$field->value);
+            }
+        }
+    }
+
+    /**
      * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
      * load Model objects for each object stored at the config path. If `internal_callable` is set, this will create
      * Model objects for each object returned by the specified callable.
@@ -1678,17 +1728,23 @@ class Model {
      * enabled Models.
      * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
      * enabled Models.
+     * @param bool $reverse Set to true to reverse the order of the ModelSet. This is only applicable to $many enabled
+     * Models.
      * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
      * not enabled.
      */
-    public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0): ModelSet|Model {
+    public static function read_all(
+        mixed $parent_id = null,
+        int $limit = 0,
+        int $offset = 0,
+        bool $reverse = false,
+    ): ModelSet|Model {
         # Variables
         $model_name = get_called_class();
         $model = new $model_name(parent_id: $parent_id);
         $model_objects = [];
         $is_parent_model_many = $model->is_parent_model_many();
         $requests_pagination = ($limit or $offset);
-        $offset_counter = 0;
 
         # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
         if ($is_parent_model_many and !isset($parent_id)) {
@@ -1713,35 +1769,28 @@ class Model {
         # For non `many` Models, wrap the internal object in an array so we can loop
         $internal_objects = $model->many ? $internal_objects : [$internal_objects];
 
+        # Reverse the order we read the objects and/or paginate if requested
+        $internal_objects = $reverse ? array_reverse($internal_objects, preserve_keys: true) : $internal_objects;
+        $internal_objects = self::paginate($internal_objects, $limit, $offset, preserve_keys: true);
+
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id => $internal_object) {
-            # Do not include this object if we have not reached our offset
-            if ($offset_counter < $offset) {
-                $offset_counter++;
-                continue;
-            }
+            # Ensure numeric IDs are converted to integers
+            $internal_id = is_numeric($internal_id) ? (int) $internal_id : $internal_id;
 
             # Create a new Model object for this internal object and assign its ID
             $model_object = new $model(id: $internal_id, parent_id: $parent_id, skip_init: true);
 
             # Obtain the parent Model object if this Model has a parent Model class assigned
-            $model_object->get_parent_model();
+            $model_object->parent_model = $model->parent_model;
 
             # Populate the Model object using its current internal values and add it to the array of all Model objects
             $model_object->from_internal_object($internal_object);
             $model_objects[] = $model_object;
-
-            # Break the loop if $limit is set, and we've met our limit of objects to obtain
-            if ($limit and $limit === count($model_objects)) {
-                break;
-            }
-
-            # Increase the offset counter
-            $offset_counter++;
         }
 
-        # Unwrap the array for non `many` Models, otherwise return all objects
-        return $model->many ? new ModelSet($model_objects) : $model_objects[0];
+        # For many enabled Models return a ModelSet, otherwise return a single Model object
+        return $model->many ? new ModelSet(model_objects: $model_objects) : $model_objects[0];
     }
 
     /**
@@ -1756,6 +1805,8 @@ class Model {
      * enabled Models.
      * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
      * enabled Models.
+     * @param bool $reverse Set to true to reverse the order of the ModelSet. This is only applicable to $many enabled
+     * Models.
      * @param mixed ...$vl_query_params Qyery parameters that are passed in using variable-length arguments
      * https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
      * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
@@ -1766,6 +1817,7 @@ class Model {
         mixed $parent_id = null,
         int $limit = 0,
         int $offset = 0,
+        bool $reverse = false,
         ...$vl_query_params,
     ): ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
@@ -1773,24 +1825,27 @@ class Model {
 
         # If no query parameters were provided, just run read_all() with pagination for optimal performance
         if (!$query_params) {
-            return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset);
+            return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset, reverse: $reverse);
         }
 
         # Perform the query against all Model objects for this Model first
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
 
-        # Apply pagination to limit the number of objects returned if requested
+        # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);
-        return $modelset;
+        return $reverse ? $modelset->reverse() : $modelset;
     }
 
     /**
      * Paginates a given array but obtaining a smaller subset of the array based on the provided limit and offset values.
+     * @param array $array The array to paginate.
      * @param int $limit The maximum number of items to return in the paginated array. Use 0 to impose no limit.
      * @param int $offset The starting point in the array to begin the paginated array.
+     * @param bool $preserve_keys Set to true to preserve the keys of the array. This is useful when the array is
+     * associative and you want to maintain the key-value pairs.
      * @return array The paginated array containing only the subset of items that match the limit and offset values.
      */
-    public static function paginate(array $array, int $limit, int $offset): array {
+    public static function paginate(array $array, int $limit, int $offset, bool $preserve_keys = false): array {
         # Return the entire array if no limit or offset is set
         if (!$limit and !$offset) {
             return $array;
@@ -1807,7 +1862,7 @@ class Model {
         }
 
         # Return the subset of the array that matches the limit and offset values
-        return array_slice($array, $offset, $limit);
+        return array_slice($array, $offset, $limit, preserve_keys: $preserve_keys);
     }
 
     /**
@@ -1939,9 +1994,23 @@ class Model {
     /**
      * Perform validation, update this object internally and restart any associated services.
      * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
+     * @param bool $append Set to `true` if you would like to append changes to arrays in the existing object instead
+     * of replacing the entire array. This only applies to `many` enabled Fields.
+     * @param bool $remove Set to `true` if you would like to remove values from arrays in the existing object instead
+     * of replacing the entire array. This only applies to `many` enabled Fields.
      * @return Model Returns the updated Model object (this object).
      */
-    final public function update(bool $apply = false): Model {
+    final public function update(bool $apply = false, bool $append = false, bool $remove = false): Model {
+        # Append changes to the many enabled fields if requested. This must be done before validation.
+        if ($append) {
+            $this->append_array_changes();
+        }
+
+        # Remove changes from the many enabled fields if requested. This must be done before validation.
+        if ($remove) {
+            $this->remove_array_changes();
+        }
+
         # Ensure all object Fields and validations succeed for proceeding.
         if ($this->validate(requires_id: true)) {
             # Run the _update method
@@ -2018,13 +2087,13 @@ class Model {
         $initial_objects = $this->read_all(parent_id: $this->parent_id);
 
         # Obtain any Models that are deemed protected to ensure they do not removed in the next step.
-        $protected_models = new ModelSet();
+        $new_objects = new ModelSet();
         if ($this->protected_model_query) {
-            $protected_models = $initial_objects->query(query_params: $this->protected_model_query);
+            $new_objects = $initial_objects->query(query_params: $this->protected_model_query);
         }
 
         # Before beginning validation, empty the stored values in the config path. Retain protected Models (if any).
-        $this->set_config($this->get_config_path(), $protected_models->to_internal());
+        $this->set_config($this->get_config_path(), $new_objects->to_internal());
 
         # Loop through each Model representation included in the array
         foreach ($data as $representation_object) {
@@ -2032,21 +2101,20 @@ class Model {
             unset($representation_object['id']);
 
             # Define a new Model object using this representation and validate
-            $model_object = new $this(data: $representation_object);
+            $model_object = new $this(data: $representation_object, skip_init: true);
             $model_object->id = $model_object->get_next_id();
-            $model_object->validate();
+            $model_object->validate(modelset: $new_objects);
 
             # If an error was not thrown during Model object creation or validation, give it an ID and set the config
-            $model_object->id = $model_object->get_next_id();
             $this->set_config("{$this->get_config_path()}/$model_object->id", $model_object->to_internal());
+
+            # Add the new Model object to the ModelSet
+            $new_objects->model_objects[] = $model_object;
         }
 
         # Sort and write the changes to config
         $this->sort();
         $this->write_config("Replaced all $this->verbose_name_plural via API");
-
-        # Read all new objects for this Model so it can be passed into `apply_replace_all()`.
-        $new_objects = $this->read_all(parent_id: $this->parent_id);
 
         # Mark the subsystem as dirty if set
         if ($this->subsystem) {
@@ -2146,6 +2214,64 @@ class Model {
 
         # Return the current representation of this object
         return $this;
+    }
+
+    /**
+     * Uses a query to delete many Model objects at once. This method is only available for $many Models.
+     * @param array $query_params An array of query parameters.
+     * @param array $excluded An array of field names to exclude from the query. This is helpful when
+     *  query data may have extra values that you do not want to include in the query.
+     * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
+     *  $many Models with a $parent_model_class. This value has no affect otherwise.
+     * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many
+     *  enabled Models.
+     * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
+     *  enabled Models.
+     * @param mixed ...$vl_query_params Qyery parameters that are passed in using variable-length arguments
+     *  https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
+     * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
+     */
+    public static function delete_many(
+        array $query_params = [],
+        array $excluded = [],
+        mixed $parent_id = null,
+        int $limit = 0,
+        int $offset = 0,
+        ...$vl_query_params,
+    ): ModelSet {
+        # Merge the $query_params and any provided variable-length arguments into a single variable
+        $query_params = array_merge($query_params, $vl_query_params);
+
+        # As a safety net, always require at least one query parameter to perform mass deletion.
+        if (!$query_params) {
+            throw new ValidationError(
+                message: 'At least one query parameter is required to perform mass deletion.',
+                response_id: 'MODEL_DELETE_MANY_REQUIRES_QUERY_PARAMS',
+            );
+        }
+
+        # Obtain all Model objects that match the query of objects to be deleted
+        $model_objects = self::query(
+            query_params: $query_params,
+            excluded: $excluded,
+            parent_id: $parent_id,
+            limit: $limit,
+            offset: $offset,
+        );
+
+        # Delete the Model objects that matched the query
+        return $model_objects->delete();
+    }
+
+    /**
+     * Deletes all Model objects for this Model. This method is only available for $many Models without a $parent_model_class.
+     */
+    public static function delete_all(): ModelSet|Model {
+        # Obtain all Model objects for this Model
+        $model_objects = self::read_all();
+
+        # Delete all Model objects for this Model
+        return $model_objects->delete();
     }
 
     /**

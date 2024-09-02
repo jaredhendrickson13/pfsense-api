@@ -17,7 +17,7 @@ class UsersEndpoint extends Endpoint {
         $this->model_name = 'User';
         $this->tag = 'USER';
         $this->many = true;
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

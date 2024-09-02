@@ -16,7 +16,7 @@ class VPNWireGuardTunnelsEndpoint extends Endpoint {
         $this->url = '/api/v2/vpn/wireguard/tunnels';
         $this->model_name = 'WireGuardTunnel';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

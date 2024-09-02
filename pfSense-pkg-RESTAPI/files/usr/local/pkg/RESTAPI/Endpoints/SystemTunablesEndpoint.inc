@@ -16,7 +16,7 @@ class SystemTunablesEndpoint extends Endpoint {
         $this->url = '/api/v2/system/tunables';
         $this->model_name = 'SystemTunable';
         $this->many = true;
-        $this->request_method_options = ['GET', 'PUT'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

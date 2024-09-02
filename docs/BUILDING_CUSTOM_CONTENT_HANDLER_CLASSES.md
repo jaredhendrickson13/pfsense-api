@@ -51,21 +51,6 @@ must be set to a valid MIME type string.
     The `mime_type` property must be unique from all other ContentHandler classes. If two ContentHandler classes have the same
     `mime_type` property, unexpected behavior may occur.
 
-## Implementing the get_content() Method
-
-The `get_content()` method is used to obtain the raw request content from the API client. This method is required and should
-return the raw request content without any additional processing. In most cases, you should define this method as follows:
-
-```php
-/**
- * Get the raw request content from the API client.
- * @return string The raw request content.
- */
-
-public function get_content(): string {
-    return file_get_contents('php://input') ?? '';
-}
-```
 ## Implementing the _decode() Method
 
 The `_decode()` method is used to define how the ContentHandler decodes the raw request content returned by 

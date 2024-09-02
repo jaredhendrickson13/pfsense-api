@@ -3,6 +3,8 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Core\ModelSet;
+use RESTAPI\Dispatchers\FirewallStateTableResetDispatcher;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 
@@ -63,6 +65,11 @@ class FirewallState extends Model {
             help_text: 'The destination address listed in the state. Note: Depending on the `protocol`, this value may ' .
                 'contain the destination port as well.',
         );
+        $this->state = new StringField(
+            default: null,
+            allow_null: true,
+            help_text: 'The current status of the firewall state.',
+        );
         $this->age = new StringField(
             default: null,
             allow_null: true,
@@ -119,6 +126,17 @@ class FirewallState extends Model {
      */
     protected function get_pf_states(): array {
         return pfSense_get_pf_states();
+    }
+
+    /**
+     * Resets the entire state table.
+     * @note This action is performed in the background and on a delay to prevent the API from hanging or timing out.
+     */
+    public static function delete_all(): ModelSet|Model {
+        # Initiate the state table reset in the background
+        $dispatcher = new FirewallStateTableResetDispatcher(async: true);
+        $dispatcher->spawn_process();
+        return new ModelSet();
     }
 
     /**

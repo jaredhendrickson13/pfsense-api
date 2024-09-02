@@ -101,7 +101,7 @@ function build_privs(): void {
  * @param string|null $dispatcher_name
  * @note This function does not call the Dispatcher process asynchronously, it will wait for the process to complete.
  */
-function notify_dispatcher(string|null $dispatcher_name): void {
+function notify_dispatcher(string|null $dispatcher_name, array $arguments = []): void {
     # Format the fully qualified class name
     $class = "\\RESTAPI\\Dispatchers\\$dispatcher_name";
 
@@ -124,7 +124,7 @@ function notify_dispatcher(string|null $dispatcher_name): void {
     echo "Running $class process... ";
     file_put_contents("/tmp/$dispatcher_name.lock", 'lock');
     $dispatcher = new $class(async: false);
-    $dispatcher->process();
+    $dispatcher->process(...$arguments);
 
     # Remove the lock and exit once the process is complete
     echo 'done.' . PHP_EOL;
@@ -423,7 +423,9 @@ elseif ($argv[1] == 'generatedocs') {
 }
 # NOTIFY_DISPATCHER COMMAND
 elseif ($argv[1] == 'notifydispatcher') {
-    notify_dispatcher(dispatcher_name: $argv[2]);
+    # Decode JSON arguments if they were provided and notify the Dispatcher
+    $arguments = $argv[3] ? json_decode($argv[3], associative: true) : [];
+    notify_dispatcher(dispatcher_name: $argv[2], arguments: $arguments);
 }
 # SCHEDULE_DISPATCHER COMMAND
 elseif ($argv[1] == 'scheduledispatchers') {

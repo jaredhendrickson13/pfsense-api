@@ -39,8 +39,8 @@ class DHCPServerAddressPool extends Model {
         # Define Model attributes
         $this->parent_model_class = 'DHCPServer';
         $this->config_path = 'pool';
+        $this->subsystem = 'dhcpd';
         $this->many = true;
-        $this->always_apply = true;
 
         $this->range_from = new StringField(
             required: true,

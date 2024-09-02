@@ -39,8 +39,8 @@ class DHCPServerStaticMapping extends Model {
         # Define model attributes
         $this->parent_model_class = 'DHCPServer';
         $this->config_path = 'staticmap';
+        $this->subsystem = 'dhcpd';
         $this->many = true;
-        $this->always_apply = true;
 
         # Define model Fields
         $this->mac = new StringField(
@@ -51,17 +51,20 @@ class DHCPServerStaticMapping extends Model {
         );
         $this->ipaddr = new StringField(
             default: null,
+            allow_empty: true,
             allow_null: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
             help_text: 'The IP address to assign this client via DHCP.',
         );
         $this->cid = new StringField(
             default: null,
+            allow_empty: true,
             allow_null: true,
             help_text: 'The client identifier of the client this mapping is for.',
         );
         $this->hostname = new StringField(
             default: null,
+            allow_empty: true,
             allow_null: true,
             validators: [new HostnameValidator()],
             help_text: 'The hostname to assign this client via DHCP.',
@@ -161,6 +164,14 @@ class DHCPServerStaticMapping extends Model {
                 message: "Field `ipaddr` overlaps existing $overlapped_model->verbose_name with ID " .
                     "`$overlapped_model->id`.",
                 response_id: 'DHCP_SERVER_STATIC_MAPPING_IPADDR_OVERLAPS_EXISTING_OBJECT',
+            );
+        }
+
+        # Do not allow this $ipaddr to be outside the interface's subnet
+        if ($ipaddr and !$this->parent_model->interface->get_related_model()->is_ipv4_in_cidr($ipaddr)) {
+            throw new ValidationError(
+                message: 'Field `ipaddr` must be within the interface\'s subnet.',
+                response_id: 'DHCP_SERVER_STATIC_MAPPING_IPADDR_NOT_WITHIN_SUBNET',
             );
         }
 

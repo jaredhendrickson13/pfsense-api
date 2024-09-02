@@ -4,13 +4,16 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Core\Response;
 use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\FilterAddressField;
+use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
+use RESTAPI\Responses\ServerError;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**
@@ -18,6 +21,7 @@ use RESTAPI\Validators\IPAddressValidator;
  */
 class PortForward extends Model {
     public InterfaceField $interface;
+    public StringField $ipprotocol;
     public StringField $protocol;
     public FilterAddressField $source;
     public PortField $source_port;
@@ -30,7 +34,7 @@ class PortForward extends Model {
     public BooleanField $nosync;
     public StringField $descr;
     public StringField $natreflection;
-    public StringField $associated_rule_id;
+    public ForeignModelField $associated_rule_id;
     public UnixTimeField $created_time;
     public StringField $created_by;
     public UnixTimeField $updated_time;
@@ -53,6 +57,11 @@ class PortForward extends Model {
             allow_openvpn_interface: true,
             allow_carp_interface: false,
             help_text: 'The interface this port forward rule applies to.',
+        );
+        $this->ipprotocol = new StringField(
+            default: 'inet',
+            choices: ['inet', 'inet6', 'inet46'],
+            help_text: 'The IP protocol this port forward rule should match.',
         );
         $this->protocol = new StringField(
             required: true,
@@ -89,7 +98,7 @@ class PortForward extends Model {
         );
         $this->target = new StringField(
             required: true,
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_alias: true)],
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_alias: true)],
             help_text: 'The IP address or alias of the internal host to forward matching traffic to.',
         );
         $this->local_port = new PortField(
@@ -123,14 +132,18 @@ class PortForward extends Model {
             help_text: 'The NAT reflection mode to use for traffic matching this port forward rule. Set to `null` to ' .
                 'use the system default.',
         );
-        $this->associated_rule_id = new StringField(
+        $this->associated_rule_id = new ForeignModelField(
+            model_name: 'FirewallRule',
+            model_field: 'associated_rule_id',
+            allowed_keywords: ['', 'new', 'pass'],
             default: '',
-            choices: ['', 'pass'],
             allow_empty: true,
             internal_name: 'associated-rule-id',
-            help_text: 'The associated firewall rule mode. Use `pass` to automatically pass traffic matching this ' .
-                'port forward rule without the need for a firewall rule. Use an empty string to require a separate ' .
-                'firewall rule to be created to pass traffic matching this port forward rule.',
+            help_text: 'The associated firewall rule mode. Use an empty string to require a separate firewall rule ' .
+                'to be created to pass traffic matching this port forward rule. Use `new` to create a new associated ' .
+                'firewall rule to pass traffic matching this port forward rule. Use `pass` to automatically pass ' .
+                'traffic matching this port forward rule without the need for a firewall rule.   Otherwise, you can ' .
+                'specify the `associated_rule_id` of an existing firewall rule to associate with this port forward rule.',
         );
         $this->created_time = new UnixTimeField(
             editable: false,
@@ -168,9 +181,105 @@ class PortForward extends Model {
     }
 
     /**
+     * Overrides the default _create() method to ensure the associated_rule_id is generated if it's set to `new`.
+     */
+    public function _create(): void {
+        # Before writing this model to the config, generate an associated_rule_id if it's set to 'new'
+        if ($this->associated_rule_id->value === 'new') {
+            $this->associated_rule_id->value = get_unique_id();
+        }
+
+        parent::_create();
+    }
+
+    /**
+     * Creates an associated firewall rule for this port forward rule if requested after creation.
+     */
+    public function pre_apply_create(): void {
+        # Only create a new associated rule if the associated_rule_id is not pass or empty
+        if ($this->associated_rule_id->value and $this->associated_rule_id->value !== 'pass') {
+            $firewall_rule = new FirewallRule(
+                type: 'pass',
+                interface: [$this->interface->value],
+                ipprotocol: $this->ipprotocol->value,
+                protocol: $this->protocol->value,
+                source: $this->source->value,
+                source_port: $this->source_port->value,
+                destination: $this->destination->value,
+                destination_port: $this->destination_port->value,
+                descr: "Associated rule for port forward rule {$this->associated_rule_id->value}",
+                client: $this->client,
+            );
+            $firewall_rule->associated_rule_id->value = $this->associated_rule_id->value;
+
+            # Format any errors that occur during the creation of the rule so its clear that its associated with the linked rule
+            try {
+                $firewall_rule->create();
+            } catch (Response $e) {
+                throw new ServerError(
+                    message: "Failed to create associated firewall rule for port forward rule: $e->message",
+                    response_id: 'PORT_FORWARD_ASSOCIATED_FIREWALL_RULE_CREATION_FAILED',
+                );
+            }
+        }
+    }
+
+    /**
+     * Updates the associated firewall rule for this port forward rule if assigned after updates
+     */
+    public function pre_apply_update(): void {
+        # Skip this method if the associated_rule_id is not set or is set to pass
+        if (!$this->associated_rule_id->value or $this->associated_rule_id->value === 'pass') {
+            return;
+        }
+
+        # Query for the associated firewall rule
+        $rule_q = FirewallRule::query(associated_rule_id: $this->associated_rule_id->value);
+
+        # If the associated rule exists, update it
+        if ($rule_q->exists()) {
+            $firewall_rule = $rule_q->first();
+            $firewall_rule->from_representation(
+                type: 'pass',
+                interface: [$this->interface->value],
+                ipprotocol: $this->ipprotocol->value,
+                protocol: $this->protocol->value,
+                source: $this->source->value,
+                source_port: $this->source_port->value,
+                destination: $this->destination->value,
+                destination_port: $this->destination_port->value,
+            );
+
+            # Format any errors that occur during the update of the rule so its clear that its associated with the linked rule
+            try {
+                $firewall_rule->update();
+            } catch (Response $e) {
+                throw new ServerError(
+                    message: "Failed to update associated firewall rule for port forward rule: $e->message",
+                    response_id: 'PORT_FORWARD_ASSOCIATED_FIREWALL_RULE_UPDATE_FAILED',
+                );
+            }
+        }
+    }
+
+    /**
+     * Deletes the associated firewall rule for this port forward rule if assigned after deletion.
+     */
+    public function pre_apply_delete(): void {
+        # Skip this method if the associated_rule_id is not set or is set to pass
+        if (!$this->associated_rule_id->value or $this->associated_rule_id->value === 'pass') {
+            return;
+        }
+
+        # Query for the associated firewall rule and delete it
+        $rule_q = FirewallRule::query(associated_rule_id: $this->associated_rule_id->value);
+        $rule_q->delete();
+    }
+
+    /**
      * Applies port forward changes.
      */
-    public function apply() {
+    public function apply(): void {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

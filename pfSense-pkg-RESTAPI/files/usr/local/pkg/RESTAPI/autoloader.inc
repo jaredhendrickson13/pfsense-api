@@ -8,6 +8,7 @@ require_once 'interfaces.inc';
 require_once 'interfaces_fast.inc';
 require_once 'service-utils.inc';
 require_once 'filter.inc';
+require_once 'itemid.inc';
 require_once 'shaper.inc';
 require_once 'auth.inc';
 require_once 'functions.inc';
@@ -43,6 +44,7 @@ const RESTAPI_LIBRARIES = [
     '/usr/local/pkg/RESTAPI/Responses/',
     '/usr/local/pkg/RESTAPI/Validators/',
     '/usr/local/pkg/RESTAPI/Fields/',
+    '/usr/local/pkg/RESTAPI/ModelTraits/',
     '/usr/local/pkg/RESTAPI/Models/',
     '/usr/local/pkg/RESTAPI/QueryFilters/',
     '/usr/local/pkg/RESTAPI/ContentHandlers/',

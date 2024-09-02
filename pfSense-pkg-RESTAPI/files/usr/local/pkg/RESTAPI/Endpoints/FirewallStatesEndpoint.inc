@@ -14,11 +14,11 @@ class FirewallStatesEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/firewall/states';
         $this->model_name = 'FirewallState';
-        $this->request_method_options = ['GET'];
+        $this->request_method_options = ['GET', 'DELETE'];
         $this->many = true;
-
+        $this->limit = 100; # Set default limit to 100
         # Set documentation help text
-        $this->get_help_text =
+        $this->get_help_text .=
             'Reads all current Firewall States. A normal firewall may have thousands, millions, ' .
             'or even billions of firewall states registered at a time. This can quickly become too much for ' .
             'this endpoint to handle. It is strongly recommended to limit the number of objects obtained by the ' .

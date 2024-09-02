@@ -287,10 +287,10 @@ class APICoreEndpointTestCase extends TestCase {
         # Ensure the request data is correctly obtained and decoded
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['HTTP_CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
-        $_GET = ['key' => 'value'];
+        $_SERVER['QUERY_STRING'] = 'key=value';
         $endpoint = new FirewallAliasEndpoint();
         $endpoint->process_request();
-        $this->assert_equals($endpoint->request_data, ['key' => 'value', 'async' => true, 'limit' => 0, 'offset' => 0]);
+        $this->assert_equals($endpoint->request_data, ['key' => 'value']);
     }
 
     /**
@@ -306,17 +306,17 @@ class APICoreEndpointTestCase extends TestCase {
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['HTTP_CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
 
-        $_GET = ['async' => 'invalid'];
+        $_SERVER['QUERY_STRING'] = 'async=invalid';
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_equals($json_resp->response_id, 'ENDPOINT_ASYNC_FIELD_INVALID_TYPE');
 
-        $_GET = ['limit' => 'invalid'];
+        $_SERVER['QUERY_STRING'] = 'limit=invalid';
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_equals($json_resp->response_id, 'ENDPOINT_LIMIT_FIELD_INVALID_TYPE');
 
-        $_GET = ['offset' => 'invalid'];
+        $_SERVER['QUERY_STRING'] = 'offset=invalid';
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_equals($json_resp->response_id, 'ENDPOINT_OFFSET_FIELD_INVALID_TYPE');
@@ -334,7 +334,7 @@ class APICoreEndpointTestCase extends TestCase {
         # Mock an example POST request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['HTTP_CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
-        $_GET = ['name' => 'test_alias', 'type' => 'host', 'descr' => 'test description'];
+        $_SERVER['QUERY_STRING'] = 'name=test_alias&type=host&descr=test description';
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request(), associative: true);
         $this->assert_equals($json_resp['data'], $endpoint->model->to_representation());
@@ -343,14 +343,14 @@ class APICoreEndpointTestCase extends TestCase {
 
         # Mock an example GET request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_GET = ['id' => $id];
+        $_SERVER['QUERY_STRING'] = "id=$id";
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request(), associative: true);
         $this->assert_equals($json_resp['data'], $alias->to_representation());
 
         # Mock an example PATCH request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'PATCH';
-        $_GET = ['id' => $id, 'descr' => 'new description'];
+        $_SERVER['QUERY_STRING'] = "id=$id&descr=new description";
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request(), associative: true);
         $alias = new FirewallAlias(id: $id);
@@ -359,7 +359,7 @@ class APICoreEndpointTestCase extends TestCase {
 
         # Mock an example DELETE request and ensure the response is correct
         $_SERVER['REQUEST_METHOD'] = 'DELETE';
-        $_GET = ['id' => $id];
+        $_SERVER['QUERY_STRING'] = "id=$id";
         $endpoint = new FirewallAliasEndpoint();
         $json_resp = json_decode($endpoint->process_request(), associative: true);
         $this->assert_equals($json_resp['data'], $alias->to_representation());
@@ -441,6 +441,43 @@ class APICoreEndpointTestCase extends TestCase {
     }
 
     /**
+     * Ensures we can make a DELETE request to `many` endpoints and receive a successful response.
+     */
+    public function test_delete_many_e2e(): void {
+        # Use a PUT request to create new aliases
+        \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'PUT',
+            data: [
+                ['name' => 'host_alias', 'type' => 'host'],
+                ['name' => 'network_alias1', 'type' => 'network'],
+                ['name' => 'network_alias2', 'type' => 'network'],
+                ['name' => 'port_alias', 'type' => 'port'],
+            ],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure we can make a successful DELETE request to a `many` endpoint
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'DELETE',
+            data: ['type' => 'network'],
+            headers: ['Content-Type' => 'application/x-www-form-urlencoded'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+        $this->assert_equals(count($resp->data), 2);
+        $this->assert_equals($resp->data[0]->name, 'network_alias1');
+        $this->assert_equals($resp->data[1]->name, 'network_alias2');
+    }
+
+    /**
      * Ensures that Endpoints correctly allow or deny access based on the REST API Access List.
      */
     public function test_check_acl(): void {
@@ -468,5 +505,178 @@ class APICoreEndpointTestCase extends TestCase {
         $endpoint = new FirewallAliasesEndpoint();
         $json_resp = json_decode($endpoint->process_request());
         $this->assert_equals($json_resp->code, 200);
+    }
+
+    /**
+     * Ensures the Endpoint's $reverse flag correctly reverses the order of the returned data.
+     */
+    public function test_reverse(): void {
+        # Use a PUT request to create new aliases
+        \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'PUT',
+            data: [
+                ['name' => 'host_alias', 'type' => 'host'],
+                ['name' => 'network_alias1', 'type' => 'network'],
+                ['name' => 'network_alias2', 'type' => 'network'],
+                ['name' => 'port_alias', 'type' => 'port'],
+            ],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure the 'reverse' flag does not reverse the order of the returned data by default
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->data[0]->id, 0);
+
+        # Ensure the 'reverse' flag correctly reverses the order of the returned data
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['reverse' => true],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->data[0]->id, 3);
+    }
+
+    /**
+     * Ensure API calls submitted with the 'append' control parameter correctly append the requested array field values
+     * to the existing array field values.
+     */
+    public function test_patch_append(): void {
+        # Use a POST request to create a new alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'POST',
+            data: ['name' => 'host_alias', 'type' => 'host', 'address' => ['127.0.0.1']],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+
+        # Make a PATCH request with 'append' enabled to append a new address to the alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'PATCH',
+            data: ['id' => 0, 'address' => ['127.0.0.2'], 'append' => true],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+        $this->assert_equals($resp->data->address, ['127.0.0.1', '127.0.0.2']);
+
+        # Delete the alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'DELETE',
+            data: ['id' => 0],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+    }
+
+    /**
+     * Ensure API calls submitted with the 'remove' control parameter correctly remove the requested array field values
+     * in the existing array field values.
+     */
+    public function test_patch_remove(): void {
+        # Use a POST request to create a new alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'POST',
+            data: ['name' => 'host_alias', 'type' => 'host', 'address' => ['127.0.0.1', '127.0.0.2', '127.0.0.3']],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+
+        # Make a PATCH request with 'remove' enabled to remove a new address to the alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'PATCH',
+            data: ['id' => 0, 'address' => ['127.0.0.2'], 'remove' => true],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+        $this->assert_equals($resp->data->address, ['127.0.0.1', '127.0.0.3']);
+
+        # Delete the alias
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/alias',
+            method: 'DELETE',
+            data: ['id' => 0],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+    }
+
+    /**
+     * Checks that a DELETE request to a plural endpoint with the 'all' query parameter deletes all Model objects.
+     */
+    public function test_delete_all(): void {
+        # Use a PUT request to create new aliases
+        \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'PUT',
+            data: [
+                ['name' => 'host_alias', 'type' => 'host'],
+                ['name' => 'network_alias1', 'type' => 'network'],
+                ['name' => 'network_alias2', 'type' => 'network'],
+                ['name' => 'port_alias', 'type' => 'port'],
+            ],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure we can make a successful DELETE request to a `many` endpoint
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'DELETE',
+            data: ['all' => true],
+            headers: ['Content-Type' => 'application/x-www-form-urlencoded'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->code, 200);
+        $this->assert_equals(count($resp->data), 4);
     }
 }

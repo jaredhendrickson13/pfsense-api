@@ -6,9 +6,9 @@ use RESTAPI;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\RoutingApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
+use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
-use RESTAPI\Validators\GatewayValidator;
 use RESTAPI\Validators\SubnetValidator;
 
 /**
@@ -16,7 +16,7 @@ use RESTAPI\Validators\SubnetValidator;
  */
 class StaticRoute extends Model {
     public StringField $network;
-    public StringField $gateway;
+    public ForeignModelField $gateway;
     public StringField $descr;
     public BooleanField $disabled;
 
@@ -35,9 +35,10 @@ class StaticRoute extends Model {
             validators: [new SubnetValidator(allow_ipv4: true, allow_ipv6: true, allow_alias: true)],
             help_text: 'Sets the destination network for this static route in CIDR notation.',
         );
-        $this->gateway = new StringField(
+        $this->gateway = new ForeignModelField(
+            model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
+            model_field: 'name',
             required: true,
-            validators: [new GatewayValidator(allow_ipv4: true, allow_ipv6: true)],
             help_text: 'Sets which gateway this route applies to.',
         );
         $this->descr = new StringField(
@@ -116,7 +117,7 @@ class StaticRoute extends Model {
         }
 
         # Fetch the gateway object of the value assigned
-        $gateway_obj = RoutingGateway::query(['name' => $gateway])->first();
+        $gateway_obj = $this->gateway->get_related_model();
 
         # Ensure the upstream gateways IP version matches the `network` assigned
         if ($gateway_obj->ipprotocol->value === 'inet' and !$this->network->has_label('is_subnetv4')) {
