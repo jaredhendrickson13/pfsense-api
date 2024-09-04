@@ -18,6 +18,9 @@ require_once 'pkg-utils.inc';
 require_once 'firewall_virtual_ip.inc';
 require_once 'includes/functions.inc.php';
 
+# Include the Composer autoloader
+require_once '/usr/local/pkg/RESTAPI/.resources/vendor/autoload.php';
+
 # Ensure the RESTAPI BaseTraits is imported before any other libraries
 require_once 'RESTAPI/Core/BaseTraits.inc';
 
@@ -34,6 +37,8 @@ const RESTAPI_LIBRARIES = [
     '/usr/local/pkg/RESTAPI/Models/',
     '/usr/local/pkg/RESTAPI/QueryFilters/',
     '/usr/local/pkg/RESTAPI/ContentHandlers/',
+    '/usr/local/pkg/RESTAPI/Schemas/',
+    '/usr/local/pkg/RESTAPI/GraphQL/',
     '/usr/local/pkg/RESTAPI/Auth',
     '/usr/local/pkg/RESTAPI/Endpoints/',
     '/usr/local/pkg/RESTAPI/Forms/',
@@ -51,6 +56,3 @@ foreach (RESTAPI_LIBRARIES as $library) {
 # the Endpoint classes to auto-generate Endpoint privileges
 require_once 'priv.defs.inc';
 require_once 'priv.inc';
-
-# Include the Composer autoloader
-require_once '/usr/local/pkg/RESTAPI/.resources/vendor/autoload.php';
