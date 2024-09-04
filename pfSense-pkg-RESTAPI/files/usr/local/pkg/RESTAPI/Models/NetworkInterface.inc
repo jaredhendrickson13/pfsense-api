@@ -72,6 +72,7 @@ class NetworkInterface extends Model {
         $this->many = true;
         $this->subsystem = 'interfaces';
         $this->update_strategy = 'replace';
+        $this->id_type = 'string';
 
         # Model Fields
         $this->if = new StringField(

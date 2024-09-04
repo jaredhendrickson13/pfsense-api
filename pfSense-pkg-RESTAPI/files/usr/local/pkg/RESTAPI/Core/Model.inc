@@ -76,11 +76,27 @@ class Model {
     public mixed $id = null;
 
     /**
+     * @var string $id_type
+     * The data type of the ID field for this Model. In most cases, this should be set to 'integer'. In some cases,
+     * the ID field may be a 'string'. This field should be set accordingly to ensure documentation and validation
+     * processes are accurate. This applies exclusively to Models with $many enabled.
+     */
+    public string $id_type = 'integer';
+
+    /**
      * @var mixed $parent_id
      * For Models acting as children to a different Model class, this property will contain the ID of the parent model
      * object. If a $parent_model_class is defined, this value MUST be specified during object construction.
      */
     public mixed $parent_id = null;
+
+    /**
+     * @var string $parent_id_type
+     * The data type of the parent ID field for this Model. In most cases, this should be set to 'integer'. In some cases,
+     * the parent ID field may be a 'string'. This field should be set accordingly to ensure documentation and validation
+     * processes are accurate. This applies exclusively to Models with a $parent_model_class assigned.
+     */
+    public string $parent_id_type = 'integer';
 
     /**
      * @var string $parent_model_class
