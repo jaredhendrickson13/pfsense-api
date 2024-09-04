@@ -9,8 +9,7 @@ namespace RESTAPI\Core;
  * represent this API's data structure in a format that can be easily shared and understood by developers such as
  * OpenAPI, GraphQL, etc.
  */
-abstract class Schema
-{
+abstract class Schema {
     use BaseTraits;
 
     /**
@@ -44,18 +43,14 @@ abstract class Schema
      * Saves the schema to file.
      */
     public function save_schema(): void {
-        file_put_contents(
-            $this->file_path,
-            $this->get_schema_str()
-        );
+        file_put_contents($this->file_path, $this->get_schema_str());
     }
 
     /**
      * Reads the schema from file.
      * @return string The schema as a string.
      */
-    public function read_schema_from_file(): string
-    {
+    public function read_schema_from_file(): string {
         return file_get_contents($this->file_path);
     }
 }

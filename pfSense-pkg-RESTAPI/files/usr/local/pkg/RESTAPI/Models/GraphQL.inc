@@ -11,8 +11,7 @@ use RESTAPI\Schemas\GraphQLSchema;
 /**
  * Defines a model that accept GraphQL queries and mutations and executes them against the GraphQL schema.
  */
-class GraphQL extends Model
-{
+class GraphQL extends Model {
     public StringField $query;
     public ObjectField $variables;
 
@@ -21,8 +20,7 @@ class GraphQL extends Model
      */
     public ?ExecutionResult $result;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->internal_callable = 'get_internal';
         $this->verbose_name = 'GraphQL';
@@ -39,7 +37,7 @@ class GraphQL extends Model
             default: [],
             allow_empty: true,
             help_text: 'The variables to pass to the GraphQL query or mutation. In general, this will be an object ' .
-            'containing the variables to pass to the query or mutation.',
+                'containing the variables to pass to the query or mutation.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
@@ -57,8 +55,7 @@ class GraphQL extends Model
     /**
      * Executes the GraphQL query or mutation against the GraphQL schema.
      */
-    public function _create(): void
-    {
+    public function _create(): void {
         # Obtain the GraphQL schema
         $schema = new GraphQLSchema();
 
@@ -74,8 +71,7 @@ class GraphQL extends Model
      * Prevents the 'result' property from being included in serialization. This property is not serializable and will
      * cause an error when setting the Model::$initial_data property.
      */
-    public function __sleep(): array
-    {
+    public function __sleep(): array {
         # Get the properties of this object
         $properties = get_object_vars($this);
 

@@ -31,8 +31,7 @@ class GraphQLEndpoint extends Endpoint {
      * @param Response $response The incoming response object.
      * @return Response The response object to return to the client.
      */
-    public function response_handler(Response $response): Response
-    {
+    public function response_handler(Response $response): Response {
         # For non-successful responses, convert the error response into a GraphQL response.
         if ($response->code !== 200) {
             return GraphQLResponse::to_graphql_response($response);

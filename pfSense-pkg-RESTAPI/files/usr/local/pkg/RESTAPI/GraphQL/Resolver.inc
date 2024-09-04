@@ -11,8 +11,7 @@ use RESTAPI\Core\Response;
 /**
  * Defines a class that maps/resolves GraphQL queries and mutations to the appropriate Model methods.
  */
-class Resolver
-{
+class Resolver {
     /**
      * Constructs the GraphQLResolver object with a given Model object.
      * @param Model $model The Model object to be used for resolving queries and mutations.
@@ -36,27 +35,23 @@ class Resolver
 
             # Return the query results in an array representation
             return $query->to_representation();
-        }
-        catch (Response $e) {
+        } catch (Response $e) {
             throw new Error(message: $e->message, extensions: ['response_id' => $e->response_id]);
         }
-
     }
 
     /**
      * A resolver that maps a GraphQL query to the Model's 'read' method.
      * @link https://webonyx.github.io/graphql-php/schema-definition-language/#defining-resolvers
      */
-    public function read($root, $args, $context, $info): array
-    {
+    public function read($root, $args, $context, $info): array {
         try {
             # Read the requested object using the Model's 'read' method (which is called on construction)
             $model = new $this->model(id: $args['id'] ?? null, parent_id: $args['parent_id'] ?? null);
 
             # Return the read results in an array representation
             return $model->to_representation();
-        }
-        catch (Response $e) {
+        } catch (Response $e) {
             throw new Error(message: $e->message, extensions: ['response_id' => $e->response_id]);
         }
     }
@@ -72,8 +67,7 @@ class Resolver
 
             # Return the created object in an array representation
             return $model->create()->to_representation();
-        }
-        catch (Response $e) {
+        } catch (Response $e) {
             throw new Error(message: $e->message, extensions: ['response_id' => $e->response_id]);
         }
     }
@@ -89,8 +83,7 @@ class Resolver
 
             # Return the update object in an array representation
             return $model->update()->to_representation();
-        }
-        catch (Response $e) {
+        } catch (Response $e) {
             throw new Error(message: $e->message, extensions: ['response_id' => $e->response_id]);
         }
     }
@@ -106,8 +99,7 @@ class Resolver
 
             # Return the deleted object in an array representation
             return $model->delete()->to_representation();
-        }
-        catch (Response $e) {
+        } catch (Response $e) {
             throw new Error(message: $e->message, extensions: ['response_id' => $e->response_id]);
         }
     }
@@ -116,8 +108,7 @@ class Resolver
      * A resolver that maps a GraphQL mutation to the Model's 'replace_all' method.
      * @link https://webonyx.github.io/graphql-php/schema-definition-language/#defining-resolvers
      */
-    public function replace_all($root, $args, $context, $info): array
-    {
+    public function replace_all($root, $args, $context, $info): array {
         try {
             # Load the existing Model object with the given data
             $model = new $this->model();
@@ -133,8 +124,7 @@ class Resolver
      * A resolver that maps a GraphQL mutation to the Model's 'delete_many' method.
      * @link https://webonyx.github.io/graphql-php/schema-definition-language/#defining-resolvers
      */
-    public function delete_many($root, $args, $context, $info): array
-    {
+    public function delete_many($root, $args, $context, $info): array {
         try {
             # Load the existing Model object with the given data
             $model = new $this->model();

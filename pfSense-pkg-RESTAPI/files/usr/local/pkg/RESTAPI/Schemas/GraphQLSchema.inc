@@ -24,8 +24,7 @@ use function RESTAPI\Core\Tools\to_upper_camel_case;
 /**
  * Defines a Schema that represents this API in GraphQL format. This class is used to generate a GraphQL schema file.
  */
-class GraphQLSchema extends Schema
-{
+class GraphQLSchema extends Schema {
     /**
      * @var string $file_name
      * The file name for this schema.
@@ -61,8 +60,7 @@ class GraphQLSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function __construct()
-    {
+    public function __construct() {
         # Create a custom scalar type for JSON arguments
         $this->query_params_type = new QueryParamsScalarType();
 
@@ -90,8 +88,7 @@ class GraphQLSchema extends Schema
     /**
      * @inheritDoc
      */
-    public function get_schema_str(): string
-    {
+    public function get_schema_str(): string {
         return SchemaPrinter::doPrint($this->get_schema());
     }
 
@@ -106,17 +103,19 @@ class GraphQLSchema extends Schema
      */
     public function field_to_type(Field $field, ?Type $type = null, bool $ignore_required = false): Type {
         # Obtain the GraphQL type that corresponds to this Field's type if one was not provided
-        $type = $type ?: match ($field->type) {
-            'boolean' => Type::boolean(),
-            'integer' => Type::int(),
-            'double' => Type::float(),
-            'string' => Type::string(),
-            'array' => $this->query_params_type,
-            default => throw new ServerError(
-                message: "Field '$field->name' has an unsupported type '$field->type' for GraphQL.",
-                response_id: 'FIELD_UNSUPPORTED_TYPE_FOR_GRAPHQL',
-            ),
-        };
+        $type =
+            $type ?:
+            match ($field->type) {
+                'boolean' => Type::boolean(),
+                'integer' => Type::int(),
+                'double' => Type::float(),
+                'string' => Type::string(),
+                'array' => $this->query_params_type,
+                default => throw new ServerError(
+                    message: "Field '$field->name' has an unsupported type '$field->type' for GraphQL.",
+                    response_id: 'FIELD_UNSUPPORTED_TYPE_FOR_GRAPHQL',
+                ),
+            };
 
         # Use an EnumType for Fields with choices
         if ($field->choices) {
@@ -148,7 +147,7 @@ class GraphQLSchema extends Schema
      */
     public function field_to_enum(Field $field): EnumType {
         # Variables
-        $enum_name = $field->context->get_class_shortname().to_upper_camel_case($field->name).'Enum';
+        $enum_name = $field->context->get_class_shortname() . to_upper_camel_case($field->name) . 'Enum';
 
         # If the Field has an EnumType already, return it
         if (array_key_exists($enum_name, $this->field_enum_types)) {
@@ -172,7 +171,7 @@ class GraphQLSchema extends Schema
             $enum_key = preg_replace('/[^A-Za-z0-9]/', '', $enum_key);
 
             # Prefix 'VAL_' to the Enum key to avoid any potential conflicts
-            $enum_key = 'VAL_'.$enum_key;
+            $enum_key = 'VAL_' . $enum_key;
             $values[$enum_key] = ['value' => $choice];
         }
 
@@ -201,7 +200,6 @@ class GraphQLSchema extends Schema
         $model_sn = $model->get_class_shortname();
         $model_vn = $model->verbose_name;
 
-
         # If an ID is required, add it to the GraphQL schema
         if ($model->many) {
             $fields['id'] = $model->id_type === 'integer' ? Type::int() : Type::string();
@@ -210,9 +208,8 @@ class GraphQLSchema extends Schema
 
         # If a parent ID is required, add it to the GraphQL schema
         if ($model->parent_model_class) {
-            $fields['parent_id'] = $model->parent_id_type === 'integer'
-                ? Type::nonNull(Type::int())
-                : Type::nonNull(Type::string());
+            $fields['parent_id'] =
+                $model->parent_id_type === 'integer' ? Type::nonNull(Type::int()) : Type::nonNull(Type::string());
         }
 
         # Loop through each Field in this Model and obtain its GraphQL field definition
@@ -231,7 +228,7 @@ class GraphQLSchema extends Schema
         }
 
         return $input
-            ? new InputObjectType(['name' => $model_sn."Input", 'description' => $model_vn, 'fields' => $fields])
+            ? new InputObjectType(['name' => $model_sn . 'Input', 'description' => $model_vn, 'fields' => $fields])
             : new ObjectType(['name' => $model_sn, 'description' => $model_vn, 'fields' => $fields]);
     }
 
@@ -241,8 +238,7 @@ class GraphQLSchema extends Schema
      * is the Model's FQN and the value is the GraphQL ObjectType object. Note: This value can also be accessed via the
      * $model_object_types property.
      */
-    public function get_model_object_types(): array
-    {
+    public function get_model_object_types(): array {
         # Variables
         $model_classes = get_classes_from_namespace('RESTAPI\Models');
 
@@ -263,8 +259,7 @@ class GraphQLSchema extends Schema
      * is the Model's FQN and the value is the GraphQL InputObjectType object. Note: This value can also be accessed via the
      * $model_input_object_types property.
      */
-    public function get_model_input_object_types(): array
-    {
+    public function get_model_input_object_types(): array {
         # Variables
         $model_classes = get_classes_from_namespace('RESTAPI\Models');
 
@@ -373,8 +368,7 @@ class GraphQLSchema extends Schema
      * @param Endpoint $endpoint The Endpoint object to convert to a GraphQL query/mutation name.
      * @returns array The GraphQL query field config for this Endpoint object.
      */
-    public function endpoint_to_operation_name(string $operation, Endpoint $endpoint): string
-    {
+    public function endpoint_to_operation_name(string $operation, Endpoint $endpoint): string {
         # Ensure the operation name is lowercase
         $operation = lcfirst($operation);
 
@@ -392,15 +386,14 @@ class GraphQLSchema extends Schema
      * @param Endpoint $endpoint The Endpoint object to convert to a GraphQL query operation.
      * @returns array The GraphQL query field config for this Endpoint object.
      */
-    public function endpoint_to_queries(Endpoint $endpoint): array
-    {
+    public function endpoint_to_queries(Endpoint $endpoint): array {
         # Do not generate GraphQL query operations for Endpoints that do not allow GET requests
         if (!in_array('GET', $endpoint->request_method_options)) {
             return [];
         }
 
         # Get the query operation for this Endpoint. 'many' endpoints will get a query op, non-many will get a read op
-        return ($endpoint->many) ? $this->get_query_query($endpoint) : $this->get_query_read($endpoint);
+        return $endpoint->many ? $this->get_query_query($endpoint) : $this->get_query_read($endpoint);
     }
 
     /**
@@ -419,25 +412,25 @@ class GraphQLSchema extends Schema
                     'query_params' => [
                         'type' => $this->query_params_type,
                         'defaultValue' => [],
-                        'description' => 'An object containing the query parameters used to filter the results.'
+                        'description' => 'An object containing the query parameters used to filter the results.',
                     ],
                     'limit' => [
                         'type' => Type::int(),
                         'defaultValue' => 0,
-                        'description' => 'The maximum number of objects to return.'
+                        'description' => 'The maximum number of objects to return.',
                     ],
                     'offset' => [
                         'type' => Type::int(),
                         'defaultValue' => 0,
-                        'description' => 'The offset to start returning objects from.'
+                        'description' => 'The offset to start returning objects from.',
                     ],
                     'reverse' => [
                         'type' => Type::boolean(),
                         'defaultValue' => false,
-                        'description' => 'Reverse the order of the returned objects.'
+                        'description' => 'Reverse the order of the returned objects.',
                     ],
                 ],
-            ]
+            ],
         ];
     }
 
@@ -455,15 +448,19 @@ class GraphQLSchema extends Schema
         # Require an ID if the Model is a many Model
         if ($endpoint->model->many) {
             $args['id'] = [
-                'type' => $this->get_model_object_type($endpoint->model_name)->getField('id')->getType(),
-                'description' => 'The ID of the object to read.'
+                'type' => $this->get_model_object_type($endpoint->model_name)
+                    ->getField('id')
+                    ->getType(),
+                'description' => 'The ID of the object to read.',
             ];
         }
         # Require a parent ID if the Model has a parent Model
         if ($endpoint->model->parent_model_class) {
             $args['parent_id'] = [
-                'type' => $this->get_model_object_type($endpoint->model_name)->getField('parent_id')->getType(),
-                'description' => 'The parent ID of the object to read.'
+                'type' => $this->get_model_object_type($endpoint->model_name)
+                    ->getField('parent_id')
+                    ->getType(),
+                'description' => 'The parent ID of the object to read.',
             ];
         }
 
@@ -472,7 +469,7 @@ class GraphQLSchema extends Schema
                 'type' => $this->get_model_object_type($endpoint->model_name),
                 'resolve' => [$resolver, 'read'], // Use the GraphQLResolver::read method to resolve this query
                 'args' => $args,
-            ]
+            ],
         ];
     }
 
@@ -525,23 +522,20 @@ class GraphQLSchema extends Schema
         bool $require_id = true,
         bool $only_id = false,
         bool $ignore_required = false,
-        array $exclude_fields = []
+        array $exclude_fields = [],
     ): array {
         # Variables
         $args = [];
 
         # If an ID is required, and the Model supports it, add it to the GraphQL schema
         if ($require_id) {
-            $args['id'] = $model->id_type === 'integer'
-                ? Type::nonNull(Type::int())
-                : Type::nonNull(Type::string());
+            $args['id'] = $model->id_type === 'integer' ? Type::nonNull(Type::int()) : Type::nonNull(Type::string());
         }
 
         # If the Model has a parent Model, add the parent ID to the GraphQL schema
         if ($model->parent_model_class) {
-            $args['parent_id'] = $model->parent_id_type === 'integer'
-                ? Type::nonNull(Type::int())
-                : Type::nonNull(Type::string());
+            $args['parent_id'] =
+                $model->parent_id_type === 'integer' ? Type::nonNull(Type::int()) : Type::nonNull(Type::string());
         }
 
         # If only the ID is required, return the arguments now
@@ -554,7 +548,11 @@ class GraphQLSchema extends Schema
             # For NestedModelFields, ensure we pass the Type for the nested Model
             if ($model->$field instanceof NestedModelField) {
                 $nested_model_type = $this->get_model_input_object_type($model->$field->model_class);
-                $args[$field]['type'] = $this->field_to_type(field: $model->$field, type: $nested_model_type, ignore_required: $ignore_required);
+                $args[$field]['type'] = $this->field_to_type(
+                    field: $model->$field,
+                    type: $nested_model_type,
+                    ignore_required: $ignore_required,
+                );
                 $args[$field]['description'] = $model->$field->help_text;
                 continue;
             }
@@ -579,19 +577,21 @@ class GraphQLSchema extends Schema
         return [
             'placement' => [
                 'type' => Type::int(),
-                'description' => 'The index to place this object in the configuration.'
+                'description' => 'The index to place this object in the configuration.',
             ],
             'append' => [
                 'type' => Type::boolean(),
                 'defaultValue' => false,
-                'description' => 'Force new array values to be appended to the existing array instead of replacing '.
-                    'it. This only applies to update operations.'
+                'description' =>
+                    'Force new array values to be appended to the existing array instead of replacing ' .
+                    'it. This only applies to update operations.',
             ],
             'delete' => [
                 'type' => Type::boolean(),
                 'defaultValue' => false,
-                'description' => 'Force given array values to be removed from the existing array. This only applies '.
-                    'to update operations.'
+                'description' =>
+                    'Force given array values to be removed from the existing array. This only applies ' .
+                    'to update operations.',
             ],
             'apply' => [
                 'type' => Type::boolean(),
@@ -600,9 +600,9 @@ class GraphQLSchema extends Schema
             ],
             'async' => [
                 'type' => Type::boolean(),
-            'defaultValue' => true,
+                'defaultValue' => true,
                 'description' => 'Run this operation asynchronously when possible.',
-            ]
+            ],
         ];
     }
 
@@ -624,9 +624,9 @@ class GraphQLSchema extends Schema
                     model: $endpoint->model,
                     require_id: false,
                     ignore_required: true,
-                    exclude_fields: ['append', 'delete']
+                    exclude_fields: ['append', 'delete'],
                 ),
-            ]
+            ],
         ];
     }
 
@@ -650,9 +650,9 @@ class GraphQLSchema extends Schema
                 'args' => $this->model_to_mutation_args(
                     model: $endpoint->model,
                     require_id: $requires_id,
-                    ignore_required: true
+                    ignore_required: true,
                 ),
-            ]
+            ],
         ];
     }
 
@@ -677,9 +677,9 @@ class GraphQLSchema extends Schema
                     model: $endpoint->model,
                     require_id: $requires_id,
                     ignore_required: true,
-                    exclude_fields: ['append', 'delete', 'placement']
+                    exclude_fields: ['append', 'delete', 'placement'],
                 ),
-            ]
+            ],
         ];
     }
 
@@ -701,9 +701,9 @@ class GraphQLSchema extends Schema
                     'objects' => [
                         'type' => Type::listOf($this->get_model_input_object_type($endpoint->model_name)),
                         'description' => 'The objects to replace all existing objects with.',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -724,20 +724,21 @@ class GraphQLSchema extends Schema
                 'args' => [
                     'query_params' => [
                         'type' => Type::nonNull($this->query_params_type),
-                        'description' => 'An object containing the query parameters used to filter which objects to delete.'
+                        'description' =>
+                            'An object containing the query parameters used to filter which objects to delete.',
                     ],
                     'limit' => [
                         'type' => Type::int(),
                         'defaultValue' => 0,
-                        'description' => 'The maximum number of objects to delete.'
+                        'description' => 'The maximum number of objects to delete.',
                     ],
                     'offset' => [
                         'type' => Type::int(),
                         'defaultValue' => 0,
-                        'description' => 'The offset to start deleting objects from.'
+                        'description' => 'The offset to start deleting objects from.',
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -756,8 +757,8 @@ class GraphQLSchema extends Schema
             $this->endpoint_to_operation_name(operation: 'deleteAll', endpoint: $endpoint) => [
                 'type' => Type::listOf($this->get_model_object_type($endpoint->model_name)),
                 'resolve' => [$resolver, 'delete_all'], // Use the Resolver::delete_all method to resolve this query,
-                'args' => []
-            ]
+                'args' => [],
+            ],
         ];
     }
 }

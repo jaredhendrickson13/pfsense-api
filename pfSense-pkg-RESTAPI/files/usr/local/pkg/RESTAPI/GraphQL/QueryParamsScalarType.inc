@@ -15,28 +15,27 @@ use GraphQL\Language\AST\ValueNode;
  * arbitrary objects to be passed as arguments to GraphQL queries and mutations. This scalar type should only be
  * used if the schema of the objects is dynamic and cannot be easily represented by a GraphQL input object type.
  */
-class QueryParamsScalarType extends CustomScalarType
-{
-    public function __construct()
-    {
+class QueryParamsScalarType extends CustomScalarType {
+    public function __construct() {
         parent::__construct([
             'name' => 'QueryParams',
-            'description' => 'The `queryParam` scalar type represents arbitrary GraphQL object containing query parameters as key-value pairs.',
-            'serialize' => function($value) {
+            'description' =>
+                'The `queryParam` scalar type represents arbitrary GraphQL object containing query parameters as key-value pairs.',
+            'serialize' => function ($value) {
                 # In order to print the schema, this cannot be an object so just use an empty string
                 return '';
             },
-            'parseValue' => function($value) {
+            'parseValue' => function ($value) {
                 # Only handle PHP arrays or objects directly
                 if (is_array($value) or is_object($value)) {
                     return (array) $value;
                 }
-                throw new Error("Cannot parse value as a QueryParams object.");
+                throw new Error('Cannot parse value as a QueryParams object.');
             },
-            'parseLiteral' => function($ast) {
+            'parseLiteral' => function ($ast) {
                 # Only handle GraphQL objects
                 if ($ast instanceof ObjectValueNode === false) {
-                    throw new Error("Invalid QueryParams literal. Expected value to be an object.");
+                    throw new Error('Invalid QueryParams literal. Expected value to be an object.');
                 }
 
                 # Keep track of fields and values
@@ -57,7 +56,7 @@ class QueryParamsScalarType extends CustomScalarType
                     }
                 }
                 return $result;
-            }
+            },
         ]);
     }
 }

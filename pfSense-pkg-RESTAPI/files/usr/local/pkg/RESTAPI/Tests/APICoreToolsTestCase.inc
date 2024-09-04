@@ -46,8 +46,7 @@ class APICoreToolsTestCase extends TestCase {
     /**
      * Checks that the to_upper_camel_case() function correctly converts a provided string into upper camel case.
      */
-    public function test_to_upper_camel_case(): void
-    {
+    public function test_to_upper_camel_case(): void {
         $this->assert_equals(to_upper_camel_case('this_is_a_test'), 'ThisIsATest');
         $this->assert_equals(to_upper_camel_case('this-is-a-test'), 'ThisIsATest');
         $this->assert_equals(to_upper_camel_case('this is a test'), 'ThisIsATest');

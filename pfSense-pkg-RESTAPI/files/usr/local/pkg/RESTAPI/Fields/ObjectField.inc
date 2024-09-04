@@ -133,13 +133,12 @@ class ObjectField extends Field {
         );
     }
 
-    public function validate_extra(mixed $value): void
-    {
+    public function validate_extra(mixed $value): void {
         # Ensure this value is an associative array
         if (array_keys($value) === range(0, count($value) - 1)) {
             throw new ValidationError(
                 message: "Field `$this->name` value must be an associative array of key-value pairs.",
-                response_id: 'OBJECT_FIELD_INVALID_VALUE'
+                response_id: 'OBJECT_FIELD_INVALID_VALUE',
             );
         }
     }
