@@ -50,7 +50,7 @@ function is_assoc_array(array $array): bool {
  * @param string $string The string to convert to UpperCamelCase.
  * @return string The string converted to UpperCamelCase.
  */
-function to_upper_camel_case($string): string {
+function to_upper_camel_case(string $string): string {
     # Remove non-alphanumeric characters and convert to lowercase
     $string = preg_replace('/[^a-zA-Z0-9]+/', ' ', $string);
     $string = trim($string);
