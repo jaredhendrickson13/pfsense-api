@@ -131,7 +131,7 @@ class Response extends Error {
      * Converts this Response object to an array representation of its contents.
      * @return array An array containing the response details.
      */
-    final public function to_representation(): array {
+    public function to_representation(): array {
         # Set the standard representation for the Response
         $representation = [
             'code' => $this->code,
