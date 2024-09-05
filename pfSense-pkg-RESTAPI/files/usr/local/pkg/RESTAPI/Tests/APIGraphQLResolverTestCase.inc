@@ -282,22 +282,21 @@ class APIGraphQLResolverTestCase extends TestCase {
     /**
      * Ensure the 'check_privs' method correctly checks privileges for the query resolver
      */
-    public function test_check_query_privilege(): void
-    {
+    public function test_check_query_privilege(): void {
         $resolver = new Resolver(model: new FirewallAlias());
 
         # Create a user we can use for testing
-        $user = new User(name: "test_check_query_privilege", password: "testpass", priv: []);
+        $user = new User(name: 'test_check_query_privilege', password: 'testpass', priv: []);
         $user->create();
         $auth = new Auth();
         $auth->username = $user->name->value;
 
         # Ensure we cannot query the model without an allowed privilege when running the query method
         $this->assert_throws(
-            exceptions: ["GraphQL\Error\Error"],
+            exceptions: ['GraphQL\Error\Error'],
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->query(root: null, args: [], context: ['auth' => $auth], info: null);
-            }
+            },
         );
 
         # Ensure we cannot call check_privs for the query resolver without an allowed privilege
@@ -306,7 +305,7 @@ class APIGraphQLResolverTestCase extends TestCase {
             code: 403,
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'query', auth: $auth);
-            }
+            },
         );
 
         # Use the admin user to ensure we can query the model with an allowed privilege
@@ -316,7 +315,7 @@ class APIGraphQLResolverTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'query', auth: $auth);
-            }
+            },
         );
 
         # Delete the user
@@ -330,17 +329,17 @@ class APIGraphQLResolverTestCase extends TestCase {
         $resolver = new Resolver(model: new FirewallAlias());
 
         # Create a user we can use for testing
-        $user = new User(name: "test_check_read_privilege", password: "testpass", priv: []);
+        $user = new User(name: 'test_check_read_privilege', password: 'testpass', priv: []);
         $user->create();
         $auth = new Auth();
         $auth->username = $user->name->value;
 
         # Ensure we cannot read the model without an allowed privilege when running the read method
         $this->assert_throws(
-            exceptions: ["GraphQL\Error\Error"],
+            exceptions: ['GraphQL\Error\Error'],
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->read(root: null, args: [], context: ['auth' => $auth], info: null);
-            }
+            },
         );
 
         # Ensure we cannot call check_privs for the read resolver without an allowed privilege
@@ -349,7 +348,7 @@ class APIGraphQLResolverTestCase extends TestCase {
             code: 403,
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'read', auth: $auth);
-            }
+            },
         );
 
         # Use the admin user to ensure we can read the model with an allowed privilege
@@ -359,7 +358,7 @@ class APIGraphQLResolverTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'read', auth: $auth);
-            }
+            },
         );
 
         # Delete the user
@@ -369,22 +368,21 @@ class APIGraphQLResolverTestCase extends TestCase {
     /**
      * Ensure the 'check_privs' method correctly checks privileges for the create resolver
      */
-    public function test_check_create_privilege(): void
-    {
+    public function test_check_create_privilege(): void {
         $resolver = new Resolver(model: new FirewallAlias());
 
         # Create a user we can use for testing
-        $user = new User(name: "test_check_create_privilege", password: "testpass", priv: []);
+        $user = new User(name: 'test_check_create_privilege', password: 'testpass', priv: []);
         $user->create();
         $auth = new Auth();
         $auth->username = $user->name->value;
 
         # Ensure we cannot create the model without an allowed privilege when running the create method
         $this->assert_throws(
-            exceptions: ["GraphQL\Error\Error"],
+            exceptions: ['GraphQL\Error\Error'],
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->create(root: null, args: [], context: ['auth' => $auth], info: null);
-            }
+            },
         );
 
         # Ensure we cannot call check_privs for the create resolver without an allowed privilege
@@ -393,7 +391,7 @@ class APIGraphQLResolverTestCase extends TestCase {
             code: 403,
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'create', auth: $auth);
-            }
+            },
         );
 
         # Use the admin user to ensure we can create the model with an allowed privilege
@@ -403,7 +401,7 @@ class APIGraphQLResolverTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'create', auth: $auth);
-            }
+            },
         );
 
         # Delete the user
@@ -413,22 +411,21 @@ class APIGraphQLResolverTestCase extends TestCase {
     /**
      * Ensure the 'check_privs' method correctly checks privileges for the update resolver
      */
-    public function test_check_update_privilege(): void
-    {
+    public function test_check_update_privilege(): void {
         $resolver = new Resolver(model: new FirewallAlias());
 
         # Create a user we can use for testing
-        $user = new User(name: "test_check_update_privilege", password: "testpass", priv: []);
+        $user = new User(name: 'test_check_update_privilege', password: 'testpass', priv: []);
         $user->create();
         $auth = new Auth();
         $auth->username = $user->name->value;
 
         # Ensure we cannot update the model without an allowed privilege when running the update method
         $this->assert_throws(
-            exceptions: ["GraphQL\Error\Error"],
+            exceptions: ['GraphQL\Error\Error'],
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->update(root: null, args: [], context: ['auth' => $auth], info: null);
-            }
+            },
         );
 
         # Ensure we cannot call check_privs for the update resolver without an allowed privilege
@@ -437,7 +434,7 @@ class APIGraphQLResolverTestCase extends TestCase {
             code: 403,
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'update', auth: $auth);
-            }
+            },
         );
 
         # Use the admin user to ensure we can update the model with an allowed privilege
@@ -447,7 +444,7 @@ class APIGraphQLResolverTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'update', auth: $auth);
-            }
+            },
         );
 
         # Delete the user
@@ -457,22 +454,21 @@ class APIGraphQLResolverTestCase extends TestCase {
     /**
      * Ensure the 'check_privs' method correctly checks privileges for the delete resolver
      */
-    public function test_check_delete_privilege(): void
-    {
+    public function test_check_delete_privilege(): void {
         $resolver = new Resolver(model: new FirewallAlias());
 
         # Create a user we can use for testing
-        $user = new User(name: "test_check_delete_privilege", password: "testpass", priv: []);
+        $user = new User(name: 'test_check_delete_privilege', password: 'testpass', priv: []);
         $user->create();
         $auth = new Auth();
         $auth->username = $user->name->value;
 
         # Ensure we cannot delete the model without an allowed privilege when running the delete method
         $this->assert_throws(
-            exceptions: ["GraphQL\Error\Error"],
+            exceptions: ['GraphQL\Error\Error'],
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->delete(root: null, args: [], context: ['auth' => $auth], info: null);
-            }
+            },
         );
 
         # Ensure we cannot call check_privs for the delete resolver without an allowed privilege
@@ -481,7 +477,7 @@ class APIGraphQLResolverTestCase extends TestCase {
             code: 403,
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'delete', auth: $auth);
-            }
+            },
         );
 
         # Use the admin user to ensure we can delete the model with an allowed privilege
@@ -491,7 +487,7 @@ class APIGraphQLResolverTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'delete', auth: $auth);
-            }
+            },
         );
 
         # Delete the user
@@ -501,22 +497,21 @@ class APIGraphQLResolverTestCase extends TestCase {
     /**
      * Ensure the 'check_privs' method correctly checks privileges for the replace_all resolver
      */
-    public function test_check_replace_all_privilege(): void
-    {
+    public function test_check_replace_all_privilege(): void {
         $resolver = new Resolver(model: new FirewallAlias());
 
         # Create a user we can use for testing
-        $user = new User(name: "test_check_replace_all_privilege", password: "testpass", priv: []);
+        $user = new User(name: 'test_check_replace_all_privilege', password: 'testpass', priv: []);
         $user->create();
         $auth = new Auth();
         $auth->username = $user->name->value;
 
         # Ensure we cannot replace_all the model without an allowed privilege when running the replace_all method
         $this->assert_throws(
-            exceptions: ["GraphQL\Error\Error"],
+            exceptions: ['GraphQL\Error\Error'],
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->replace_all(root: null, args: [], context: ['auth' => $auth], info: null);
-            }
+            },
         );
 
         # Ensure we cannot call check_privs for the replace_all resolver without an allowed privilege
@@ -525,7 +520,7 @@ class APIGraphQLResolverTestCase extends TestCase {
             code: 403,
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'replace_all', auth: $auth);
-            }
+            },
         );
 
         # Use the admin user to ensure we can replace_all the model with an allowed privilege
@@ -535,7 +530,7 @@ class APIGraphQLResolverTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'replace_all', auth: $auth);
-            }
+            },
         );
 
         # Delete the user
@@ -545,22 +540,21 @@ class APIGraphQLResolverTestCase extends TestCase {
     /**
      * Ensure the 'check_privs' method correctly checks privileges for the delete_many resolver
      */
-    public function test_check_delete_many_privilege(): void
-    {
+    public function test_check_delete_many_privilege(): void {
         $resolver = new Resolver(model: new FirewallAlias());
 
         # Create a user we can use for testing
-        $user = new User(name: "test_check_delete_many_privilege", password: "testpass", priv: []);
+        $user = new User(name: 'test_check_delete_many_privilege', password: 'testpass', priv: []);
         $user->create();
         $auth = new Auth();
         $auth->username = $user->name->value;
 
         # Ensure we cannot delete_many the model without an allowed privilege when running the delete_many method
         $this->assert_throws(
-            exceptions: ["GraphQL\Error\Error"],
+            exceptions: ['GraphQL\Error\Error'],
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->delete_many(root: null, args: [], context: ['auth' => $auth], info: null);
-            }
+            },
         );
 
         # Ensure we cannot call check_privs for the delete_many resolver without an allowed privilege
@@ -569,7 +563,7 @@ class APIGraphQLResolverTestCase extends TestCase {
             code: 403,
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'delete_many', auth: $auth);
-            }
+            },
         );
 
         # Use the admin user to ensure we can delete_many the model with an allowed privilege
@@ -579,7 +573,7 @@ class APIGraphQLResolverTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'delete_many', auth: $auth);
-            }
+            },
         );
 
         # Delete the user
@@ -589,22 +583,21 @@ class APIGraphQLResolverTestCase extends TestCase {
     /**
      * Ensure the 'check_privs' method correctly checks privileges for the delete_all resolver
      */
-    public function test_check_delete_all_privilege(): void
-    {
+    public function test_check_delete_all_privilege(): void {
         $resolver = new Resolver(model: new FirewallAlias());
 
         # Create a user we can use for testing
-        $user = new User(name: "test_check_delete_all_privilege", password: "testpass", priv: []);
+        $user = new User(name: 'test_check_delete_all_privilege', password: 'testpass', priv: []);
         $user->create();
         $auth = new Auth();
         $auth->username = $user->name->value;
 
         # Ensure we cannot delete_all the model without an allowed privilege when running the delete_all method
         $this->assert_throws(
-            exceptions: ["GraphQL\Error\Error"],
+            exceptions: ['GraphQL\Error\Error'],
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->delete_all(root: null, args: [], context: ['auth' => $auth], info: null);
-            }
+            },
         );
 
         # Ensure we cannot call check_privs for the delete_all resolver without an allowed privilege
@@ -613,7 +606,7 @@ class APIGraphQLResolverTestCase extends TestCase {
             code: 403,
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'delete_all', auth: $auth);
-            }
+            },
         );
 
         # Use the admin user to ensure we can delete_all the model with an allowed privilege
@@ -623,7 +616,7 @@ class APIGraphQLResolverTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () use ($resolver, $user, $auth) {
                 $resolver->check_privs(resolver: 'delete_all', auth: $auth);
-            }
+            },
         );
 
         # Delete the user

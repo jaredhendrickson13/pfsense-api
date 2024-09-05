@@ -69,12 +69,9 @@ class GraphQLResponse extends Response {
         # Create an ExecutionResult object with the error details from the Response object.
         $graphql_model->result = new ExecutionResult(
             data: $is_success ? $response->data : null,
-            errors: $is_success ? null : [
-                new Error(
-                    message: $response->message,
-                    extensions: ['response_id' => $response->response_id]
-                )
-            ],
+            errors: $is_success
+                ? null
+                : [new Error(message: $response->message, extensions: ['response_id' => $response->response_id])],
         );
 
         return new GraphQLResponse(data: $graphql_model);

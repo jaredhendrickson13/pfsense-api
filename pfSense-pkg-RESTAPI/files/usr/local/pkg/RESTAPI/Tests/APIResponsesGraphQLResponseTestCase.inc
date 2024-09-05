@@ -10,8 +10,7 @@ use RESTAPI\Models\SystemHostname;
 use RESTAPI\Responses\GraphQLResponse;
 use RESTAPI\Responses\ValidationError;
 
-class APIResponsesGraphQLResponseTestCase extends TestCase
-{
+class APIResponsesGraphQLResponseTestCase extends TestCase {
     /**
      * @var Auth $auth;
      * Auth object to pass to GraphQL for privilege checks.
@@ -29,8 +28,7 @@ class APIResponsesGraphQLResponseTestCase extends TestCase
     /**
      * Ensure an execution result is always present when constructing a GraphQLResponse object.
      */
-    public function test_execution_result(): void
-    {
+    public function test_execution_result(): void {
         # Create a new GraphQLResponse object.
         $response = new GraphQLResponse();
 
@@ -44,7 +42,7 @@ class APIResponsesGraphQLResponseTestCase extends TestCase
     public function test_to_representation(): void {
         # Test success response
         $hostname = new SystemHostname();
-        $graphql = new GraphQL(query: "{ readSystemHostname { hostname domain } }", client: $this->auth);
+        $graphql = new GraphQL(query: '{ readSystemHostname { hostname domain } }', client: $this->auth);
         $graphql->create();
         $graphql_resp = new GraphQLResponse(data: $graphql);
         $this->assert_equals($graphql_resp->to_representation(), [
@@ -57,30 +55,26 @@ class APIResponsesGraphQLResponseTestCase extends TestCase
         ]);
 
         # Ensure any errors that occur are also represented correctly.
-        $graphql = new GraphQL(query: "{ readFirewallRule(id: 65535) { id } }", client: $this->auth);
+        $graphql = new GraphQL(query: '{ readFirewallRule(id: 65535) { id } }', client: $this->auth);
         $graphql->create();
         $graphql_resp = new GraphQLResponse(data: $graphql);
-        $this->assert_equals(
-            $graphql_resp->to_representation(),
-            [
-                'errors' => [
-                    [
-                        'message' => 'Object with ID `65535` does not exist.',
-                        'locations' => [['line' => 1, 'column' => 3,],],
-                        'path' => ['readFirewallRule'],
-                        'extensions' => ['response_id' => 'MODEL_OBJECT_NOT_FOUND',],
-                    ],
+        $this->assert_equals($graphql_resp->to_representation(), [
+            'errors' => [
+                [
+                    'message' => 'Object with ID `65535` does not exist.',
+                    'locations' => [['line' => 1, 'column' => 3]],
+                    'path' => ['readFirewallRule'],
+                    'extensions' => ['response_id' => 'MODEL_OBJECT_NOT_FOUND'],
                 ],
-                'data' => ['readFirewallRule' => null,],
-            ]
-        );
+            ],
+            'data' => ['readFirewallRule' => null],
+        ]);
     }
 
     /**
      * Ensure the to_graphql_response method correctly converts a standard Response object into a GraphQLResponse object.
      */
-    public function test_to_graphql_response(): void
-    {
+    public function test_to_graphql_response(): void {
         # Create a few different Response objects to test with.
         $not_found_resp = new ValidationError(message: 'Test not found', response_id: 'TEST_NOT_FOUND');
         $bad_request_resp = new ValidationError(message: 'Test bad request', response_id: 'TEST_BAD_REQUEST');

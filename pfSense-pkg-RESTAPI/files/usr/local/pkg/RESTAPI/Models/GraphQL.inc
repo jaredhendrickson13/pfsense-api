@@ -64,7 +64,7 @@ class GraphQL extends Model {
             schema: $schema->get_schema(),
             source: $this->query->value,
             contextValue: ['auth' => $this->client],
-            variableValues: $this->variables->value
+            variableValues: $this->variables->value,
         );
     }
 
