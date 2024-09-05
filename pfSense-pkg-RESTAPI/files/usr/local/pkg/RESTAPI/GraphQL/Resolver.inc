@@ -5,8 +5,11 @@ namespace RESTAPI\GraphQL;
 require_once 'RESTAPI/autoloader.inc';
 
 use GraphQL\Error\Error;
+use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Core\Response;
+use RESTAPI\Responses\ForbiddenError;
+use RESTAPI\Schemas\GraphQLSchema;
 
 /**
  * Defines a class that maps/resolves GraphQL queries and mutations to the appropriate Model methods.
@@ -25,6 +28,9 @@ class Resolver {
      */
     public function query($root, $args, $context, $info): array {
         try {
+            # Ensure that the user has the required privileges to perform this action
+            $this->check_privs(action: 'query', auth: $context['auth']);
+
             # Execute the query
             $query = $this->model->query(
                 query_params: $args['query_params'],
@@ -46,6 +52,9 @@ class Resolver {
      */
     public function read($root, $args, $context, $info): array {
         try {
+            # Ensure that the user has the required privileges to perform this action
+            $this->check_privs(action: 'read', auth: $context['auth']);
+
             # Read the requested object using the Model's 'read' method (which is called on construction)
             $model = new $this->model(id: $args['id'] ?? null, parent_id: $args['parent_id'] ?? null);
 
@@ -62,6 +71,9 @@ class Resolver {
      */
     public function create($root, $args, $context, $info): array {
         try {
+            # Ensure that the user has the required privileges to perform this action
+            $this->check_privs(action: 'create', auth: $context['auth']);
+
             # Create a new Model object with the given data
             $model = new $this->model(data: $args);
 
@@ -78,6 +90,9 @@ class Resolver {
      */
     public function update($root, $args, $context, $info): array {
         try {
+            # Ensure that the user has the required privileges to perform this action
+            $this->check_privs(action: 'update', auth: $context['auth']);
+
             # Load the existing Model object with the given data
             $model = new $this->model(data: $args);
 
@@ -94,6 +109,9 @@ class Resolver {
      */
     public function delete($root, $args, $context, $info): array {
         try {
+            # Ensure that the user has the required privileges to perform this action
+            $this->check_privs(action: 'delete', auth: $context['auth']);
+
             # Load the existing Model object with the given data
             $model = new $this->model(data: $args);
 
@@ -110,6 +128,9 @@ class Resolver {
      */
     public function replace_all($root, $args, $context, $info): array {
         try {
+            # Ensure that the user has the required privileges to perform this action
+            $this->check_privs(action: 'replace_all', auth: $context['auth']);
+
             # Load the existing Model object with the given data
             $model = new $this->model();
 
@@ -126,6 +147,9 @@ class Resolver {
      */
     public function delete_many($root, $args, $context, $info): array {
         try {
+            # Ensure that the user has the required privileges to perform this action
+            $this->check_privs(action: 'delete_many', auth: $context['auth']);
+
             # Load the existing Model object with the given data
             $model = new $this->model();
 
@@ -149,6 +173,9 @@ class Resolver {
      */
     public function delete_all($root, $args, $context, $info): array {
         try {
+            # Ensure that the user has the required privileges to perform this action
+            $this->check_privs(action: 'delete_all', auth: $context['auth']);
+
             # Load the existing Model object with the given data
             $model = new $this->model();
 
@@ -161,4 +188,60 @@ class Resolver {
             throw new Error(message: $e->message, extensions: ['response_id' => $e->response_id]);
         }
     }
+
+    /**
+     * Checks if authenticated user has privileges to perform the requested action.
+     * @param string $action The action to check permissions for.
+     * @param Auth $auth The Auth object to use for checking permissions.
+     * @param GraphQLSchema $schema The GraphQL schema to use for checking operation to endpoint mappings.
+     * @throws ForbiddenError If the user does not have the required privileges.
+     */
+    public function check_privs(string $action, Auth $auth): void {
+        # Obtain the endpoint that corresponds with the Model and resolve method
+        switch ($action) {
+            case 'query':
+                $endpoint = $this->model->get_related_endpoint(many: true);
+                $auth->required_privileges = $endpoint->get_privileges;
+                break;
+            case 'read':
+                $endpoint = $this->model->get_related_endpoint(many: false);
+                $auth->required_privileges = $endpoint->get_privileges;
+                break;
+            case 'create':
+                $endpoint = $this->model->get_related_endpoint(many: false);
+                $auth->required_privileges = $endpoint->post_privileges;
+                break;
+            case 'update':
+                $endpoint = $this->model->get_related_endpoint(many: false);
+                $auth->required_privileges = $endpoint->patch_privileges;
+                break;
+            case 'delete':
+                $endpoint = $this->model->get_related_endpoint(many: false);
+                $auth->required_privileges = $endpoint->delete_privileges;
+                break;
+            case 'replace_all':
+                $endpoint = $this->model->get_related_endpoint(many: true);
+                $auth->required_privileges = $endpoint->put_privileges;
+                break;
+            case 'delete_all':
+            case 'delete_many':
+                $endpoint = $this->model->get_related_endpoint(many: true);
+                $auth->required_privileges = $endpoint->delete_privileges;
+                break;
+            default:
+                throw new ForbiddenError(
+                    message: 'Unknown GraphQL resolver action requested.',
+                    response_id: 'GRAPHQL_RESOLVER_UNKNOWN_CHECK_PRIVS_ACTION',
+                );
+        }
+
+        # Throw an error if the user does not have the required privileges
+        if (!$auth->authorize()) {
+            throw new ForbiddenError(
+                message: 'Authorization failed. You do not have sufficient privileges to access this resource.',
+                response_id: 'GRAPHQL_RESOLVER_UNAUTHORIZED',
+            );
+        }
+    }
+
 }
