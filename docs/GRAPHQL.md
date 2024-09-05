@@ -5,15 +5,26 @@ traditional REST APIs and provides a more flexible and efficient way to interact
 API is built on top of the same underlying components as the REST API and provides virtually the same functionality as
 the REST API, with the added benefits of GraphQL.
 
-!!! Important
+!!! Tips
     If you are new to APIs in general, it is recommended to start with the REST API first. The REST API is more
     straightforward and easier to understand for beginners. Once you are comfortable with the REST API, you may
     benefit from the additional features and flexibility provided by the GraphQL API.
 
-## Authentication
+## Authentication and Authorization
 
-The GraphQL API uses the same authentication methods as the REST API. For more information on authentication, please refer
-to the [Authentication and Authorization](./AUTHENTICATION_AND_AUTHORIZATION.md) documentation.
+The GraphQL API uses the same authentication methods and privileges as the REST API. For more information on 
+authentication, please refer to the [Authentication and Authorization](AUTHENTICATION_AND_AUTHORIZATION.md) 
+documentation.
+
+!!! Important
+    The user must at least have the `api-v2-graphql-post` privilege to access the GraphQL API. From there, the user
+    must also have the relevant privileges to perform any desired operations within the GraphQL API.
+
+## Content and Accept Types
+
+The GraphQL API supports the same content and accept types as the REST API. However, it is highly recommended to use
+`application/json` as both the content and accept types when making requests to the GraphQL API. For more information
+on content and accept types, please refer to the [Content and Accept Types](CONTENT_AND_ACCEPT_TYPES.md) documentation.
 
 ## Differences from REST API
 
@@ -22,30 +33,35 @@ There are some key differences in behavior between the REST and GraphQL APIs. Be
 - All GraphQL requests are made to the `/api/v2/graphql` endpoint.
 - GraphQL requests are made using the `POST` HTTP method exclusively.
 - Responses from the GraphQL API follow a different schema than the REST API. The GraphQL API will return a `data` object
-  containing the result of the query or mutation, as well as an `errors` object containing any errors that occurred during
+  containing the result of the query or mutation, as well as an `errors` array containing any errors that occurred during
   the request.
 - All GraphQL responses will return a 200 OK status code, regardless if the result contains errors. This is because GraphQL 
-  responses may include both success data and error messages.
+  responses may include both success data and error messages. Do not rely on the status code to determine the success or
+  failure of the request, use the `errors` array in the response instead.
 - Fields with pre-defined choices must use the GraphQL enum values. See the [Enums](#enums) section for more information.
 
 ## Schema and Documentation
 
 The full schema and documentation for the GraphQL API can be found in the [GraphQL reference docs](https://pfrest.org/graphql-docs/).
+It is also highly recommended to read through the [GraphQL documentation](https://graphql.org/learn/) to fully understand how
+to interact with the GraphQL API.
 
 ## Why Use GraphQL?
 
 GraphQL is a powerful tool for building APIs that allow clients to request only the data they need. This can lead to
 faster and more efficient API interactions, as clients can avoid over-fetching or under-fetching data. GraphQL also
-provides a more flexible way to query and mutate data, allowing clients to request exactly the data they need in a single
-request. 
+provides a more flexible way to query and mutate data, allowing clients to obtain all the data they need in a single
+request instead of making multiple requests to different endpoints for various resources.
 
 In summary, the primary benefits of the GraphQL API are:
 
 1. **Flexibility**: Clients can specify exactly which field values they need, reducing the amount of data transferred over the network.
 2. **Efficiency**: Clients can request multiple resources in a single query, reducing the number of round trips to the server.
+3. **Versatility**: GraphQL can handle complex operations out of the box, which often requires custom logic on the client-side when using REST APIs.
 
-However, GraphQL is not always the best choice for every use case. For simple apps, scripts and integrations where you 
-only need to read or write a small number of resources, the REST API may be a more straightforward approach.
+However, GraphQL is not always the best choice for everyone. GraphQL is more complex and may require more effort to
+implement than a traditional REST API. For simple apps, scripts and integrations where you only need to read or write 
+a small number of resources, the REST API may be a more straightforward approach.
 
 ## Getting Started
 
