@@ -1,8 +1,8 @@
 # pfSense REST API
 
-The pfSense REST API package is an unofficial, open-source REST API for pfSense CE and pfSense Plus firewalls that is
-designed to be light-weight, fast, and easy to use. This guide will help you get started with the REST API package and
-provide you with the information you need to configure and use the package effectively.
+The pfSense REST API package is an unofficial, open-source REST and GraphQL API for pfSense CE and pfSense Plus
+firewalls.It is designed to be light-weight, fast, and easy to use. This guide will help you get started with the REST
+API package and provide you with the information you need to configure and use the package effectively.
 
 !!! Tip
     Looking for documentation on REST API endpoints and parameters? An interactive [Swagger documentation](./SWAGGER_AND_OPENAPI.md)
@@ -16,7 +16,8 @@ provide you with the information you need to configure and use the package effec
 
 ## Key Features
 
-- 100+ endpoints available for managing your firewall and associated services
+- 100+ REST endpoints available for managing your firewall and associated services
+- A GraphQL API for flexible data retrieval and mutation
 - Easy to use querying and filtering
 - Configurable security settings
 - Supports HATEOAS driven development
