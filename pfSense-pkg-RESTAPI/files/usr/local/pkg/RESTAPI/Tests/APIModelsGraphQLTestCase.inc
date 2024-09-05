@@ -2,15 +2,26 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\Auth;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\GraphQL;
 
 class APIModelsGraphQLTestCase extends TestCase {
     /**
-     * Set up FirewallAlias models for testing.
+     * @var Auth $auth;
+     * Auth object to pass to GraphQL for privilege checks.
+     */
+    public Auth $auth;
+
+    /**
+     * Set up Auth and FirewallAlias models for testing.
      */
     public function setup(): void {
+        # Ensure we have a valid Auth object to pass to GraphQL for privilege checks.
+        $this->auth = new Auth();
+        $this->auth->username = 'admin';
+
         # First, create several new FirewallAlias models to query.
         $alias = new FirewallAlias();
         $alias->replace_all([
@@ -52,7 +63,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_graphql_read(): void {
         # Define a new GraphQL model to execute a read query against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value = '{ readFirewallAlias(id: 0) { name type descr address detail } }';
         $graphql->create();
 
@@ -75,7 +86,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_query_all_models_without_params(): void {
         # Define a new GraphQL model to execute a query against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
 
         $graphql->query->value = '{ queryFirewallAliases { name type } }';
         $graphql->create();
@@ -95,7 +106,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_query_model_with_params(): void {
         # Define a new GraphQL model to execute a query against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value = '{ queryFirewallAliases(query_params: {id: 1}) { name type } }';
         $graphql->create();
         $this->assert_equals($graphql->result->toArray(), [
@@ -110,7 +121,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_query_models_with_limit(): void {
         # Define a new GraphQL model to execute a query against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
 
         $graphql->query->value = '{ queryFirewallAliases(limit: 2) { name type } }';
         $graphql->create();
@@ -129,7 +140,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_query_models_with_offset(): void {
         # Define a new GraphQL model to execute a query against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
 
         $graphql->query->value = '{ queryFirewallAliases(offset: 1) { name type } }';
         $graphql->create();
@@ -148,7 +159,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_query_models_with_reverse(): void {
         # Define a new GraphQL model to execute a query against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
 
         $graphql->query->value = '{ queryFirewallAliases(reverse: true) { name type } }';
         $graphql->create();
@@ -168,7 +179,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_create_mutation(): void {
         # Define a new GraphQL model to execute a mutation against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value =
             "mutation { createFirewallAlias(name: \"test4\", type: VAL_HOST, descr: \"Test alias 4\", address: [\"4.3.2.1\"], detail: [\"test detail 4\"]) { name type descr address detail } }";
         $graphql->create();
@@ -204,7 +215,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_update_mutation(): void {
         # Define a new GraphQL model to execute a mutation against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value =
             "mutation { updateFirewallAlias(id: 0, type: VAL_NETWORK, descr: \"Test alias 5\", address: [\"5.5.5.5/5\"], detail: [\"test detail 5\"]) { id type descr address detail } }";
         $graphql->create();
@@ -235,7 +246,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_delete_mutation(): void {
         # Define a new GraphQL model to execute a mutation against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value = 'mutation { deleteFirewallAlias(id: 0) { id name } }';
         $graphql->create();
 
@@ -259,7 +270,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_replace_all_mutation(): void {
         # Define a new GraphQL model to execute a mutation against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value =
             "mutation { replaceAllFirewallAliases(objects: [{name: \"test4\", type: VAL_HOST, descr: \"Test alias 4\", address: [\"4.4.4.4\"], detail: [\"test detail 4\"]}]) { name type descr address detail } }";
         $graphql->create();
@@ -294,7 +305,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_delete_all_mutation(): void {
         # Define a new GraphQL model to execute a mutation against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value = 'mutation { deleteAllFirewallAliases { id name } }';
         $graphql->create();
 
@@ -319,7 +330,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_delete_many_mutation(): void {
         # Define a new GraphQL model to execute a mutation against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value =
             "mutation { deleteManyFirewallAliases(query_params: {name__except: \"test2\"}) { id name } }";
         $graphql->create();
@@ -342,7 +353,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      */
     public function test_query_with_variables(): void {
         # Define a new GraphQL model to execute a query against.
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $graphql->query->value =
             "query(\$query_params: QueryParams) { queryFirewallAliases(query_params: \$query_params) { name } }";
         $graphql->variables->value = ['query_params' => ['id__except' => 1]];
@@ -360,7 +371,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      * Ensure the GraphQL model's internal callable returns an empty array.
      */
     public function test_internal_callable(): void {
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $this->assert_equals($graphql->get_internal(), []);
     }
 
@@ -369,7 +380,7 @@ class APIModelsGraphQLTestCase extends TestCase {
      * throw an error when the Model tries to set the 'initial_object' property.
      */
     public function test_result_property_excluded_from_serialization(): void {
-        $graphql = new GraphQL();
+        $graphql = new GraphQL(client: $this->auth);
         $this->assert_is_true(!in_array('result', $graphql->__sleep()));
         $this->assert_does_not_throw(
             callable: function () use ($graphql) {

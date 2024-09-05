@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use GraphQL\Executor\ExecutionResult;
+use RESTAPI\Core\Auth;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\GraphQL;
 use RESTAPI\Models\SystemHostname;
@@ -11,6 +12,20 @@ use RESTAPI\Responses\ValidationError;
 
 class APIResponsesGraphQLResponseTestCase extends TestCase
 {
+    /**
+     * @var Auth $auth;
+     * Auth object to pass to GraphQL for privilege checks.
+     */
+    public Auth $auth;
+
+    /**
+     * Ensures we have a valid Auth object to pass to GraphQL for privilege checks.
+     */
+    public function setup(): void {
+        $this->auth = new Auth();
+        $this->auth->username = 'admin';
+    }
+
     /**
      * Ensure an execution result is always present when constructing a GraphQLResponse object.
      */
@@ -29,7 +44,7 @@ class APIResponsesGraphQLResponseTestCase extends TestCase
     public function test_to_representation(): void {
         # Test success response
         $hostname = new SystemHostname();
-        $graphql = new GraphQL(query: "{ readSystemHostname { hostname domain } }");
+        $graphql = new GraphQL(query: "{ readSystemHostname { hostname domain } }", client: $this->auth);
         $graphql->create();
         $graphql_resp = new GraphQLResponse(data: $graphql);
         $this->assert_equals($graphql_resp->to_representation(), [
@@ -42,7 +57,7 @@ class APIResponsesGraphQLResponseTestCase extends TestCase
         ]);
 
         # Ensure any errors that occur are also represented correctly.
-        $graphql = new GraphQL(query: "{ readFirewallRule(id: 65535) { id } }");
+        $graphql = new GraphQL(query: "{ readFirewallRule(id: 65535) { id } }", client: $this->auth);
         $graphql->create();
         $graphql_resp = new GraphQLResponse(data: $graphql);
         $this->assert_equals(
