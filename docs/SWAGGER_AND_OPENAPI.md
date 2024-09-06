@@ -89,5 +89,5 @@ the data returned by the endpoint may not always be up-to-date.
 ## OpenAPI Schema
 
 The pfSense REST API package was designed around the OpenAPI specification and is built to automatically document its
-components as OpenAPI schemas. The full OpenAPI schema is available at the `/api/v2/schema` endpoint. This schema can be
-used to quickly generate client libraries, documentation, and more.
+components as OpenAPI schemas. The full OpenAPI schema is available at the `/api/v2/schema/openapi` endpoint. This 
+schema can be used to quickly generate client libraries, documentation, and more.
