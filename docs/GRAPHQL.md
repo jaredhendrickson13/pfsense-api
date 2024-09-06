@@ -42,8 +42,9 @@ There are some key differences in behavior between the REST and GraphQL APIs. Be
 
 ## Schema and Documentation
 
-The full schema and documentation for the GraphQL API can be found in the [GraphQL reference docs](https://pfrest.org/graphql-docs/).
-It is also highly recommended to read through the [GraphQL documentation](https://graphql.org/learn/) to fully understand how
+The full schema and documentation for the GraphQL API can be found in the [GraphQL reference docs](https://pfrest.org/graphql-docs/),
+or you can access the schema directly from your pfSense instance using the /api/v2/schema/graphql endpoint. It is also 
+highly recommended to read through the [GraphQL documentation](https://graphql.org/learn/) to fully understand how
 to interact with the GraphQL API.
 
 ## Why Use GraphQL?
