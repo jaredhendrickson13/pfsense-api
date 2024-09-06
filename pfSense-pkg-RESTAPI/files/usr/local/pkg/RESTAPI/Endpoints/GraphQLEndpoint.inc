@@ -22,6 +22,10 @@ class GraphQLEndpoint extends Endpoint {
         $this->model_name = 'GraphQL';
         $this->request_method_options = ['POST'];
 
+        # Set help text for this Endpoint
+        $this->post_help_text = 'Execute a GraphQL query. For more information on utilizing the GraphQL API, please ' .
+            'refer to https://pfrest.org/graphql.';
+
         # Construct the parent Endpoint object
         parent::__construct();
     }
