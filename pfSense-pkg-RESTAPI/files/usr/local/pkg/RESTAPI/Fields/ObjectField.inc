@@ -153,8 +153,13 @@ class ObjectField extends Field {
         return $internal_value;
     }
 
+    /**
+     * Converts this field value into an OpenAPI property definition.
+     * @return array The OpenAPI property definition.
+     */
     public function to_openapi_property(): array
     {
+        # Temporarily change the type to 'object' to generate the property definition
         $this->type = 'object';
         $property = parent::to_openapi_property();
         $this->type = 'array';
