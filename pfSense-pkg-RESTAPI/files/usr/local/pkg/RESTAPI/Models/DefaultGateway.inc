@@ -22,7 +22,7 @@ class DefaultGateway extends Model {
 
         # Set model fields
         $this->defaultgw4 = new ForeignModelField(
-            model_name: 'RoutingGateway',
+            model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
             model_field: 'name',
             model_query: ['ipprotocol' => 'inet'],
             allowed_keywords: ['', '-'],
@@ -32,7 +32,7 @@ class DefaultGateway extends Model {
                 'automatically determine the default gateway, or set to `-` to assign no gateway.',
         );
         $this->defaultgw6 = new ForeignModelField(
-            model_name: 'RoutingGateway',
+            model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
             model_field: 'name',
             model_query: ['ipprotocol' => 'inet6'],
             allowed_keywords: ['', '-'],
