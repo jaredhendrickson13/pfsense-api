@@ -240,10 +240,10 @@ and the endpoint will be accessible via the REST API.
 
 ## Generating Documentation
 
-To regenerate the OpenAPI documentation for all Endpoint classes, run the following command:
+To regenerate the OpenAPI and GraphQL schemas for all Endpoint classes, run the following command:
 
 ```shell
-pfsense-restapi generatedocs
+pfsense-restapi buildschemas
 ```
 
 ## Examples

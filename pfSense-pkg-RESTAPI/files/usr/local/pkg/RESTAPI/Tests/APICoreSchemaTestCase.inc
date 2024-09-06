@@ -41,4 +41,19 @@ class APICoreSchemaTestCase extends TestCase {
         # Ensure the schema is read from file.
         $this->assert_is_not_empty($schema->read_schema_from_file());
     }
+
+    /**
+     * Ensure the schema URL is built correctly.
+     */
+    public function test_build_schema_url(): void
+    {
+        # Use the GraphQLSchema for this since Schema is an abstract class.
+        $schema = new GraphQLSchema();
+
+        # Remove the schema file if it exists.
+        unlink($schema->file_path);
+        $schema->save_schema();
+        $schema->build_schema_url();
+        $this->assert_is_true(file_exists('/usr/local/www/api/v2/schema/' . pathinfo($schema->file_name, PATHINFO_FILENAME) . '/index.php'));
+    }
 }

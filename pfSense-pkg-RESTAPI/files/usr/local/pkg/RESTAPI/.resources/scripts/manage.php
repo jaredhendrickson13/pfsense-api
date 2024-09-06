@@ -97,6 +97,25 @@ function build_privs(): void {
 }
 
 /**
+ * Automatically generates the package schemas/documentation files for each Schema class defined in \RESTAPI\Schemas
+ * and writes them to /usr/local/pkg/RESTAPI/.resources/schemas/.
+ */
+function build_schemas(): void {
+    # Import each schema class
+    foreach (glob('/usr/local/pkg/RESTAPI/Schemas/*.inc') as $file) {
+        # Import classes files and create object
+        require_once $file;
+        $schema_class = '\\RESTAPI\\Schemas\\' . str_replace('.inc', '', basename($file));
+        print "Generating schema files for $schema_class... ";
+        $schema_obj = new $schema_class();
+        $schema_obj->save_schema();
+        $schema_obj->build_schema_url();
+        print 'done.' . PHP_EOL;
+    }
+}
+
+
+/**
  * Runs the process for a specified Dispatcher class in \RESTAPI\Dispatchers.
  * @param string|null $dispatcher_name
  * @note This function does not call the Dispatcher process asynchronously, it will wait for the process to complete.
@@ -387,7 +406,7 @@ function help(): void {
     echo '  buildendpoints      : Build all REST API Endpoints included in this package' . PHP_EOL;
     echo '  buildforms          : Build all REST API Forms included in this package' . PHP_EOL;
     echo '  buildprivs          : Build all REST API privileges included in this package' . PHP_EOL;
-    echo '  generatedocs        : Regenerates the OpenAPI documentation' . PHP_EOL;
+    echo '  buildschemas        : Build all Schema/documentation files' . PHP_EOL;
     echo '  notifydispatcher    : Start a dispatcher process' . PHP_EOL;
     echo '  scheduledispatchers : Sets up cron jobs for dispatchers and caches on a schedule.' . PHP_EOL;
     echo '  refreshcache        : Refresh the cache file for a given cache class.' . PHP_EOL;
@@ -416,10 +435,8 @@ elseif ($argv[1] == 'buildprivs') {
     build_privs();
 }
 # GENERATEDOCUMENTATION COMMAND
-elseif ($argv[1] == 'generatedocs') {
-    echo 'Generating OpenAPI documentation... ';
-    RESTAPI\Core\Tools\generate_documentation();
-    echo 'done.' . PHP_EOL;
+elseif ($argv[1] == 'buildschemas') {
+    build_schemas();
 }
 # NOTIFY_DISPATCHER COMMAND
 elseif ($argv[1] == 'notifydispatcher') {

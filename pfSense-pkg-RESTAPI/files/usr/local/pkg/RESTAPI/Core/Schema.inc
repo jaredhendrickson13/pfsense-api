@@ -18,15 +18,23 @@ abstract class Schema {
     const SCHEMA_DIR = '/usr/local/pkg/RESTAPI/.resources/schemas/';
 
     /**
+     * @var string $file_name
      * The file name for this schema.
      */
     public string $file_name = 'unnamed_schema.txt';
 
     /**
-     * The full file path to the schema file.
      * @var string $file_path
+     * The full file path to the schema file.
      */
     public string $file_path;
+
+    /**
+     * @var string $content_type
+     * The content type for this schema. This is used to determine how the schema is formatted and displayed when
+     * accessed via the URL.
+     */
+    public string $content_type = 'text/plain';
 
     public function __construct() {
         $this->file_path = self::SCHEMA_DIR . $this->file_name;
@@ -38,6 +46,27 @@ abstract class Schema {
      * @return string The schema as a string.
      */
     abstract public function get_schema_str(): string;
+
+    /**
+     * Builds a unique endpoint URL for this schema in the pfSense webroot directory.
+     */
+    public function build_schema_url(): void
+    {
+        $name = pathinfo($this->file_name, PATHINFO_FILENAME);
+
+        # Specify the PHP code to write to the Endpoints index.php file
+        $code =
+            "<?php\n" .
+            "require_once('RESTAPI/autoloader.inc');\n" .
+            "header('Content-Type: $this->content_type');\n" .
+            "header('Referer: no-referrer');\n" .
+            "echo (new {$this->get_class_fqn()}())->read_schema_from_file();\n" .
+            "exit();\n";
+
+        # Write the code to the schema's index.php file
+        mkdir("/usr/local/www/api/v2/schema/$name", 0755, true);
+        file_put_contents("/usr/local/www/api/v2/schema/$name/index.php", $code);
+    }
 
     /**
      * Saves the schema to file.
