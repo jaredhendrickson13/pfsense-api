@@ -152,4 +152,12 @@ class ObjectField extends Field {
     protected function _from_internal(mixed $internal_value): array {
         return $internal_value;
     }
+
+    public function to_openapi_property(): array
+    {
+        $this->type = 'object';
+        $property = parent::to_openapi_property();
+        $this->type = 'array';
+        return $property;
+    }
 }
