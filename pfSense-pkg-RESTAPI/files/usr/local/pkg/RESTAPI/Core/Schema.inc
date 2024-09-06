@@ -50,8 +50,7 @@ abstract class Schema {
     /**
      * Builds a unique endpoint URL for this schema in the pfSense webroot directory.
      */
-    public function build_schema_url(): void
-    {
+    public function build_schema_url(): void {
         $name = pathinfo($this->file_name, PATHINFO_FILENAME);
 
         # Specify the PHP code to write to the Endpoints index.php file

@@ -114,7 +114,6 @@ function build_schemas(): void {
     }
 }
 
-
 /**
  * Runs the process for a specified Dispatcher class in \RESTAPI\Dispatchers.
  * @param string|null $dispatcher_name

@@ -8,8 +8,7 @@ use RESTAPI\Models\RESTAPIVersion;
 use stdClass;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
-class OpenAPISchema extends Schema
-{
+class OpenAPISchema extends Schema {
     /**
      * @var string $file_name The name of the OpenAPI schema file.
      */
@@ -25,9 +24,8 @@ class OpenAPISchema extends Schema
      * Obtains the OpenAPI schema as a string.
      * @return string The OpenAPI schema as a string.
      */
-    public function get_schema_str(): string
-    {
-        return json_encode($this->get_schema()).PHP_EOL;
+    public function get_schema_str(): string {
+        return json_encode($this->get_schema()) . PHP_EOL;
     }
 
     /**
@@ -199,18 +197,23 @@ class OpenAPISchema extends Schema
                                 ],
                             ],
                         ];
-                    } # For `many` Endpoints with `many` Models, accept arrays of many schema objects
+                    }
+                    # For `many` Endpoints with `many` Models, accept arrays of many schema objects
                     elseif ($endpoint->many and $model->many) {
                         # Write the schema objects with any required fields
                         $schema = [
                             'schema' => [
                                 'type' => 'array',
                                 'items' => [
-                                    'allOf' => [['$ref' => "#/components/schemas/$endpoint->model_name"], $allof_schema],
+                                    'allOf' => [
+                                        ['$ref' => "#/components/schemas/$endpoint->model_name"],
+                                        $allof_schema,
+                                    ],
                                 ],
                             ],
                         ];
-                    } # Otherwise, just assign the schema with all required Fields included
+                    }
+                    # Otherwise, just assign the schema with all required Fields included
                     else {
                         $schema = [
                             'schema' => [

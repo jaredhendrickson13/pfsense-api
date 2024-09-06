@@ -45,8 +45,7 @@ class APICoreSchemaTestCase extends TestCase {
     /**
      * Ensure the schema URL is built correctly.
      */
-    public function test_build_schema_url(): void
-    {
+    public function test_build_schema_url(): void {
         # Use the GraphQLSchema for this since Schema is an abstract class.
         $schema = new GraphQLSchema();
 
@@ -54,6 +53,10 @@ class APICoreSchemaTestCase extends TestCase {
         unlink($schema->file_path);
         $schema->save_schema();
         $schema->build_schema_url();
-        $this->assert_is_true(file_exists('/usr/local/www/api/v2/schema/' . pathinfo($schema->file_name, PATHINFO_FILENAME) . '/index.php'));
+        $this->assert_is_true(
+            file_exists(
+                '/usr/local/www/api/v2/schema/' . pathinfo($schema->file_name, PATHINFO_FILENAME) . '/index.php',
+            ),
+        );
     }
 }
