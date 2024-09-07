@@ -11,6 +11,7 @@ use RESTAPI\Core\ModelSet;
 use RESTAPI\Core\ResourceLinkSet;
 use RESTAPI\Core\Response;
 use RESTAPI\Models\GraphQL;
+use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
  * Response class that represents a GraphQL response. Unlike other responses, this response does not represent a
@@ -18,8 +19,27 @@ use RESTAPI\Models\GraphQL;
  * This is essentially a wrapper around the ExecutionResult object from the GraphQL library.
  */
 class GraphQLResponse extends Response {
-    public $code = 200;
+    /**
+     * @var ExecutionResult $execution_result
+     * The GraphQL ExecutionResult object that contains the query results.
+     */
     public ExecutionResult $execution_result;
+
+    /**
+     * @var int $code
+     * The HTTP status code that corresponds with the API response. Note: For GraphQL, all responses
+     * are considered successful, so this is always set to 200.
+     */
+    public $code = 200;
+
+    /**
+     * @var string $help_text
+     * A description for this response to use in documentation.
+     */
+    public string $help_text =
+        'The GraphQL query execution completed. All GraphQL responses return a 200 OK regardless of whether ' .
+        'the query was successful or not. Use the "errors" field in the response data to determine if the query ' .
+        'was successful.';
 
     /**
      * Constructs a new GraphQLResponse object.
@@ -75,5 +95,64 @@ class GraphQLResponse extends Response {
         );
 
         return new GraphQLResponse(data: $graphql_model);
+    }
+
+    /**
+     * Obtains the OpenAPI schema for this GraphQLResponse object.
+     */
+    public function to_openapi_schema(): array {
+        return [
+            'type' => 'object',
+            'properties' => [
+                'data' => ['description' => 'The GraphQL response data.', 'type' => 'object'],
+                'errors' => [
+                    'description' => 'The GraphQL response errors.',
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'message' => [
+                                'description' => 'The error message.',
+                                'type' => 'string',
+                            ],
+                            'extensions' => [
+                                'description' => 'The error extensions.',
+                                'type' => 'object',
+                                'properties' => [
+                                    'response_id' => [
+                                        'description' => 'The error response ID.',
+                                        'type' => 'string',
+                                    ],
+                                ],
+                            ],
+                            'locations' => [
+                                'description' => 'The error locations.',
+                                'type' => 'array',
+                                'items' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'line' => [
+                                            'description' => 'The error line.',
+                                            'type' => 'integer',
+                                        ],
+                                        'column' => [
+                                            'description' => 'The error column.',
+                                            'type' => 'integer',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            'path' => [
+                                'description' => 'The error path.',
+                                'type' => 'array',
+                                'items' => [
+                                    'type' => 'string',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

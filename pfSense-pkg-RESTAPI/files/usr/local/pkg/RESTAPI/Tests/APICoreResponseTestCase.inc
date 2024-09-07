@@ -100,10 +100,12 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
                 'code' => [
                     'description' => 'The HTTP status code that corresponds with the API response.',
                     'type' => 'integer',
+                    'default' => $response->code
                 ],
                 'status' => [
                     'description' => 'The HTTP status message that corresponds with the HTTP status code.',
                     'type' => 'string',
+                    'default' => $response->status
                 ],
                 'response_id' => [
                     'description' =>

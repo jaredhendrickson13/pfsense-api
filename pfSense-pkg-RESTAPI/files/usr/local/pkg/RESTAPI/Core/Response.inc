@@ -176,7 +176,7 @@ class Response extends Error {
         $content_handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
 
         # Default to application/json
-        $component['content']['application/json'] = ['schema' => ['$ref' => '#/components/schemas/Response']];
+        $component['content']['application/json'] = [];
 
         # Populate a component content schema for each ContentHandler that can encode content
         foreach ($content_handler_classes as $content_handler_class) {
@@ -186,7 +186,7 @@ class Response extends Error {
             # Only include this content if it can encode responses
             if ($content_handler->can_encode()) {
                 $component['content'][$content_handler->mime_type] = [
-                    'schema' => ['$ref' => '#/components/schemas/Response'],
+                    'schema' => ['$ref' => "#/components/schemas/{$this->get_class_shortname()}"],
                 ];
             }
         }
@@ -198,17 +198,19 @@ class Response extends Error {
      * Represents the Response object as an OpenAPI schema.
      * @return array This Response object as an OpenAPI schema.
      */
-    final public static function to_openapi_schema(): array {
+    public function to_openapi_schema(): array {
         return [
             'type' => 'object',
             'properties' => [
                 'code' => [
                     'description' => 'The HTTP status code that corresponds with the API response.',
                     'type' => 'integer',
+                    'default' => $this->code,
                 ],
                 'status' => [
                     'description' => 'The HTTP status message that corresponds with the HTTP status code.',
                     'type' => 'string',
+                    'default' => $this->status,
                 ],
                 'response_id' => [
                     'description' =>

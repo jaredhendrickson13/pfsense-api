@@ -21,6 +21,7 @@ class GraphQLEndpoint extends Endpoint {
         $this->url = '/api/v2/graphql';
         $this->model_name = 'GraphQL';
         $this->request_method_options = ['POST'];
+        $this->response_types = ['GraphQLResponse'];
 
         # Set help text for this Endpoint
         $this->post_help_text =

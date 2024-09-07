@@ -96,4 +96,67 @@ class APIResponsesGraphQLResponseTestCase extends TestCase {
             ],
         ]);
     }
+
+    /**
+     * Ensure the to_openapi_schema method correctly returns the OpenAPI schema for a GraphQLResponse object.
+     */
+    public function test_to_openapi_schema(): void {
+        # Create a new GraphQLResponse object.
+        $response = new GraphQLResponse();
+
+        # Ensure the OpenAPI schema is correctly returned.
+        $this->assert_equals($response->to_openapi_schema(), [
+            'type' => 'object',
+            'properties' => [
+                'data' => ['description' => 'The GraphQL response data.', 'type' => 'object'],
+                'errors' => [
+                    'description' => 'The GraphQL response errors.',
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'message' => [
+                                'description' => 'The error message.',
+                                'type' => 'string',
+                            ],
+                            'extensions' => [
+                                'description' => 'The error extensions.',
+                                'type' => 'object',
+                                'properties' => [
+                                    'response_id' => [
+                                        'description' => 'The error response ID.',
+                                        'type' => 'string',
+                                    ],
+                                ],
+                            ],
+                            'locations' => [
+                                'description' => 'The error locations.',
+                                'type' => 'array',
+                                'items' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'line' => [
+                                            'description' => 'The error line.',
+                                            'type' => 'integer',
+                                        ],
+                                        'column' => [
+                                            'description' => 'The error column.',
+                                            'type' => 'integer',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            'path' => [
+                                'description' => 'The error path.',
+                                'type' => 'array',
+                                'items' => [
+                                    'type' => 'string',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+    }
 }

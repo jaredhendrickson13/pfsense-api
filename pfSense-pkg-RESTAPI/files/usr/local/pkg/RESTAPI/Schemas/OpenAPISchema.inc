@@ -67,7 +67,7 @@ class OpenAPISchema extends Schema {
             ],
             'components' => [
                 'responses' => [],
-                'schemas' => ['Response' => Response::to_openapi_schema()],
+                'schemas' => [],
                 'securitySchemes' => [],
             ],
             'security' => [],
@@ -93,6 +93,9 @@ class OpenAPISchema extends Schema {
             # Create the Response object
             $response = new $response_class(message: '', response_id: '');
             $resp_shortname = $response->get_class_shortname();
+
+            # Add both a schema and response for this Response class
+            $openapi_config['components']['schemas'][$resp_shortname] = $response->to_openapi_schema();
             $openapi_config['components']['responses'][$resp_shortname] = $response->to_openapi_component();
         }
 
@@ -360,7 +363,16 @@ class OpenAPISchema extends Schema {
 
                 # Assign this request method Responses for each Response class defined.
                 foreach ($response_classes as $response_class) {
+                    # Construct the Response class
                     $response = new $response_class(message: '', response_id: '');
+                    $response_sn = $response->get_class_shortname();
+
+                    # Skip this response class if it is not a response type for this endpoint
+                    if ($endpoint->response_types and !in_array($response_sn, $endpoint->response_types)) {
+                        continue;
+                    }
+
+                    # Otherwise, add it to the OpenAPI config
                     $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code] = [
                         '$ref' => '#/components/responses/' . $response->get_class_shortname(),
                     ];

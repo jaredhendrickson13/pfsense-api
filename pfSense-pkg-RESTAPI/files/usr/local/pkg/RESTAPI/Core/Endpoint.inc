@@ -74,6 +74,14 @@ class Endpoint {
     protected array $errors = [];
 
     /**
+     * @var array $response_types
+     * An array of Response classes that can be returned by this Endpoint. This array
+     * should contain the class names of the Response objects that can be returned by
+     * this Endpoint.
+     */
+    public array $response_types = [];
+
+    /**
      * @var Auth $client
      * The \RESTAPI\Core\Auth object created by this Endpoint during API calls, contains
      * client authentication information.
