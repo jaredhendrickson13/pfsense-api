@@ -170,7 +170,7 @@ class Response extends Error {
      * are allowed by the Accept header.
      * @return array This Response object as an OpenAPI response component
      */
-    final public function to_openapi_component(): array {
+    public function to_openapi_component(): array {
         # Variables
         $component = ['description' => $this->help_text, 'content' => []];
         $content_handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
