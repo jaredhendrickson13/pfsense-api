@@ -157,15 +157,9 @@ class ModelSet {
                 $field = $query_options['field'];
                 $filter_name = $query_options['filter'];
 
-                # Skip this field if it's excluded
-                if (in_array($field, $excluded)) {
+                # Skip this field if it's excluded or not present in the model object
+                if (in_array($field, $excluded) or !property_exists($model_object, $field)) {
                     continue;
-                }
-
-                # Ensure this object has the requested field
-                if (!property_exists($model_object, $field)) {
-                    $is_match = false;
-                    break;
                 }
 
                 # Obtain the value for this field. If it is the ID, handle accordingly.

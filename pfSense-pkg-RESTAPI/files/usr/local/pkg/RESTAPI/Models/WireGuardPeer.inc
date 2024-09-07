@@ -71,6 +71,7 @@ class WireGuardPeer extends Model {
         $this->publickey = new StringField(required: true, unique: true, help_text: 'The public key for this peer.');
         $this->presharedkey = new StringField(
             default: '',
+            allow_empty: true,
             allow_null: true,
             write_only: true,
             help_text: 'The pre-shared key for this tunnel.',
