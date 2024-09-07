@@ -43,6 +43,7 @@ class RESTAPIVersion extends Model {
         );
         $this->update_available = new BooleanField(
             read_only: true,
+            indicates_true: true,
             help_text: 'Indicates if an API update is available for this system.',
         );
         $this->install_version = new StringField(

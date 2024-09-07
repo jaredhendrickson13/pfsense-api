@@ -24,20 +24,26 @@ run pfSense. It's recommended to follow Netgate's [minimum hardware requirements
 ## Installing the package
 
 The pfSense REST API package is built just like any other pfSense package and can therefor be installed easily using
-`pkg` from the pfSense command line:
+`pkg` from the pfSense command line. Below are the installation commands for the latest version of the package.
+
+**Install on pfSense CE**
 
 ```bash
-pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7.2-pkg-RESTAPI.pkg
+pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7.2-pkg-RESTAPI.pkg
 ```
 
-!!! Note
-    You may need to customize the installation command to reference the package built for your pfSense version. Check
-    the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
-    your version of pfSense.
+**Install on pfSense Plus**
+
+```bash
+pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-24.03-pkg-RESTAPI.pkg
+```
 
 !!! Important
-    When updating pfSense, **you must reinstall this package afterward** as pfSense removes unofficial packages during
-    system updates and has no way to automatically reinstall them.
+    - You may need to customize the installation command to reference the package built for your pfSense version. Check
+      the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
+      your version of pfSense.
+    - When updating pfSense, **you must reinstall this package afterward** as pfSense removes unofficial packages during
+      system updates and has no way to automatically reinstall them.
 
 ## Configuring the package
 

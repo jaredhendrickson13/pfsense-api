@@ -27,14 +27,22 @@ API package and provide you with the information you need to configure and use t
 
 ## Quickstart
 
-For new users, it is recommended to refer to the links in the [Getting Started section](#getting-started) to begin. Otherwise, the install
-command is included below for quick reference:
+For new users, it is recommended to refer to the links in the [Getting Started section](#getting-started) to begin. Otherwise, the installation
+commands are included below for quick reference.
+
+Install on pfSense CE:
 
 ```bash
-pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7.2-pkg-RESTAPI.pkg
+pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7.2-pkg-RESTAPI.pkg
 ```
 
-> [!NOTE]
+Install on pfSense Plus:
+
+```bash
+pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-24.03-pkg-RESTAPI.pkg
+```
+
+> [!IMPORTANT]
 > You may need to customize the installation command to reference the package built for your pfSense version. Check
 > the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
 > your version of pfSense.
