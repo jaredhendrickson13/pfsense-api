@@ -138,9 +138,14 @@ class OpenAPISchema extends Schema {
                 $required_packages_str = $model->packages ? implode(', ', $model->packages) : 'None';
                 $requires_auth_str = $endpoint->requires_auth ? 'Yes' : 'No';
                 $auth_method_str = implode(', ', $endpoint->auth_methods ?: $auth_classes_short);
-                $applies_immediately = $model->always_apply ? 'Yes' : 'No';
                 $cache_class = $model->cache_class ?: 'None';
                 $operation_id = "$request_method{$endpoint->get_class_shortname()}";
+
+                # Determine if this Model applies changes immediately or not
+                $applies_immediately = $model->does_apply_immediately();
+                $applies_immediately = $applies_immediately ? 'Yes' : $applies_immediately;
+                $applies_immediately = $applies_immediately === false ? 'No' : $applies_immediately;
+                $applies_immediately = $applies_immediately === null ? 'Not Applicable' : $applies_immediately;
 
                 # Add openapi for all requests at this path
                 $openapi_config['paths'][$endpoint->url][$request_method] = [

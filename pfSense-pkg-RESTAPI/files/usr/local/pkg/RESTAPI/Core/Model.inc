@@ -1043,6 +1043,29 @@ class Model {
     }
 
     /**
+     * Determines if this Model applies changes immediately or if they must applied manually after changes are made.
+     * This is intended to be used to more accurately determine the 'Applies immediately' value in the API documentation
+     * to prevent misleading information.
+     * @return bool|null Returns true if this Model applies changes immediately, false if changes must be applied
+     * manually, or null if this does not apply to this Model.
+     */
+    public function does_apply_immediately(): ?bool
+    {
+        # If this Model does not have a `config_path` set, this is not relevant. Return null.
+        if (!$this->config_path) {
+            return null;
+        }
+
+        # If this Model has the `always_apply` property set, changes always apply immediately. Return true.
+        if ($this->always_apply) {
+            return true;
+        }
+
+        # Otherwise, changes must be applied manually. Return false.
+        return false;
+    }
+
+    /**
      * Populates an array of field names for this model.
      * @param bool $required_only Only obtain required Fields
      * @return array An array of field names for this model.

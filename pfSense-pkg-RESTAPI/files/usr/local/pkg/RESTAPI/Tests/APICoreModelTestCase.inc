@@ -8,6 +8,7 @@ use RESTAPI\Caches\RESTAPIVersionReleasesCache;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Models\FirewallAlias;
+use RESTAPI\Models\InterfaceVLAN;
 use RESTAPI\Models\SystemStatus;
 use RESTAPI\Models\Test;
 
@@ -981,5 +982,24 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         # Ensure all the aliases were deleted
         $this->assert_equals($deleted_aliases->count(), 6);
         $this->assert_equals(FirewallAlias::read_all()->count(), 0);
+    }
+
+    /**
+     * Ensure the does_apply_immediately() method correctly determines if the Model object will apply changes
+     * immediately or requires a manual apply.
+     */
+    public function test_does_apply_immediately(): void
+    {
+        # The FirewallAlias Model requires a manual apply via FirewallApply, ensure it returns false
+        $alias = new FirewallAlias();
+        $this->assert_is_false($alias->does_apply_immediately());
+
+        # Applies immediately isn't relevant for the SystemStatus Model, ensure it returns null
+        $status = new SystemStatus();
+        $this->assert_equals($status->does_apply_immediately(), null);
+
+        # The InterfaceVLAN Model automatically applies changes, ensure it returns true
+        $vlan = new InterfaceVLAN();
+        $this->assert_is_true($vlan->does_apply_immediately());
     }
 }
