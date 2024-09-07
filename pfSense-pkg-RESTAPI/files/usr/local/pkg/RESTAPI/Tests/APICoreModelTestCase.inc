@@ -988,8 +988,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Ensure the does_apply_immediately() method correctly determines if the Model object will apply changes
      * immediately or requires a manual apply.
      */
-    public function test_does_apply_immediately(): void
-    {
+    public function test_does_apply_immediately(): void {
         # The FirewallAlias Model requires a manual apply via FirewallApply, ensure it returns false
         $alias = new FirewallAlias();
         $this->assert_is_false($alias->does_apply_immediately());

@@ -1049,8 +1049,7 @@ class Model {
      * @return bool|null Returns true if this Model applies changes immediately, false if changes must be applied
      * manually, or null if this does not apply to this Model.
      */
-    public function does_apply_immediately(): ?bool
-    {
+    public function does_apply_immediately(): ?bool {
         # If this Model does not have a `config_path` set, this is not relevant. Return null.
         if (!$this->config_path) {
             return null;
