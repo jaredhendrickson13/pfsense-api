@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Validators\URLValidator;
 
-class APIValidatorsURLValidatorTestCase extends TestCase
-{
+class APIValidatorsURLValidatorTestCase extends TestCase {
     /**
      * Ensure the URLValidator does not throw an exception when given a valid URL is given, but does throw an exception
      * when given an invalid URL.
@@ -27,7 +26,7 @@ class APIValidatorsURLValidatorTestCase extends TestCase
             callable: function () {
                 $validator = new URLValidator();
                 $validator->validate('not a url!');
-            }
+            },
         );
     }
 }

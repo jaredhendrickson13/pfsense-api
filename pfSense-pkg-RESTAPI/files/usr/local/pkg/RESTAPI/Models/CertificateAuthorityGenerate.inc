@@ -197,8 +197,7 @@ class CertificateAuthorityGenerate extends Model {
      * Returns a list of available country codes for the certificate authority.
      * @returns array The list of available country codes.
      */
-    public static function get_country_choices(): array
-    {
+    public static function get_country_choices(): array {
         # Obtain the available country codes from pfSense's built-in get_cert_country_codes function
         return array_keys(get_cert_country_codes());
     }
@@ -206,8 +205,7 @@ class CertificateAuthorityGenerate extends Model {
     /**
      * Extends the default _create method to ensure the certificate is generated before it is written to config.
      */
-    protected function _create(): void
-    {
+    protected function _create(): void {
         # Generate the certificate authority
         $this->is_intermediate->value ? $this->generate_intermediate_ca() : $this->generate_ca();
 

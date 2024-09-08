@@ -217,8 +217,7 @@ class CertificateGenerate extends Model {
      * Returns a list of available country codes for the certificate.
      * @returns array The list of available country codes.
      */
-    public static function get_country_choices(): array
-    {
+    public static function get_country_choices(): array {
         # Obtain the available country codes from pfSense's built-in get_cert_country_codes function
         return array_keys(get_cert_country_codes());
     }
@@ -226,8 +225,7 @@ class CertificateGenerate extends Model {
     /**
      * Extends the default _create method to ensure the certificate is generated before it is written to config.
      */
-    protected function _create(): void
-    {
+    protected function _create(): void {
         # Generate the certificate
         $this->generate_cert();
 
@@ -248,7 +246,7 @@ class CertificateGenerate extends Model {
             'localityName' => $this->dn_city->value,
             'organizationName' => $this->dn_organization->value,
             'organizationalUnitName' => $this->dn_organizationalunit->value,
-            'subjectAltName' => []
+            'subjectAltName' => [],
         ];
 
         # Loop through the SAN fields and add them to the subjectAltName array accordingly

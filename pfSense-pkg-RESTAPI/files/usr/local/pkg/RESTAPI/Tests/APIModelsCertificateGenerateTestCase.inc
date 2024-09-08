@@ -9,8 +9,7 @@ use RESTAPI\Models\CertificateAuthorityGenerate;
 use RESTAPI\Models\CertificateGenerate;
 use RESTAPI\Validators\X509Validator;
 
-class APIModelsCertificateGenerateTestCase extends TestCase
-{
+class APIModelsCertificateGenerateTestCase extends TestCase {
     /**
      * @var CertificateAuthority|Model $ca The CertificateAuthority model to use for testing.
      */
@@ -33,7 +32,7 @@ class APIModelsCertificateGenerateTestCase extends TestCase
             dn_state: 'UT',
             dn_city: 'Salt Lake City',
             dn_organization: 'ACME Org',
-            dn_organizationalunit: 'IT'
+            dn_organizationalunit: 'IT',
         );
         $this->ca->create();
         $this->ca = CertificateAuthority::query(refid: $this->ca->refid->value)->first();
@@ -111,8 +110,7 @@ class APIModelsCertificateGenerateTestCase extends TestCase
     /**
      * Ensure the get_digest_alg_choices method returns digest algorithms.
      */
-    public function test_get_digest_alg_choices(): void
-    {
+    public function test_get_digest_alg_choices(): void {
         $cert = new CertificateGenerate();
         $this->assert_is_not_empty($cert->get_digest_alg_choices());
     }

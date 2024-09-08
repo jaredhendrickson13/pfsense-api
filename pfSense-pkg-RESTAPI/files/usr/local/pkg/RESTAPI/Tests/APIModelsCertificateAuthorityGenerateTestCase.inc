@@ -7,8 +7,7 @@ use RESTAPI\Models\CertificateAuthority;
 use RESTAPI\Models\CertificateAuthorityGenerate;
 use RESTAPI\Validators\X509Validator;
 
-class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
-{
+class APIModelsCertificateAuthorityGenerateTestCase extends TestCase {
     /**
      * Ensure we can generate a new Certificate Authority with an RSA key.
      */
@@ -26,7 +25,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
             dn_state: 'UT',
             dn_city: 'Salt Lake City',
             dn_organization: 'ACME Org',
-            dn_organizationalunit: 'IT'
+            dn_organizationalunit: 'IT',
         );
         $ca->always_apply = false; # Disable always_apply so we can test the create method without overloading cpu
         $ca->create();
@@ -49,8 +48,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
     /**
      * Ensure we can generate a new Certificate Authority with an ECDSA key.
      */
-    public function test_generate_ecdsa_certificate_authority(): void
-    {
+    public function test_generate_ecdsa_certificate_authority(): void {
         $ca = new CertificateAuthorityGenerate(
             descr: 'test_ca',
             trust: true,
@@ -64,7 +62,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
             dn_state: 'UT',
             dn_city: 'Salt Lake City',
             dn_organization: 'ACME Org',
-            dn_organizationalunit: 'IT'
+            dn_organizationalunit: 'IT',
         );
         $ca->always_apply = false; # Disable always_apply so we can test the create method without overloading cpu
         $ca->create();
@@ -87,8 +85,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
     /**
      * Ensure we can generate a new intermediate Certificate Authority.
      */
-    public function test_generate_intermediate_certificate_authority(): void
-    {
+    public function test_generate_intermediate_certificate_authority(): void {
         $root_ca = new CertificateAuthorityGenerate(
             descr: 'root_ca',
             trust: true,
@@ -102,7 +99,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
             dn_state: 'UT',
             dn_city: 'Salt Lake City',
             dn_organization: 'ACME Org',
-            dn_organizationalunit: 'IT'
+            dn_organizationalunit: 'IT',
         );
         $root_ca->always_apply = false; # Disable always_apply so we can test the create method without overloading cpu
         $root_ca->create();
@@ -129,7 +126,9 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
         # Ensure we have a matching keypair
         $this->assert_is_not_empty($intermediate_ca->crt->value);
         $this->assert_is_not_empty($intermediate_ca->prv->value);
-        $this->assert_is_true(X509Validator::is_matching_keypair($intermediate_ca->crt->value, $intermediate_ca->prv->value));
+        $this->assert_is_true(
+            X509Validator::is_matching_keypair($intermediate_ca->crt->value, $intermediate_ca->prv->value),
+        );
 
         # Ensure our RSA key length is correct
         $prv = openssl_pkey_get_private($intermediate_ca->prv->value);
@@ -140,7 +139,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
         # Ensure the root CAs next serial has incremented
         $this->assert_is_greater_than(
             CertificateAuthority::query(refid: $root_ca->refid->value)->first()->serial->value,
-            $root_ca->serial->value
+            $root_ca->serial->value,
         );
 
         # Ensure our intermediate CA is signed by the root CA
@@ -165,8 +164,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
     /**
      * Ensure the get_digest_alg_choices method returns digest algorithms.
      */
-    public function test_get_digest_alg_choices(): void
-    {
+    public function test_get_digest_alg_choices(): void {
         $ca = new CertificateAuthorityGenerate();
         $this->assert_is_not_empty($ca->get_digest_alg_choices());
     }

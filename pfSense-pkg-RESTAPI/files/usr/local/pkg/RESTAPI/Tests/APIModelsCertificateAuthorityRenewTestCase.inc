@@ -8,8 +8,7 @@ use RESTAPI\Models\CertificateAuthority;
 use RESTAPI\Models\CertificateAuthorityGenerate;
 use RESTAPI\Models\CertificateAuthorityRenew;
 
-class APIModelsCertificateAuthorityRenewTestCase extends TestCase
-{
+class APIModelsCertificateAuthorityRenewTestCase extends TestCase {
     /**
      * @var CertificateAuthority|Model $ca The Certificate Authority to renew.
      */
@@ -33,7 +32,7 @@ class APIModelsCertificateAuthorityRenewTestCase extends TestCase
             dn_state: 'UT',
             dn_city: 'Salt Lake City',
             dn_organization: 'ACME Org',
-            dn_organizationalunit: 'IT'
+            dn_organizationalunit: 'IT',
         );
         $ca->always_apply = false; # Disable always_apply so we can test the create method without overloading cpu
         $ca->create();
@@ -55,8 +54,7 @@ class APIModelsCertificateAuthorityRenewTestCase extends TestCase
      * Ensure when we renew the CertificateAuthority while reusing the key and serial, both the certificate and
      * the key remain the same.
      */
-    public function test_renew_certificate_authority_reuse(): void
-    {
+    public function test_renew_certificate_authority_reuse(): void {
         # Before we renew, obtain the existing CA cert
         $old_cert = $this->ca->crt->value;
         $old_key = $this->ca->prv->value;
@@ -85,8 +83,7 @@ class APIModelsCertificateAuthorityRenewTestCase extends TestCase
      * Ensure when we renew the CertificateAuthority without reusing the key and serial, the certificate, key, and serial
      * all change.
      */
-    public function test_renew_certificate_authority_no_reuse(): void
-    {
+    public function test_renew_certificate_authority_no_reuse(): void {
         # Before we renew, obtain the existing CA cert, key, and serial
         $old_cert = $this->ca->crt->value;
         $old_key = $this->ca->prv->value;
@@ -113,8 +110,7 @@ class APIModelsCertificateAuthorityRenewTestCase extends TestCase
     /**
      * Ensure the reusekey and reuseserial fields both default to rue internally
      */
-    public function test_reusekey_and_reuseserial_default_to_true(): void
-    {
+    public function test_reusekey_and_reuseserial_default_to_true(): void {
         $renew = new CertificateAuthorityRenew();
         $this->assert_equals($renew->get_internal()['reusekey'], true);
         $this->assert_equals($renew->get_internal()['reuseserial'], true);

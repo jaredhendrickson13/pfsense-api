@@ -12,8 +12,7 @@ use RESTAPI\Responses\ServerError;
 /**
  * Defines a Model for renewing an existing Certificate Authority.
  */
-class CertificateAuthorityRenew extends Model
-{
+class CertificateAuthorityRenew extends Model {
     public ForeignModelField $caref;
     public BooleanField $reusekey;
     public BooleanField $reuseserial;
@@ -21,11 +20,10 @@ class CertificateAuthorityRenew extends Model
     public StringField $oldserial;
     public StringField $newserial;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
-        $this->internal_callable = "get_internal";
-        $this->many = False;
+        $this->internal_callable = 'get_internal';
+        $this->many = false;
 
         # Set model fields
         $this->caref = new ForeignModelField(
@@ -84,7 +82,7 @@ class CertificateAuthorityRenew extends Model
         if (!is_cert_locally_renewable($this->caref->get_related_model()->to_internal())) {
             throw new NotAcceptableError(
                 message: "Certificate Authority with refid `$caref` is not capable of being renewed.",
-                response_id: 'CERTIFICATE_AUTHORITY_RENEW_UNAVAILABLE'
+                response_id: 'CERTIFICATE_AUTHORITY_RENEW_UNAVAILABLE',
             );
         }
 
@@ -94,8 +92,7 @@ class CertificateAuthorityRenew extends Model
     /**
      * Renews the specified Certificate Authority.
      */
-    public function _create(): void
-    {
+    public function _create(): void {
         # Extract details from the Certificate Authority to renew
         $ca_config = &lookup_ca($this->caref->value);
         $this->oldserial->value = cert_get_serial($ca_config['crt']);
@@ -105,14 +102,14 @@ class CertificateAuthorityRenew extends Model
             $ca_config,
             reusekey: $this->reusekey->value,
             strictsecurity: $this->strictsecurity->value,
-            reuseserial: $this->reuseserial->value
+            reuseserial: $this->reuseserial->value,
         );
 
         # Throw an error if the renewal failed
         if (!$renewed) {
             throw new ServerError(
                 message: 'Failed to renew the Certificate Authority for unknown reason.',
-                response_id: 'CERTIFICATE_AUTHORITY_RENEW_FAILED'
+                response_id: 'CERTIFICATE_AUTHORITY_RENEW_FAILED',
             );
         }
 

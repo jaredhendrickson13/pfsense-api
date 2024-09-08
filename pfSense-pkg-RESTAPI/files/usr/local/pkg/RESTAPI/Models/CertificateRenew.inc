@@ -12,8 +12,7 @@ use RESTAPI\Responses\ServerError;
 /**
  * Defines a Model for renewing an existing Certificate.
  */
-class CertificateRenew extends Model
-{
+class CertificateRenew extends Model {
     public ForeignModelField $certref;
     public BooleanField $reusekey;
     public BooleanField $reuseserial;
@@ -21,11 +20,10 @@ class CertificateRenew extends Model
     public StringField $oldserial;
     public StringField $newserial;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
-        $this->internal_callable = "get_internal";
-        $this->many = False;
+        $this->internal_callable = 'get_internal';
+        $this->many = false;
 
         # Set model fields
         $this->certref = new ForeignModelField(
@@ -84,7 +82,7 @@ class CertificateRenew extends Model
         if (!is_cert_locally_renewable(lookup_cert($certref))) {
             throw new NotAcceptableError(
                 message: "Certificate with refid `$certref` is not capable of being renewed.",
-                response_id: 'CERTIFICATE_RENEW_UNAVAILABLE'
+                response_id: 'CERTIFICATE_RENEW_UNAVAILABLE',
             );
         }
 
@@ -94,8 +92,7 @@ class CertificateRenew extends Model
     /**
      * Renews the specified Certificate.
      */
-    public function _create(): void
-    {
+    public function _create(): void {
         # Extract details from the Certificate to renew
         $cert_config = &lookup_cert($this->certref->value);
         $this->oldserial->value = cert_get_serial($cert_config['crt']);
@@ -105,14 +102,14 @@ class CertificateRenew extends Model
             $cert_config,
             reusekey: $this->reusekey->value,
             strictsecurity: $this->strictsecurity->value,
-            reuseserial: $this->reuseserial->value
+            reuseserial: $this->reuseserial->value,
         );
 
         # Throw an error if the renewal failed
         if (!$renewed) {
             throw new ServerError(
                 message: 'Failed to renew the Certificate for unknown reason.',
-                response_id: 'CERTIFICATE_RENEW_FAILED'
+                response_id: 'CERTIFICATE_RENEW_FAILED',
             );
         }
 
