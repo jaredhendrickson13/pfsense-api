@@ -78,83 +78,83 @@ class CertificateAuthorityGenerate extends Model {
         );
         $this->is_intermediate = new BooleanField(
             default: false,
-            write_only: true,
+            representation_only: true,
             help_text: 'Indicates if this certificate authority is an intermediate certificate authority.',
         );
         $this->caref = new ForeignModelField(
             model_name: 'CertificateAuthority',
             model_field: 'refid',
             required: true,
-            write_only: true,
             conditions: ['is_intermediate' => true],
             help_text: 'The certificate authority to use as the parent for this intermediate certificate authority.',
         );
         $this->keytype = new StringField(
             required: true,
             choices: ['RSA', 'ECDSA'],
-            write_only: true,
+            representation_only: true,
             help_text: 'The type of key pair to generate.',
         );
         $this->keylen = new IntegerField(
             required: true,
             choices: [1024, 2048, 3072, 4096, 6144, 7680, 8192, 15360, 16384],
-            write_only: true,
+            representation_only: true,
             conditions: ['keytype' => 'RSA'],
             help_text: 'The length of the RSA key pair to generate.',
         );
         $this->ecname = new StringField(
             required: true,
             choices_callable: 'get_ecname_choices',
-            write_only: true,
+            representation_only: true,
             conditions: ['keytype' => 'ECDSA'],
             help_text: 'The name of the elliptic curve to use for the ECDSA key pair.',
         );
         $this->digest_alg = new StringField(
             required: true,
             choices_callable: 'get_digest_alg_choices',
-            write_only: true,
+            representation_only: true,
             help_text: 'The digest algorithm to use when signing certificates.',
         );
         $this->lifetime = new IntegerField(
             default: 3650,
-            write_only: true,
+            representation_only: true,
             minimum: 1,
             maximum: 12000,
             help_text: 'The number of days the certificate authority is valid for.',
         );
         $this->dn_commonname = new StringField(
             default: 'internal-ca',
-            write_only: true,
+            representation_only: true,
             help_text: 'The common name for the certificate authority.',
         );
         $this->dn_country = new StringField(
             default: '',
             choices_callable: 'get_country_choices',
             allow_empty: true,
-            write_only: true,
+            representation_only: true,
             help_text: 'The country for the certificate authority.',
         );
         $this->dn_state = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            representation_only: true,
             help_text: 'The state for the certificate authority.',
         );
         $this->dn_city = new StringField(
             default: '',
             allow_empty: true,
+            representation_only: true,
             help_text: 'The city for the certificate authority.',
         );
         $this->dn_organization = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            representation_only: true,
             help_text: 'The organization for the certificate authority.',
         );
         $this->dn_organizationalunit = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            representation_only: true,
             help_text: 'The organizational unit for the certificate authority.',
         );
         $this->crt = new Base64Field(
