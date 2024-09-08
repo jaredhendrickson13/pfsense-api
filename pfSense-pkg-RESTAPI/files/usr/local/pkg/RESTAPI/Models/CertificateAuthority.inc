@@ -121,6 +121,24 @@ class CertificateAuthority extends Model {
             );
         }
 
+        # Remove references to this CA from any existing certificates
+        $cert_q = Certificate::query(reverse: true, caref: $this->refid->value);
+        foreach ($cert_q->model_objects as $cert) {
+            $this->del_config("cert/$cert->id/caref");
+        }
+
+        # Remove any CRLs associated with this CA
+        $crl_q = CertificateRevocationList::query(reverse: true, caref: $this->refid->value);
+        foreach ($crl_q->model_objects as $crl) {
+            $this->del_config("crl/$crl->id");
+        }
+
+        # Delete an intermediate CAs signed by this CA
+        $ca_q = CertificateAuthority::query(reverse: true, caref: $this->refid->value, id__except: $this->id);
+        foreach ($ca_q->model_objects as $ca) {
+            $this->del_config("ca/$ca->id");
+        }
+
         parent::_delete();
     }
 
