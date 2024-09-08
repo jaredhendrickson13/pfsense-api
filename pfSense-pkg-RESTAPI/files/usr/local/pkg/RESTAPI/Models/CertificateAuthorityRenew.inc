@@ -6,6 +6,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\NotAcceptableError;
 use RESTAPI\Responses\ServerError;
 
 /**
@@ -71,6 +72,23 @@ class CertificateAuthorityRenew extends Model
     public function get_internal(): array {
         # Ensure 'reusekey' and 'reuseserial' are set to true by default
         return ['reusekey' => true, 'reuseserial' => true];
+    }
+
+    /**
+     * Adds extra validation to he 'caref' field.
+     * @param string $caref The incoming value to validate.
+     * @return string The validated value to assign.
+     */
+    public function validate_caref(string $caref): string {
+        # Ensure the Certificate Authority is capable of being renewed.
+        if (!is_cert_locally_renewable($this->caref->get_related_model()->to_internal())) {
+            throw new NotAcceptableError(
+                message: "Certificate Authority with refid `$caref` is not capable of being renewed.",
+                response_id: 'CERTIFICATE_AUTHORITY_RENEW_UNAVAILABLE'
+            );
+        }
+
+        return $caref;
     }
 
     /**
