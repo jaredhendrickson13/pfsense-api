@@ -44,6 +44,8 @@ class CertificateAuthorityGenerate extends Model {
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'ca';
+        $this->verbose_name = 'Certificate Authority (Generated)';
+        $this->verbose_name_plural = 'Certificate Authorities (Generated)';
         $this->many = true;
         $this->always_apply = true;
 
