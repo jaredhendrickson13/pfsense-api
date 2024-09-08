@@ -28,6 +28,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
             dn_organization: 'ACME Org',
             dn_organizationalunit: 'IT'
         );
+        $ca->always_apply = false; # Disable always_apply so we can test the create method without overloading cpu
         $ca->create();
 
         # Ensure we have a matching keypair
@@ -65,6 +66,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
             dn_organization: 'ACME Org',
             dn_organizationalunit: 'IT'
         );
+        $ca->always_apply = false; # Disable always_apply so we can test the create method without overloading cpu
         $ca->create();
 
         # Ensure we have a matching keypair
@@ -102,6 +104,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
             dn_organization: 'ACME Org',
             dn_organizationalunit: 'IT'
         );
+        $root_ca->always_apply = false; # Disable always_apply so we can test the create method without overloading cpu
         $root_ca->create();
 
         $intermediate_ca = new CertificateAuthorityGenerate(
@@ -120,6 +123,7 @@ class APIModelsCertificateAuthorityGenerateTestCase extends TestCase
             dn_organization: 'ACME Org',
             dn_organizationalunit: 'IT',
         );
+        $intermediate_ca->always_apply = false; # Disable always_apply to test create method without overloading cpu
         $intermediate_ca->create();
 
         # Ensure we have a matching keypair
