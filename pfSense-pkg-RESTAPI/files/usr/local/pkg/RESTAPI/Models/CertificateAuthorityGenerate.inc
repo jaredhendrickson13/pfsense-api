@@ -161,14 +161,14 @@ class CertificateAuthorityGenerate extends Model {
             default: null,
             allow_null: true,
             read_only: true,
-            help_text: 'The X509 certificate string. This field is required when `method` is set to `existing`.',
+            help_text: 'The X509 certificate string.',
         );
         $this->prv = new Base64Field(
             default: null,
             allow_null: true,
             read_only: true,
             sensitive: true,
-            help_text: 'The X509 private key string. This field is required when `method` is set to `existing`.',
+            help_text: 'The X509 private key string.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
