@@ -4,6 +4,7 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\ContentHandler;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Responses\NotFoundError;
 
 class APICoreContentHandlerTestCase extends TestCase {
     /**
@@ -109,5 +110,24 @@ class APICoreContentHandlerTestCase extends TestCase {
         # Ensure media type parameters are ignored
         $_SERVER['HTTP_CONTENT_TYPE'] = 'application/json; charset=utf-8';
         $this->assert_equals(ContentHandler::get_decode_mime_type(), 'application/json');
+    }
+
+    /**
+     * Checks that the to_openapi_schema() correctly converts the content handler into a OpenAPI response content
+     * schema.
+     */
+    public function test_to_openapi_schema(): void
+    {
+        $handler = new ContentHandler();
+        $handler->mime_type = 'application/json';
+        $handler->encode_help_text = 'This is a test help text.';
+        $response = new NotFoundError(message: '', response_id: '');
+        $schema = $handler->to_openapi_schema($response);
+        $this->assert_equals($schema, [
+            'application/json' => [
+                'description' => 'This is a test help text.',
+                'schema' => ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"]
+            ],
+        ]);
     }
 }

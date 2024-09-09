@@ -29,6 +29,12 @@ class ContentHandler {
     public string $mime_type;
 
     /**
+     * @var string $encode_help_text The help text to be displayed when the remote client requests this ContentHandler's
+     * MIME type in the Accept header. This help text should detail what this ContentHandler is capable of encoding.
+     */
+    public string $encode_help_text = '';
+
+    /**
      * Obtains the content from the remote client in its unprocessed form.
      * @return mixed The unprocessed content from the remote client.
      * @throws ServerError When this method is called but not overridden by the child class.
@@ -41,11 +47,14 @@ class ContentHandler {
      * Defines the steps necessary to encode the given content into the correct format. This method is generally used
      * to encode the remote client's response in the format requested by the client.
      * @note This method MUST be overridden by the child class to be used in response to a client's Accept header
-     * @param mixed $content The content to be encoded in this ContentHandler's format.
+     * @param mixed $content The content to be encoded in this ContentHandler's format. This generally the array
+     * representation of the Response object, but can be any content that needs to be encoded.
+     * @param Response|null $context The Response object that this content is being encoded for. This useful for
+     * ContentHandlers that need more context from the Response object that is being encoded.
      * @return mixed The content in this ContentHandler's respective format.
      * @throws NotAcceptableError When this ContentHandler does not support encoding content.
      */
-    protected function _encode(mixed $content = null): mixed {
+    protected function _encode(mixed $content = null, ?Response $context = null): mixed {
         throw new NotAcceptableError(
             message: "Content handler `$this->mime_type` cannot format a response as it does not support content " .
                 'encoding. Change the value of your `Accept` header to a valid option and try again.',
@@ -56,11 +65,14 @@ class ContentHandler {
     /**
      * Encodes the provided content into the format corresponding with this ContentHandler's MIME type and sets the
      * Content-Type and Content-Length response headers accordingly.
-     * @param mixed $content The content to be encoded in this ContentHandler's format.
+     * @param mixed $content The content to be encoded in this ContentHandler's format. This generally the array
+     * representation of the Response object, but can be any content that needs to be encoded.
+     * @param Response|null $context The Response object that this content is being encoded for. This useful for
+     * ContentHandlers that need more context from the Response object that is being encoded.
      * @return mixed The content in this ContentHandler's respective format.
      */
-    final public function encode(mixed $content): mixed {
-        $encoded_content = $this->_encode($content);
+    final public function encode(mixed $content, ?Response $context = null): mixed {
+        $encoded_content = $this->_encode($content, context: $context);
         header("content-type: $this->mime_type");
         return $encoded_content;
     }
@@ -252,5 +264,22 @@ class ContentHandler {
         }
 
         return $mime_type;
+    }
+
+    /**
+     * Converts this ContentHandler into an OpenAPI 'content' schema. This schema details which MIME types are allowed
+     * by the Accept header and also provides a reference to the schema of the Response object.
+     * @param Response $response The Response object this content schema describes.
+     * @return array This ContentHandler as an OpenAPI 'content' schema for this MIME type in a given Response object.
+     */
+    public function to_openapi_schema(Response $response): array
+    {
+        # Default to an empty schema if this ContentHandler cannot encode content, otherwise use the schema
+        return !$this->can_encode() ? [] : [
+            $this->mime_type => [
+                'description' => $this->encode_help_text,
+                'schema' => ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"]
+            ]
+        ];
     }
 }
