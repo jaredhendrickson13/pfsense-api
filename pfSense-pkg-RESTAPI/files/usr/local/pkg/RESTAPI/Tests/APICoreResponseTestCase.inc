@@ -70,19 +70,15 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
      * Checks that the Response object is correctly converted to its OpenAPI component representation when the
      * `to_openapi_component()` method is run.
      */
-    public function test_response_to_openapi_component() {
+    public function test_response_to_openapi_component(): void {
         # Create a Response object to represent as an OpenAPI component.
         $response = new RESTAPI\Core\Response(message: 'Test message', response_id: 'TEST_RESPONSE_ID');
         $response->help_text = 'Example OpenAPI description for this response component.';
 
-        $this->assert_equals($response->to_openapi_component(), [
-            'description' => 'Example OpenAPI description for this response component.',
-            'content' => [
-                'application/json' => [
-                    'schema' => ['$ref' => '#/components/schemas/Response'],
-                ],
-            ],
-        ]);
+        $this->assert_equals(
+            $response->to_openapi_component(),
+            ['description' => 'Example OpenAPI description for this response component.',]
+        );
     }
 
     /**

@@ -172,26 +172,7 @@ class Response extends Error {
      */
     public function to_openapi_component(): array {
         # Variables
-        $component = ['description' => $this->help_text, 'content' => []];
-        $content_handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
-
-        # Default to application/json
-        $component['content']['application/json'] = [];
-
-        # Populate a component content schema for each ContentHandler that can encode content
-        foreach ($content_handler_classes as $content_handler_class) {
-            # Create the content handler object
-            $content_handler = new $content_handler_class();
-
-            # Only include this content if it can encode responses
-            if ($content_handler->can_encode()) {
-                $component['content'][$content_handler->mime_type] = [
-                    'schema' => ['$ref' => "#/components/schemas/{$this->get_class_shortname()}"],
-                ];
-            }
-        }
-
-        return $component;
+        return ['description' => $this->help_text];
     }
 
     /**
