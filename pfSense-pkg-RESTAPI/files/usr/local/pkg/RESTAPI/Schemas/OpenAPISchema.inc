@@ -249,11 +249,18 @@ class OpenAPISchema extends Schema {
                     foreach ($content_handler_classes as $content_handler_class) {
                         # Create an object for this content handler so we can extract handler info
                         $content_handler = new $content_handler_class();
+                        $content_handler_sn = $content_handler->get_class_shortname();
 
-                        # Only include this ContentHandler as a valid content definition if it can decode data
-                        if ($content_handler->can_decode()) {
-                            $contents[$content_handler->mime_type] = $schema;
+                        # Skip this content handler if it's not allowed by the endpoint
+                        if ($endpoint->decode_content_handlers and !in_array($content_handler_sn, $endpoint->decode_content_handlers)) {
+                            continue;
                         }
+                        # Skip this content handler if it can't decode
+                        if (!$content_handler->can_decode()) {
+                            continue;
+                        }
+
+                        $contents[$content_handler->mime_type] = $schema;
                     }
                     $openapi_config['paths'][$endpoint->url][$request_method]['requestBody']['content'] = $contents;
                 }
@@ -371,16 +378,35 @@ class OpenAPISchema extends Schema {
                     # Construct the Response class
                     $response = new $response_class(message: '', response_id: '');
                     $response_sn = $response->get_class_shortname();
+                    $content_handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
 
                     # Skip this response class if it is not a response type for this endpoint
                     if ($endpoint->response_types and !in_array($response_sn, $endpoint->response_types)) {
                         continue;
                     }
 
-                    # Otherwise, add it to the OpenAPI config
-                    $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code] = [
-                        '$ref' => '#/components/responses/' . $response->get_class_shortname(),
-                    ];
+                    # Loop through all ContentHandlers and add relevant accept types to the response
+                    foreach ($content_handler_classes as $content_handler_class) {
+                        # Create the content handler object and add the schema for the content to our component
+                        $content_handler = new $content_handler_class();
+                        $content_handler_sn = $content_handler->get_class_shortname();
+
+                        # Skip this content handler if the Endpoint does not support it
+                        if ($endpoint->encode_content_handlers and !in_array($content_handler_sn, $endpoint->encode_content_handlers)) {
+                            continue;
+                        }
+                        # Skip content handlers that cannot encode
+                        if (!$content_handler->can_encode()) {
+                            continue;
+                        }
+
+                        $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code]['content'] = [];
+                        $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code]['content'] =
+                            array_merge(
+                                $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code]['content'],
+                                $content_handler->to_openapi_schema($response)
+                            );
+                    }
                 }
             }
         }

@@ -25,6 +25,7 @@ use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\VirtualIP;
 use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\MethodNotAllowedError;
+use RESTAPI\Responses\NotAcceptableError;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ServiceUnavailableError;
 use RESTAPI\Responses\Success;
@@ -124,6 +125,22 @@ class Endpoint {
      * DELETE will use the Model's `delete()` method.
      */
     public array $request_method_options = [];
+
+    /**
+     * @var array $encode_content_handlers
+     * Defines which ContentHandler class (as shortnames) can be used to encode the API response. If this array is
+     * empty, all ContentHandlers with encode capabilities can be used. This directly relates to which MIME-types
+     * this endpoint supports in the Accept header.
+     */
+    public array $encode_content_handlers = [];
+
+    /**
+     * @var array $decode_content_handlers
+     * Defines which ContentHandler class (as shortnames) can be used to decode the API request. If this array is
+     * empty, all ContentHandlers with decode capabilities can be used. This directly relates to which MIME-types
+     * this endpoint supports in the Content-Type header.
+     */
+    public array $decode_content_handlers = [];
 
     /**
      * @property bool $requires_auth
@@ -531,6 +548,41 @@ class Endpoint {
     }
 
     /**
+     * Checks if the requested decode ContentHandler is supported.
+     * @throws NotAcceptableError When the requested ContentHandler is not supported.
+     */
+    public function check_decode_content_handler_supported(ContentHandler $content_handler): void {
+        # Obtain the shortname for the class
+        $content_handler_sn = $content_handler->get_class_shortname();
+
+        # Check that this ContentHandler is allowed to decode the client's request
+        if ($this->decode_content_handlers and !in_array($content_handler_sn, $this->decode_content_handlers)) {
+            throw new NotAcceptableError(
+                message: "The requested Content-Type '$content_handler->mime_type' is not supported by this endpoint.",
+                response_id: 'ENDPOINT_CONTENT_TYPE_NOT_SUPPORTED',
+            );
+        }
+    }
+
+    /**
+     * Checks if the requested encode ContentHandler is supported.
+     * @throws NotAcceptableError When the requested ContentHandler is not supported.
+     */
+    public function check_encode_content_handler_supported(ContentHandler $content_handler): void
+    {
+        # Obtain the shortname for the class
+        $content_handler_sn = $content_handler->get_class_shortname();
+
+        # Check that this ContentHandler is allowed to encode the client's request
+        if ($this->encode_content_handlers and !in_array($content_handler_sn, $this->encode_content_handlers)) {
+            throw new NotAcceptableError(
+                message: "The requested Accept '$content_handler->mime_type' is not supported by this endpoint.",
+                response_id: 'ENDPOINT_ACCEPT_NOT_SUPPORTED',
+            );
+        }
+    }
+
+    /**
      * Checks if authentication and authorization for this Endpoint is successful. This will attempt authentication
      * and authorization for each allowed auth method. Only one auth method needs to succeed to allow access.
      */
@@ -660,6 +712,11 @@ class Endpoint {
     private function check_request_data(): void {
         # Obtain the ContentHandler associated with the HTTP Content-Type header sent by the client
         $content_handler = ContentHandler::get_decode_handler();
+
+        # Ensure this endpoint supports the decode handler
+        $this->check_decode_content_handler_supported($content_handler);
+
+        # Decode the request data
         $this->request_data = $content_handler->decode();
         $this->validate_endpoint_fields();
     }
@@ -854,6 +911,9 @@ class Endpoint {
             # This will throw an error if the client's Accept header is not supported by an existing ContentHandler
             $content_handler = ContentHandler::get_encode_handler();
 
+            # Ensure the ContentHandler is also supported by this Endpoint
+            $this->check_encode_content_handler_supported($content_handler);
+
             # Checks that request data was properly received and parsed.
             $this->check_request_method();
             $this->check_request_data();
@@ -908,8 +968,16 @@ class Endpoint {
         $response = $this->response_handler($response);
 
         # Format the HTTP response as JSON and set response code
-        http_response_code($response->code);
-        return $content_handler->encode($response->to_representation()) . PHP_EOL;
+        try {
+            http_response_code($response->code);
+            return $content_handler->encode($response->to_representation(), context: $response) . PHP_EOL;
+        }
+        # If an error occurs during the response encoding process, return the error message as JSON
+        catch (Response $response) {
+            http_response_code($response->code);
+            $content_handler = new JSONContentHandler();
+            return $content_handler->encode($response->to_representation(), context: $response) . PHP_EOL;
+        }
     }
 
     /**
