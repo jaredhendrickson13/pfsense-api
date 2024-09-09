@@ -10,16 +10,14 @@ use RESTAPI\Responses\ServerError;
 /**
  * Defines a Model for handling the export of an existing Certificate as a PKCS12 file.
  */
-class CertificatePKCS12Export extends Model
-{
+class CertificatePKCS12Export extends Model {
     public ForeignModelField $certref;
     public StringField $encryption;
     public StringField $passphrase;
     public StringField $filename;
     public StringField $binary_data;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set Model attributes
         $this->internal_callable = 'get_internal';
         $this->verbose_name = 'Certificate PKCS#12 Export';
@@ -45,7 +43,7 @@ class CertificatePKCS12Export extends Model
             default: null,
             allow_null: true,
             read_only: true,
-            help_text: 'The filename used when exporting the PKCS#12 archive. This value cannot be changed and will '.
+            help_text: 'The filename used when exporting the PKCS#12 archive. This value cannot be changed and will ' .
                 'always be certificate refid with the .p12 extension.',
         );
         $this->binary_data = new StringField(
@@ -63,8 +61,7 @@ class CertificatePKCS12Export extends Model
      * callable.
      * @return array An empty array.
      */
-    public function get_internal(): array
-    {
+    public function get_internal(): array {
         return [];
     }
 
@@ -80,7 +77,7 @@ class CertificatePKCS12Export extends Model
             cert: $this->certref->get_related_model()->to_internal(),
             encryption: $this->encryption->value,
             passphrase: $this->passphrase->value,
-            delivery: 'data'
+            delivery: 'data',
         );
 
         # Throw an error if the PKCS#12 archive could not be created

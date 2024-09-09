@@ -252,7 +252,10 @@ class OpenAPISchema extends Schema {
                         $content_handler_sn = $content_handler->get_class_shortname();
 
                         # Skip this content handler if it's not allowed by the endpoint
-                        if ($endpoint->decode_content_handlers and !in_array($content_handler_sn, $endpoint->decode_content_handlers)) {
+                        if (
+                            $endpoint->decode_content_handlers and
+                            !in_array($content_handler_sn, $endpoint->decode_content_handlers)
+                        ) {
                             continue;
                         }
                         # Skip this content handler if it can't decode
@@ -392,7 +395,10 @@ class OpenAPISchema extends Schema {
                         $content_handler_sn = $content_handler->get_class_shortname();
 
                         # Skip this content handler if the Endpoint does not support it
-                        if ($endpoint->encode_content_handlers and !in_array($content_handler_sn, $endpoint->encode_content_handlers)) {
+                        if (
+                            $endpoint->encode_content_handlers and
+                            !in_array($content_handler_sn, $endpoint->encode_content_handlers)
+                        ) {
                             continue;
                         }
                         # Skip content handlers that cannot encode
@@ -400,12 +406,17 @@ class OpenAPISchema extends Schema {
                             continue;
                         }
 
-                        $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code]['content'] = [];
-                        $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code]['content'] =
-                            array_merge(
-                                $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code]['content'],
-                                $content_handler->to_openapi_schema($response)
-                            );
+                        $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
+                            'content'
+                        ] = [];
+                        $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
+                            'content'
+                        ] = array_merge(
+                            $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
+                                'content'
+                            ],
+                            $content_handler->to_openapi_schema($response),
+                        );
                     }
                 }
             }

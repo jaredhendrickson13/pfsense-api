@@ -75,10 +75,9 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
         $response = new RESTAPI\Core\Response(message: 'Test message', response_id: 'TEST_RESPONSE_ID');
         $response->help_text = 'Example OpenAPI description for this response component.';
 
-        $this->assert_equals(
-            $response->to_openapi_component(),
-            ['description' => 'Example OpenAPI description for this response component.',]
-        );
+        $this->assert_equals($response->to_openapi_component(), [
+            'description' => 'Example OpenAPI description for this response component.',
+        ]);
     }
 
     /**

@@ -53,7 +53,7 @@ class BinaryContentHandler extends ContentHandler {
         # Ensure the filename is actually a filename
         if (!preg_match('/^[a-zA-Z0-9_\-.]+$/', $content['filename'])) {
             throw new ServerError(
-                message: "The requested filename for this resource is invalid.",
+                message: 'The requested filename for this resource is invalid.',
                 response_id: 'BINARY_CONTENT_HANDLER_INVALID_FILENAME',
             );
         }
@@ -61,7 +61,7 @@ class BinaryContentHandler extends ContentHandler {
         # Ensure the data is actually binary data
         if (mb_detect_encoding($content['binary_data'], 'UTF-8', true) !== false) {
             throw new ServerError(
-                message: "The requested data does not appear to be binary data.",
+                message: 'The requested data does not appear to be binary data.',
                 response_id: 'BINARY_CONTENT_HANDLER_INVALID_DATA',
             );
         }
@@ -77,8 +77,7 @@ class BinaryContentHandler extends ContentHandler {
     /**
      * @inheritDoc
      */
-    public function to_openapi_schema(Response $response): array
-    {
+    public function to_openapi_schema(Response $response): array {
         return [
             $this->mime_type => [
                 'description' => $this->encode_help_text,

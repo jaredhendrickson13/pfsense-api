@@ -116,8 +116,7 @@ class APICoreContentHandlerTestCase extends TestCase {
      * Checks that the to_openapi_schema() correctly converts the content handler into a OpenAPI response content
      * schema.
      */
-    public function test_to_openapi_schema(): void
-    {
+    public function test_to_openapi_schema(): void {
         $handler = new ContentHandler();
         $handler->mime_type = 'application/json';
         $handler->encode_help_text = 'This is a test help text.';
@@ -126,7 +125,7 @@ class APICoreContentHandlerTestCase extends TestCase {
         $this->assert_equals($schema, [
             'application/json' => [
                 'description' => 'This is a test help text.',
-                'schema' => ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"]
+                'schema' => ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"],
             ],
         ]);
     }

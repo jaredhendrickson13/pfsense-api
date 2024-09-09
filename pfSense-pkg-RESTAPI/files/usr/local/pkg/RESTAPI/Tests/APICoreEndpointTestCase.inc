@@ -685,8 +685,7 @@ class APICoreEndpointTestCase extends TestCase {
      * Checks that the encode_content_handler property controls which ContentHandlers can be used to encode the response
      * for the endpoint.
      */
-    public function test_encode_content_handler(): void
-    {
+    public function test_encode_content_handler(): void {
         $this->assert_throws_response(
             response_id: 'ENDPOINT_ACCEPT_NOT_SUPPORTED',
             code: 406,
@@ -707,8 +706,7 @@ class APICoreEndpointTestCase extends TestCase {
      * Checks that the decode_content_handler property controls which ContentHandlers can be used to decode requests
      * for the endpoint.
      */
-    public function test_decode_content_handler(): void
-    {
+    public function test_decode_content_handler(): void {
         $this->assert_throws_response(
             response_id: 'ENDPOINT_CONTENT_TYPE_NOT_SUPPORTED',
             code: 406,

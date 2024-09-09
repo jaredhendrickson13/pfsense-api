@@ -568,8 +568,7 @@ class Endpoint {
      * Checks if the requested encode ContentHandler is supported.
      * @throws NotAcceptableError When the requested ContentHandler is not supported.
      */
-    public function check_encode_content_handler_supported(ContentHandler $content_handler): void
-    {
+    public function check_encode_content_handler_supported(ContentHandler $content_handler): void {
         # Obtain the shortname for the class
         $content_handler_sn = $content_handler->get_class_shortname();
 
@@ -971,9 +970,8 @@ class Endpoint {
         try {
             http_response_code($response->code);
             return $content_handler->encode($response->to_representation(), context: $response) . PHP_EOL;
-        }
-        # If an error occurs during the response encoding process, return the error message as JSON
-        catch (Response $response) {
+        } catch (Response $response) {
+            # If an error occurs during the response encoding process, return the error message as JSON
             http_response_code($response->code);
             $content_handler = new JSONContentHandler();
             return $content_handler->encode($response->to_representation(), context: $response) . PHP_EOL;

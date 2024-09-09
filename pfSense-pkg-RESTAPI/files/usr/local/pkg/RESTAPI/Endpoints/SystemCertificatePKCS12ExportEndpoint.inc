@@ -17,7 +17,6 @@ class SystemCertificatePKCS12ExportEndpoint extends Endpoint {
         $this->model_name = 'CertificatePKCS12Export';
         $this->request_method_options = ['POST'];
         $this->encode_content_handlers = ['BinaryContentHandler']; # Only allow binary DLs (application/octet-stream)
-
         # Set help text
         $this->post_help_text = 'Exports an existing certificate as a PKCS#12 archive.';
 

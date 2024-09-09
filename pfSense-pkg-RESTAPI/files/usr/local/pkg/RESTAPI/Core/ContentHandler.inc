@@ -272,14 +272,15 @@ class ContentHandler {
      * @param Response $response The Response object this content schema describes.
      * @return array This ContentHandler as an OpenAPI 'content' schema for this MIME type in a given Response object.
      */
-    public function to_openapi_schema(Response $response): array
-    {
+    public function to_openapi_schema(Response $response): array {
         # Default to an empty schema if this ContentHandler cannot encode content, otherwise use the schema
-        return !$this->can_encode() ? [] : [
-            $this->mime_type => [
-                'description' => $this->encode_help_text,
-                'schema' => ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"]
-            ]
-        ];
+        return !$this->can_encode()
+            ? []
+            : [
+                $this->mime_type => [
+                    'description' => $this->encode_help_text,
+                    'schema' => ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"],
+                ],
+            ];
     }
 }

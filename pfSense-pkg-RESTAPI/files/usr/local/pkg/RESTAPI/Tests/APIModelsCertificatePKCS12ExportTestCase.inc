@@ -6,8 +6,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\Certificate;
 use RESTAPI\Models\CertificatePKCS12Export;
 
-class APIModelsCertificatePKCS12ExportTestCase extends TestCase
-{
+class APIModelsCertificatePKCS12ExportTestCase extends TestCase {
     /**
      * Ensure the get_internal() method returns an empty array. This model has no internal representation.
      */
@@ -24,16 +23,11 @@ class APIModelsCertificatePKCS12ExportTestCase extends TestCase
         $cert = new Certificate(id: 0);
 
         # Create a PKCS12 archive from the certificate
-        $model = new CertificatePKCS12Export(
-            certref: $cert->refid->value,
-            encryption: 'high',
-            passphrase: 'testpass',
-        );
+        $model = new CertificatePKCS12Export(certref: $cert->refid->value, encryption: 'high', passphrase: 'testpass');
         $model->create();
 
         # Ensure we can load the PKCS12 archive
         $pkcs12 = openssl_pkcs12_read($model->binary_data->value, $certs, 'testpass');
         $this->assert_not_equals(false, $pkcs12);
     }
-
 }
