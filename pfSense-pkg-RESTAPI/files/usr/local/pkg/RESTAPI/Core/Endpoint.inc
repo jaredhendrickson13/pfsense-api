@@ -576,7 +576,7 @@ class Endpoint {
         # Check that this ContentHandler is allowed to encode the client's request
         if ($this->encode_content_handlers and !in_array($content_handler_sn, $this->encode_content_handlers)) {
             throw new NotAcceptableError(
-                message: "The requested Accept '$content_handler->mime_type' is not supported by this endpoint.",
+                message: "The requested Accept value '$content_handler->mime_type' is not supported by this endpoint.",
                 response_id: 'ENDPOINT_ACCEPT_NOT_SUPPORTED',
             );
         }
