@@ -4,21 +4,16 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\Base64Field;
-use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
-use RESTAPI\Responses\ForbiddenError;
-use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
-use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\RegexValidator;
 use RESTAPI\Validators\URLValidator;
-use RESTAPI\Validators\X509Validator;
 
 /**
  * Defines a Model for generating new Certificates.

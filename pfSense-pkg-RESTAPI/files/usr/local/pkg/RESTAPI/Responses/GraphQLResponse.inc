@@ -11,7 +11,6 @@ use RESTAPI\Core\ModelSet;
 use RESTAPI\Core\ResourceLinkSet;
 use RESTAPI\Core\Response;
 use RESTAPI\Models\GraphQL;
-use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
  * Response class that represents a GraphQL response. Unlike other responses, this response does not represent a

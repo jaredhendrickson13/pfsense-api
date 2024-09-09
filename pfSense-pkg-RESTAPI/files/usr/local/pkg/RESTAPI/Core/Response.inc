@@ -19,7 +19,6 @@ require_once 'RESTAPI/autoloader.inc';
 
 use Error;
 use RESTAPI\Models\RESTAPISettings;
-use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 const HTTP_STATUS_MESSAGES = [
     100 => 'continue',

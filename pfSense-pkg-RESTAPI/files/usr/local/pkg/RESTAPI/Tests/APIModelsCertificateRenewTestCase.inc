@@ -7,7 +7,6 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\Certificate;
 use RESTAPI\Models\CertificateAuthority;
 use RESTAPI\Models\CertificateAuthorityGenerate;
-use RESTAPI\Models\CertificateAuthorityRenew;
 use RESTAPI\Models\CertificateGenerate;
 use RESTAPI\Models\CertificateRenew;
 

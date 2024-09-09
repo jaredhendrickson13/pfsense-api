@@ -4,12 +4,12 @@ namespace RESTAPI\Schemas;
 
 require_once 'RESTAPI/autoloader.inc';
 
+use GraphQL\Type\Definition\CustomScalarType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Utils\SchemaPrinter;
-use GraphQL\Type\Definition\CustomScalarType;
 use RESTAPI\Core\Endpoint;
 use RESTAPI\Core\Field;
 use RESTAPI\Core\Model;

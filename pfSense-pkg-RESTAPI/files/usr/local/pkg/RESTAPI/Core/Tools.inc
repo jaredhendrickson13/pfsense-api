@@ -15,10 +15,7 @@
 
 namespace RESTAPI\Core\Tools;
 
-use RESTAPI\Core\Response;
-use RESTAPI\Models\RESTAPIVersion;
 use RESTAPI\Responses\ServerError;
-use stdClass;
 
 require_once 'RESTAPI/autoloader.inc';
 

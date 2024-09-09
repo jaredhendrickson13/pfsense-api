@@ -6,9 +6,9 @@ require_once 'RESTAPI/autoloader.inc';
 require_once 'RESTAPI/.resources/vendor/webonyx/graphql-php/src/Type/Definition/CustomScalarType.php';
 
 use GraphQL\Error\Error;
-use GraphQL\Type\Definition\CustomScalarType;
 use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\ValueNode;
+use GraphQL\Type\Definition\CustomScalarType;
 
 /**
  * Defines a custom scalar type for handling JSON objects in GraphQL queries. This is primarily intended to allow

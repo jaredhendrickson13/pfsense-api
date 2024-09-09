@@ -9,7 +9,6 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Core\Response;
 use RESTAPI\Responses\ForbiddenError;
-use RESTAPI\Schemas\GraphQLSchema;
 
 /**
  * Defines a class that maps/resolves GraphQL queries and mutations to the appropriate Model methods.

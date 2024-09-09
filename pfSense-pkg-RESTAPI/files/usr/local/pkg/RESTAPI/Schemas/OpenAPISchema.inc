@@ -2,7 +2,6 @@
 
 namespace RESTAPI\Schemas;
 
-use RESTAPI\Core\Response;
 use RESTAPI\Core\Schema;
 use RESTAPI\Models\RESTAPIVersion;
 use stdClass;
