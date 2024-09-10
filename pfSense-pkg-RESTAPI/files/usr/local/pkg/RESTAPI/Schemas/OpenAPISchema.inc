@@ -404,7 +404,7 @@ class OpenAPISchema extends Schema {
                         }
 
                         $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
-                        'description'
+                            'description'
                         ] = $response->help_text;
                         $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
                             'content'

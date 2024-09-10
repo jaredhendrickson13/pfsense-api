@@ -136,13 +136,13 @@ class APICoreContentHandlerTestCase extends TestCase {
                                 'data' => [
                                     'type' => 'array',
                                     'items' => [
-                                        '$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"
+                                        '$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}",
                                     ],
                                 ],
                             ],
-                        ]
+                        ],
                     ],
-                ]
+                ],
             ],
         ]);
     }
@@ -167,9 +167,9 @@ class APICoreContentHandlerTestCase extends TestCase {
                             'properties' => [
                                 'data' => ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"],
                             ],
-                        ]
+                        ],
                     ],
-                ]
+                ],
             ],
         ]);
     }
@@ -194,9 +194,9 @@ class APICoreContentHandlerTestCase extends TestCase {
                             'properties' => [
                                 'data' => ['oneOf' => [['type' => 'array'], ['type' => 'object']]],
                             ],
-                        ]
+                        ],
                     ],
-                ]
+                ],
             ],
         ]);
     }

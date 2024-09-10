@@ -275,11 +275,9 @@ class ContentHandler {
                 'type' => 'array',
                 'items' => ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"],
             ];
-        }
-        elseif ($response instanceof Success and !$endpoint->many) {
+        } elseif ($response instanceof Success and !$endpoint->many) {
             $data_schema = ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"];
-        }
-        else {
+        } else {
             $data_schema = ['oneOf' => [['type' => 'array'], ['type' => 'object']]];
         }
 
@@ -296,7 +294,7 @@ class ContentHandler {
                                 'properties' => [
                                     'data' => $data_schema,
                                 ],
-                            ]
+                            ],
                         ],
                     ],
                 ],
