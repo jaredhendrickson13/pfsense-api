@@ -431,7 +431,7 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
             callable: function () {
                 $ovpns = new OpenVPNServer(data: $this->base_data);
                 $ovpns->mode->value = 'server_user';
-                $ovpns->authmode->value = 'Local Database';
+                $ovpns->authmode->value = ['Local Database'];
                 $ovpns->validate();
             },
         );
