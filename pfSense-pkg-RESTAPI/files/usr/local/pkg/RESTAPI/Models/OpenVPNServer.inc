@@ -136,6 +136,7 @@ class OpenVPNServer extends Model {
         $this->authmode = new ForeignModelField(
             model_name: 'AuthServer',
             model_field: 'name',
+            allowed_keywords: ['Local Database'],
             default: ['Local Database'],
             many: true,
             conditions: ['mode' => ['server_user', 'server_tls_user']],
