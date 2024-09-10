@@ -422,4 +422,18 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
         $ovpns->vpnid->value = $ovpns->get_next_vpn_id();
         $this->assert_equals($ovpns->from_internal_vpnif(), $ovpns::INTERFACE_PREFIX . $ovpns->vpnid->value);
     }
+
+    /**
+     * Checks that we can set the `authmode` field to 'Local Database' without an AuthServer created
+     */
+    public function test_authmode_local_database(): void {
+        $this->assert_does_not_throw(
+            callable: function () {
+                $ovpns = new OpenVPNServer(data: $this->base_data);
+                $ovpns->mode->value = 'server_user';
+                $ovpns->authmode->value = ['Local Database'];
+                $ovpns->validate();
+            },
+        );
+    }
 }
