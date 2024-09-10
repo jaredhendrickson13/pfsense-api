@@ -3,7 +3,6 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\ContentHandlers\BinaryContentHandler;
-use RESTAPI\Core\Endpoint;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Endpoints\FirewallAliasEndpoint;
 use RESTAPI\Responses\Success;
