@@ -165,16 +165,6 @@ class Response extends Error {
     }
 
     /**
-     * Represents this Response object as an OpenAPI response component. This component details which content-types
-     * are allowed by the Accept header.
-     * @return array This Response object as an OpenAPI response component
-     */
-    public function to_openapi_component(): array {
-        # Variables
-        return ['description' => $this->help_text];
-    }
-
-    /**
      * Represents the Response object as an OpenAPI schema.
      * @return array This Response object as an OpenAPI schema.
      */
@@ -207,7 +197,6 @@ class Response extends Error {
                         'The data requested from the API. In the event that many objects have' .
                         'been requested, this field will be an array of objects. Otherwise, it will only return' .
                         'the single object requested.',
-                    'example' => [],
                     'oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']],
                 ],
                 '_links' => [

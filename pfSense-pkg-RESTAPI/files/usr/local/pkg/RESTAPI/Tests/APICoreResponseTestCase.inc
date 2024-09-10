@@ -67,20 +67,6 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
     }
 
     /**
-     * Checks that the Response object is correctly converted to its OpenAPI component representation when the
-     * `to_openapi_component()` method is run.
-     */
-    public function test_response_to_openapi_component(): void {
-        # Create a Response object to represent as an OpenAPI component.
-        $response = new RESTAPI\Core\Response(message: 'Test message', response_id: 'TEST_RESPONSE_ID');
-        $response->help_text = 'Example OpenAPI description for this response component.';
-
-        $this->assert_equals($response->to_openapi_component(), [
-            'description' => 'Example OpenAPI description for this response component.',
-        ]);
-    }
-
-    /**
      * Checks that the Response object is correctly converted it its OpenAPI schema representation when the
      * `to_openapi_schema()` method is run.
      */
@@ -117,7 +103,6 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
                         'The data requested from the API. In the event that many objects have' .
                         'been requested, this field will be an array of objects. Otherwise, it will only return' .
                         'the single object requested.',
-                    'example' => [],
                     'oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']],
                 ],
                 '_links' => [

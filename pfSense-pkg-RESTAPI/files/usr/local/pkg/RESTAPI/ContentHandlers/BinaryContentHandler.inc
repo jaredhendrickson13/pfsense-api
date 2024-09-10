@@ -81,7 +81,6 @@ class BinaryContentHandler extends ContentHandler {
     public function to_openapi_schema(Response $response, Endpoint $endpoint): array {
         return [
             $this->mime_type => [
-                'description' => $this->encode_help_text,
                 'schema' => [
                     'type' => 'string',
                     'format' => 'binary',

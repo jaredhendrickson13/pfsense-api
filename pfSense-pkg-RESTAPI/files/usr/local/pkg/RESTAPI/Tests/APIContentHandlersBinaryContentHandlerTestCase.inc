@@ -3,7 +3,9 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\ContentHandlers\BinaryContentHandler;
+use RESTAPI\Core\Endpoint;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Endpoints\FirewallAliasEndpoint;
 use RESTAPI\Responses\Success;
 
 class APIContentHandlersBinaryContentHandlerTestCase extends TestCase {
@@ -77,9 +79,9 @@ class APIContentHandlersBinaryContentHandlerTestCase extends TestCase {
     public function test_to_openapi_schema(): void {
         $handler = new BinaryContentHandler();
         $response = new Success(message: '', response_id: ''); # Required as context for the to_openapi_schema() method
-        $this->assert_equals($handler->to_openapi_schema($response), [
+        $endpoint = new FirewallAliasEndpoint(); # Required as context for the to_openapi_schema() method
+        $this->assert_equals($handler->to_openapi_schema($response, $endpoint), [
             $handler->mime_type => [
-                'description' => $handler->encode_help_text,
                 'schema' => [
                     'type' => 'string',
                     'format' => 'binary',

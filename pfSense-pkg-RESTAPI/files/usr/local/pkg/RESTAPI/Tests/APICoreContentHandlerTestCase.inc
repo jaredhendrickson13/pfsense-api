@@ -4,7 +4,10 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\ContentHandler;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Endpoints\FirewallAliasEndpoint;
+use RESTAPI\Endpoints\FirewallAliasesEndpoint;
 use RESTAPI\Responses\NotFoundError;
+use RESTAPI\Responses\Success;
 
 class APICoreContentHandlerTestCase extends TestCase {
     /**
@@ -114,18 +117,86 @@ class APICoreContentHandlerTestCase extends TestCase {
 
     /**
      * Checks that the to_openapi_schema() correctly converts the content handler into a OpenAPI response content
-     * schema.
+     * schema for a many endpoint
      */
-    public function test_to_openapi_schema(): void {
+    public function test_to_openapi_schema_many_endpoint(): void {
         $handler = new ContentHandler();
         $handler->mime_type = 'application/json';
-        $handler->encode_help_text = 'This is a test help text.';
-        $response = new NotFoundError(message: '', response_id: '');
-        $schema = $handler->to_openapi_schema($response);
+        $response = new Success(message: '', response_id: '');
+        $endpoint = new FirewallAliasesEndpoint();
+        $schema = $handler->to_openapi_schema($response, $endpoint);
         $this->assert_equals($schema, [
             'application/json' => [
-                'description' => 'This is a test help text.',
-                'schema' => ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"],
+                'schema' => [
+                    'allOf' => [
+                        ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"],
+                        [
+                            'type' => 'object',
+                            'properties' => [
+                                'data' => [
+                                    'type' => 'array',
+                                    'items' => [
+                                        '$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"
+                                    ],
+                                ],
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+        ]);
+    }
+
+    /**
+     * Checks that the to_openapi_schema() correctly converts the content handler into a OpenAPI response content
+     * schema for a non-many endpoint
+     */
+    public function test_to_openapi_schema_non_many_endpoint(): void {
+        $handler = new ContentHandler();
+        $handler->mime_type = 'application/json';
+        $response = new Success(message: '', response_id: '');
+        $endpoint = new FirewallAliasEndpoint();
+        $schema = $handler->to_openapi_schema($response, $endpoint);
+        $this->assert_equals($schema, [
+            'application/json' => [
+                'schema' => [
+                    'allOf' => [
+                        ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"],
+                        [
+                            'type' => 'object',
+                            'properties' => [
+                                'data' => ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"],
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+        ]);
+    }
+
+    /**
+     * Checks that the to_openapi_schema() correctly converts the content handler into a OpenAPI response content
+     * schema for non successful response
+     */
+    public function test_to_openapi_schema_non_success(): void {
+        $handler = new ContentHandler();
+        $handler->mime_type = 'application/json';
+        $response = new NotFoundError(message: '', response_id: '');
+        $endpoint = new FirewallAliasesEndpoint();
+        $schema = $handler->to_openapi_schema($response, $endpoint);
+        $this->assert_equals($schema, [
+            'application/json' => [
+                'schema' => [
+                    'allOf' => [
+                        ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"],
+                        [
+                            'type' => 'object',
+                            'properties' => [
+                                'data' => ['oneOf' => [['type' => 'array'], ['type' => 'object']]],
+                            ],
+                        ]
+                    ],
+                ]
             ],
         ]);
     }

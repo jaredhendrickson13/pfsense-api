@@ -65,7 +65,6 @@ class OpenAPISchema extends Schema {
                     '- [Working with HATEOAS](https://pfrest.org/WORKING_WITH_HATEOAS/)<br>',
             ],
             'components' => [
-                'responses' => [],
                 'schemas' => [],
                 'securitySchemes' => [],
             ],
@@ -95,7 +94,6 @@ class OpenAPISchema extends Schema {
 
             # Add both a schema and response for this Response class
             $openapi_config['components']['schemas'][$resp_shortname] = $response->to_openapi_schema();
-            $openapi_config['components']['responses'][$resp_shortname] = $response->to_openapi_component();
         }
 
         # Import each Endpoint class and assign openapi for the endpoint according to the options and Model assigned.
@@ -406,6 +404,9 @@ class OpenAPISchema extends Schema {
                         }
 
                         $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
+                        'description'
+                        ] = $response->help_text;
+                        $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
                             'content'
                         ] = [];
                         $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
@@ -414,7 +415,7 @@ class OpenAPISchema extends Schema {
                             $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code][
                                 'content'
                             ],
-                            $content_handler->to_openapi_schema($response),
+                            $content_handler->to_openapi_schema($response, $endpoint),
                         );
                     }
                 }

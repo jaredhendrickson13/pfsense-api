@@ -30,12 +30,6 @@ class ContentHandler {
     public string $mime_type;
 
     /**
-     * @var string $encode_help_text The help text to be displayed when the remote client requests this ContentHandler's
-     * MIME type in the Accept header. This help text should detail what this ContentHandler is capable of encoding.
-     */
-    public string $encode_help_text = '';
-
-    /**
      * Obtains the content from the remote client in its unprocessed form.
      * @return mixed The unprocessed content from the remote client.
      * @throws ServerError When this method is called but not overridden by the child class.
@@ -286,7 +280,7 @@ class ContentHandler {
             $data_schema = ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"];
         }
         else {
-            $data_schema = ['oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']]];
+            $data_schema = ['oneOf' => [['type' => 'array'], ['type' => 'object']]];
         }
 
         # Default to an empty schema if this ContentHandler cannot encode content, otherwise use the schema
