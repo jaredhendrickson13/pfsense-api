@@ -3,6 +3,7 @@
 namespace RESTAPI\ContentHandlers;
 
 use RESTAPI\Core\ContentHandler;
+use RESTAPI\Core\Endpoint;
 use RESTAPI\Core\Response;
 use RESTAPI\Responses\NotAcceptableError;
 use RESTAPI\Responses\ServerError;
@@ -77,7 +78,7 @@ class BinaryContentHandler extends ContentHandler {
     /**
      * @inheritDoc
      */
-    public function to_openapi_schema(Response $response): array {
+    public function to_openapi_schema(Response $response, Endpoint $endpoint): array {
         return [
             $this->mime_type => [
                 'description' => $this->encode_help_text,

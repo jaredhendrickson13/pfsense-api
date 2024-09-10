@@ -7,6 +7,7 @@ use ReflectionMethod;
 use RESTAPI\Responses\MediaTypeError;
 use RESTAPI\Responses\NotAcceptableError;
 use RESTAPI\Responses\ServerError;
+use RESTAPI\Responses\Success;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 require_once 'RESTAPI/autoloader.inc';
@@ -270,16 +271,40 @@ class ContentHandler {
      * Converts this ContentHandler into an OpenAPI 'content' schema. This schema details which MIME types are allowed
      * by the Accept header and also provides a reference to the schema of the Response object.
      * @param Response $response The Response object this content schema describes.
+     * @param Endpoint $endpoint The Endpoint object this content schema is being generated for.
      * @return array This ContentHandler as an OpenAPI 'content' schema for this MIME type in a given Response object.
      */
-    public function to_openapi_schema(Response $response): array {
+    public function to_openapi_schema(Response $response, Endpoint $endpoint): array {
+        # Format the data schema based on the endpoint for successful responses
+        if ($response instanceof Success and $endpoint->many) {
+            $data_schema = [
+                'type' => 'array',
+                'items' => ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"],
+            ];
+        }
+        elseif ($response instanceof Success and !$endpoint->many) {
+            $data_schema = ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"];
+        }
+        else {
+            $data_schema = ['oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']]];
+        }
+
         # Default to an empty schema if this ContentHandler cannot encode content, otherwise use the schema
         return !$this->can_encode()
             ? []
             : [
                 $this->mime_type => [
-                    'description' => $this->encode_help_text,
-                    'schema' => ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"],
+                    'schema' => [
+                        'allOf' => [
+                            ['$ref' => "#/components/schemas/{$response->get_class_shortname()}"],
+                            [
+                                'type' => 'object',
+                                'properties' => [
+                                    'data' => $data_schema,
+                                ],
+                            ]
+                        ],
+                    ],
                 ],
             ];
     }
