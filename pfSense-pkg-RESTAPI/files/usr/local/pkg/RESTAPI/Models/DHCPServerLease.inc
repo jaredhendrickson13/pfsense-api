@@ -28,6 +28,7 @@ class DHCPServerLease extends Model {
         # Set model attributes
         $this->internal_callable = 'get_dhcp_leases';
         $this->many = true;
+        $this->always_apply = true;
 
         # Set model fields
         $this->ip = new StringField(default: null, allow_null: true, help_text: 'The IP address of the lease.');
@@ -77,7 +78,6 @@ class DHCPServerLease extends Model {
             # Stop the DHCP server, remove the lease, and restart the DHCP server
             killbyname('dhcpd');
             $this->isc_remove_lease(file_get_contents(self::ISC_LEASES_FILE), $this->ip->value);
-            services_dhcpd_configure();
         }
         # Delete the DHCP lease via kea
         elseif ($dhcp_backend->dhcpbackend->value === 'kea') {
@@ -125,23 +125,31 @@ class DHCPServerLease extends Model {
      * @param string $ip The IP address of the lease to remove.
      * @return string The new contents of the DHCP leases file.
      */
-    public function isc_remove_lease(string $leases_file_contents, string $ip): string {
+    public static function isc_remove_lease(string $leases_file_contents, string $ip): string {
         # Split the leases file into lines and add variable to store new contents
         $leases_lines = explode("\n", $leases_file_contents);
         $new_leases_contents = [];
 
         # Iterate over each line in the leases file
+        $in_declaration = false;
         foreach ($leases_lines as $line) {
-            # If the line starts with the lease declaration for the specified IP address, skip to the end of the lease
-            if (str_starts_with("lease $ip {", trim($line))) {
-                # Skip all the following lines until the end of the lease declaration
-                while (trim(next($leases_lines)) !== '}') {
+            # Skip the current line if we are in the middle of a lease declaration
+            if ($in_declaration) {
+                # If the line ends the lease declaration, stop skipping lines
+                if (str_starts_with('}', trim($line))) {
+                    $in_declaration = false;
                 }
+                continue;
             }
+
+            # If the line starts the lease declaration we're looking for, start skipping lines
+            if (str_starts_with("lease $ip {", trim($line))) {
+                $in_declaration = true;
+                continue;
+            }
+
             # Otherwise, add the line to the new leases contents
-            else {
-                $new_leases_contents[] = $line;
-            }
+            $new_leases_contents[] = $line;
         }
 
         return implode("\n", $new_leases_contents);
