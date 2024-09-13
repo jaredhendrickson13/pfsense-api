@@ -62,20 +62,33 @@ class CertificateRevocationListRevokedCertificate extends Model {
         $this->descr = new StringField(
             default: null,
             allow_null: true,
+            write_only: true,
             help_text: 'The unique name/description for this CRL.',
         );
         $this->caref = new StringField(
             default: null,
             allow_null: true,
+            write_only: true,
             help_text: 'The unique ID of the CA that signed the revoked certificate.',
         );
         $this->type = new StringField(
             default: null,
             allow_null: true,
+            write_only: true,
             help_text: 'The type of the certificate to be revoked.',
         );
-        $this->crt = new Base64Field(default: null, allow_null: true, help_text: 'The X509 certificate string.');
-        $this->prv = new Base64Field(default: null, allow_null: true, help_text: 'The X509 private key string.');
+        $this->crt = new Base64Field(
+            default: null,
+            allow_null: true,
+            write_only: true,
+            help_text: 'The X509 certificate string.'
+        );
+        $this->prv = new Base64Field(
+            default: null,
+            allow_null: true,
+            write_only: true,
+            help_text: 'The X509 private key string.'
+        );
 
         parent::__construct($id, $parent_id, $data, ...$options);
     }
@@ -100,12 +113,7 @@ class CertificateRevocationListRevokedCertificate extends Model {
                 response_id: 'CERTIFICATE_REVOCATION_LIST_REVOKED_CERTIFICATE_CERTREF_AND_SERIAL_CONFLICT',
             );
         }
-    }
 
-    /**
-     * Extend the default _create() method to add attributes from the referenced certificate if a `certref` is set.
-     */
-    public function _create(): void {
         # If a `certref` is set, add attributes from the referenced certificate
         if ($this->certref->value) {
             $cert = $this->certref->get_related_model();
@@ -116,8 +124,6 @@ class CertificateRevocationListRevokedCertificate extends Model {
             $this->crt->value = $cert->crt->value;
             $this->prv->value = $cert->prv->value;
         }
-
-        parent::_create();
     }
 
     /**
