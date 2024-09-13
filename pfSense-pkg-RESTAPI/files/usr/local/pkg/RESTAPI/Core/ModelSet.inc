@@ -98,7 +98,7 @@ class ModelSet {
         }
 
         # Sort the sort values
-        array_multisort($sort_values, constant($order), $model_objects);
+        array_multisort($sort_values, $order, $model_objects);
 
         # Re-assign the model object IDs if they should not be retained
         if (!$retain_ids) {
