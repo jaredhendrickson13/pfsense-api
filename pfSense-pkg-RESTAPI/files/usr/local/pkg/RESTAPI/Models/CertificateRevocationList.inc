@@ -6,8 +6,11 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
+use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
+use RESTAPI\Responses\ConflictError;
+use RESTAPI\Responses\ServerError;
 use RESTAPI\Validators\RegexValidator;
 
 /**
@@ -15,12 +18,13 @@ use RESTAPI\Validators\RegexValidator;
  */
 class CertificateRevocationList extends Model {
     public UIDField $refid;
-    public StringField $descr;
     public ForeignModelField $caref;
+    public StringField $descr;
     public StringField $method;
     public IntegerField $lifetime;
     public IntegerField $serial;
     public Base64Field $text;
+    public NestedModelField $cert;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
@@ -73,14 +77,80 @@ class CertificateRevocationList extends Model {
             conditions: ['method' => 'existing'],
             help_text: 'The raw x509 CRL data.',
         );
+        $this->cert = new NestedModelField(
+            model_class: 'CertificateRevocationListRevokedCertificate',
+            default: [],
+            allow_empty: true,
+            conditions: ['method' => 'internal'],
+            help_text: 'The list of revoked certificates in this CRL.',
+        );
 
         parent::__construct($id, $parent_id, $data, ...$options);
+    }
+
+    /**
+     * Extend the default _create() method to generate the X509 CRL data before writing to config.
+     */
+    public function _create(): void {
+        # Make our CRL first
+        $this->text->value = $this->to_x509_crl();
+        parent::_create();
+    }
+
+    /**
+     * Extend the default _update() method to regenerate the X509 CRL data before writing to config.
+     */
+    public function _update(): void {
+        # Update our CRL data first
+        $this->text->value = $this->to_x509_crl();
+        $this->serial->value++; # Bump the serial number
+        parent::_update();
+    }
+
+    /**
+     * Extends the default _delete() method to prevent deletion of the CRLs in use.
+     */
+    protected function _delete(): void {
+        # Don't allow this CRL to be deleted if it's in use.
+        if (crl_in_use($this->refid->value)) {
+            throw new ConflictError(
+                message: "CRL with refid '{$this->refid->value}' cannot be deletd because it is in use.",
+                response_id: 'CERTIFICATE_REVOCATION_LIST_CANNOT_DELETE_WHILE_IN_USE',
+            );
+        }
+
+        parent::_delete();
+    }
+
+    /**
+     * Converts this CertificateRevocationModel to an x509 CRL data.
+     * @returns string The x509 CRL data.
+     */
+    public function to_x509_crl(): string {
+        # Prep the CRL config for generation
+        $crl_config = $this->to_internal();
+        $crl_config['idx'] = $this->id;
+
+        # Attempt to update/generate the CRL
+        $crl_gen = crl_update($crl_config);
+
+        # If the CRL generation was successful, return the CRL data
+        if ($crl_gen) {
+            return base64_decode($crl_gen);
+        }
+
+        # Otherwise, throw an error
+        throw new ServerError(
+            message: 'Failed to generate the CRL data for unknown reason.',
+            response_id: 'CERTIFICATE_REVOCATION_LIST_FAILED_TO_GENERATE_CRL',
+        );
     }
 
     /**
      * Applies the newly created CRL by reloading the OpenVPN and IPsec services.
      */
     public function apply(): void {
+        # Restart OpenVPN and IPsec services
         openvpn_refresh_crls();
         ipsec_configure();
     }
