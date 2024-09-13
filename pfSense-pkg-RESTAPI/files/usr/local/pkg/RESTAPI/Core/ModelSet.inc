@@ -80,6 +80,37 @@ class ModelSet {
     }
 
     /**
+     * Sorts the Model objects in this ModelSet by a specific field and order.
+     * @param string $field The field to sort the Model objects by.
+     * @param int $order The order to sort the Model objects by. This must be a PHP sort order constant.
+     * @param bool $retain_ids Retain the original Model object IDs when sorting.
+     * @return ModelSet A new ModelSet object with the Model objects sorted by the specified field and order.
+     */
+    public function sort(string $field, int $order = SORT_ASC, bool $retain_ids = false): ModelSet
+    {
+        # Variables
+        $sort_values = [];
+        $model_objects = $this->model_objects;
+
+        # Loop through each model object and store the sort value
+        foreach ($model_objects as $model_object) {
+            $sort_values[] = $model_object->$field->value;
+        }
+
+        # Sort the sort values
+        array_multisort($sort_values, constant($order), $model_objects);
+
+        # Re-assign the model object IDs if they should not be retained
+        if (!$retain_ids) {
+            foreach ($model_objects as $id => $model_object) {
+                $model_object->id = $id;
+            }
+        }
+
+        return new ModelSet($model_objects);
+    }
+
+    /**
      * Runs the to_representation() method for each model object within the model set and returns them all in an array.
      * @return array A serializable representation of all model objects within this model set.
      */
