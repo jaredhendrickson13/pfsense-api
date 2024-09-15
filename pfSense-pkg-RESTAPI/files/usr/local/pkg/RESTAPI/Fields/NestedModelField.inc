@@ -212,6 +212,9 @@ class NestedModelField extends Field {
                 field: $this->model->sort_by_field,
                 order: $this->model->sort_option,
             );
+
+            # Re-assign the sorted values to this Field
+            $this->value = $this->modelset->to_representation();
         }
     }
 
