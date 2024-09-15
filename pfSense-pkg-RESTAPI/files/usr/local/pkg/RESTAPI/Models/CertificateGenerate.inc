@@ -105,33 +105,33 @@ class CertificateGenerate extends Model {
             help_text: 'The common name of the certificate.',
         );
         $this->dn_country = new StringField(
-            default: '',
+            default: null,
             choices_callable: 'get_country_choices',
-            allow_empty: true,
+            allow_null: true,
             representation_only: true,
             help_text: 'The country of the certificate.',
         );
         $this->dn_state = new StringField(
-            default: '',
-            allow_empty: true,
+            default: null,
+            allow_null: true,
             representation_only: true,
             help_text: 'The state/province of the certificate.',
         );
         $this->dn_city = new StringField(
-            default: '',
-            allow_empty: true,
+            default: null,
+            allow_null: true,
             representation_only: true,
             help_text: 'The city of the certificate.',
         );
         $this->dn_organization = new StringField(
-            default: '',
-            allow_empty: true,
+            default: null,
+            allow_null: true,
             representation_only: true,
             help_text: 'The organization of the certificate.',
         );
         $this->dn_organizationalunit = new StringField(
-            default: '',
-            allow_empty: true,
+            default: null,
+            allow_null: true,
             representation_only: true,
             help_text: 'The organizational unit of the certificate.',
         );
@@ -234,15 +234,28 @@ class CertificateGenerate extends Model {
      */
     private function to_x509_dn(): array {
         # Define static DN values
-        $dn = [
-            'commonName' => $this->dn_commonname->value,
-            'countryName' => $this->dn_country->value,
-            'stateOrProvinceName' => $this->dn_state->value,
-            'localityName' => $this->dn_city->value,
-            'organizationName' => $this->dn_organization->value,
-            'organizationalUnitName' => $this->dn_organizationalunit->value,
-            'subjectAltName' => [],
-        ];
+        $dn = ['commonName' => $this->dn_commonname->value, 'subjectAltName' => [],];
+
+        # Add countryName if it was given
+        if ($this->dn_country->value) {
+            $dn['countryName'] = $this->dn_country->value;
+        }
+        # Add stateOrProvinceName if it was given
+        if ($this->dn_state->value) {
+            $dn['stateOrProvinceName'] = $this->dn_state->value;
+        }
+        # Add localityName if it was given
+        if ($this->dn_city->value) {
+            $dn['localityName'] = $this->dn_city->value;
+        }
+        # Add organizationName if it was given
+        if ($this->dn_organization->value) {
+            $dn['organizationName'] = $this->dn_organization->value;
+        }
+        # Add organizationalUnitName if it was given
+        if ($this->dn_organizationalunit->value) {
+            $dn['organizationalUnitName'] = $this->dn_organizationalunit->value;
+        }
 
         # Loop through the SAN fields and add them to the subjectAltName array accordingly
         foreach ($this->dn_dns_sans->value as $san) {

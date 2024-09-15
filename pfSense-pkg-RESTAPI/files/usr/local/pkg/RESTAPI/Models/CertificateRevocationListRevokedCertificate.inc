@@ -106,14 +106,6 @@ class CertificateRevocationListRevokedCertificate extends Model {
             );
         }
 
-        # Do not allow both a serial number and a certificate reference to be set
-        if ($this->certref->value and $this->serial->value) {
-            throw new ConflictError(
-                message: 'The `certref` and `serial` fields cannot both be set.',
-                response_id: 'CERTIFICATE_REVOCATION_LIST_REVOKED_CERTIFICATE_CERTREF_AND_SERIAL_CONFLICT',
-            );
-        }
-
         # If a `certref` is set, add attributes from the referenced certificate
         if ($this->certref->value) {
             $cert = $this->certref->get_related_model();

@@ -340,4 +340,39 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $alias_b->delete();
         $alias_c->delete();
     }
+
+    /**
+     * Checks that the sort() method correctly sorts the Model objects in the ModelSet.
+     */
+    public function test_sort(): void {
+        # Add three firewall aliases to a ModelSet
+        $alias_b = new FirewallAlias(name: 'alias_b', type: 'port');
+        $alias_a = new FirewallAlias(name: 'alias_a', type: 'host');
+        $alias_c = new FirewallAlias(name: 'alias_c', type: 'network');
+        $modelset = new ModelSet([$alias_a, $alias_b, $alias_c]);
+
+        # Sort the ModelSet by the 'name' field in ascending order and ensure the order is correct
+        $this->assert_equals(
+            $modelset->sort('name')->model_objects,
+            (new ModelSet([$alias_a, $alias_b, $alias_c]))->model_objects,
+        );
+
+        # Sort the ModelSet by the 'name' field in descending order and ensure the order is correct
+        $this->assert_equals(
+            $modelset->sort('name', order: SORT_DESC)->model_objects,
+            (new ModelSet([$alias_c, $alias_b, $alias_a]))->model_objects,
+        );
+
+        # Sort the ModelSet by the 'type' field in ascending order and ensure the order is correct
+        $this->assert_equals(
+            $modelset->sort('type')->model_objects,
+            (new ModelSet([$alias_a, $alias_c, $alias_b]))->model_objects,
+        );
+
+        # Sort the ModelSet by the 'type' field in descending order and ensure the order is correct
+        $this->assert_equals(
+            $modelset->sort('type', order: SORT_DESC)->model_objects,
+            (new ModelSet([$alias_b, $alias_c, $alias_a]))->model_objects,
+        );
+    }
 }

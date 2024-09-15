@@ -92,8 +92,11 @@ class CertificateRevocationList extends Model {
      * Extend the default _create() method to generate the X509 CRL data before writing to config.
      */
     public function _create(): void {
-        # Make our CRL first
-        $this->text->value = $this->to_x509_crl();
+        # If this is an internal CRL, make the CRL first
+        if ($this->method->value === 'internal') {
+            $this->text->value = $this->to_x509_crl();
+        }
+
         parent::_create();
     }
 
@@ -101,9 +104,12 @@ class CertificateRevocationList extends Model {
      * Extend the default _update() method to regenerate the X509 CRL data before writing to config.
      */
     public function _update(): void {
-        # Update our CRL data first
-        $this->text->value = $this->to_x509_crl();
-        $this->serial->value++; # Bump the serial number
+        # If this is an internal CRL, update the CRL first
+        if ($this->method->value === 'internal') {
+            $this->text->value = $this->to_x509_crl();
+            $this->serial->value++; # Bump the serial number
+        }
+
         parent::_update();
     }
 
