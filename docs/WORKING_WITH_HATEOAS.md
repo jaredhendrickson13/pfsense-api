@@ -15,7 +15,7 @@ easily navigate the API and discover available actions and resources related to 
 !!! Important
     Enabling HATEOAS can greatly increase the size of API responses as additional links are included in the response data;
     which may also impact performance on large datasets. It is strongly recommended to only enable HATEOAS when needed and
-    to use [pagination](./QUERIES_AND_FILTERS.md#pagination) to limit the amount of data returned in a single request.
+    to use [pagination](./QUERIES_FILTERS_AND_SORTING#pagination) to limit the amount of data returned in a single request.
 
 ### Link types
 
@@ -28,11 +28,11 @@ API response.
 
 #### next
 
-Provides a link to the next set of data when [pagination](./QUERIES_AND_FILTERS.md#pagination) is used.
+Provides a link to the next set of data when [pagination](./QUERIES_FILTERS_AND_SORTING#pagination) is used.
 
 #### prev
 
-Provides a link to the previous set of data when [pagination](./QUERIES_AND_FILTERS.md#pagination) is used.
+Provides a link to the previous set of data when [pagination](./QUERIES_FILTERS_AND_SORTING#pagination) is used.
 
 #### self
 

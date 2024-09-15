@@ -1856,7 +1856,7 @@ class Model {
         int $limit = 0,
         int $offset = 0,
         bool $reverse = false,
-        ?string $sort_by = null,
+        ?array $sort_by = null,
         int $sort_order = SORT_ASC,
         ...$vl_query_params,
     ): ModelSet {
@@ -1872,7 +1872,7 @@ class Model {
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
 
         # Sort the set if a sort field was provided
-        $modelset = ($sort_by) ? $modelset->sort(field: $sort_by, order: $sort_order, retain_ids: true) : $modelset;
+        $modelset = ($sort_by) ? $modelset->sort(fields: $sort_by, order: $sort_order, retain_ids: true) : $modelset;
 
         # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);

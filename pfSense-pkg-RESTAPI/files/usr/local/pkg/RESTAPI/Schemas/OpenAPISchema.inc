@@ -60,7 +60,7 @@ class OpenAPISchema extends Schema {
                     '<br>' .
                     '- [Authentication and Authorization](https://pfrest.org/AUTHENTICATION_AND_AUTHORIZATION/)<br>' .
                     '- [Working with Object IDs](https://pfrest.org/WORKING_WITH_OBJECT_IDS/)<br>' .
-                    '- [Queries and Filters](https://pfrest.org/QUERIES_AND_FILTERS/)<br>' .
+                    '- [Queries, Filters, and Sorting](https://pfrest.org/QUERIES_FILTERS_AND_SORTING/)<br>' .
                     '- [Common Control Parameters](https://pfrest.org/COMMON_CONTROL_PARAMETERS/)<br>' .
                     '- [Working with HATEOAS](https://pfrest.org/WORKING_WITH_HATEOAS/)<br>',
             ],

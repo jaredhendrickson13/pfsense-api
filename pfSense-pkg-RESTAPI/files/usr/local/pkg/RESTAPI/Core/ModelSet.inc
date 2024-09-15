@@ -81,23 +81,33 @@ class ModelSet {
 
     /**
      * Sorts the Model objects in this ModelSet by a specific field and order.
-     * @param string $field The field to sort the Model objects by.
+     * @param string|array $fields The field(s) to sort the Model objects by.
      * @param int $order The order to sort the Model objects by. This must be a PHP sort order constant.
      * @param bool $retain_ids Retain the original Model object IDs when sorting.
      * @return ModelSet A new ModelSet object with the Model objects sorted by the specified field and order.
      */
-    public function sort(string $field, int $order = SORT_ASC, bool $retain_ids = false): ModelSet {
+    public function sort(string|array $fields, int $order = SORT_ASC, bool $retain_ids = false): ModelSet {
         # Variables
-        $sort_values = [];
         $model_objects = $this->model_objects;
+        $fields = is_array($fields) ? $fields : [$fields];
+        $sort_criteria = [];
 
-        # Loop through each model object and store the sort value
-        foreach ($model_objects as $model_object) {
-            $sort_values[] = $model_object->$field->value;
+        # Loop through each Model object and add the field values to the sort criteria
+        foreach ($this->model_objects as $model_object) {
+            # Loop variables
+            $sort_values = [];
+
+            # Loop through each field to sort by and extract it's value
+            foreach ($fields as $field) {
+                $sort_values[] = $field === 'id' ? $model_object->id : $model_object->$field->value;
+            }
+
+            # Add the sort values to the sort criteria
+            $sort_criteria[] = $sort_values;
         }
 
-        # Sort the sort values
-        array_multisort($sort_values, $order, $model_objects);
+        # Sort using array_multisort
+        array_multisort($sort_criteria, $order, $model_objects);
 
         # Re-assign the model object IDs if they should not be retained
         if (!$retain_ids) {

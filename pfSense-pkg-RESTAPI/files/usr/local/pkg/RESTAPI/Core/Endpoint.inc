@@ -317,12 +317,12 @@ class Endpoint {
 
     /**
      * @var string|null $sort_by
-     * Sets the default value for the `sort_by` field in the request data. This value is used to control the sorting of
+     * Sets the default value(s) for the `sort_by` field in the request data. This value is used to control the sorting of
      * the Model objects returned by this Endpoint. This value can be overridden by the client in the request data. Use
      * caution when assigning this value as it may force objects to be sorted in this order when they are written to the
      * configuration file.
      */
-    public ?string $sort_by = null;
+    public string|array|null $sort_by = null;
 
     /**
      * @var string $sort_order
@@ -794,20 +794,28 @@ class Endpoint {
     {
         # Only validate this field if the client specifically requested it in the request data
         if (isset($this->request_data['sort_by'])) {
-            # Ensure value is a string
-            if (!is_string($this->request_data['sort_by'])) {
-                throw new ValidationError(
-                    message: 'Field `sort_by` must be of type `string`.',
-                    response_id: 'ENDPOINT_SORT_BY_FIELD_INVALID_TYPE',
-                );
-            }
+            # Ensure value is an array
+            $this->request_data['sort_by'] = is_array($this->request_data['sort_by'])
+                ? $this->request_data['sort_by']
+                : [$this->request_data['sort_by']];
 
-            # Ensure the field is a valid field in the Model
-            if (!in_array($this->request_data['sort_by'], $this->model->get_fields())) {
-                throw new ValidationError(
-                    message: 'Field `sort_by` must be a valid field in the Model.',
-                    response_id: 'ENDPOINT_SORT_BY_FIELD_NON_EXISTENT_FIELD',
-                );
+            # Check each field in the array
+            foreach ($this->request_data['sort_by'] as $sort_by) {
+                # Ensure value is a string
+                if (!is_string($sort_by)) {
+                    throw new ValidationError(
+                        message: 'Field `sort_by` must be of type `string`.',
+                        response_id: 'ENDPOINT_SORT_BY_FIELD_INVALID_TYPE',
+                    );
+                }
+
+                # Ensure the field is a valid field in the Model
+                if (!in_array($sort_by, $this->model->get_fields())) {
+                    throw new ValidationError(
+                        message: 'Field `sort_by` must be a valid field in the Model.',
+                        response_id: 'ENDPOINT_SORT_BY_FIELD_NON_EXISTENT_FIELD',
+                    );
+                }
             }
 
             # Update the sort_by property to use the client's requested value and remove it from the request data

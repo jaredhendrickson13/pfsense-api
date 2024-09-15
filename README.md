@@ -23,7 +23,7 @@ API package and provide you with the information you need to configure and use t
 - [Installation and Configuration](https://pfrest.org/INSTALL_AND_CONFIG/)
 - [Authentication and Authorization](https://pfrest.org/AUTHENTICATION_AND_AUTHORIZATION/)
 - [Swagger and OpenAPI](https://pfrest.org/SWAGGER_AND_OPENAPI/)
-- [Queries and Filters](https://pfrest.org/QUERIES_AND_FILTERS/)
+- [Queries, Filters, and Sorting](https://pfrest.org/QUERIES_FILTERS_AND_SORTING/)
 
 ## Quickstart
 

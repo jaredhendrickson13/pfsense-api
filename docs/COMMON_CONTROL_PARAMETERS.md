@@ -84,5 +84,22 @@ parameters you can use:
   looking for an object near the end of the list. Additionally, it is helpful for time-sorted objects, such as logs,
   where you may want to view the most recent entries first.
 
-!!! Note
-    This parameter is only available for `GET` requests to [plural endpoints](ENDPOINT_TYPES.md#plural-many-endpoints).
+## sort_by
+
+- Type: String or Array
+- Default: _Defaults to the primary sort attribute for the endpoint, typically `null`._
+- Description: This parameters allows you to select the fields to use to sort the objects related to the endpoint. The
+  behavior of this parameter varies based on the request method and endpoint type. Refer to the 
+  [Sorting](QUERIES_FILTERS_AND_SORTING.md#sorting) section for more information.
+
+## sort_order
+
+- Type: String
+- Default: `SORT_ASC`
+- Choices:
+    - `SORT_ASC`
+    - `SORT_DESC`
+- Description: This parameter allows you to control the order in which the objects are sorted. The default value is
+  `SORT_ASC` which sorts the objects in ascending order. Setting this parameter to `SORT_DESC` will sort the objects in
+  descending order. The behavior of this parameter varies based on the request method and endpoint type. Refer to the
+  [Sorting](QUERIES_FILTERS_AND_SORTING.md#sorting) section for more information.
