@@ -11,8 +11,7 @@ use RESTAPI\Models\CertificateGenerate;
 use RESTAPI\Models\CertificateRevocationList;
 use RESTAPI\Models\CertificateRevocationListRevokedCertificate;
 
-class APIModelsCertificateRevocationListRevokedCertificateTestCase extends TestCase
-{
+class APIModelsCertificateRevocationListRevokedCertificateTestCase extends TestCase {
     /**
      * @var CertificateAuthority|Model $ca The CertificateAuthority model to use for testing.
      */
@@ -76,8 +75,7 @@ class APIModelsCertificateRevocationListRevokedCertificateTestCase extends TestC
     /**
      * Cleans up the test cases by deleting the CA and certificate
      */
-    public function teardown(): void
-    {
+    public function teardown(): void {
         $this->cert->delete();
         $this->ca->delete();
     }
@@ -85,8 +83,7 @@ class APIModelsCertificateRevocationListRevokedCertificateTestCase extends TestC
     /*
      * Ensures revoked certificates can be created, updated and deleted
      */
-    public function test_create_update_and_delete(): void
-    {
+    public function test_create_update_and_delete(): void {
         # Ensure we can revoke the certificate
         $revoked_cert = new CertificateRevocationListRevokedCertificate(
             parent_id: $this->crl->id,
@@ -118,8 +115,7 @@ class APIModelsCertificateRevocationListRevokedCertificateTestCase extends TestC
     /**
      * Ensures revoked certificates can't be created for external CRLs
      */
-    public function test_external_crl_rejection(): void
-    {
+    public function test_external_crl_rejection(): void {
         $this->assert_throws_response(
             response_id: 'CERTIFICATE_REVOCATION_LIST_REVOKED_CERTIFICATE_PARENT_NOT_INTERNAL',
             code: 406,
@@ -131,7 +127,7 @@ class APIModelsCertificateRevocationListRevokedCertificateTestCase extends TestC
                 );
                 $revoked_cert->parent_model->method->value = 'external';
                 $revoked_cert->validate_extra();
-            }
+            },
         );
     }
 }

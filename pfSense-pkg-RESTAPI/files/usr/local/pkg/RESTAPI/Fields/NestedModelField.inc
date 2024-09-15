@@ -159,7 +159,7 @@ class NestedModelField extends Field {
             return $this->modelset->to_internal();
         }
         # Otherwise, just convert the one object
-        else {;
+        else {
             return $this->modelset->first()->to_internal();
         }
     }

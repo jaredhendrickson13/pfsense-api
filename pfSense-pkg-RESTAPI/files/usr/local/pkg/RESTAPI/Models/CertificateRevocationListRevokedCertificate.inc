@@ -81,13 +81,13 @@ class CertificateRevocationListRevokedCertificate extends Model {
             default: null,
             allow_null: true,
             write_only: true,
-            help_text: 'The X509 certificate string.'
+            help_text: 'The X509 certificate string.',
         );
         $this->prv = new Base64Field(
             default: null,
             allow_null: true,
             write_only: true,
-            help_text: 'The X509 private key string.'
+            help_text: 'The X509 private key string.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);

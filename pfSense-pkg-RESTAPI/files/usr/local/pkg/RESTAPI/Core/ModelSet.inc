@@ -86,8 +86,7 @@ class ModelSet {
      * @param bool $retain_ids Retain the original Model object IDs when sorting.
      * @return ModelSet A new ModelSet object with the Model objects sorted by the specified field and order.
      */
-    public function sort(string $field, int $order = SORT_ASC, bool $retain_ids = false): ModelSet
-    {
+    public function sort(string $field, int $order = SORT_ASC, bool $retain_ids = false): ModelSet {
         # Variables
         $sort_values = [];
         $model_objects = $this->model_objects;

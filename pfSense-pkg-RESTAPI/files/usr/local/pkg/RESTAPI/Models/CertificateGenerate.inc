@@ -234,7 +234,7 @@ class CertificateGenerate extends Model {
      */
     private function to_x509_dn(): array {
         # Define static DN values
-        $dn = ['commonName' => $this->dn_commonname->value, 'subjectAltName' => [],];
+        $dn = ['commonName' => $this->dn_commonname->value, 'subjectAltName' => []];
 
         # Add countryName if it was given
         if ($this->dn_country->value) {

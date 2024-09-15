@@ -123,8 +123,7 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
     /**
      * Cleans up the test cases by deleting the CA and certificate
      */
-    public function teardown(): void
-    {
+    public function teardown(): void {
         $this->cert->delete();
         $this->ca->delete();
     }
@@ -170,8 +169,7 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
     /*
      * Ensures the 'to_x509_crl' method works as expected
      */
-    public function test_to_x509_crl(): void
-    {
+    public function test_to_x509_crl(): void {
         # Ensure an undefined CRL method throws an error
         $this->assert_throws_response(
             response_id: 'CERTIFICATE_REVOCATION_LIST_FAILED_TO_GENERATE_CRL',
@@ -179,7 +177,7 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
             callable: function () {
                 $internal_crl = new CertificateRevocationList();
                 $internal_crl->to_x509_crl();
-            }
+            },
         );
 
         # Ensure a valid internal CRL outputs the raw CRL data
@@ -191,10 +189,7 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
             serial: 1,
         );
         $internal_crl->create();
-        $this->assert_str_contains(
-            $internal_crl->to_x509_crl(),
-            '-----BEGIN X509 CRL-----',
-        );
+        $this->assert_str_contains($internal_crl->to_x509_crl(), '-----BEGIN X509 CRL-----');
 
         # Delete the CRL
         $internal_crl->delete();
@@ -203,8 +198,7 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
     /**
      * Ensure CRL can be generated with certificates being revoked
      */
-    public function test_generate_with_revoked_certificates(): void
-    {
+    public function test_generate_with_revoked_certificates(): void {
         # Create a CRL with a revoked certificate
         $crl = new CertificateRevocationList(
             descr: 'test_crl',
@@ -215,8 +209,8 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
             cert: [
                 [
                     'certref' => $this->cert->refid->value,
-                    'reason' => 1
-                ]
+                    'reason' => 1,
+                ],
             ],
         );
         $crl->create();
