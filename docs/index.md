@@ -5,8 +5,8 @@ firewalls.It is designed to be light-weight, fast, and easy to use. This guide w
 API package and provide you with the information you need to configure and use the package effectively.
 
 !!! Tip
-    Looking for documentation on REST API endpoints and parameters? An interactive [Swagger documentation](./SWAGGER_AND_OPENAPI.md)
-    site is available on your pfSense instance after [installing the package](./INSTALL_AND_CONFIG.md) under 
+    Looking for documentation on REST API endpoints and parameters? An interactive [Swagger documentation](SWAGGER_AND_OPENAPI.md)
+    site is available on your pfSense instance after [installing the package](INSTALL_AND_CONFIG.md) under 
     'System' -> 'REST API' -> 'Documentation'. Alternatively, a simplified version of the Swagger documentation is 
     available [here](https://pfrest.org/api-docs/).
 

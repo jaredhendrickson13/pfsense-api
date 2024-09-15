@@ -84,7 +84,7 @@ curl -H "Authorization: Bearer xxxxxxxxxxxxxxxxxxxxxxx" https://pfsense.example.
 ### Custom Authentication
 
 For advanced users, the REST API's framework allows for custom authentication methods to be added using PHP. See
-[Building Custom Authentication](./BUILDING_CUSTOM_AUTH_CLASSES.md) for more information.
+[Building Custom Authentication](BUILDING_CUSTOM_AUTH_CLASSES.md) for more information.
 
 ## Authorization
 
