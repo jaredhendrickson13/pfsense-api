@@ -316,6 +316,24 @@ class Endpoint {
     public bool $reverse = false;
 
     /**
+     * @var string|null $sort_by
+     * Sets the default value for the `sort_by` field in the request data. This value is used to control the sorting of
+     * the Model objects returned by this Endpoint. This value can be overridden by the client in the request data. Use
+     * caution when assigning this value as it may force objects to be sorted in this order when they are written to the
+     * configuration file.
+     */
+    public ?string $sort_by = null;
+
+    /**
+     * @var string $sort_order
+     * Sets the default value for the `sort_order` field in the request data. This value is used to control the sorting
+     * order of the Model objects returned by this Endpoint. This value can be overridden by the client in the request
+     * data. This value only takes effect when the `sort_by` field is also set. This value must be the name of a valid
+     * PHP sort order constant ('SORT_ASC' or 'SORT_DESC').
+     */
+    public string $sort_order = 'SORT_ASC';
+
+    /**
      * @var bool $append
      * Sets the default value for the `append` field in the request data. This value is used to control how Model objects
      * apply updates to array fields on existing objects. If set to `true`, any requested updates to array fields will
@@ -767,6 +785,69 @@ class Endpoint {
     }
 
     /**
+     * Validates the $sort_by common control parameter for this request.
+     * @note If the `sort_by` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $sort_by property value.
+     * @throws ValidationError When the `sort_by` field is not a string or is not a valid field in the Model.
+     */
+    private function validate_sort_by(): void
+    {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['sort_by'])) {
+            # Ensure value is a string
+            if (!is_string($this->request_data['sort_by'])) {
+                throw new ValidationError(
+                    message: 'Field `sort_by` must be of type `string`.',
+                    response_id: 'ENDPOINT_SORT_BY_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Ensure the field is a valid field in the Model
+            if (!in_array($this->request_data['sort_by'], $this->model->get_fields())) {
+                throw new ValidationError(
+                    message: 'Field `sort_by` must be a valid field in the Model.',
+                    response_id: 'ENDPOINT_SORT_BY_FIELD_NON_EXISTENT_FIELD',
+                );
+            }
+
+            # Update the sort_by property to use the client's requested value and remove it from the request data
+            $this->sort_by = $this->request_data['sort_by'];
+            unset($this->request_data['sort_by']);
+        }
+    }
+
+    /**
+     * Validates the $sort_order common control parameter for this request.
+     * @note If the `sort_order` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $sort_order property value.
+     * @throws ValidationError When the `sort_order` field is not a string or is not a valid sort order constant.
+     */
+    private function validate_sort_order(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['sort_order'])) {
+            # Ensure value is a string
+            if (!is_string($this->request_data['sort_order'])) {
+                throw new ValidationError(
+                    message: 'Field `sort_order` must be of type `string`.',
+                    response_id: 'ENDPOINT_SORT_ORDER_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Ensure the field is a valid sort order constant
+            if (!in_array($this->request_data['sort_order'], ['SORT_ASC', 'SORT_DESC'])) {
+                throw new ValidationError(
+                    message: 'Field `sort_order` must be one of: [\'SORT_ASC\', \'SORT_DESC\'].',
+                    response_id: 'ENDPOINT_SORT_ORDER_FIELD_UNKNOWN_SORT_ORDER',
+                );
+            }
+
+            # Update the sort_order property to use the client's requested value and remove it from the request data
+            $this->sort_order = $this->request_data['sort_order'];
+            unset($this->request_data['sort_order']);
+        }
+    }
+
+    /**
      * Validates the $append common control parameter for this request.
      * @note If the `append` field was not provided in the request data, the request will default to the Endpoint's assigned
      * $append property value.
@@ -874,6 +955,8 @@ class Endpoint {
         # Ensure control parameters are of the correct type if the client requested them
         $this->validate_async();
         $this->validate_reverse();
+        $this->validate_sort_by();
+        $this->validate_sort_order();
         $this->validate_append();
         $this->validate_remove();
         $this->validate_limit();
@@ -990,6 +1073,8 @@ class Endpoint {
                 limit: $this->limit,
                 offset: $this->offset,
                 reverse: $this->reverse,
+                sort_by: $this->sort_by,
+                sort_order: constant($this->sort_order),
             );
         }
         # For GET requests on many Endpoints, obtain all objects from the assigned Model.

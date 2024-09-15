@@ -1856,18 +1856,23 @@ class Model {
         int $limit = 0,
         int $offset = 0,
         bool $reverse = false,
+        ?string $sort_by = null,
+        int $sort_order = SORT_ASC,
         ...$vl_query_params,
     ): ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
         $query_params = array_merge($query_params, $vl_query_params);
 
-        # If no query parameters were provided, just run read_all() with pagination for optimal performance
-        if (!$query_params) {
+        # If no query or sort parameters were provided, just run read_all() with pagination for optimal performance
+        if (!$query_params and $sort_by === null) {
             return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset, reverse: $reverse);
         }
 
         # Perform the query against all Model objects for this Model first
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
+
+        # Sort the set if a sort field was provided
+        $modelset = ($sort_by) ? $modelset->sort(field: $sort_by, order: $sort_order, retain_ids: true) : $modelset;
 
         # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);

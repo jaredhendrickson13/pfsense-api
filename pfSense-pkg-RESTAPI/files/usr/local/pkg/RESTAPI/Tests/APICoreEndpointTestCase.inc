@@ -738,4 +738,76 @@ class APICoreEndpointTestCase extends TestCase {
         # Ensure the response is JSON
         $this->assert_equals(json_decode($resp)->code, 406);
     }
+
+    /**
+     * Ensure the 'sort_by' common control parameter must be the name of a Model field.
+     */
+    public function test_sort_by_must_be_model_field_name(): void {
+        # Use a GET request to request a non-string field to sort by
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 12345],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        # Ensure the response threw a ENDPOINT_SORT_BY_FIELD_INVALID_TYPE error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_BY_FIELD_INVALID_TYPE');
+        $this->assert_equals($resp->code, 400);
+
+        # Make another request to sort by a field that does not exist in the Model
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'non_existent_field'],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure the response threw a ENDPOINT_SORT_BY_FIELD_NON_EXISTENT_FIELD error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_BY_FIELD_NON_EXISTENT_FIELD');
+        $this->assert_equals($resp->code, 400);
+    }
+
+    /**
+     * Ensure the 'sort_order' common control parameter must be the name of a valid PHP sort constant.
+     */
+    public function test_sort_odrer_must_be_php_sort_constant(): void {
+        # Use a GET request to request a non-string sort order
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'name', 'sort_order' => 12345],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        # Ensure the response threw a ENDPOINT_SORT_ORDER_FIELD_INVALID_TYPE error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_ORDER_FIELD_INVALID_TYPE');
+        $this->assert_equals($resp->code, 400);
+
+        # Make another request to sort order that is not known
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'name', 'sort_order' => 'unknown_sort_order'],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure the response threw a ENDPOINT_SORT_ORDER_FIELD_UNKNOWN_SORT_ORDER error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_ORDER_FIELD_UNKNOWN_SORT_ORDER');
+        $this->assert_equals($resp->code, 400);
+    }
 }

@@ -1001,4 +1001,45 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $vlan = new InterfaceVLAN();
         $this->assert_is_true($vlan->does_apply_immediately());
     }
+
+    /**
+     * Ensures sorting via the Model's query() method works correctly.
+     */
+    public function test_query_sort(): void {
+        # Create FirewallAlias models to test this
+        $a_alias = new FirewallAlias(name: 'a_alias', type: 'network');
+        $a_alias->create();
+        $c_alias = new FirewallAlias(name: 'c_alias', type: 'port');
+        $c_alias->create();
+        $b_alias = new FirewallAlias(name: 'b_alias', type: 'host');
+        $b_alias->create();
+
+        # Ensure no sort_by field leaves the objects in their natural order
+        $unsorted_aliases = FirewallAlias::query();
+        $this->assert_equals($unsorted_aliases->model_objects[0]->name->value, 'a_alias');
+        $this->assert_equals($unsorted_aliases->model_objects[1]->name->value, 'c_alias');
+        $this->assert_equals($unsorted_aliases->model_objects[2]->name->value, 'b_alias');
+
+        # Query for all aliases and sort by name in ascending order
+        $sorted_aliases = FirewallAlias::query(sort_by: 'name', sort_order: SORT_ASC);
+
+        # Ensure the aliases were sorted and their IDs were retained
+        $this->assert_equals($sorted_aliases->model_objects[0]->name->value, 'a_alias');
+        $this->assert_equals($sorted_aliases->model_objects[0]->id, 0);
+        $this->assert_equals($sorted_aliases->model_objects[1]->name->value, 'b_alias');
+        $this->assert_equals($sorted_aliases->model_objects[1]->id, 2);
+        $this->assert_equals($sorted_aliases->model_objects[2]->name->value, 'c_alias');
+        $this->assert_equals($sorted_aliases->model_objects[2]->id, 1);
+
+        # Query for all aliases and sort by type in descending order
+        $sorted_aliases = FirewallAlias::query(sort_by: 'type', sort_order: SORT_DESC);
+
+        # Ensure the aliases were sorted and their IDs were retained
+        $this->assert_equals($sorted_aliases->model_objects[0]->type->value, 'port');
+        $this->assert_equals($sorted_aliases->model_objects[0]->id, 1);
+        $this->assert_equals($sorted_aliases->model_objects[1]->type->value, 'network');
+        $this->assert_equals($sorted_aliases->model_objects[1]->id, 0);
+        $this->assert_equals($sorted_aliases->model_objects[2]->type->value, 'host');
+        $this->assert_equals($sorted_aliases->model_objects[2]->id, 2);
+    }
 }
