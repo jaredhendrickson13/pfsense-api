@@ -129,8 +129,8 @@ class NestedModelField extends Field {
         # Variables
         $return_value = true;
 
-        # Only validate if the current value is different than our ModelSet's values
-        if ($this->value !== $this->modelset->to_representation()) {
+        # Only validate if the current value is different than our ModelSet's values, or the value is empty
+        if (!$this->value or $this->value !== $this->modelset->to_representation()) {
             # Empty any existing ModelSet entries in the event this is a subsequent `validate()` call.
             $this->modelset->model_objects = [];
             $return_value = parent::validate();
