@@ -50,8 +50,9 @@ class CertificateRevocationListRevokedCertificate extends Model {
             help_text: 'The serial number of the certificate to be revoked.',
         );
         $this->reason = new IntegerField(
-            default: -1,
+            default: 0,
             choices: [-1, 0, 1, 2, 3, 4, 5, 6, 9],
+            minimum: -1,
             help_text: 'The CRL reason for revocation code.',
         );
         $this->revoke_time = new UnixTimeField(
