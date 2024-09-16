@@ -307,7 +307,7 @@ class OpenAPISchema extends Schema {
                     }
                 }
 
-                # Assign the limit and offset to GET endpoints with $many enabled
+                # Assign the limit, offset, query and sort params to GET endpoints with $many enabled
                 if ($endpoint->many and $request_method === 'get') {
                     $openapi_config['paths'][$endpoint->url][$request_method]['parameters'] = [
                         [
@@ -321,6 +321,27 @@ class OpenAPISchema extends Schema {
                             'name' => 'offset',
                             'description' => 'The starting point in the dataset to begin fetching objects.',
                             'schema' => ['type' => 'integer', 'default' => $endpoint->offset],
+                        ],
+                        [
+                            'in' => 'query',
+                            'name' => 'sort_by',
+                            'description' => 'The fields to sort response data by.',
+                            'schema' => [
+                                'type' => 'array',
+                                'items' => ['type' => 'string'],
+                                'nullable' => true,
+                                'default' => $endpoint->sort_by],
+                        ],
+                        [
+                            'in' => 'query',
+                            'name' => 'sort_order',
+                            'description' => 'Sort the response data in descending order.',
+                            'schema' => [
+                                'type' => 'string',
+                                'enum' => ['SORT_ASC', 'SORT_DESC'],
+                                'nullable' => true,
+                                'default' => $endpoint->sort_desc
+                            ],
                         ],
                         [
                             'in' => 'query',
