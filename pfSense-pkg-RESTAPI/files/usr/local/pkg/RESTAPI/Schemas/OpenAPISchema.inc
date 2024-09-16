@@ -341,7 +341,6 @@ class OpenAPISchema extends Schema {
                                 'type' => 'string',
                                 'enum' => ['SORT_ASC', 'SORT_DESC'],
                                 'nullable' => true,
-                                'default' => $endpoint->sort_desc,
                             ],
                         ],
                         [
