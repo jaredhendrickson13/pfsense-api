@@ -330,7 +330,8 @@ class OpenAPISchema extends Schema {
                                 'type' => 'array',
                                 'items' => ['type' => 'string'],
                                 'nullable' => true,
-                                'default' => $endpoint->sort_by],
+                                'default' => $endpoint->sort_by,
+                            ],
                         ],
                         [
                             'in' => 'query',
@@ -340,7 +341,7 @@ class OpenAPISchema extends Schema {
                                 'type' => 'string',
                                 'enum' => ['SORT_ASC', 'SORT_DESC'],
                                 'nullable' => true,
-                                'default' => $endpoint->sort_desc
+                                'default' => $endpoint->sort_desc,
                             ],
                         ],
                         [

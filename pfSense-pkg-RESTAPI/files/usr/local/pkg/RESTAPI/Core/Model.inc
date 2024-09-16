@@ -1872,7 +1872,7 @@ class Model {
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
 
         # Sort the set if a sort field was provided
-        $modelset = ($sort_by) ? $modelset->sort(fields: $sort_by, order: $sort_order, retain_ids: true) : $modelset;
+        $modelset = $sort_by ? $modelset->sort(fields: $sort_by, order: $sort_order, retain_ids: true) : $modelset;
 
         # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);

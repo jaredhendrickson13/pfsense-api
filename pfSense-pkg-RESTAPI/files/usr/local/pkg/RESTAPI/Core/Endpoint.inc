@@ -790,8 +790,7 @@ class Endpoint {
      * $sort_by property value.
      * @throws ValidationError When the `sort_by` field is not a string or is not a valid field in the Model.
      */
-    private function validate_sort_by(): void
-    {
+    private function validate_sort_by(): void {
         # Only validate this field if the client specifically requested it in the request data
         if (isset($this->request_data['sort_by'])) {
             # Ensure value is an array
