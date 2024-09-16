@@ -1021,7 +1021,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($unsorted_aliases->model_objects[2]->name->value, 'b_alias');
 
         # Query for all aliases and sort by name in ascending order
-        $sorted_aliases = FirewallAlias::query(sort_by: 'name', sort_order: SORT_ASC);
+        $sorted_aliases = FirewallAlias::query(sort_by: ['name'], sort_order: SORT_ASC);
 
         # Ensure the aliases were sorted and their IDs were retained
         $this->assert_equals($sorted_aliases->model_objects[0]->name->value, 'a_alias');
@@ -1032,7 +1032,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($sorted_aliases->model_objects[2]->id, 1);
 
         # Query for all aliases and sort by type in descending order
-        $sorted_aliases = FirewallAlias::query(sort_by: 'type', sort_order: SORT_DESC);
+        $sorted_aliases = FirewallAlias::query(sort_by: ['type'], sort_order: SORT_DESC);
 
         # Ensure the aliases were sorted and their IDs were retained
         $this->assert_equals($sorted_aliases->model_objects[0]->type->value, 'port');
