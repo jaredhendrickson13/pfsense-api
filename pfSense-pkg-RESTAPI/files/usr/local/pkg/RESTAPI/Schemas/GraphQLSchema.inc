@@ -429,6 +429,17 @@ class GraphQLSchema extends Schema {
                         'defaultValue' => false,
                         'description' => 'Reverse the order of the returned objects.',
                     ],
+                    'sort_by' => [
+                        'type' => Type::listOf(Type::string()),
+                        'defaultValue' => [],
+                        'description' => 'The fields to sort the returned objects by.',
+                    ],
+                    'sort_order' => [
+                        'nullable' => true,
+                        'description' => 'The order to use when sorting.',
+                        'type' => Type::int(),
+                        'defaultValue' => SORT_ASC,
+                    ],
                 ],
             ],
         ];

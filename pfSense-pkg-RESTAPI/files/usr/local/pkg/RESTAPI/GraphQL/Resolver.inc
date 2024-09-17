@@ -36,6 +36,8 @@ class Resolver {
                 limit: $args['limit'],
                 offset: $args['offset'],
                 reverse: $args['reverse'],
+                sort_by: $args['sort_by'],
+                sort_order: $args['sort_order'],
             );
 
             # Return the query results in an array representation
