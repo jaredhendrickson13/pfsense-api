@@ -6,6 +6,7 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\ModelSet;
+use RESTAPI\Models\DNSResolverHostOverride;
 use RESTAPI\Models\FirewallAlias;
 
 /**
@@ -353,26 +354,65 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
 
         # Sort the ModelSet by the 'name' field in ascending order and ensure the order is correct
         $this->assert_equals(
-            $modelset->sort('name')->model_objects,
+            $modelset->sort(['name'])->model_objects,
             (new ModelSet([$alias_a, $alias_b, $alias_c]))->model_objects,
         );
 
         # Sort the ModelSet by the 'name' field in descending order and ensure the order is correct
         $this->assert_equals(
-            $modelset->sort('name', order: SORT_DESC)->model_objects,
+            $modelset->sort(['name'], order: SORT_DESC)->model_objects,
             (new ModelSet([$alias_c, $alias_b, $alias_a]))->model_objects,
         );
 
         # Sort the ModelSet by the 'type' field in ascending order and ensure the order is correct
         $this->assert_equals(
-            $modelset->sort('type')->model_objects,
+            $modelset->sort(['type'])->model_objects,
             (new ModelSet([$alias_a, $alias_c, $alias_b]))->model_objects,
         );
 
         # Sort the ModelSet by the 'type' field in descending order and ensure the order is correct
         $this->assert_equals(
-            $modelset->sort('type', order: SORT_DESC)->model_objects,
+            $modelset->sort(['type'], order: SORT_DESC)->model_objects,
             (new ModelSet([$alias_b, $alias_c, $alias_a]))->model_objects,
+        );
+    }
+
+    /**
+     * Ensures multi-field sorts work as expected.
+     */
+    public function test_sort_multiple_fields(): void
+    {
+        # Add DNS Resolver host overrides to test this
+        $host_1 = new DNSResolverHostOverride(host: 'a', domain: 'a.example.com', ip: ['127.0.0.1']);
+        $host_2 = new DNSResolverHostOverride(host: 'b', domain: 'a.example.com', ip: ['127.35.0.2']);
+        $host_3 = new DNSResolverHostOverride(host: 'c', domain: 'a.example.com', ip: ['127.0.8.3']);
+        $host_4 = new DNSResolverHostOverride(host: 'a', domain: 'b.example.com', ip: ['127.0.1.4']);
+        $host_5 = new DNSResolverHostOverride(host: 'b', domain: 'b.example.com', ip: ['127.5.1.7']);
+        $host_6 = new DNSResolverHostOverride(host: 'c', domain: 'b.example.com', ip: ['127.3.3.3']);
+        $host_7 = new DNSResolverHostOverride(host: 'a', domain: 'c.example.com', ip: ['127.0.4.2']);
+        $host_8 = new DNSResolverHostOverride(host: 'b', domain: 'c.example.com', ip: ['127.3.0.1']);
+        $host_9 = new DNSResolverHostOverride(host: 'c', domain: 'c.example.com', ip: ['127.5.1.3']);
+
+        # Create a ModelSet using the previously created Models in a random order
+        $modelset = new ModelSet([$host_1, $host_2, $host_3, $host_4, $host_5, $host_6, $host_7, $host_8, $host_9]);
+        shuffle($modelset->model_objects);
+
+        # Sort the ModelSet by the host and domain fields in ascending order and ensure the order is correct
+        $this->assert_equals(
+            $modelset->sort(['host', 'domain'])->model_objects,
+            [$host_1, $host_4, $host_7, $host_2, $host_5, $host_8, $host_3, $host_6, $host_9],
+        );
+
+        # Sort the ModelSet by the domain and host fields in descending order and ensure the order is correct
+        $this->assert_equals(
+            $modelset->sort(['domain', 'host'], order: SORT_DESC)->model_objects,
+            [$host_9, $host_8, $host_7, $host_6, $host_5, $host_4, $host_3, $host_2, $host_1],
+        );
+
+        # Sort the ModelSet by domain and ip fields in ascending order and ensure the order is correct
+        $this->assert_equals(
+            $modelset->sort(['domain', 'ip'])->model_objects,
+            [$host_1, $host_3, $host_2, $host_4, $host_6, $host_5, $host_7, $host_8, $host_9],
         );
     }
 }

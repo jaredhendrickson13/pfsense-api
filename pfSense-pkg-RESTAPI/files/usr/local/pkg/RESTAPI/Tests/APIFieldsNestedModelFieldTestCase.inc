@@ -142,7 +142,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase {
         $field->name = 'test';
 
         # Assign the nested Model sort criteria for testing - by field `name` in alphabetical order
-        $field->model->sort_by_field = 'name';
+        $field->model->sort_by = 'name';
         $field->model->sort_option = SORT_ASC;
 
         # Set the value to an array of alias objects that are out of order

@@ -29,7 +29,7 @@ class RESTAPIAccessListEntry extends Model {
         $this->many_minimum = 1;
         $this->verbose_name_plural = 'REST API Access List Entries';
         $this->sort_option = SORT_ASC;
-        $this->sort_by_field = 'weight';
+        $this->sort_by = ['weight'];
 
         # Define model fields
         $this->type = new StringField(

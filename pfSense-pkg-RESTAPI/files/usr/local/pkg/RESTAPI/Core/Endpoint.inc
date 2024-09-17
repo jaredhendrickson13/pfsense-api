@@ -1097,8 +1097,16 @@ class Endpoint {
     protected function post(): Model|ModelSet {
         # POST request cannot include an ID, strip the ID if present
         unset($this->request_data['id']);
+
+        # Construct the model from representation using the client's request data
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
+
+        # Allow the endpoint/client to override the Model's sort_by and sort_order properties
+        $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
+        $this->model->sort_option = constant($this->sort_order) ?? $this->model->sort_option;
+
+        # Create the object and return it
         return $this->model->create(apply: $this->request_data['apply'] === true);
     }
 
@@ -1113,8 +1121,16 @@ class Endpoint {
      * Updates an existing object for the assigned Model using the data submitted in a PATCH request.
      */
     protected function patch(): Model|ModelSet {
+        # Construct the model from representation using the client's request data
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
+
+        # Allow the endpoint/client to override the Model's sort_by and sort_order properties
+        $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
+        $this->model->sort_option = constant($this->sort_order) ?? $this->model->sort_option;
+        echo $this->model->sort_order;
+
+        # Update the object and return it
         return $this->model->update(
             apply: $this->request_data['apply'] === true,
             append: $this->append,

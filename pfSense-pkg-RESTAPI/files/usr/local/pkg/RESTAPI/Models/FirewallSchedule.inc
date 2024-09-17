@@ -27,7 +27,7 @@ class FirewallSchedule extends Model {
         $this->config_path = 'schedules/schedule';
         $this->many = true;
         $this->always_apply = true;
-        $this->sort_by_field = 'name';
+        $this->sort_by = ['name'];
         $this->sort_option = SORT_ASC;
 
         # Set model fields

@@ -45,7 +45,7 @@ class PortForward extends Model {
         $this->config_path = 'nat/rule';
         $this->many = true;
         $this->subsystem = 'natconf';
-        $this->sort_by_field = 'interface';
+        $this->sort_by = ['interface'];
         $this->sort_option = SORT_ASC;
         $this->client = $options['client'] instanceof Auth ? $options['client'] : new Auth();
 

@@ -1042,4 +1042,152 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals($sorted_aliases->model_objects[2]->type->value, 'host');
         $this->assert_equals($sorted_aliases->model_objects[2]->id, 2);
     }
+
+    /**
+     * Ensures the sort() method works correctly when creating a new Model object.
+     */
+    public function test_sort_create(): void {
+        # Create a few FirewallAlias models to test this
+        $alias_0 = new FirewallAlias(name: 'zzz', type: 'host');
+        $alias_1 = new FirewallAlias(name: 'ccc', type: 'host');
+        $alias_2 = new FirewallAlias(name: 'aaa', type: 'host');
+        $alias_3 = new FirewallAlias(name: 'bbb', type: 'host');
+        $alias_4 = new FirewallAlias(name: 'ddd', type: 'host');
+        $alias_5 = new FirewallAlias(name: 'fff', type: 'host');
+
+        # Create the first four aliases
+        $alias_0->create();
+        $alias_1->create();
+        $alias_2->create();
+        $alias_3->create();
+        $alias_4->create();
+
+        # Ensure the aliases are not sorted yet
+        $this->assert_equals(
+            FirewallAlias::read_all()->to_representation(),
+            [
+                $alias_0->to_representation(),
+                $alias_1->to_representation(),
+                $alias_2->to_representation(),
+                $alias_3->to_representation(),
+                $alias_4->to_representation(),
+            ],
+        );
+
+        # Ensure the aliases are sorted by name when creating the fifth alias
+        $alias_5->sort_by = ['name'];
+        $alias_5->sort_option = SORT_ASC;
+        $alias_5->create();
+
+        # Ensure the aliases are now sorted
+        $this->assert_equals(
+            FirewallAlias::read_all()->to_internal(),
+            [
+                $alias_2->to_internal(),
+                $alias_3->to_internal(),
+                $alias_1->to_internal(),
+                $alias_4->to_internal(),
+                $alias_5->to_internal(),
+                $alias_0->to_internal(),
+            ]
+        );
+
+        # Delete all the aliases
+        FirewallAlias::delete_all();
+    }
+
+    /**
+     * Ensures the sort() method works correctly when updating an existing Model object.
+     */
+    public function test_sort_update(): void {
+        # Create a few FirewallAlias models to test this
+        $alias_0 = new FirewallAlias(name: 'zzz', type: 'host');
+        $alias_1 = new FirewallAlias(name: 'ccc', type: 'host');
+        $alias_2 = new FirewallAlias(name: 'aaa', type: 'host');
+        $alias_3 = new FirewallAlias(name: 'bbb', type: 'host');
+        $alias_4 = new FirewallAlias(name: 'ddd', type: 'host');
+        $alias_5 = new FirewallAlias(name: 'fff', type: 'host');
+
+        # Create the aliases
+        $alias_0->create();
+        $alias_1->create();
+        $alias_2->create();
+        $alias_3->create();
+        $alias_4->create();
+        $alias_5->create();
+
+        # Ensure the aliases are not sorted yet
+        $this->assert_equals(
+            FirewallAlias::read_all()->to_representation(),
+            [
+                $alias_0->to_representation(),
+                $alias_1->to_representation(),
+                $alias_2->to_representation(),
+                $alias_3->to_representation(),
+                $alias_4->to_representation(),
+                $alias_5->to_representation(),
+            ],
+        );
+
+        # Ensure the aliases are sorted by name when updating the alias
+        $alias_2->sort_by = ['name'];
+        $alias_2->sort_option = SORT_ASC;
+
+        # Change the name value of $alias_2 and ensure it gets sorted correctly
+        $alias_2->name->value = 'yyy';
+        $alias_2->name->editable = true; # Allow the name to be updated for this test
+        $alias_2->update();
+        $this->assert_equals(
+            FirewallAlias::read_all()->to_internal(),
+            [
+                $alias_3->to_internal(),
+                $alias_1->to_internal(),
+                $alias_4->to_internal(),
+                $alias_5->to_internal(),
+                $alias_2->to_internal(),
+                $alias_0->to_internal(),
+            ]
+        );
+
+        # Ensure $alias_2's ID was updated to reflect the new order
+        $this->assert_equals($alias_2->id, 4);
+
+        # Delete all the aliases
+        FirewallAlias::delete_all();
+    }
+
+    /**
+     * Ensure the sort() method works correctly when replacing all Model objects.
+     */
+    public function test_sort_replace_all(): void {
+        $alias = new FirewallAlias();
+        $alias->sort_by = ['name'];
+        $alias->sort_option = SORT_ASC;
+        $alias->replace_all(
+            [
+                ['name' => 'zzz', 'type' => 'host'],
+                ['name' => 'ccc', 'type' => 'host'],
+                ['name' => 'aaa', 'type' => 'host'],
+                ['name' => 'bbb', 'type' => 'host'],
+                ['name' => 'ddd', 'type' => 'host'],
+                ['name' => 'fff', 'type' => 'host'],
+            ],
+        );
+
+        # Ensure the aliases are sorted by name
+        $this->assert_equals(
+            FirewallAlias::read_all()->to_internal(),
+            [
+                ['name' => 'aaa', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+                ['name' => 'bbb', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+                ['name' => 'ccc', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+                ['name' => 'ddd', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+                ['name' => 'fff', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+                ['name' => 'zzz', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+            ],
+        );
+
+        # Delete all the aliases
+        FirewallAlias::delete_all();
+    }
 }

@@ -217,12 +217,12 @@ class Model {
     public int|null $sort_option = null;
 
     /**
-     * @var string|null $sort_by_field
-     * Sets the field name this Model will use when sorting objects written to the pfSense configuration. This field must
+     * @var array|null $sort_by
+     * Sets the field names this Model will use when sorting objects written to the pfSense configuration. These fields must
      * be set to an existing property name from this Model, and that property must be assigned a Field class. Leave empty
      * to disable sorting for this Model. In most cases, sorting should not be used.
      */
-    public string|null $sort_by_field = null;
+    public array|null $sort_by = null;
 
     /**
      * @var string $subsystem
@@ -1613,9 +1613,9 @@ class Model {
      * Sorts `many` Model entries internally before writing the changes to config. This is useful for Model's whose
      * internal objects must be written in a specific order.
      */
-    protected function sort() {
-        # Do not sort if there is no `sort_option` or `sort_by_field` set
-        if (!$this->sort_option or !$this->sort_by_field) {
+    protected function sort(): void {
+        # Do not sort if there is no `sort_option` or `sort_by` set
+        if (!$this->sort_option or !$this->sort_by) {
             return;
         }
 
@@ -1627,43 +1627,27 @@ class Model {
             );
         }
 
-        $internal_objects = $this->get_config($this->get_config_path(), []);
-        $criteria = [];
+        # Obtain all Model objects for this Model and sort them by the requested criteria
+        $modelset = $this->query(parent_id: $this->parent_id, sort_by: $this->sort_by, sort_order: $this->sort_option);
 
-        # Loop through each rule and map its sort field value to our sort criteria array
-        foreach ($internal_objects as $id => $internal_object) {
-            # Store the internal object's existing ID so we can locate new IDs after sorting
-            $internal_objects[$id]['original_id'] = $id;
-
-            # Use the `internal_name` of the assigned `sort_by_field` since we are dealing with internal objects
-            $sort_by_field_internal_name = $this->{$this->sort_by_field}->internal_name;
-
-            # Map the real field if it's not empty, otherwise assume an empty string
-            if (!empty($internal_object[$sort_by_field_internal_name])) {
-                $criteria[$id] = $internal_object[$sort_by_field_internal_name];
-            } else {
-                $criteria[$id] = '';
-            }
-        }
-
-        # Sort the internal objects using the previously determined criteria
-        array_multisort($criteria, $this->sort_option, $internal_objects);
-
-        # Loop through the sorted internal objects and find $this object's new ID
+        # Loop through the sorted object and assign it's internal value
+        $internal_objects = [];
         $id_found = false;
-        foreach ($internal_objects as $new_id => $sorted_internal_object) {
-            # Check if this sorted internal object contains $this objects original ID
-            if (!$id_found and $this->id === $sorted_internal_object['original_id']) {
-                $id_found = true;
-                $this->id = $new_id;
-            }
+        foreach ($modelset->model_objects as $id => $sorted_model_object) {
+            # Assign the internal object to the internal objects array
+            $internal_objects[] = $this->get_config(
+                $sorted_model_object->get_config_path()
+            )[$sorted_model_object->id];
 
-            # Remove the `original_id` value so we don't save it to config
-            unset($internal_objects[$new_id]['original_id']);
+            # If the sorted object's ID matches this object's ID, update this object's ID.
+            if (!$id_found and $this->id === $sorted_model_object->id) {
+                $this->id = $id;
+                $id_found = true;
+            }
         }
 
         # Sets the sorted internal objects to the pfSense config
-        $this->set_config($this->get_config_path(), array_values($internal_objects));
+        $this->set_config($this->get_config_path(), $internal_objects);
     }
 
     /**
