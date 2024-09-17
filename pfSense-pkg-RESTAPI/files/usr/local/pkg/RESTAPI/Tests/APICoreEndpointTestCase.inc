@@ -778,7 +778,7 @@ class APICoreEndpointTestCase extends TestCase {
     /**
      * Ensure the 'sort_order' common control parameter must be the name of a valid PHP sort constant.
      */
-    public function test_sort_odrer_must_be_php_sort_constant(): void {
+    public function test_sort_order_must_be_php_sort_constant(): void {
         # Use a GET request to request a non-string sort order
         $json_resp = \RESTAPI\Core\Tools\http_request(
             url: 'https://localhost/api/v2/firewall/aliases',
