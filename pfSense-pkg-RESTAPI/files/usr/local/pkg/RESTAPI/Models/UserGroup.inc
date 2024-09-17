@@ -28,7 +28,7 @@ class UserGroup extends Model {
         $this->config_path = 'system/group';
         $this->many = true;
         $this->always_apply = true;
-        $this->sort_option = SORT_ASC;
+        $this->sort_order = SORT_ASC;
         $this->sort_by = ['name'];
         $this->protected_model_query = ['scope' => 'system'];
 

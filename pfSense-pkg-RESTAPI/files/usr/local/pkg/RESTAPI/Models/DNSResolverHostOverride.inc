@@ -25,7 +25,7 @@ class DNSResolverHostOverride extends Model {
         $this->config_path = 'unbound/hosts';
         $this->subsystem = 'unbound';
         $this->many = true;
-        $this->sort_option = SORT_ASC;
+        $this->sort_order = SORT_ASC;
         $this->sort_by = ['host'];
         $this->unique_together_fields = ['host', 'domain'];
 

@@ -1104,7 +1104,7 @@ class Endpoint {
 
         # Allow the endpoint/client to override the Model's sort_by and sort_order properties
         $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
-        $this->model->sort_option = constant($this->sort_order) ?? $this->model->sort_option;
+        $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
 
         # Create the object and return it
         return $this->model->create(apply: $this->request_data['apply'] === true);
@@ -1127,7 +1127,7 @@ class Endpoint {
 
         # Allow the endpoint/client to override the Model's sort_by and sort_order properties
         $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
-        $this->model->sort_option = constant($this->sort_order) ?? $this->model->sort_option;
+        $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
         echo $this->model->sort_order;
 
         # Update the object and return it

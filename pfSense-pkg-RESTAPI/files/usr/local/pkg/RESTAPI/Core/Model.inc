@@ -208,13 +208,13 @@ class Model {
     public int|null $placement = null;
 
     /**
-     * @var int|null $sort_option
+     * @var int|null $sort_order
      * For $many enabled Models, this property can be used to set the PHP sort option used when writing Model objects to
      * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
      * to Models with a $config_path defined. For valid value options for this property, refer to:
      * https://www.php.net/manual/en/function.array-multisort.php
      */
-    public int|null $sort_option = null;
+    public int|null $sort_order = null;
 
     /**
      * @var array|null $sort_by
@@ -1614,8 +1614,8 @@ class Model {
      * internal objects must be written in a specific order.
      */
     protected function sort(): void {
-        # Do not sort if there is no `sort_option` or `sort_by` set
-        if (!$this->sort_option or !$this->sort_by) {
+        # Do not sort if there is no `sort_order` or `sort_by` set
+        if (!$this->sort_order or !$this->sort_by) {
             return;
         }
 
@@ -1628,7 +1628,7 @@ class Model {
         }
 
         # Obtain all Model objects for this Model and sort them by the requested criteria
-        $modelset = $this->query(parent_id: $this->parent_id, sort_by: $this->sort_by, sort_order: $this->sort_option);
+        $modelset = $this->query(parent_id: $this->parent_id, sort_by: $this->sort_by, sort_order: $this->sort_order);
 
         # Loop through the sorted object and assign it's internal value
         $internal_objects = [];

@@ -28,7 +28,7 @@ class FirewallSchedule extends Model {
         $this->many = true;
         $this->always_apply = true;
         $this->sort_by = ['name'];
-        $this->sort_option = SORT_ASC;
+        $this->sort_order = SORT_ASC;
 
         # Set model fields
         $this->schedlabel = new UIDField(help_text: 'A unique ID for this schedule used internally by the system.');

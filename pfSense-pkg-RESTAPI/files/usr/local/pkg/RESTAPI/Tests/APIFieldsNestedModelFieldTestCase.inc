@@ -143,7 +143,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase {
 
         # Assign the nested Model sort criteria for testing - by field `name` in alphabetical order
         $field->model->sort_by = 'name';
-        $field->model->sort_option = SORT_ASC;
+        $field->model->sort_order = SORT_ASC;
 
         # Set the value to an array of alias objects that are out of order
         $field->value = [
@@ -166,7 +166,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase {
         ]);
 
         # Sort again but this time in descending order
-        $field->model->sort_option = SORT_DESC;
+        $field->model->sort_order = SORT_DESC;
         $field->sort();
         $this->assert_equals($field->value, [
             ['id' => 0, 'name' => 'ddd', 'type' => 'host', 'descr' => '', 'address' => [], 'detail' => []],

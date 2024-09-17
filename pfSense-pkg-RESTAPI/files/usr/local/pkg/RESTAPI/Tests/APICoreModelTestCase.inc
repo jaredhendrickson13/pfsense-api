@@ -1076,7 +1076,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
 
         # Ensure the aliases are sorted by name when creating the fifth alias
         $alias_5->sort_by = ['name'];
-        $alias_5->sort_option = SORT_ASC;
+        $alias_5->sort_order = SORT_ASC;
         $alias_5->create();
 
         # Ensure the aliases are now sorted
@@ -1131,7 +1131,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
 
         # Ensure the aliases are sorted by name when updating the alias
         $alias_2->sort_by = ['name'];
-        $alias_2->sort_option = SORT_ASC;
+        $alias_2->sort_order = SORT_ASC;
 
         # Change the name value of $alias_2 and ensure it gets sorted correctly
         $alias_2->name->value = 'yyy';
@@ -1162,7 +1162,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     public function test_sort_replace_all(): void {
         $alias = new FirewallAlias();
         $alias->sort_by = ['name'];
-        $alias->sort_option = SORT_ASC;
+        $alias->sort_order = SORT_ASC;
         $alias->replace_all(
             [
                 ['name' => 'zzz', 'type' => 'host'],

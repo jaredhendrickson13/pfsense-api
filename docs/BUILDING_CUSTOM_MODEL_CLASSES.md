@@ -232,40 +232,40 @@ $this->unique_together_fields = ['name', 'port'];
     - The `unique_together_fields` property is only applicable when the `many` property is set to `true`.
     - The fields defined in the `unique_together_fields` property must be defined in the Model's Field objects.
 
-### sort_by_field
+### sort_by
 
-The `sort_by_field` property is used to define the field that objects of the Model will be sorted by. When this property is
-set, objects created and updated will be sorted according to the assigned field using the assigned `sort_option`.
+The `sort_by` property is used to define the fields that objects of the Model will be sorted by. When this property is
+set, objects created and updated will be sorted according to the assigned field using the assigned `sort_order`.
 
 Example:
 
 ```php
-$this->sort_by_field = 'name';
+$this->sort_by = ['name'];
 ```
 
 !!! Warning
     The use of sorting in a Model may cause IDs to be re-ordered when objects are created or updated.
 !!! Notes
-    - The `sort_by_field` property is only applicable when the `many` property is set to `true`.
-    - The field defined in the `sort_by_field` property must be defined in the Model's Field objects.
+    - The `sort_by` property is only applicable when the `many` property is set to `true`.
+    - The field defined in the `sort_by` property must be defined in the Model's Field objects.
 
-### sort_option
+### sort_order
 
-The `sort_option` property is used to define the PHP sorting option for objects of the Model. When this property is set,
+The `sort_order` property is used to define the PHP sorting option for objects of the Model. When this property is set,
 objects created and updated will be sorted according to the assigned option. For valid sorting options, refer to: For valid value options for this property, refer to the
 [PHP multi-sort function type flags](https://www.php.net/manual/en/function.array-multisort.php).
 
 Example:
 
 ```php
-$this->sort_option = SORT_ASC;
+$this->sort_order = SORT_ASC;
 ```
 
 !!! Warning
     The use of sorting in a Model may cause IDs to be re-ordered when objects are created or updated.
 !!! Notes
-    - The `sort_option` property is only applicable when the `many` property is set to `true`.
-    - The `sort_option` property is only applicable when a `sort_by_field` is defined.
+    - The `sort_order` property is only applicable when the `many` property is set to `true`.
+    - The `sort_order` property is only applicable when a `sort_by` is defined.
 
 ### subsystem
 

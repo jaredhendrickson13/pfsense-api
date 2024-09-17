@@ -196,21 +196,21 @@ class NestedModelField extends Field {
     }
 
     /**
-     * Sorts the nested Model data use the nested Model's `sort_option` and `sort_by` setting. This method
+     * Sorts the nested Model data use the nested Model's `sort_order` and `sort_by` setting. This method
      * closely resembles the Model->sort() method, but does not require values to be set in config beforehand.
      */
     public function sort(): void {
         # Only sort this Field's values if this is a `many` field and it has a value
         if ($this->many and $this->value) {
-            # Do not sort if there is no `sort_option` or `sort_by` set for this nested Model
-            if (!$this->model->sort_option or !$this->model->sort_by) {
+            # Do not sort if there is no `sort_order` or `sort_by` set for this nested Model
+            if (!$this->model->sort_order or !$this->model->sort_by) {
                 return;
             }
 
             # Sort the nested Model objects by the specified field
             $this->modelset = $this->modelset->sort(
                 fields: $this->model->sort_by,
-                order: $this->model->sort_option,
+                order: $this->model->sort_order,
             );
 
             # Re-assign the sorted values to this Field
