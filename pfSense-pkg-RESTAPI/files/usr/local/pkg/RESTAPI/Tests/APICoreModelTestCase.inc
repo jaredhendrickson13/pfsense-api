@@ -1063,16 +1063,13 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $alias_4->create();
 
         # Ensure the aliases are not sorted yet
-        $this->assert_equals(
-            FirewallAlias::read_all()->to_representation(),
-            [
-                $alias_0->to_representation(),
-                $alias_1->to_representation(),
-                $alias_2->to_representation(),
-                $alias_3->to_representation(),
-                $alias_4->to_representation(),
-            ],
-        );
+        $this->assert_equals(FirewallAlias::read_all()->to_representation(), [
+            $alias_0->to_representation(),
+            $alias_1->to_representation(),
+            $alias_2->to_representation(),
+            $alias_3->to_representation(),
+            $alias_4->to_representation(),
+        ]);
 
         # Ensure the aliases are sorted by name when creating the fifth alias
         $alias_5->sort_by = ['name'];
@@ -1080,17 +1077,14 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $alias_5->create();
 
         # Ensure the aliases are now sorted
-        $this->assert_equals(
-            FirewallAlias::read_all()->to_internal(),
-            [
-                $alias_2->to_internal(),
-                $alias_3->to_internal(),
-                $alias_1->to_internal(),
-                $alias_4->to_internal(),
-                $alias_5->to_internal(),
-                $alias_0->to_internal(),
-            ]
-        );
+        $this->assert_equals(FirewallAlias::read_all()->to_internal(), [
+            $alias_2->to_internal(),
+            $alias_3->to_internal(),
+            $alias_1->to_internal(),
+            $alias_4->to_internal(),
+            $alias_5->to_internal(),
+            $alias_0->to_internal(),
+        ]);
 
         # Delete all the aliases
         FirewallAlias::delete_all();
@@ -1117,17 +1111,14 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $alias_5->create();
 
         # Ensure the aliases are not sorted yet
-        $this->assert_equals(
-            FirewallAlias::read_all()->to_representation(),
-            [
-                $alias_0->to_representation(),
-                $alias_1->to_representation(),
-                $alias_2->to_representation(),
-                $alias_3->to_representation(),
-                $alias_4->to_representation(),
-                $alias_5->to_representation(),
-            ],
-        );
+        $this->assert_equals(FirewallAlias::read_all()->to_representation(), [
+            $alias_0->to_representation(),
+            $alias_1->to_representation(),
+            $alias_2->to_representation(),
+            $alias_3->to_representation(),
+            $alias_4->to_representation(),
+            $alias_5->to_representation(),
+        ]);
 
         # Ensure the aliases are sorted by name when updating the alias
         $alias_2->sort_by = ['name'];
@@ -1137,17 +1128,14 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $alias_2->name->value = 'yyy';
         $alias_2->name->editable = true; # Allow the name to be updated for this test
         $alias_2->update();
-        $this->assert_equals(
-            FirewallAlias::read_all()->to_internal(),
-            [
-                $alias_3->to_internal(),
-                $alias_1->to_internal(),
-                $alias_4->to_internal(),
-                $alias_5->to_internal(),
-                $alias_2->to_internal(),
-                $alias_0->to_internal(),
-            ]
-        );
+        $this->assert_equals(FirewallAlias::read_all()->to_internal(), [
+            $alias_3->to_internal(),
+            $alias_1->to_internal(),
+            $alias_4->to_internal(),
+            $alias_5->to_internal(),
+            $alias_2->to_internal(),
+            $alias_0->to_internal(),
+        ]);
 
         # Ensure $alias_2's ID was updated to reflect the new order
         $this->assert_equals($alias_2->id, 4);
@@ -1163,29 +1151,24 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $alias = new FirewallAlias();
         $alias->sort_by = ['name'];
         $alias->sort_order = SORT_ASC;
-        $alias->replace_all(
-            [
-                ['name' => 'zzz', 'type' => 'host'],
-                ['name' => 'ccc', 'type' => 'host'],
-                ['name' => 'aaa', 'type' => 'host'],
-                ['name' => 'bbb', 'type' => 'host'],
-                ['name' => 'ddd', 'type' => 'host'],
-                ['name' => 'fff', 'type' => 'host'],
-            ],
-        );
+        $alias->replace_all([
+            ['name' => 'zzz', 'type' => 'host'],
+            ['name' => 'ccc', 'type' => 'host'],
+            ['name' => 'aaa', 'type' => 'host'],
+            ['name' => 'bbb', 'type' => 'host'],
+            ['name' => 'ddd', 'type' => 'host'],
+            ['name' => 'fff', 'type' => 'host'],
+        ]);
 
         # Ensure the aliases are sorted by name
-        $this->assert_equals(
-            FirewallAlias::read_all()->to_internal(),
-            [
-                ['name' => 'aaa', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
-                ['name' => 'bbb', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
-                ['name' => 'ccc', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
-                ['name' => 'ddd', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
-                ['name' => 'fff', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
-                ['name' => 'zzz', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
-            ],
-        );
+        $this->assert_equals(FirewallAlias::read_all()->to_internal(), [
+            ['name' => 'aaa', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+            ['name' => 'bbb', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+            ['name' => 'ccc', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+            ['name' => 'ddd', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+            ['name' => 'fff', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+            ['name' => 'zzz', 'type' => 'host', 'descr' => '', 'address' => '', 'detail' => ''],
+        ]);
 
         # Delete all the aliases
         FirewallAlias::delete_all();

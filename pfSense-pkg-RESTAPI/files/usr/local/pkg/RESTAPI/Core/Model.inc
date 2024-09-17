@@ -1635,9 +1635,7 @@ class Model {
         $id_found = false;
         foreach ($modelset->model_objects as $id => $sorted_model_object) {
             # Assign the internal object to the internal objects array
-            $internal_objects[] = $this->get_config(
-                $sorted_model_object->get_config_path()
-            )[$sorted_model_object->id];
+            $internal_objects[] = $this->get_config($sorted_model_object->get_config_path())[$sorted_model_object->id];
 
             # If the sorted object's ID matches this object's ID, update this object's ID.
             if (!$id_found and $this->id === $sorted_model_object->id) {

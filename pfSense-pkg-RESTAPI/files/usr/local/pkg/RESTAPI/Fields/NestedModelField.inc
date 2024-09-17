@@ -208,10 +208,7 @@ class NestedModelField extends Field {
             }
 
             # Sort the nested Model objects by the specified field
-            $this->modelset = $this->modelset->sort(
-                fields: $this->model->sort_by,
-                order: $this->model->sort_order,
-            );
+            $this->modelset = $this->modelset->sort(fields: $this->model->sort_by, order: $this->model->sort_order);
 
             # Re-assign the sorted values to this Field
             $this->value = $this->modelset->to_representation();

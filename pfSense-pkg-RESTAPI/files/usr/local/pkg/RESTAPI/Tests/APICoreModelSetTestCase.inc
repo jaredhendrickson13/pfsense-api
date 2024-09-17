@@ -380,8 +380,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures multi-field sorts work as expected.
      */
-    public function test_sort_multiple_fields(): void
-    {
+    public function test_sort_multiple_fields(): void {
         # Add DNS Resolver host overrides to test this
         $host_1 = new DNSResolverHostOverride(host: 'a', domain: 'a.example.com', ip: ['127.0.0.1']);
         $host_2 = new DNSResolverHostOverride(host: 'b', domain: 'a.example.com', ip: ['127.35.0.2']);
@@ -398,21 +397,42 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         shuffle($modelset->model_objects);
 
         # Sort the ModelSet by the host and domain fields in ascending order and ensure the order is correct
-        $this->assert_equals(
-            $modelset->sort(['host', 'domain'])->model_objects,
-            [$host_1, $host_4, $host_7, $host_2, $host_5, $host_8, $host_3, $host_6, $host_9],
-        );
+        $this->assert_equals($modelset->sort(['host', 'domain'])->model_objects, [
+            $host_1,
+            $host_4,
+            $host_7,
+            $host_2,
+            $host_5,
+            $host_8,
+            $host_3,
+            $host_6,
+            $host_9,
+        ]);
 
         # Sort the ModelSet by the domain and host fields in descending order and ensure the order is correct
-        $this->assert_equals(
-            $modelset->sort(['domain', 'host'], order: SORT_DESC)->model_objects,
-            [$host_9, $host_8, $host_7, $host_6, $host_5, $host_4, $host_3, $host_2, $host_1],
-        );
+        $this->assert_equals($modelset->sort(['domain', 'host'], order: SORT_DESC)->model_objects, [
+            $host_9,
+            $host_8,
+            $host_7,
+            $host_6,
+            $host_5,
+            $host_4,
+            $host_3,
+            $host_2,
+            $host_1,
+        ]);
 
         # Sort the ModelSet by domain and ip fields in ascending order and ensure the order is correct
-        $this->assert_equals(
-            $modelset->sort(['domain', 'ip'])->model_objects,
-            [$host_1, $host_3, $host_2, $host_4, $host_6, $host_5, $host_7, $host_8, $host_9],
-        );
+        $this->assert_equals($modelset->sort(['domain', 'ip'])->model_objects, [
+            $host_1,
+            $host_3,
+            $host_2,
+            $host_4,
+            $host_6,
+            $host_5,
+            $host_7,
+            $host_8,
+            $host_9,
+        ]);
     }
 }
