@@ -1128,7 +1128,6 @@ class Endpoint {
         # Allow the endpoint/client to override the Model's sort_by and sort_order properties
         $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
         $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
-        echo $this->model->sort_order;
 
         # Update the object and return it
         return $this->model->update(
