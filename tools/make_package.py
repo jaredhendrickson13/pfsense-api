@@ -68,6 +68,7 @@ class MakePackage:
 
         # Set Jijna2 environment and variables
         j2_env = jinja2.Environment(
+            autoescape=jinja2.select_autoescape(None),
             loader=jinja2.FileSystemLoader(searchpath=str(template_dir))
         )
         j2_env.filters["dirname"] = self.dirname
@@ -97,12 +98,12 @@ class MakePackage:
 
     def run_ssh_cmd(self, cmd):
         """Formats the SSH command to use when building on remote hosts."""
-        ssh_cmd = f"ssh {self.args.username}@{self.args.host} '{cmd}'"
+        ssh_cmd = ['ssh', f'{self.args.username}@{self.args.host}', f'"{cmd}"']
         return subprocess.call(ssh_cmd, shell=True)
 
     def run_scp_cmd(self, src, dst, recurse=False):
         """Formats the SCP command to use when copying over the built package."""
-        scp_cmd = f"scp {'-r' if recurse else ''} {src} {dst}"
+        scp_cmd = ['scp', '-r' if recurse else '', src, dst]
         return subprocess.call(scp_cmd, shell=True)
 
     def build_package(self, pkg_dir):
