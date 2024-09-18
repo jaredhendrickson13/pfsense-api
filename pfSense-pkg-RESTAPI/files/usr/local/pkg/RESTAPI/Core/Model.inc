@@ -22,6 +22,7 @@ use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
+use RESTAPI\Responses\ServiceUnavailableError;
 use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
@@ -36,6 +37,11 @@ const DEFAULT_CLIENT_IP_ADDRESS = '127.0.0.1';
  */
 class Model {
     use BaseTraits;
+
+    /**
+     * @const string $READ_LOCK_FILE
+     */
+    const WRITE_LOCK_FILE = '/tmp/.RESTAPI.write_config.lock';
 
     /**
      * @var string|null $config_path
@@ -631,17 +637,15 @@ class Model {
     /**
      * Write configuration changes to the config file
      * @param string $change_note The message to write to the change log.
+     * @param int $attempts The number of write attempts to make before giving up in the event that a lock is present.
      */
-    final protected function write_config(string $change_note) {
-        # Local variables
-        $lock_file = '/tmp/.RESTAPI.write_config.lock';
-
+    final public function write_config(string $change_note, int $attempts = 60): void {
         # Ensure there is not an API config lock, loop until the lock is released
-        foreach (range(0, 60) as $attempt) {
+        foreach (range(0, $attempts) as $attempt) {
             # Only write to the config if there is not an active lock
-            if (!file_exists($lock_file)) {
+            if (!file_exists(self::WRITE_LOCK_FILE)) {
                 # Create a lock on API config writes while we write changes
-                file_put_contents($lock_file, microtime());
+                file_put_contents(self::WRITE_LOCK_FILE, microtime());
 
                 # Start a temporary session to write the config that contains the user's username in the config history
                 session_start();
@@ -656,13 +660,19 @@ class Model {
                 }
 
                 # Remove the temporary session and write lock
-                unlink($lock_file);
+                unlink(self::WRITE_LOCK_FILE);
                 return;
             }
 
             # Delay attempts by 1 second
             sleep(1);
         }
+
+        # If the lock was not released after the attempts, throw an error
+        throw new ServiceUnavailableError(
+            message: 'Failed to write to the configuration file after multiple attempts.',
+            response_id: 'MODEL_WRITE_CONFIG_LOCKED',
+        );
     }
 
     /**

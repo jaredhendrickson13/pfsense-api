@@ -1173,4 +1173,28 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         # Delete all the aliases
         FirewallAlias::delete_all();
     }
+
+    /**
+     * Ensure an error is thrown if the write lock is not released after all write_config() attempts are exhausted.
+     */
+    public function test_write_lock_not_released(): void {
+        # Set the write lock
+        touch(Model::WRITE_LOCK_FILE);
+
+        # Ensure an error is thrown if the write lock is not released after all write_config() attempts are exhausted
+        $this->assert_throws_response(
+            response_id: 'MODEL_WRITE_CONFIG_LOCKED',
+            code: 503,
+            callable: function () {
+                # Create a new model object to test with
+                $test_model = new Model();
+
+                # Attempt to write the config
+                $test_model->write_config(change_note: 'test', attempts: 1);
+            },
+        );
+
+        # Remove the write lock
+        unlink(Model::WRITE_LOCK_FILE);
+    }
 }
