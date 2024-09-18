@@ -37,7 +37,7 @@ class Resolver {
                 offset: $args['offset'],
                 reverse: $args['reverse'],
                 sort_by: $args['sort_by'],
-                sort_order: $args['sort_order'],
+                sort_order: $args['sort_order'] ?? SORT_ASC,
             );
 
             # Return the query results in an array representation

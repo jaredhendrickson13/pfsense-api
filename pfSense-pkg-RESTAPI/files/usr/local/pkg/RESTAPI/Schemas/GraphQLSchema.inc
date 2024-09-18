@@ -435,10 +435,9 @@ class GraphQLSchema extends Schema {
                         'description' => 'The fields to sort the returned objects by.',
                     ],
                     'sort_order' => [
-                        'nullable' => true,
-                        'description' => 'The order to use when sorting.',
                         'type' => Type::int(),
                         'defaultValue' => SORT_ASC,
+                        'description' => 'The order to use when sorting.',
                     ],
                 ],
             ],
