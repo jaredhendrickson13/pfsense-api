@@ -29,7 +29,8 @@ class IPAddressValidator extends RESTAPI\Core\Validator {
         public bool $allow_fqdn = false,
         public bool $allow_port = false,
         public array $allow_keywords = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Checks if a given value is a valid IP address.

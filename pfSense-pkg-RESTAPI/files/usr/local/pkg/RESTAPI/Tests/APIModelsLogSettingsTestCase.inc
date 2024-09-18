@@ -5,8 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\LogSettings;
 
-class APIModelsLogSettingsTestCase extends TestCase
-{
+class APIModelsLogSettingsTestCase extends TestCase {
     /**
      * Ensure we can update and read the LogSettings model.
      */
@@ -17,7 +16,7 @@ class APIModelsLogSettingsTestCase extends TestCase
             rotatecount: 6,
             enableremotelogging: true,
             remoteserver: '127.0.0.1:514',
-            logall: true
+            logall: true,
         );
 
         $log_settings->update();

@@ -247,8 +247,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase {
     /**
      * Checks that the IPAddressValidator 'allow_port' option works as expected.
      */
-    public function test_ip_address_validator_port_suffix()
-    {
+    public function test_ip_address_validator_port_suffix() {
         # Ensure socket addresses are valid when allowed
         $this->assert_does_not_throw(
             callable: function () {

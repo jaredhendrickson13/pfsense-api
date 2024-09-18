@@ -11,8 +11,7 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
-class LogSettings extends Model
-{
+class LogSettings extends Model {
     public StringField $format;
     public BooleanField $reverseorder;
     public IntegerField $nentries;
@@ -48,8 +47,7 @@ class LogSettings extends Model
     public BooleanField $routing;
     public BooleanField $ntpd;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options)
-    {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'syslog';
         $this->many = false;
@@ -107,7 +105,7 @@ class LogSettings extends Model
         $this->filterdescriptions = new IntegerField(
             default: 0,
             choices: [0, 1, 2],
-            help_text: 'Display filter descriptions in the log entries Use `0` to not load descriptions, `1` to '.
+            help_text: 'Display filter descriptions in the log entries Use `0` to not load descriptions, `1` to ' .
                 'display descriptions in their own column, or `2` to display the description in a second row.',
         );
         $this->logfilesize = new IntegerField(
@@ -266,11 +264,9 @@ class LogSettings extends Model
      * Checks if log settings related to the filter were changed
      */
     private function has_filter_log_changed(): bool {
-        return (
-            $this->nologdefaultblock->value !== $this->initial_object->nologdefaultblock->value or
+        return $this->nologdefaultblock->value !== $this->initial_object->nologdefaultblock->value or
             $this->nologdefaultpass->value !== $this->initial_object->nologdefaultpass->value or
             $this->nologbogons->value !== $this->initial_object->nologbogons->value or
-            $this->nologprivatenets->value !== $this->initial_object->nologprivatenets->value
-        );
+            $this->nologprivatenets->value !== $this->initial_object->nologprivatenets->value;
     }
 }
