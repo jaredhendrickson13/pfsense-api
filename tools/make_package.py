@@ -99,12 +99,12 @@ class MakePackage:
     def run_ssh_cmd(self, cmd):
         """Formats the SSH command to use when building on remote hosts."""
         ssh_cmd = ['ssh', f'{self.args.username}@{self.args.host}', f'"{cmd}"']
-        return subprocess.call(ssh_cmd, shell=True)
+        return subprocess.call(ssh_cmd, shell=False)
 
     def run_scp_cmd(self, src, dst, recurse=False):
         """Formats the SCP command to use when copying over the built package."""
         scp_cmd = ['scp', '-r' if recurse else '', src, dst]
-        return subprocess.call(scp_cmd, shell=True)
+        return subprocess.call(scp_cmd, shell=False)
 
     def build_package(self, pkg_dir):
         """Builds the package when the local system is FreeBSD."""
