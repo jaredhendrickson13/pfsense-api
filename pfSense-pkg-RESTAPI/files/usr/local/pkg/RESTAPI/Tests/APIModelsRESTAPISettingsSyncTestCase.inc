@@ -80,12 +80,12 @@ class APIModelsRESTAPISettingsSyncTestCase extends TestCase {
 
         # Read the syslog and ensure the synced failed
         # TODO: This test is flaky and needs to be reworked
-//        RESTAPISettingsSync::sync();
-//        $syslog = file_get_contents('/var/log/system.log');
-//        $this->assert_str_contains(
-//            $syslog,
-//            'Failed to sync REST API settings to example.com: received unexpected response.',
-//        );
+        //        RESTAPISettingsSync::sync();
+        //        $syslog = file_get_contents('/var/log/system.log');
+        //        $this->assert_str_contains(
+        //            $syslog,
+        //            'Failed to sync REST API settings to example.com: received unexpected response.',
+        //        );
 
         # Use a non-existent host as an HA peer and ensure the sync failed
         $api_settings->ha_sync_hosts->value = ['127.1.2.3'];
