@@ -101,9 +101,9 @@ class MakePackage:
         ssh_cmd = ["ssh", f"{self.args.username}@{self.args.host}", cmd]
         return subprocess.call(ssh_cmd, shell=False)
 
-    def run_scp_cmd(self, src, dst, recurse=False):
+    def run_scp_cmd(self, src, dst):
         """Formats the SCP command to use when copying over the built package."""
-        scp_cmd = ["scp", "-r" if recurse else "", src, dst]
+        scp_cmd = ["scp", src, dst]
         return subprocess.call(scp_cmd, shell=False)
 
     def build_package(self, pkg_dir):
