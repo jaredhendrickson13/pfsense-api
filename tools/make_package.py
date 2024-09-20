@@ -68,7 +68,7 @@ class MakePackage:
 
         # Set Jijna2 environment and variables
         j2_env = jinja2.Environment(
-            autoescape=jinja2.select_autoescape(None),
+            autoescape=jinja2.select_autoescape([]),
             loader=jinja2.FileSystemLoader(searchpath=str(template_dir)),
         )
         j2_env.filters["dirname"] = self.dirname
