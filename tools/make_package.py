@@ -98,7 +98,7 @@ class MakePackage:
 
     def run_ssh_cmd(self, cmd):
         """Formats the SSH command to use when building on remote hosts."""
-        ssh_cmd = ["ssh", f"{self.args.username}@{self.args.host}", f'"{cmd}"']
+        ssh_cmd = ["ssh", f"{self.args.username}@{self.args.host}", cmd]
         return subprocess.call(ssh_cmd, shell=False)
 
     def run_scp_cmd(self, src, dst, recurse=False):
