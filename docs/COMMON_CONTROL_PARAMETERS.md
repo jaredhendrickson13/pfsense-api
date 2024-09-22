@@ -75,6 +75,16 @@ parameters you can use:
   submitted in your request will be removed from the existing array values. This is useful when you want to remove
   specific values from an array field without needing to retrieve the existing values first.
 
+!!! Warning
+    If you set this parameter to `true`, it will apply to all array fields. You can't choose to remove to some array
+    fields and replace others at the same time. To work around this, first make a request with the data for the fields
+    you want to remove from. Then, make another request for the fields you want to replace.
+
+!!! Notes
+  - This parameter is only available for `PATCH` requests.
+  - This parameter is only applicable to array fields.
+  - If the submitted array values match the existing array values exactly, the API will not make any changes to that field to avoid removing all values unintentionally.
+
 ## reverse
 
 - Type: Boolean
