@@ -14,7 +14,7 @@ class ServicesBINDSyncRemoteHostEndpoint extends Endpoint {
     public function __construct() {
         # Set Endpoint attributes
         $this->url = '/api/v2/services/bind/sync/remote_host';
-        $this->model_name = 'BINDSync';
+        $this->model_name = 'BINDSyncRemoteHost';
         $this->request_method_options = ['GET', 'POST', 'PATCH', 'DELETE'];
 
         # Construct the parent Endpoint object
