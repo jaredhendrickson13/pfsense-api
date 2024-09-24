@@ -58,7 +58,7 @@ class BINDSettings extends Model {
             help_text: 'The IP version to use for the BIND service. Leave empty to use both IPv4 and IPv6.',
         );
         $this->listenon = new InterfaceField(
-            default: 'All',
+            default: ['All'],
             allow_localhost_interface: true,
             allow_custom: ['All'],
             many: true,
@@ -92,7 +92,7 @@ class BINDSettings extends Model {
             help_text: 'The minimum severity of events to log.',
         );
         $this->log_options = new StringField(
-            default: 'default',
+            default: ['default'],
             choices: [
                 'default',
                 'general',
@@ -154,11 +154,11 @@ class BINDSettings extends Model {
             help_text: 'Enable DNSSEC validation when BIND is acting as a recursive resolver.',
         );
         $this->listenport = new PortField(
-            default: 53,
+            default: '53',
             help_text: 'The TCP and UDP port to listen on for DNS requests.',
         );
         $this->controlport = new PortField(
-            default: 953,
+            default: '953',
             help_text: 'The TCP port to listen on for control requests (localhost only).',
         );
         $this->bind_custom_options = new Base64Field(
