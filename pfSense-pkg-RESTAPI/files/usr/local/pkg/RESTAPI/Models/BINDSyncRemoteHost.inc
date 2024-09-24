@@ -28,7 +28,7 @@ class BINDSyncRemoteHost extends Model {
         $this->config_path = 'row';
         $this->packages = ['pfSense-pkg-bind'];
         $this->package_includes = ['bind.inc'];
-        $this->many = false;
+        $this->many = true;
         $this->always_apply = true;
 
         # Set model fields
