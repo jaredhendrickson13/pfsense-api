@@ -45,6 +45,7 @@ class BINDSync extends Model {
         $this->remotehosts = new NestedModelField(
             model_class: 'BINDSyncRemoteHost',
             default: [],
+            allow_empty: true,
             help_text: 'The remote hosts to sync with.',
         );
 
