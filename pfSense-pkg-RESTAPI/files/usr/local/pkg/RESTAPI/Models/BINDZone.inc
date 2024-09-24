@@ -21,7 +21,7 @@ class BINDZone extends Model {
     public StringField $description;
     public StringField $type;
     public ForeignModelField $view;
-    public BooleanField $reverse;
+    public BooleanField $reversev4;
     public BooleanField $reversev6;
     public BooleanField $rpz;
     public Base64Field $custom;
@@ -76,7 +76,7 @@ class BINDZone extends Model {
             many: true,
             help_text: 'The views this BIND zone belongs to.',
         );
-        $this->reverse = new BooleanField(
+        $this->reversev4 = new BooleanField(
             default: false,
             indicates_true: 'on',
             internal_name: 'reverso',
