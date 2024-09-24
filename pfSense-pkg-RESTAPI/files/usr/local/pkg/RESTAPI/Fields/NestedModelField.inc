@@ -62,7 +62,7 @@ class NestedModelField extends Field {
         # Assign attributes specific to this Field
         $this->model_class = "\\RESTAPI\\Models\\$model_class";
         $this->model_class_short = $model_class;
-        $this->model = new $this->model_class();
+        $this->model = new $this->model_class(skip_init: true);
         $config_path = explode('/', $this->model->config_path);
 
         # Initialize the validation ModelSet. This is used to keep track of nested Model objects that have already
@@ -171,7 +171,7 @@ class NestedModelField extends Field {
     public function from_internal(mixed $internal_value): void {
         # Variables
         $representations = [];
-        $model = new $this->model_class();
+        $model = new $this->model_class(skip_init: true);
         $this->modelset->model_objects = [];
 
         # For `many` Models, loop through each value and convert it to its representation value
@@ -190,7 +190,7 @@ class NestedModelField extends Field {
         }
         # Otherwise, just convert the one object
         else {
-            $object = new $this->model_class();
+            $object = new $this->model_class(skip_init: true);
             $this->value = $object->to_representation();
         }
     }
