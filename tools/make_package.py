@@ -68,7 +68,8 @@ class MakePackage:
 
         # Set Jijna2 environment and variables
         j2_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(searchpath=str(template_dir))
+            autoescape=jinja2.select_autoescape([]),
+            loader=jinja2.FileSystemLoader(searchpath=str(template_dir)),
         )
         j2_env.filters["dirname"] = self.dirname
         plist_template = j2_env.get_template("pkg-plist.j2")
@@ -97,13 +98,13 @@ class MakePackage:
 
     def run_ssh_cmd(self, cmd):
         """Formats the SSH command to use when building on remote hosts."""
-        ssh_cmd = f"ssh {self.args.username}@{self.args.host} '{cmd}'"
-        return subprocess.call(ssh_cmd, shell=True)
+        ssh_cmd = ["ssh", f"{self.args.username}@{self.args.host}", cmd]
+        return subprocess.call(ssh_cmd, shell=False)
 
-    def run_scp_cmd(self, src, dst, recurse=False):
+    def run_scp_cmd(self, src, dst):
         """Formats the SCP command to use when copying over the built package."""
-        scp_cmd = f"scp {'-r' if recurse else ''} {src} {dst}"
-        return subprocess.call(scp_cmd, shell=True)
+        scp_cmd = ["scp", src, dst]
+        return subprocess.call(scp_cmd, shell=False)
 
     def build_package(self, pkg_dir):
         """Builds the package when the local system is FreeBSD."""
