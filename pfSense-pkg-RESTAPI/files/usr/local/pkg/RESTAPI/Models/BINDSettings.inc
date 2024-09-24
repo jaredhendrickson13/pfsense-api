@@ -38,7 +38,7 @@ class BINDSettings extends Model {
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
-        $this->config_path = 'installedpackages/bind/config';
+        $this->config_path = 'installedpackages/bind/config/0';
         $this->packages = ['pfSense-pkg-bind'];
         $this->package_includes = ['bind.inc'];
         $this->many = false;
@@ -53,7 +53,7 @@ class BINDSettings extends Model {
         );
         $this->bind_ip_version = new StringField(
             default: '',
-            choices: ['-4', '-6'],
+            choices: ['', '-4', '-6'],
             allow_empty: true,
             help_text: 'The IP version to use for the BIND service. Leave empty to use both IPv4 and IPv6.',
         );
@@ -61,6 +61,7 @@ class BINDSettings extends Model {
             default: 'All',
             allow_localhost_interface: true,
             allow_custom: ['All'],
+            many: true,
             help_text: 'The interfaces to listen on for DNS requests.',
         );
         $this->bind_notify = new BooleanField(
