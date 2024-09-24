@@ -7,11 +7,9 @@ use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Fields\UIDField;
 use RESTAPI\Fields\UnixTimeField;
 use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\NotAcceptableError;
-use RESTAPI\Validators\RegexValidator;
 
 /**
  * Defines a Model for interacting with certificates revoked by a certificate revocation list.

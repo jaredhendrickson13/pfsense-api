@@ -6,7 +6,6 @@ use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\BINDApplyDispatcher;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Validators\SubnetValidator;
 
 /**
  * Defines a model that interacts with BIND zone records.

@@ -5,8 +5,6 @@ namespace RESTAPI\Models;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\BINDApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
-use RESTAPI\Fields\IntegerField;
-use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
