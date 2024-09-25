@@ -43,6 +43,7 @@ class BINDView extends Model {
             default: [],
             allow_empty: true,
             many: true,
+            internal_name: 'match-clients',
             help_text: 'The access lists to match clients against.',
         );
         $this->allow_recursion = new ForeignModelField(
@@ -51,12 +52,12 @@ class BINDView extends Model {
             default: [],
             allow_empty: true,
             many: true,
+            internal_name: 'allow-recursion',
             help_text: 'The access lists to allow recursion for.',
         );
         $this->bind_custom_options = new Base64Field(
-            default: [],
+            default: '',
             allow_empty: true,
-            many: true,
             help_text: 'Custom BIND options for the view.',
         );
 
