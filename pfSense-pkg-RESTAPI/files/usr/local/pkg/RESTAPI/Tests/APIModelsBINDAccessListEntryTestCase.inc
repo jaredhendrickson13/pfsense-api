@@ -6,8 +6,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\BINDAccessList;
 use RESTAPI\Models\BINDAccessListEntry;
 
-class APIModelsBINDAccessListEntryTestCase extends TestCase
-{
+class APIModelsBINDAccessListEntryTestCase extends TestCase {
     public array $required_packages = ['pfSense-pkg-bind'];
     public BINDAccessList $bind_acl;
 
@@ -20,7 +19,7 @@ class APIModelsBINDAccessListEntryTestCase extends TestCase
             async: false,
             name: 'test_acl',
             description: 'A test access list.',
-            entries: [['value' => '127.0.0.1/32']]
+            entries: [['value' => '127.0.0.1/32']],
         );
         $this->bind_acl->create(apply: true);
     }
@@ -35,14 +34,13 @@ class APIModelsBINDAccessListEntryTestCase extends TestCase
     /**
      * Check that we can create, read, update and delete BIND access list entries.
      */
-    public function test_crud(): void
-    {
+    public function test_crud(): void {
         # Create a new access list entry
         $bind_acl_entry = new BINDAccessListEntry(
             parent_id: $this->bind_acl->id,
             async: false,
             value: '1.2.3.4/32',
-            description: 'A test entry.'
+            description: 'A test entry.',
         );
         $bind_acl_entry->create(apply: true);
 
