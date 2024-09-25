@@ -13,7 +13,7 @@ use RESTAPI\Fields\StringField;
 class BINDAccessList extends Model {
     public StringField $name;
     public StringField $description;
-    public NestedModelField $row;
+    public NestedModelField $entries;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
@@ -30,10 +30,9 @@ class BINDAccessList extends Model {
             allow_empty: true,
             help_text: 'A description for the access list.',
         );
-        $this->row = new NestedModelField(
+        $this->entries = new NestedModelField(
             model_class: 'BINDAccessListEntry',
-            default: [],
-            allow_empty: true,
+            required: true,
             help_text: 'The network entries for this access list.',
         );
 
