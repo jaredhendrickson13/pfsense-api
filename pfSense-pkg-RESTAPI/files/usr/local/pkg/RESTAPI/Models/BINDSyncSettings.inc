@@ -5,22 +5,20 @@ namespace RESTAPI\Models;
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\BINDApplyDispatcher;
 use RESTAPI\Fields\IntegerField;
-use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**
  * Defines a model for interacting with the BIND sync settings.
  */
-class BINDSync extends Model {
+class BINDSyncSettings extends Model {
     public StringField $synconchanges;
     public IntegerField $synctimeout;
     public StringField $masterip;
-    public NestedModelField $remotehosts;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
-        $this->config_path = 'installedpackages/bindsync/config';
+        $this->config_path = 'installedpackages/bindsync/config/0';
         $this->packages = ['pfSense-pkg-bind'];
         $this->package_includes = ['bind.inc'];
         $this->many = false;
@@ -41,12 +39,6 @@ class BINDSync extends Model {
             required: true,
             validators: [new IPAddressValidator(allow_fqdn: true)],
             help_text: 'The IP address of the master BIND server.',
-        );
-        $this->remotehosts = new NestedModelField(
-            model_class: 'BINDSyncRemoteHost',
-            default: [],
-            allow_empty: true,
-            help_text: 'The remote hosts to sync with.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);

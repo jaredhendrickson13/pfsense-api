@@ -22,8 +22,7 @@ class BINDSyncRemoteHost extends Model {
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
-        $this->parent_model_class = 'BINDSync';
-        $this->config_path = 'row';
+        $this->config_path = 'installedpackages/bindsync/config/0/row';
         $this->packages = ['pfSense-pkg-bind'];
         $this->package_includes = ['bind.inc'];
         $this->many = true;
