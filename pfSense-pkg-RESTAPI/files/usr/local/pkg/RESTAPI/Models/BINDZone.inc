@@ -10,6 +10,7 @@ use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 
 /**
@@ -151,10 +152,12 @@ class BINDZone extends Model {
         $this->mail = new StringField(
             required: true,
             conditions: ['type' => ['master', 'redirect']],
-            help_text: 'The SOA email address (RNAME) for this zone.',
+            validators: [new HostnameValidator(allow_fqdn: true)],
+            help_text: 'The SOA email address (RNAME) for this zone. This must be in an FQDN format.',
         );
         $this->serial = new IntegerField(
             required: true,
+            unique: true,
             conditions: ['type' => ['master', 'redirect']],
             help_text: 'The SOA serial number for this zone.',
         );
