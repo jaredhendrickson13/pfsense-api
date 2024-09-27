@@ -18,6 +18,7 @@ class Certificate extends Model {
     public StringField $descr;
     public UIDField $refid;
     public StringField $type;
+    public Base64Field $csr;
     public Base64Field $crt;
     public Base64Field $prv;
 
@@ -42,6 +43,12 @@ class Certificate extends Model {
             help_text: 'The certificate type. Use `server` when this certificate is to be used by one or more ' .
                 'services on this system. Use `user` when this certificate is intended to be assigned to a user for ' .
                 'authentication purposes.',
+        );
+        $this->csr = new Base64Field(
+            default: null,
+            allow_null: true,
+            read_only: true,
+            help_text: 'The X509 certificate signing request string if this certificate is pending an external signature.',
         );
         $this->crt = new Base64Field(
             required: true,
@@ -74,6 +81,15 @@ class Certificate extends Model {
         }
 
         return $prv;
+    }
+
+    /**
+     * Extends the default _update() method to ensure any `csr` value is removed before updating a Certificate.
+     */
+    public function _update(): void {
+        # Remove the `csr` field value before updating the Certificate.
+        $this->csr->value = null;
+        parent::_update();
     }
 
     /**
