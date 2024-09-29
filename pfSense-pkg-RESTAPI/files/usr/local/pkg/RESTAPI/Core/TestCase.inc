@@ -100,6 +100,7 @@ class TestCase {
     public function install_packages(): void {
         foreach ($this->required_packages as $package) {
             new Command("pkg install -y $package");
+            Model::reload_config(true);
         }
     }
 

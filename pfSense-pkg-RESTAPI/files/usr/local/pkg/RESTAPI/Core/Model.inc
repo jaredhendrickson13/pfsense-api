@@ -679,7 +679,7 @@ class Model {
      * Reloads the configuration to include any changes that may have occurred since the last config reload
      * @param bool $force_parse Force an entire reparse of the config.xml file instead of the cached config.
      */
-    public function reload_config(bool $force_parse = false): void {
+    public static function reload_config(bool $force_parse = false): void {
         global $config;
         $config = parse_config(parse: $force_parse);
     }
