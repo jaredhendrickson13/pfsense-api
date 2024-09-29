@@ -8,6 +8,7 @@ use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
+use RESTAPI\ModelTraits\CertificateModelTraits;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\HostnameValidator;
@@ -19,6 +20,8 @@ use RESTAPI\Validators\URLValidator;
  * Defines a Model for generating new CSRs.
  */
 class CertificateSigningRequest extends Model {
+    use CertificateModelTraits;
+
     public StringField $descr;
     public UIDField $refid;
     public IntegerField $serial;
@@ -174,7 +177,6 @@ class CertificateSigningRequest extends Model {
             default: null,
             allow_null: true,
             read_only: true,
-            write_only: true,
             sensitive: true,
             help_text: 'The X509 private key string.',
         );
@@ -183,98 +185,21 @@ class CertificateSigningRequest extends Model {
     }
 
     /**
-     * Returns a list of available elliptic curve names for ECDSA key pairs.
-     * @returns array The list of available elliptic curve names.
-     */
-    public static function get_ecname_choices(): array {
-        # Obtain the available curve list from pfSense's built-in cert_build_curve_list function
-        return array_keys(cert_build_curve_list());
-    }
-
-    /**
-     * Returns a list of available digest algorithms for signing certificates.
-     * @returns array The list of available digest algorithms.
-     */
-    public static function get_digest_alg_choices(): array {
-        # Obtain the available digest algorithms from pfSense's built-in $openssl_digest_algs global
-        global $openssl_digest_algs;
-        return $openssl_digest_algs;
-    }
-
-    /**
-     * Returns a list of available country codes for the certificate.
-     * @returns array The list of available country codes.
-     */
-    public static function get_country_choices(): array {
-        # Obtain the available country codes from pfSense's built-in get_cert_country_codes function
-        return array_keys(get_cert_country_codes());
-    }
-
-    /**
      * Extends the default _create method to ensure the certificate is generated before it is written to config.
      */
     protected function _create(): void {
         # Generate the certificate
-        $this->generate_cert();
+        $this->generate_csr();
 
         # Call the parent _create method to write the certificate to config
         parent::_create();
     }
 
     /**
-     * Converts this Certificate object's DN values into a X509 DN array.
-     * @returns array The X509 DN array.
-     */
-    private function to_x509_dn(): array {
-        # Define static DN values
-        $dn = ['commonName' => $this->dn_commonname->value, 'subjectAltName' => []];
-
-        # Add countryName if it was given
-        if ($this->dn_country->value) {
-            $dn['countryName'] = $this->dn_country->value;
-        }
-        # Add stateOrProvinceName if it was given
-        if ($this->dn_state->value) {
-            $dn['stateOrProvinceName'] = $this->dn_state->value;
-        }
-        # Add localityName if it was given
-        if ($this->dn_city->value) {
-            $dn['localityName'] = $this->dn_city->value;
-        }
-        # Add organizationName if it was given
-        if ($this->dn_organization->value) {
-            $dn['organizationName'] = $this->dn_organization->value;
-        }
-        # Add organizationalUnitName if it was given
-        if ($this->dn_organizationalunit->value) {
-            $dn['organizationalUnitName'] = $this->dn_organizationalunit->value;
-        }
-
-        # Loop through the SAN fields and add them to the subjectAltName array accordingly
-        foreach ($this->dn_dns_sans->value as $san) {
-            $dn['subjectAltName'][] = "DNS:$san";
-        }
-        foreach ($this->dn_email_sans->value as $san) {
-            $dn['subjectAltName'][] = "email:$san";
-        }
-        foreach ($this->dn_ip_sans->value as $san) {
-            $dn['subjectAltName'][] = "IP:$san";
-        }
-        foreach ($this->dn_uri_sans->value as $san) {
-            $dn['subjectAltName'][] = "URI:$san";
-        }
-
-        # Piece together the subjectAltName array into a comma-separated string
-        $dn['subjectAltName'] = implode(',', $dn['subjectAltName']);
-
-        return $dn;
-    }
-
-    /**
      * Generates a new CSR and key using the requested parameters. This populate the `csr` and `prv` fields.
      * @throws ServerError When the CSR and key fails to be generated.
      */
-    private function generate_cert(): void {
+    private function generate_csr(): void {
         # Define a placeholder for csr_generate() to populate
         $csr = [];
 
@@ -282,7 +207,7 @@ class CertificateSigningRequest extends Model {
         $success = csr_generate(
             cert: $csr,
             keylen: $this->keylen->value,
-            dn: $this->to_x509_dn(),
+            dn: $this->to_x509_dn($this),
             type: $this->type->value,
             digest_alg: $this->digest_alg->value,
             keytype: $this->keytype->value,

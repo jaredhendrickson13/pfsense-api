@@ -9,6 +9,7 @@ use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
+use RESTAPI\ModelTraits\CertificateModelTraits;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Validators\RegexValidator;
 
@@ -16,6 +17,8 @@ use RESTAPI\Validators\RegexValidator;
  * Defines a Model for generating internal and intermediate certificate authorities.
  */
 class CertificateAuthorityGenerate extends Model {
+    use CertificateModelTraits;
+
     public StringField $descr;
     public UIDField $refid;
     public BooleanField $trust;
@@ -171,34 +174,6 @@ class CertificateAuthorityGenerate extends Model {
     }
 
     /**
-     * Returns a list of available elliptic curve names for ECDSA key pairs.
-     * @returns array The list of available elliptic curve names.
-     */
-    public static function get_ecname_choices(): array {
-        # Obtain the available curve list from pfSense's built-in cert_build_curve_list function
-        return array_keys(cert_build_curve_list());
-    }
-
-    /**
-     * Returns a list of available digest algorithms for signing certificates.
-     * @returns array The list of available digest algorithms.
-     */
-    public static function get_digest_alg_choices(): array {
-        # Obtain the available digest algorithms from pfSense's built-in $openssl_digest_algs global
-        global $openssl_digest_algs;
-        return $openssl_digest_algs;
-    }
-
-    /**
-     * Returns a list of available country codes for the certificate authority.
-     * @returns array The list of available country codes.
-     */
-    public static function get_country_choices(): array {
-        # Obtain the available country codes from pfSense's built-in get_cert_country_codes function
-        return array_keys(get_cert_country_codes());
-    }
-
-    /**
      * Extends the default _create method to ensure the certificate is generated before it is written to config.
      */
     protected function _create(): void {
@@ -212,7 +187,7 @@ class CertificateAuthorityGenerate extends Model {
     /**
      * Apply CA changes to the OS trust store.
      */
-    public function apply() {
+    public function apply(): void {
         ca_setup_trust_store();
     }
 

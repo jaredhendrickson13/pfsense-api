@@ -8,6 +8,7 @@ use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
+use RESTAPI\ModelTraits\CertificateModelTraits;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Validators\EmailAddressValidator;
 use RESTAPI\Validators\HostnameValidator;
@@ -19,6 +20,8 @@ use RESTAPI\Validators\URLValidator;
  * Defines a Model for generating new Certificates.
  */
 class CertificateGenerate extends Model {
+    use CertificateModelTraits;
+
     public StringField $descr;
     public UIDField $refid;
     public IntegerField $serial;
@@ -181,41 +184,12 @@ class CertificateGenerate extends Model {
         $this->prv = new Base64Field(
             default: null,
             allow_null: true,
-            read_only: true,
             write_only: true,
             sensitive: true,
             help_text: 'The X509 private key string.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
-    }
-
-    /**
-     * Returns a list of available elliptic curve names for ECDSA key pairs.
-     * @returns array The list of available elliptic curve names.
-     */
-    public static function get_ecname_choices(): array {
-        # Obtain the available curve list from pfSense's built-in cert_build_curve_list function
-        return array_keys(cert_build_curve_list());
-    }
-
-    /**
-     * Returns a list of available digest algorithms for signing certificates.
-     * @returns array The list of available digest algorithms.
-     */
-    public static function get_digest_alg_choices(): array {
-        # Obtain the available digest algorithms from pfSense's built-in $openssl_digest_algs global
-        global $openssl_digest_algs;
-        return $openssl_digest_algs;
-    }
-
-    /**
-     * Returns a list of available country codes for the certificate.
-     * @returns array The list of available country codes.
-     */
-    public static function get_country_choices(): array {
-        # Obtain the available country codes from pfSense's built-in get_cert_country_codes function
-        return array_keys(get_cert_country_codes());
     }
 
     /**
@@ -227,55 +201,6 @@ class CertificateGenerate extends Model {
 
         # Call the parent _create method to write the certificate to config
         parent::_create();
-    }
-
-    /**
-     * Converts this Certificate object's DN values into a X509 DN array.
-     * @returns array The X509 DN array.
-     */
-    private function to_x509_dn(): array {
-        # Define static DN values
-        $dn = ['commonName' => $this->dn_commonname->value, 'subjectAltName' => []];
-
-        # Add countryName if it was given
-        if ($this->dn_country->value) {
-            $dn['countryName'] = $this->dn_country->value;
-        }
-        # Add stateOrProvinceName if it was given
-        if ($this->dn_state->value) {
-            $dn['stateOrProvinceName'] = $this->dn_state->value;
-        }
-        # Add localityName if it was given
-        if ($this->dn_city->value) {
-            $dn['localityName'] = $this->dn_city->value;
-        }
-        # Add organizationName if it was given
-        if ($this->dn_organization->value) {
-            $dn['organizationName'] = $this->dn_organization->value;
-        }
-        # Add organizationalUnitName if it was given
-        if ($this->dn_organizationalunit->value) {
-            $dn['organizationalUnitName'] = $this->dn_organizationalunit->value;
-        }
-
-        # Loop through the SAN fields and add them to the subjectAltName array accordingly
-        foreach ($this->dn_dns_sans->value as $san) {
-            $dn['subjectAltName'][] = "DNS:$san";
-        }
-        foreach ($this->dn_email_sans->value as $san) {
-            $dn['subjectAltName'][] = "email:$san";
-        }
-        foreach ($this->dn_ip_sans->value as $san) {
-            $dn['subjectAltName'][] = "IP:$san";
-        }
-        foreach ($this->dn_uri_sans->value as $san) {
-            $dn['subjectAltName'][] = "URI:$san";
-        }
-
-        # Piece together the subjectAltName array into a comma-separated string
-        $dn['subjectAltName'] = implode(',', $dn['subjectAltName']);
-
-        return $dn;
     }
 
     /**
@@ -291,7 +216,7 @@ class CertificateGenerate extends Model {
             cert: $cert,
             caref: $this->caref->value,
             lifetime: $this->lifetime->value,
-            dn: $this->to_x509_dn(),
+            dn: $this->to_x509_dn($this),
             type: $this->type->value,
             digest_alg: $this->digest_alg->value,
             keytype: $this->keytype->value,
