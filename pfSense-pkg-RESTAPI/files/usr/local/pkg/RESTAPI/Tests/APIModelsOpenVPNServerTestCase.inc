@@ -46,6 +46,7 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
             'dev_mode' => 'tun',
             'protocol' => 'UDP4',
             'interface' => 'wan',
+            'use_tls' => true,
             'tls' => $this->tls_key,
             'tls_type' => 'auth',
             'dh_length' => '2048',
