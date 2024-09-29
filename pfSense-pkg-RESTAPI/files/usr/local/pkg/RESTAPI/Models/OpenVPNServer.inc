@@ -662,7 +662,7 @@ class OpenVPNServer extends Model {
      */
     public function from_internal_use_tls(): bool {
         # We know TLS is enabled if we have a TLS key stored
-        return (bool)$this->tls->value;
+        return (bool) $this->tls->value;
     }
 
     /**
