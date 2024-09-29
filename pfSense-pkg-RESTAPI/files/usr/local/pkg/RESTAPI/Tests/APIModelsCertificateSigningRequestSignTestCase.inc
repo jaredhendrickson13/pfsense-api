@@ -3,7 +3,6 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\CertificateAuthority;
 use RESTAPI\Models\CertificateAuthorityGenerate;
 use RESTAPI\Models\CertificateSigningRequest;
 use RESTAPI\Models\CertificateSigningRequestSign;
