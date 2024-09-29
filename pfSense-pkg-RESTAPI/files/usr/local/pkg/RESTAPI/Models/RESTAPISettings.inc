@@ -33,6 +33,7 @@ class RESTAPISettings extends Model {
     public BooleanField $log_successful_auth;
     public BooleanField $allow_pre_releases;
     public BooleanField $hateoas;
+    public BooleanField $expose_sensitive_fields;
     public InterfaceField $allowed_interfaces;
     public StringField $represent_interfaces_as;
     public StringField $auth_methods;
@@ -109,6 +110,16 @@ class RESTAPISettings extends Model {
                 'resources in API responses. This is primarily useful for frontend web applications and self-navigating ' .
                 'client scripts that integrate with HAL standards. Enabling HATEOAS may increase API response times, ' .
                 'especially on systems with large configurations.',
+        );
+        $this->expose_sensitive_fields = new BooleanField(
+            default: false,
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
+            verbose_name: 'expose sensitive fields',
+            help_text: 'Enables or disables exposing sensitive fields in API responses. When enabled, sensitive fields ' .
+                'such as passwords, private keys, and other sensitive data will be included in API responses. This is ' .
+                'primarily useful for debugging and troubleshooting purposes, but should be disabled in production ' .
+                'environments to prevent sensitive data from being exposed.',
         );
         $this->allowed_interfaces = new InterfaceField(
             default: [],
