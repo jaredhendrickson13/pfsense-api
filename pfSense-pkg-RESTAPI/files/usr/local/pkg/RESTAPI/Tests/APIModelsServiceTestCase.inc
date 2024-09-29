@@ -17,7 +17,7 @@ class APIModelsServiceTestCase extends TestCase {
         foreach ($expected_services as $service) {
             $this->assert_is_true(
                 in_array($service, array_column(Service::get_services(), 'name')),
-                "Expected $service to be in the list of services"
+                "Expected $service to be in the list of services",
             );
         }
     }

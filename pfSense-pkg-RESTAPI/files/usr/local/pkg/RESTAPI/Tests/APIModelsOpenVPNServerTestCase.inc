@@ -441,9 +441,6 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
      * Checks that the 'generate_tls_key()' method correctly generates a new OpenVPN TLS key
      */
     public function test_generate_tls_key(): void {
-        $this->assert_str_contains(
-            OpenVPNServer::generate_tls_key(),
-            '-----BEGIN OpenVPN Static key V1-----',
-        );
+        $this->assert_str_contains(OpenVPNServer::generate_tls_key(), '-----BEGIN OpenVPN Static key V1-----');
     }
 }
