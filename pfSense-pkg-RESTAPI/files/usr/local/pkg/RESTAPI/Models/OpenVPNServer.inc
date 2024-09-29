@@ -170,7 +170,7 @@ class OpenVPNServer extends Model {
             help_text: 'The port used by OpenVPN to receive client connections.',
         );
         $this->tls = new Base64Field(
-            default: null,
+            default_callable: 'generate_tls_key',
             allow_null: true,
             help_text: 'The TLS key this OpenVPN server will use to sign control channel packets with an HMAC ' .
                 'signature for authentication when establishing the tunnel.',
@@ -646,6 +646,14 @@ class OpenVPNServer extends Model {
      */
     public function from_internal_vpnif(): string {
         return self::INTERFACE_PREFIX . $this->vpnid->value;
+    }
+
+    /**
+     * Generates a new OpenVPN TLS key.
+     * @return string The generated TLS key
+     */
+    public static function generate_tls_key(): string {
+        return openvpn_create_key();
     }
 
     /**
