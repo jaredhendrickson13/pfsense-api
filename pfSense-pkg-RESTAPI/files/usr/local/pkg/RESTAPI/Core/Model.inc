@@ -920,6 +920,9 @@ class Model {
     final public function to_representation(): array {
         # Variables
         $representation = [];
+        $pkg_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
+        $hateos_enabled = $pkg_config['hateoas'] === 'enabled';
+        $expose_sensitive_fields = $pkg_config['expose_sensitive_fields'] === 'enabled';
 
         # Embed this object's parent ID if set
         if (isset($this->parent_id)) {
@@ -933,14 +936,23 @@ class Model {
 
         # Loop through each of this Model's Fields and add its value to a serializable array
         foreach ($this->get_fields() as $field) {
-            # Only add this field if it is not a `write_only` field.
+            # Skip adding this field if it's a write only field
             if (!$this->$field->write_only) {
-                $representation[$field] = $this->$field->value;
+                continue;
             }
+
+            # Skip adding this field if it is sensitive and sensitive fields are not exposed
+            if ($this->$field->sensitive and !$expose_sensitive_fields) {
+                continue;
+            }
+
+            # Add this field's representation value to the representation array
+            $representation[$field] = $this->$field->value;
+
         }
 
         # Append any related HATEOAS links if HATEOAS is enabled
-        if (RESTAPI\Models\RESTAPISettings::get_pkg_config()['hateoas'] === 'enabled') {
+        if ($hateos_enabled) {
             $representation += $this->get_related_links()->to_representation();
         }
 
