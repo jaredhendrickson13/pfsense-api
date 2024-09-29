@@ -4,8 +4,7 @@ namespace RESTAPI\ModelTraits;
 
 use RESTAPI\Core\Model;
 
-trait CertificateModelTraits
-{
+trait CertificateModelTraits {
     /**
      * Returns a list of available elliptic curve names for ECDSA key pairs.
      * @returns array The list of available elliptic curve names.
