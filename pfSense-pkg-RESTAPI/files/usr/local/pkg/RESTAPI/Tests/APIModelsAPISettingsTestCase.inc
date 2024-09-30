@@ -5,6 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallRule;
 use RESTAPI\Models\RESTAPISettings;
+use RESTAPI\Models\User;
 use const RESTAPI\Models\API_SETTINGS_BACKUP_FILE_PATH;
 use const RESTAPI\Models\API_SETTINGS_BACKUP_NOT_CONFIGURED;
 use const RESTAPI\Models\API_SETTINGS_RESTORE_NO_BACKUP;
@@ -543,5 +544,28 @@ class APIModelsAPISettingsTestCase extends TestCase {
         # Ensure a Model's `to_representation()` method does not include the _links field if hateoas is disabled
         $rule = new FirewallRule(id: 0);
         $this->assert_is_false(array_key_exists('_links', $rule->to_representation()));
+    }
+
+    /**
+     * Checks that the `expose_sensitive_fields` field successfully enables or disables exposing sensitive fields in
+     * representations.
+     */
+    public function test_expose_sensitive_fields(): void
+    {
+        # Enable expose_sensitive_fields
+        $api_settings = new RESTAPISettings(expose_sensitive_fields: true);
+        $api_settings->update();
+
+        # Ensure sensitive fields now show in the Model's representation
+        $user = new User(id: 0);
+        $this->assert_is_not_empty($user->to_representation()['password']);
+
+        # Disable expose_sensitive_fields
+        $api_settings = new RESTAPISettings(expose_sensitive_fields: false);
+        $api_settings->update();
+
+        # Ensure sensitive fields are now hidden in the Model's representation
+        $user = new User(id: 0);
+        $this->assert_is_empty($user->to_representation()['password']);
     }
 }
