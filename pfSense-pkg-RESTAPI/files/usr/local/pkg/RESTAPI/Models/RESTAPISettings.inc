@@ -117,7 +117,7 @@ class RESTAPISettings extends Model {
             indicates_false: 'disabled',
             verbose_name: 'expose sensitive fields',
             help_text: 'Enables or disables exposing sensitive fields in API responses. When enabled, sensitive fields ' .
-                'such as passwords, private keys, and other sensitive data will be included in API responses.'
+                'such as passwords, private keys, and other sensitive data will be included in API responses.',
         );
         $this->allowed_interfaces = new InterfaceField(
             default: [],

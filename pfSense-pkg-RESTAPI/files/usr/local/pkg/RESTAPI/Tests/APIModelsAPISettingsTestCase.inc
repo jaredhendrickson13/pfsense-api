@@ -550,8 +550,7 @@ class APIModelsAPISettingsTestCase extends TestCase {
      * Checks that the `expose_sensitive_fields` field successfully enables or disables exposing sensitive fields in
      * representations.
      */
-    public function test_expose_sensitive_fields(): void
-    {
+    public function test_expose_sensitive_fields(): void {
         # Enable expose_sensitive_fields
         $api_settings = new RESTAPISettings(expose_sensitive_fields: true);
         $api_settings->update();
