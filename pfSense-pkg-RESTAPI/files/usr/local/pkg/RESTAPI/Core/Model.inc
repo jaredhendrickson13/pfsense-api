@@ -937,7 +937,7 @@ class Model {
         # Loop through each of this Model's Fields and add its value to a serializable array
         foreach ($this->get_fields() as $field) {
             # Skip adding this field if it's a write only field
-            if (!$this->$field->write_only) {
+            if ($this->$field->write_only) {
                 continue;
             }
 
