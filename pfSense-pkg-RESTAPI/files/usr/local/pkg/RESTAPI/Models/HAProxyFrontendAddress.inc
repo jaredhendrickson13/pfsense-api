@@ -29,7 +29,6 @@ class HAProxyFrontendAddress extends Model {
         # Set model fields
         $this->extaddr = new StringField(
             required: true,
-            choices: ['custom', 'any_ipv4', 'any_ipv6', 'localhost_ipv4', 'localhost_ipv6'],
             help_text: 'The external address to use.',
         );
         $this->extaddr_custom = new StringField(
