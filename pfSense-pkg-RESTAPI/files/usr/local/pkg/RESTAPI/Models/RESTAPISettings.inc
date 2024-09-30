@@ -191,7 +191,6 @@ class RESTAPISettings extends Model {
         $this->ha_sync_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
             sensitive: true,
             verbose_name: 'HA sync password',
             help_text: "Sets the password to use when authenticating for HA sync processes. This must be the password

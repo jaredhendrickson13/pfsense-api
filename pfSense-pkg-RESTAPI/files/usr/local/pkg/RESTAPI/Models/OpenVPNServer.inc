@@ -179,6 +179,7 @@ class OpenVPNServer extends Model {
         );
         $this->tls = new Base64Field(
             default_callable: 'generate_tls_key',
+            sensitive: true,
             conditions: ['use_tls' => true],
             help_text: 'The TLS key this OpenVPN server will use to sign control channel packets with an HMAC ' .
                 'signature for authentication when establishing the tunnel.',

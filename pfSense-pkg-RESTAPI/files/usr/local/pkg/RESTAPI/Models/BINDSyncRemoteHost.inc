@@ -51,7 +51,6 @@ class BINDSyncRemoteHost extends Model {
         );
         $this->password = new StringField(
             required: true,
-            write_only: true,
             sensitive: true,
             help_text: 'The password to use to authenticate when syncing.',
         );

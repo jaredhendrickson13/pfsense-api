@@ -64,7 +64,7 @@ class CertificateAuthority extends Model {
         );
         $this->prv = new Base64Field(
             required: true,
-            write_only: true,
+            sensitive: true,
             validators: [new X509Validator(allow_prv: true, allow_ecprv: true)],
             help_text: 'The X509 private key string.',
         );

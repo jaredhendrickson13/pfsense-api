@@ -109,7 +109,7 @@ class VirtualIP extends Model {
         );
         $this->password = new StringField(
             required: true,
-            write_only: true,
+            sensitive: true,
             conditions: ['mode' => 'carp'],
             help_text: 'The VHID group password shared by all CARP members.',
         );

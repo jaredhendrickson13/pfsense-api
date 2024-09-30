@@ -184,7 +184,6 @@ class CertificateGenerate extends Model {
         $this->prv = new Base64Field(
             default: null,
             allow_null: true,
-            write_only: true,
             sensitive: true,
             help_text: 'The X509 private key string.',
         );

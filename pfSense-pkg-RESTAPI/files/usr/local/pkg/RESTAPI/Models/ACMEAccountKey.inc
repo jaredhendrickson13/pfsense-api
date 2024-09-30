@@ -58,7 +58,7 @@ class ACMEAccountKey extends Model {
         );
         $this->accountkey = new Base64Field(
             default_callable: 'generate_rsa_key',
-            write_only: true,
+            sensitive: true,
             validators: [new X509Validator(allow_crt: false, allow_prv: true, allow_rsa: true, allow_ecprv: true)],
             help_text: 'The RSA private key for the ACME account key.',
         );

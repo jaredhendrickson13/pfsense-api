@@ -66,7 +66,7 @@ class WireGuardTunnel extends Model {
         );
         $this->privatekey = new StringField(
             required: true,
-            write_only: true,
+            sensitive: true,
             help_text: 'The private key for this tunnel.',
         );
         $this->mtu = new IntegerField(

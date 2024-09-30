@@ -386,7 +386,7 @@ class HAProxyBackend extends Model {
         $this->stats_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             conditions: ['stats_enabled' => true],
             help_text: 'The stats page password.',
         );

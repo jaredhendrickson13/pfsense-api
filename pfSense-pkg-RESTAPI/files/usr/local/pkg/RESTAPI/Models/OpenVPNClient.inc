@@ -160,7 +160,7 @@ class OpenVPNClient extends Model {
         );
         $this->proxy_passwd = new StringField(
             required: true,
-            write_only: true,
+            sensitive: true,
             conditions: ['!proxy_authtype' => 'none'],
             help_text: 'The username to use for authentication to the remote proxy.',
         );
