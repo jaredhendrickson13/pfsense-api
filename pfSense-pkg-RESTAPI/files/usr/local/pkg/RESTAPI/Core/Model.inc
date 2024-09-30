@@ -948,7 +948,6 @@ class Model {
 
             # Add this field's representation value to the representation array
             $representation[$field] = $this->$field->value;
-
         }
 
         # Append any related HATEOAS links if HATEOAS is enabled
