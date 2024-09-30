@@ -42,7 +42,7 @@ There are some key differences in behavior between the REST and GraphQL APIs. Be
 
 ## Schema and Documentation
 
-The full schema and documentation for the GraphQL API can be found in the [GraphQL reference docs](https://pfrest.org/graphql-docs/),
+The full schema for the GraphQL API can be found in the [GraphQL reference](https://pfrest.org/graphql-docs/),
 or you can access the schema directly from your pfSense instance using the /api/v2/schema/graphql endpoint. It is also 
 highly recommended to read through the [GraphQL documentation](https://graphql.org/learn/) to fully understand how
 to interact with the GraphQL API.
@@ -126,7 +126,7 @@ enum fields, you must use these GraphQL enum values instead of the actual values
 GraphQL queries are operations used to read data from the API, while mutations are operations used to create, update, 
 or delete data. The GraphQL API supports a wide range of queries and mutations for interacting with the pfSense 
 configuration. For a full list of available queries and mutations, please refer to 
-the [GraphQL reference docs](https://pfrest.org/graphql-docs/).
+the [GraphQL schema](https://pfrest.org/graphql-docs/).
 
 !!! Important
     Queries and mutations are executed in the order they are defined in your request. If you need to perform multiple
@@ -185,7 +185,7 @@ to perform multiple operations at once. Below is a basic example of a GraphQL mu
 
 ```graphql
 mutation {
-    createFirewallAlias(name: "alias2", type: "host", address: ["127.0.0.1"], detail: ["localhost"]) {
+    createFirewallAlias(name: "alias2", type: VAL_HOST, address: ["127.0.0.1"], detail: ["localhost"]) {
         id
         name
         address
@@ -260,6 +260,67 @@ mutation {
       "source": "lan",
       "destination": "alias2",
       "descr": "Allow traffic to hosts defined in the newly created alias"
+    }
+  }
+}
+```
+
+### Creating a new VLAN interface with a new gateway in a single request
+
+You can use a single GraphQL request to create a new VLAN, interface and a new gateway that is used by that interface.
+
+```graphql
+mutation {
+    createInterfaceVLAN(
+        if: "em0",
+        tag: 5,
+        descr: "Example VLAN Interface",
+    ) { if tag descr }
+    createInterface(
+        if: "em0.5",
+        descr: "Example Interface", 
+        type: VAL_STATICV4, 
+        ipaddr: "192.168.5.100",
+        subnet: 24
+    ) { if descr type ipaddr subnet }
+    createRoutingGateway(
+        name: "example_gateway",
+        ipporotocol: VAL_INET,
+        interface: "opt1",
+        gateway: "192.168.5.1"
+    ) { name ipporotocol interface gateway }
+    updateInterface(
+        id: "opt1",
+        gateway: "example_gateway",
+        apply: true
+    ) { id gateway }
+}
+```
+
+```json
+{
+  "data": {
+    "createInterfaceVLAN": {
+      "if": "em0",
+      "tag": 5,
+      "descr": "Example VLAN Interface"
+    },
+    "createInterface": {
+      "if": "em0.5",
+      "descr": "Example Interface",
+      "type": "VAL_STATICV4",
+      "ipaddr": "192.168.5.100",
+      "subnet": 24
+    },
+    "createRoutingGateway": {
+      "name": "example_gateway",
+      "ipporotocol": "VAL_INET",
+      "interface": "opt1",
+      "gateway": "192.168.5.1"
+    },
+    "updateInterface": {
+      "id": "opt1",
+      "gateway": "example_gateway"
     }
   }
 }
