@@ -33,6 +33,10 @@ class NestedModelField extends Field {
      * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive Fields like passwords,
      * keys, and hashes.
+     * @param string $internal_name The name of the field as it is represented in the pfSense configuration. This name
+     * should match the name used in the pfSense configuration.
+     * @param string $internal_namespace The namespace of the field as it is represented in the pfSense configuration.
+     * This namespace should match the namespace used in the pfSense configuration.
      * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
      * like web pages and help text. This Field will default to property name assigned to the parent Model with
      * underscores converted to spaces.
@@ -54,6 +58,8 @@ class NestedModelField extends Field {
         bool $editable = true,
         bool $read_only = false,
         bool $write_only = false,
+        string $internal_name = '',
+        string $internal_namespace = '',
         string $verbose_name = '',
         string $verbose_name_plural = '',
         array $conditions = [],
@@ -84,8 +90,8 @@ class NestedModelField extends Field {
             many_maximum: $this->model->many_maximum,
             verbose_name: $verbose_name,
             verbose_name_plural: $verbose_name_plural,
-            internal_name: array_pop($config_path),
-            internal_namespace: implode('/', $config_path),
+            internal_name: $internal_name ?: array_pop($config_path),
+            internal_namespace: $internal_namespace ?: implode('/', $config_path),
             conditions: $conditions,
             help_text: $help_text,
         );
