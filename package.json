@@ -1,6 +1,6 @@
 {
   "devDependencies": {
     "@prettier/plugin-php": "^0.22.2",
-    "@stoplight/spectral-cli": "^6.11.1"
+    "@stoplight/spectral-cli": "^6.13.1"
   }
 }
