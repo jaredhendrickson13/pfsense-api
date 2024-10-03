@@ -31,6 +31,7 @@ class GraphQL extends Model {
         $this->query = new StringField(
             default: '',
             allow_empty: true,
+            maximum_length: 9999999999,
             help_text: 'The GraphQL query/mutation to execute.',
         );
         $this->variables = new ObjectField(
