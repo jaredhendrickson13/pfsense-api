@@ -192,7 +192,12 @@ class APICoreContentHandlerTestCase extends TestCase {
                         [
                             'type' => 'object',
                             'properties' => [
-                                'data' => ['oneOf' => [['type' => 'array'], ['type' => 'object']]],
+                                'data' => [
+                                    'oneOf' => [
+                                        ['type' => 'array', 'items' => ['type' => 'object']],
+                                        ['type' => 'object'],
+                                    ],
+                                ],
                             ],
                         ],
                     ],
