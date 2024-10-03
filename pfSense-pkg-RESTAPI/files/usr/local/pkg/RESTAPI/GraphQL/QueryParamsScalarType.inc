@@ -20,7 +20,7 @@ class QueryParamsScalarType extends CustomScalarType {
         parent::__construct([
             'name' => 'QueryParams',
             'description' =>
-                'The `queryParam` scalar type represents arbitrary GraphQL object containing query parameters as key-value pairs.',
+                'The `QueryParam` scalar type represents arbitrary GraphQL object containing query parameters as key-value pairs.',
             'serialize' => function ($value) {
                 # In order to print the schema, this cannot be an object so just use an empty string
                 return '';
