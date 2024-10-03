@@ -278,7 +278,9 @@ class ContentHandler {
         } elseif ($response instanceof Success and !$endpoint->many) {
             $data_schema = ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"];
         } else {
-            $data_schema = ['oneOf' => [['type' => 'array'], ['type' => 'object']]];
+            $data_schema = [
+                'oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']],
+            ];
         }
 
         # Default to an empty schema if this ContentHandler cannot encode content, otherwise use the schema
