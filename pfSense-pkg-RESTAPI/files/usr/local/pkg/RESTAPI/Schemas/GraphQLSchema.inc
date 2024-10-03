@@ -338,6 +338,11 @@ class GraphQLSchema extends Schema {
 
         # Loop through each Endpoint and create a Query Type for each one.
         foreach (get_classes_from_namespace('\\RESTAPI\\Endpoints\\') as $endpoint) {
+            # Skip the GraphQLEndpoint
+            if ($endpoint === '\RESTAPI\Endpoints\GraphQLEndpoint') {
+                continue;
+            }
+
             $endpoint = new $endpoint();
             $query_types = array_merge($query_types, $this->endpoint_to_queries($endpoint));
         }
@@ -355,6 +360,11 @@ class GraphQLSchema extends Schema {
 
         # Loop through each Endpoint and create a Query Type for each one.
         foreach (get_classes_from_namespace('\\RESTAPI\\Endpoints\\') as $endpoint) {
+            # Skip the GraphQLEndpoint
+            if ($endpoint === '\RESTAPI\Endpoints\GraphQLEndpoint') {
+                continue;
+            }
+
             $endpoint = new $endpoint();
             $mutation_types = array_merge($mutation_types, $this->endpoint_to_mutations($endpoint));
         }
