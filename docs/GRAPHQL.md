@@ -42,7 +42,7 @@ There are some key differences in behavior between the REST and GraphQL APIs. Be
 
 ## Schema and Documentation
 
-The full schema for the GraphQL API can be found in the [GraphQL reference](https://pfrest.org/graphql-docs/),
+The full schema for the GraphQL API can be found [here](https://pfrest.org/graphql-docs/schema.graphql),
 or you can access the schema directly from your pfSense instance using the /api/v2/schema/graphql endpoint. It is also 
 highly recommended to read through the [GraphQL documentation](https://graphql.org/learn/) to fully understand how
 to interact with the GraphQL API.
@@ -126,7 +126,7 @@ enum fields, you must use these GraphQL enum values instead of the actual values
 GraphQL queries are operations used to read data from the API, while mutations are operations used to create, update, 
 or delete data. The GraphQL API supports a wide range of queries and mutations for interacting with the pfSense 
 configuration. For a full list of available queries and mutations, please refer to 
-the [GraphQL schema](https://pfrest.org/graphql-docs/).
+the [GraphQL schema](https://pfrest.org/graphql-docs/schema.graphql).
 
 !!! Important
     Queries and mutations are executed in the order they are defined in your request. If you need to perform multiple
