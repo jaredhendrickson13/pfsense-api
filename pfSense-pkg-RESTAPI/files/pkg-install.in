@@ -13,7 +13,7 @@ fi
 # Build Endpoints, Forms, privs, documentation and restore an existing configuration if present/configured
 /usr/local/bin/php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php buildendpoints
 /usr/local/bin/php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php buildforms
-/usr/local/bin/php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php generatedocs
+/usr/local/bin/php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php buildschemas
 /usr/local/bin/php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php restore
 
 # Setup cron jobs for Dispatchers that run on a schedule

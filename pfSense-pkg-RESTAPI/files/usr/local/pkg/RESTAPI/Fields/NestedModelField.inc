@@ -16,7 +16,7 @@ class NestedModelField extends Field {
     public string $model_class;
     private string $model_class_short;
     public Model $model;
-    private ModelSet $validation_modelset;
+    private ModelSet $modelset;
 
     /**
      * @param string $model_class The Model class that is nested within this Field.
@@ -33,6 +33,10 @@ class NestedModelField extends Field {
      * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive Fields like passwords,
      * keys, and hashes.
+     * @param string $internal_name The name of the field as it is represented in the pfSense configuration. This name
+     * should match the name used in the pfSense configuration.
+     * @param string $internal_namespace The namespace of the field as it is represented in the pfSense configuration.
+     * This namespace should match the namespace used in the pfSense configuration.
      * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
      * like web pages and help text. This Field will default to property name assigned to the parent Model with
      * underscores converted to spaces.
@@ -54,6 +58,8 @@ class NestedModelField extends Field {
         bool $editable = true,
         bool $read_only = false,
         bool $write_only = false,
+        string $internal_name = '',
+        string $internal_namespace = '',
         string $verbose_name = '',
         string $verbose_name_plural = '',
         array $conditions = [],
@@ -62,12 +68,12 @@ class NestedModelField extends Field {
         # Assign attributes specific to this Field
         $this->model_class = "\\RESTAPI\\Models\\$model_class";
         $this->model_class_short = $model_class;
-        $this->model = new $this->model_class();
+        $this->model = new $this->model_class(skip_init: true);
         $config_path = explode('/', $this->model->config_path);
 
         # Initialize the validation ModelSet. This is used to keep track of nested Model objects that have already
         # been validated.
-        $this->validation_modelset = new ModelSet([]);
+        $this->modelset = new ModelSet([]);
 
         # Construct the parent Field object with desired parameters.
         parent::__construct(
@@ -84,8 +90,8 @@ class NestedModelField extends Field {
             many_maximum: $this->model->many_maximum,
             verbose_name: $verbose_name,
             verbose_name_plural: $verbose_name_plural,
-            internal_name: array_pop($config_path),
-            internal_namespace: implode('/', $config_path),
+            internal_name: $internal_name ?: array_pop($config_path),
+            internal_namespace: $internal_namespace ?: implode('/', $config_path),
             conditions: $conditions,
             help_text: $help_text,
         );
@@ -106,12 +112,12 @@ class NestedModelField extends Field {
         # Assign the IDs and parent manually using this Field's context in case it does not yet exist in config
         $model->parent_id = $this->context->id;
         $model->parent_model = $this->context;
-        $model->id = $this->validation_modelset->count();
+        $model->id = $this->modelset->count();
 
         # Try to validate the nested Model object
         try {
-            $model->validate(skip_parent: true, modelset: $this->validation_modelset);
-            $this->validation_modelset->model_objects[] = $model;
+            $model->validate(skip_parent: true, modelset: $this->modelset);
+            $this->modelset->model_objects[] = $model;
         } catch (Response $resp) {
             throw new ValidationError(
                 message: "Field `$this->name` encountered a nested validation error: $resp->message",
@@ -126,14 +132,23 @@ class NestedModelField extends Field {
      * @return bool Returns true if the validation was successful.
      */
     public function validate(?ModelSet $modelset = null): bool {
-        # Empty any existing ModelSet entries in the event this is a subsequent `validate()` call.
-        $this->validation_modelset->model_objects = [];
-        $return_value = parent::validate();
+        # Variables
+        $return_value = true;
+
+        # Only validate if the current value is different than our ModelSet's values, or the value is empty
+        if (!$this->value or $this->value !== $this->modelset->to_representation()) {
+            # Empty any existing ModelSet entries in the event this is a subsequent `validate()` call.
+            $this->modelset->model_objects = [];
+            $return_value = parent::validate();
+        }
+
+        # Sort the nested Model objects before re-assigning the value
+        $this->sort();
 
         # Overwrite the existing `value` with the representation of the validated model object
         $this->value = $this->many
-            ? $this->validation_modelset->to_representation()
-            : $this->validation_modelset->first()->to_representation();
+            ? $this->modelset->to_representation()
+            : $this->modelset->first()->to_representation();
         return $return_value;
     }
 
@@ -147,20 +162,11 @@ class NestedModelField extends Field {
 
         # For `many` Models, loop through each value and convert it to its internal value
         if ($this->model->many) {
-            $internal_objects = [];
-            foreach ($this->value as $representation_data) {
-                # Remove any assigned IDs
-                unset($representation_data['id']);
-                unset($representation_data['parent_id']);
-                $representation_object = new $this->model(data: $representation_data);
-                $internal_objects[] = $representation_object->to_internal();
-            }
-            return $internal_objects;
+            return $this->modelset->to_internal();
         }
         # Otherwise, just convert the one object
         else {
-            $representation_object = new $this->model(data: $this->value);
-            return $representation_object->to_internal();
+            return $this->modelset->first()->to_internal();
         }
     }
 
@@ -169,18 +175,20 @@ class NestedModelField extends Field {
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
     public function from_internal(mixed $internal_value): void {
-        # Create the nested Model object
-        $model = new $this->model_class();
+        # Variables
+        $representations = [];
+        $model = new $this->model_class(skip_init: true);
+        $this->modelset->model_objects = [];
 
         # For `many` Models, loop through each value and convert it to its representation value
         if ($model->many) {
-            $representations = [];
             foreach ($internal_value as $id => $internal_data) {
                 $object = new $this->model_class();
                 $object->id = $id;
                 $object->parent_id = $this->context->id;
                 $object->parent_model = $this->context;
                 $object->from_internal_object($internal_data);
+                $this->modelset->model_objects[] = $object;
                 $representation = $object->to_representation();
                 $representations[] = $representation;
             }
@@ -188,37 +196,28 @@ class NestedModelField extends Field {
         }
         # Otherwise, just convert the one object
         else {
-            $object = new $this->model_class();
+            $object = new $this->model_class(skip_init: true);
             $this->value = $object->to_representation();
         }
     }
 
     /**
-     * Sorts the nested Model data use the nested Model's `sort_option` and `sort_by_field` setting. This method
+     * Sorts the nested Model data use the nested Model's `sort_order` and `sort_by` setting. This method
      * closely resembles the Model->sort() method, but does not require values to be set in config beforehand.
      */
     public function sort(): void {
         # Only sort this Field's values if this is a `many` field and it has a value
         if ($this->many and $this->value) {
-            # Do not sort if there is no `sort_option` or `sort_by_field` set for this nested Model
-            if (!$this->model->sort_option or !$this->model->sort_by_field) {
+            # Do not sort if there is no `sort_order` or `sort_by` set for this nested Model
+            if (!$this->model->sort_order or !$this->model->sort_by) {
                 return;
             }
 
-            # Loop through each rule and map its sort field value to our sort criteria array
-            foreach ($this->value as $id => $object) {
-                # Map the real field if it's not empty, otherwise assume an empty string
-                if (!empty($object[$this->model->sort_by_field])) {
-                    $criteria[$id] = $object[$this->model->sort_by_field];
-                } else {
-                    $criteria[$id] = '';
-                }
-            }
+            # Sort the nested Model objects by the specified field
+            $this->modelset = $this->modelset->sort(fields: $this->model->sort_by, order: $this->model->sort_order);
 
-            # Sort the internal objects using the previously determined criteria
-            array_multisort($criteria, $this->model->sort_option, $this->value);
-
-            $this->value = array_values($this->value);
+            # Re-assign the sorted values to this Field
+            $this->value = $this->modelset->to_representation();
         }
     }
 

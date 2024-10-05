@@ -33,6 +33,7 @@ class SystemRESTAPISettingsForm extends Form {
                 'jwt_exp',
                 'login_protection',
                 'log_successful_auth',
+                'expose_sensitive_fields',
             ],
         ],
         'Advanced Settings' => [

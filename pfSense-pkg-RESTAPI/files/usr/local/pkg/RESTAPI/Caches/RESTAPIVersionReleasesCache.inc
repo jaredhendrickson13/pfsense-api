@@ -5,7 +5,6 @@ namespace RESTAPI\Caches;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Cache;
-use RESTAPI\Core\Command;
 use RESTAPI\Models\RESTAPIVersion;
 
 /**

@@ -243,4 +243,40 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase {
             $test_validator->validate('www.example.com');
         });
     }
+
+    /**
+     * Checks that the IPAddressValidator 'allow_port' option works as expected.
+     */
+    public function test_ip_address_validator_port_suffix() {
+        # Ensure socket addresses are valid when allowed
+        $this->assert_does_not_throw(
+            callable: function () {
+                $test_validator = new IPAddressValidator(allow_port: true);
+                $test_validator->validate('1.2.3.4:443');
+
+                $test_validator = new IPAddressValidator(allow_fqdn: true, allow_port: true);
+                $test_validator->validate('example.com:80');
+            },
+        );
+
+        # Ensure socket addresses are invalid when the port is not a valid port number
+        $this->assert_throws_response(
+            response_id: 'IP_ADDRESS_VALIDATOR_INVALID_PORT_SUFFIX',
+            code: 400,
+            callable: function () {
+                $test_validator = new IPAddressValidator(allow_port: true);
+                $test_validator->validate('1.2.3.4:65536');
+            },
+        );
+
+        # Ensure socket addresses are not allowed when the allow_port option is not enabled
+        $this->assert_throws_response(
+            response_id: 'IP_ADDRESS_VALIDATOR_FAILED',
+            code: 400,
+            callable: function () {
+                $test_validator = new IPAddressValidator(allow_port: false);
+                $test_validator->validate('1.2.3.4:80');
+            },
+        );
+    }
 }

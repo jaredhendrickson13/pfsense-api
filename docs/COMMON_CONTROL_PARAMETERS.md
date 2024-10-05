@@ -34,7 +34,7 @@ parameters you can use:
   immediately.
 
 !!! Tip
-    The [Swagger documentation](./SWAGGER_AND_OPENAPI.md#swagger-documentation) will indicate if an endpoint applies
+    The [Swagger documentation](SWAGGER_AND_OPENAPI.md#swagger-documentation) will indicate if an endpoint applies
     changes immediately or requires a separate apply call. If an endpoint applies changes immediately, this parameter
     will have no effect.
 
@@ -75,6 +75,16 @@ parameters you can use:
   submitted in your request will be removed from the existing array values. This is useful when you want to remove
   specific values from an array field without needing to retrieve the existing values first.
 
+!!! Warning
+    If you set this parameter to `true`, it will apply to all array fields. You can't choose to remove to some array
+    fields and replace others at the same time. To work around this, first make a request with the data for the fields
+    you want to remove from. Then, make another request for the fields you want to replace.
+
+!!! Notes
+  - This parameter is only available for `PATCH` requests.
+  - This parameter is only applicable to array fields.
+  - If the submitted array values match the existing array values exactly, the API will not make any changes to that field to avoid removing all values unintentionally.
+
 ## reverse
 
 - Type: Boolean
@@ -84,5 +94,22 @@ parameters you can use:
   looking for an object near the end of the list. Additionally, it is helpful for time-sorted objects, such as logs,
   where you may want to view the most recent entries first.
 
-!!! Note
-    This parameter is only available for `GET` requests to [plural endpoints](ENDPOINT_TYPES.md#plural-many-endpoints).
+## sort_by
+
+- Type: String or Array
+- Default: _Defaults to the primary sort attribute for the endpoint, typically `null`._
+- Description: This parameters allows you to select the fields to use to sort the objects related to the endpoint. The
+  behavior of this parameter varies based on the request method and endpoint type. Refer to the 
+  [Sorting](QUERIES_FILTERS_AND_SORTING.md#sorting) section for more information.
+
+## sort_order
+
+- Type: String
+- Default: `SORT_ASC`
+- Choices:
+    - `SORT_ASC`
+    - `SORT_DESC`
+- Description: This parameter allows you to control the order in which the objects are sorted. The default value is
+  `SORT_ASC` which sorts the objects in ascending order. Setting this parameter to `SORT_DESC` will sort the objects in
+  descending order. The behavior of this parameter varies based on the request method and endpoint type. Refer to the
+  [Sorting](QUERIES_FILTERS_AND_SORTING.md#sorting) section for more information.

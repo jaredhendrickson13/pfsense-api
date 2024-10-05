@@ -80,6 +80,46 @@ class ModelSet {
     }
 
     /**
+     * Sorts the Model objects in this ModelSet by a specific field and order.
+     * @param string|array $fields The field(s) to sort the Model objects by.
+     * @param int $order The order to sort the Model objects by. This must be a PHP sort order constant.
+     * @param bool $retain_ids Retain the original Model object IDs when sorting.
+     * @return ModelSet A new ModelSet object with the Model objects sorted by the specified field and order.
+     */
+    public function sort(string|array $fields, int $order = SORT_ASC, bool $retain_ids = false): ModelSet {
+        # Variables
+        $model_objects = $this->model_objects;
+        $fields = is_array($fields) ? $fields : [$fields];
+        $sort_criteria = [];
+
+        # Loop through each Model object and add the field values to the sort criteria
+        foreach ($this->model_objects as $model_object) {
+            # Loop variables
+            $sort_values = [];
+
+            # Loop through each field to sort by and extract it's value
+            foreach ($fields as $field) {
+                $sort_values[] = $field === 'id' ? $model_object->id : $model_object->$field->value;
+            }
+
+            # Add the sort values to the sort criteria
+            $sort_criteria[] = $sort_values;
+        }
+
+        # Sort using array_multisort
+        array_multisort($sort_criteria, $order, $model_objects);
+
+        # Re-assign the model object IDs if they should not be retained
+        if (!$retain_ids) {
+            foreach ($model_objects as $id => $model_object) {
+                $model_object->id = $id;
+            }
+        }
+
+        return new ModelSet($model_objects);
+    }
+
+    /**
      * Runs the to_representation() method for each model object within the model set and returns them all in an array.
      * @return array A serializable representation of all model objects within this model set.
      */

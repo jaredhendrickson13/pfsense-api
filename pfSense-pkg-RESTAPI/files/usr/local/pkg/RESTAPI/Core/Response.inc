@@ -19,7 +19,6 @@ require_once 'RESTAPI/autoloader.inc';
 
 use Error;
 use RESTAPI\Models\RESTAPISettings;
-use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 const HTTP_STATUS_MESSAGES = [
     100 => 'continue',
@@ -131,7 +130,7 @@ class Response extends Error {
      * Converts this Response object to an array representation of its contents.
      * @return array An array containing the response details.
      */
-    final public function to_representation(): array {
+    public function to_representation(): array {
         # Set the standard representation for the Response
         $representation = [
             'code' => $this->code,
@@ -166,49 +165,22 @@ class Response extends Error {
     }
 
     /**
-     * Represents this Response object as an OpenAPI response component. This component details which content-types
-     * are allowed by the Accept header.
-     * @return array This Response object as an OpenAPI response component
-     */
-    final public function to_openapi_component(): array {
-        # Variables
-        $component = ['description' => $this->help_text, 'content' => []];
-        $content_handler_classes = get_classes_from_namespace('\\RESTAPI\\ContentHandlers\\');
-
-        # Default to application/json
-        $component['content']['application/json'] = ['schema' => ['$ref' => '#/components/schemas/Response']];
-
-        # Populate a component content schema for each ContentHandler that can encode content
-        foreach ($content_handler_classes as $content_handler_class) {
-            # Create the content handler object
-            $content_handler = new $content_handler_class();
-
-            # Only include this content if it can encode responses
-            if ($content_handler->can_encode()) {
-                $component['content'][$content_handler->mime_type] = [
-                    'schema' => ['$ref' => '#/components/schemas/Response'],
-                ];
-            }
-        }
-
-        return $component;
-    }
-
-    /**
      * Represents the Response object as an OpenAPI schema.
      * @return array This Response object as an OpenAPI schema.
      */
-    final public static function to_openapi_schema(): array {
+    public function to_openapi_schema(): array {
         return [
             'type' => 'object',
             'properties' => [
                 'code' => [
                     'description' => 'The HTTP status code that corresponds with the API response.',
                     'type' => 'integer',
+                    'default' => $this->code,
                 ],
                 'status' => [
                     'description' => 'The HTTP status message that corresponds with the HTTP status code.',
                     'type' => 'string',
+                    'default' => $this->status,
                 ],
                 'response_id' => [
                     'description' =>
@@ -225,7 +197,6 @@ class Response extends Error {
                         'The data requested from the API. In the event that many objects have' .
                         'been requested, this field will be an array of objects. Otherwise, it will only return' .
                         'the single object requested.',
-                    'example' => [],
                     'oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']],
                 ],
                 '_links' => [

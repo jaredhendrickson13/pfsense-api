@@ -14,7 +14,7 @@ endpoints will help you determine which endpoint to use for your specific use ca
 
 Singular endpoints are endpoints that interact with and return a single object. For example, a singular endpoint might 
 return a single user or a single firewall rule. These endpoints will always return the `data` of the response as an 
-associative array. Singular endpoints will often require an [object ID](./WORKING_WITH_OBJECT_IDS.md).
+associative array. Singular endpoints will often require an [object ID](WORKING_WITH_OBJECT_IDS.md).
 
 Some examples of singular endpoints are:
 
@@ -61,9 +61,9 @@ Some examples of plural endpoints are:
 ### GET Requests to Plural Endpoints
 
 A `GET` request to a plural endpoint will allow you to retrieve a list of all existing objects at once. GET requests to plural
-endpoints also support [querying and filtering](QUERIES_AND_FILTERS.md) to help you narrow down the list of objects
+endpoints also support [querying and filtering](QUERIES_FILTERS_AND_SORTING.md) to help you narrow down the list of objects
 returned by specifying criteria for the objects you want to retrieve. This includes support for 
-[pagination](QUERIES_AND_FILTERS.md#pagination) which will allow you to limit the amount of objects returned in a single request.
+[pagination](QUERIES_FILTERS_AND_SORTING.md#pagination) which will allow you to limit the amount of objects returned in a single request.
 
 ### PUT Requests to Plural Endpoints
 
@@ -87,7 +87,7 @@ one by one, and can instead replace the entire dataset as a whole in a single re
 
 ### DELETE Requests to Plural Endpoints
 
-A `DELETE` request to a plural endpoint will allow you to delete many objects at once using a [query](QUERIES_AND_FILTERS.md).
+A `DELETE` request to a plural endpoint will allow you to delete many objects at once using a [query](QUERIES_FILTERS_AND_SORTING.md).
 This is useful when you need to remove a large number of objects from the system, such as when decommissioning services,
 cleaning up old data, or removing objects that are no longer needed. This is primarily used as a method of deleting
 objects without requiring an ID.

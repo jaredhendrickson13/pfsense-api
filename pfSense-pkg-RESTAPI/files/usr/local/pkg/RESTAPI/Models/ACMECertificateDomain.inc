@@ -362,7 +362,7 @@ class ACMECertificateDomain extends Model {
         $this->webrootftppassword = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             conditions: ['method' => 'webrootftp'],
             help_text: 'Password to authenticate this user on the remote server',
         );
@@ -435,7 +435,7 @@ class ACMECertificateDomain extends Model {
         $this->one984hosting_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_1984hostingone984hosting_password',
             conditions: ['method' => 'dns_1984hosting'],
             help_text: '1984Hosting Password',
@@ -457,7 +457,7 @@ class ACMECertificateDomain extends Model {
         $this->acmeproxy_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_acmeproxyacmeproxy_password',
             conditions: ['method' => 'dns_acmeproxy'],
             help_text: 'Acmeproxy Password',
@@ -472,7 +472,7 @@ class ACMECertificateDomain extends Model {
         $this->acmedns_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_acmednsacmedns_password',
             conditions: ['method' => 'dns_acmedns'],
             help_text: 'acme-dns.io Password',
@@ -494,7 +494,7 @@ class ACMECertificateDomain extends Model {
         $this->active24_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_active24active24_token',
             conditions: ['method' => 'dns_active24'],
             help_text: 'Active24 Token',
@@ -509,7 +509,7 @@ class ACMECertificateDomain extends Model {
         $this->akamai_access_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_edgednsakamai_access_token',
             conditions: ['method' => 'dns_edgedns'],
             help_text: 'Access Token',
@@ -517,7 +517,7 @@ class ACMECertificateDomain extends Model {
         $this->akamai_client_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_edgednsakamai_client_token',
             conditions: ['method' => 'dns_edgedns'],
             help_text: 'Client Token',
@@ -525,7 +525,7 @@ class ACMECertificateDomain extends Model {
         $this->akamai_client_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_edgednsakamai_client_secret',
             conditions: ['method' => 'dns_edgedns'],
             help_text: 'Client Secret',
@@ -533,7 +533,7 @@ class ACMECertificateDomain extends Model {
         $this->ali_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_aliali_key',
             conditions: ['method' => 'dns_ali'],
             help_text: 'API Key',
@@ -541,7 +541,7 @@ class ACMECertificateDomain extends Model {
         $this->ali_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_aliali_secret',
             conditions: ['method' => 'dns_ali'],
             help_text: 'API Secret',
@@ -563,7 +563,7 @@ class ACMECertificateDomain extends Model {
         $this->kas_authdata = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_kaskas_authdata',
             conditions: ['method' => 'dns_kas'],
             help_text: 'Auth data',
@@ -571,7 +571,7 @@ class ACMECertificateDomain extends Model {
         $this->ad_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_adad_api_key',
             conditions: ['method' => 'dns_ad'],
             help_text: 'Alwaysdata API Key',
@@ -579,7 +579,7 @@ class ACMECertificateDomain extends Model {
         $this->anx_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_anxanx_token',
             conditions: ['method' => 'dns_anx'],
             help_text: 'API Token',
@@ -594,7 +594,7 @@ class ACMECertificateDomain extends Model {
         $this->af_api_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_artfilesaf_api_password',
             conditions: ['method' => 'dns_artfiles'],
             help_text: 'ArtFiles Password',
@@ -602,7 +602,7 @@ class ACMECertificateDomain extends Model {
         $this->arvan_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_arvanarvan_token',
             conditions: ['method' => 'dns_arvan'],
             help_text: 'Arvan API Token',
@@ -610,7 +610,7 @@ class ACMECertificateDomain extends Model {
         $this->aurora_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_auroraaurora_key',
             conditions: ['method' => 'dns_aurora'],
             help_text: 'API Key',
@@ -618,7 +618,7 @@ class ACMECertificateDomain extends Model {
         $this->aurora_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_auroraaurora_secret',
             conditions: ['method' => 'dns_aurora'],
             help_text: 'API Secret. Obtain the key and secret from https://cp.pcextreme.nl/auroradns/users.',
@@ -633,7 +633,7 @@ class ACMECertificateDomain extends Model {
         $this->autodns_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_autodnsautodns_password',
             conditions: ['method' => 'dns_autodns'],
             help_text: 'autoDNS Password',
@@ -655,7 +655,7 @@ class ACMECertificateDomain extends Model {
         $this->aws_secret_access_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_awsaws_secret_access_key',
             conditions: ['method' => 'dns_aws'],
             help_text: 'AWS Secret Access / API Key',
@@ -677,7 +677,7 @@ class ACMECertificateDomain extends Model {
         $this->azion_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_azionazion_password',
             conditions: ['method' => 'dns_azion'],
             help_text: 'Account password',
@@ -706,7 +706,7 @@ class ACMECertificateDomain extends Model {
         $this->azuredns_clientsecret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_azureazuredns_clientsecret',
             conditions: ['method' => 'dns_azure'],
             help_text: 'Azure Client Secret',
@@ -721,7 +721,7 @@ class ACMECertificateDomain extends Model {
         $this->bookmyname_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_bookmynamebookmyname_password',
             conditions: ['method' => 'dns_bookmyname'],
             help_text: 'BookMyName Password',
@@ -729,7 +729,7 @@ class ACMECertificateDomain extends Model {
         $this->bunny_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_bunnybunny_api_key',
             conditions: ['method' => 'dns_bunny'],
             help_text: 'Bunny DNS API Key',
@@ -751,7 +751,7 @@ class ACMECertificateDomain extends Model {
         $this->clouddns_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_clouddnsclouddns_password',
             conditions: ['method' => 'dns_clouddns'],
             help_text: 'CloudDNS Password',
@@ -773,7 +773,7 @@ class ACMECertificateDomain extends Model {
         $this->cloudns_auth_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_cloudnscloudns_auth_password',
             conditions: ['method' => 'dns_cloudns'],
             help_text: 'ClouDNS Password',
@@ -781,7 +781,7 @@ class ACMECertificateDomain extends Model {
         $this->cf_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_cfcf_key',
             conditions: ['method' => 'dns_cf'],
             help_text: 'Cloudflare API Key',
@@ -796,7 +796,7 @@ class ACMECertificateDomain extends Model {
         $this->cf_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_cfcf_token',
             conditions: ['method' => 'dns_cf'],
             help_text: 'Cloudflare API Token',
@@ -825,7 +825,7 @@ class ACMECertificateDomain extends Model {
         $this->conoha_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_conohaconoha_password',
             conditions: ['method' => 'dns_conoha'],
             help_text: 'Conoha Password',
@@ -847,7 +847,7 @@ class ACMECertificateDomain extends Model {
         $this->constellix_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_constellixconstellix_key',
             conditions: ['method' => 'dns_constellix'],
             help_text: 'Constellix Key',
@@ -855,7 +855,7 @@ class ACMECertificateDomain extends Model {
         $this->constellix_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_constellixconstellix_secret',
             conditions: ['method' => 'dns_constellix'],
             help_text: 'Constellix Secret',
@@ -870,7 +870,7 @@ class ACMECertificateDomain extends Model {
         $this->cpanel_apitoken = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_cpanelcpanel_apitoken',
             conditions: ['method' => 'dns_cpanel'],
             help_text: 'cPanel API token',
@@ -892,7 +892,7 @@ class ACMECertificateDomain extends Model {
         $this->cn_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_cncn_password',
             conditions: ['method' => 'dns_cn'],
             help_text: 'Core Networks Password',
@@ -907,7 +907,7 @@ class ACMECertificateDomain extends Model {
         $this->curanet_authsecret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_curanetcuranet_authsecret',
             conditions: ['method' => 'dns_curanet'],
             help_text: 'Authentication Secret',
@@ -922,7 +922,7 @@ class ACMECertificateDomain extends Model {
         $this->cy_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_cyoncy_password',
             conditions: ['method' => 'dns_cyon'],
             help_text: 'CY Password',
@@ -930,7 +930,7 @@ class ACMECertificateDomain extends Model {
         $this->ddnss_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_ddnssddnss_token',
             conditions: ['method' => 'dns_ddnss'],
             help_text: 'API Token (e.g. aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee)',
@@ -938,7 +938,7 @@ class ACMECertificateDomain extends Model {
         $this->dedyn_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_desecdedyn_token',
             conditions: ['method' => 'dns_desec'],
             help_text: 'deSEC.io API Token',
@@ -953,7 +953,7 @@ class ACMECertificateDomain extends Model {
         $this->do_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dgondo_api_key',
             conditions: ['method' => 'dns_dgon'],
             help_text: 'DigitalOcean API Key',
@@ -975,7 +975,7 @@ class ACMECertificateDomain extends Model {
         $this->dnsexit_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dnsexitdnsexit_api_key',
             conditions: ['method' => 'dns_dnsexit'],
             help_text: 'DNSExit API Key',
@@ -990,7 +990,7 @@ class ACMECertificateDomain extends Model {
         $this->dnsexit_auth_pass = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dnsexitdnsexit_auth_pass',
             conditions: ['method' => 'dns_dnsexit'],
             help_text: 'DNSExit Password',
@@ -1005,7 +1005,7 @@ class ACMECertificateDomain extends Model {
         $this->dnshome_subdomainpassword = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dnshomednshome_subdomainpassword',
             conditions: ['method' => 'dns_dnshome'],
             help_text: 'Subdomain Password',
@@ -1020,7 +1020,7 @@ class ACMECertificateDomain extends Model {
         $this->me_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_meme_key',
             conditions: ['method' => 'dns_me'],
             help_text: 'DNSMadeEasy API Key',
@@ -1028,7 +1028,7 @@ class ACMECertificateDomain extends Model {
         $this->me_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_meme_secret',
             conditions: ['method' => 'dns_me'],
             help_text: 'DNSMadeEasy API Secret',
@@ -1043,7 +1043,7 @@ class ACMECertificateDomain extends Model {
         $this->dnsservices_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dnsservicesdnsservices_password',
             conditions: ['method' => 'dns_dnsservices'],
             help_text: 'dns.services Password',
@@ -1051,7 +1051,7 @@ class ACMECertificateDomain extends Model {
         $this->do_letoken = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_doapido_letoken',
             conditions: ['method' => 'dns_doapi'],
             help_text: 'DO.de API Token',
@@ -1066,7 +1066,7 @@ class ACMECertificateDomain extends Model {
         $this->do_pw = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dodo_pw',
             conditions: ['method' => 'dns_do'],
             help_text: 'DO Password',
@@ -1074,7 +1074,7 @@ class ACMECertificateDomain extends Model {
         $this->domeneshop_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_domeneshopdomeneshop_token',
             conditions: ['method' => 'dns_domeneshop'],
             help_text: 'Domeneshop API Token',
@@ -1082,7 +1082,7 @@ class ACMECertificateDomain extends Model {
         $this->domeneshop_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_domeneshopdomeneshop_secret',
             conditions: ['method' => 'dns_domeneshop'],
             help_text: 'Domeneshop API Secret',
@@ -1097,7 +1097,7 @@ class ACMECertificateDomain extends Model {
         $this->dp_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dpdp_key',
             conditions: ['method' => 'dns_dp'],
             help_text: 'Dnspod API Key',
@@ -1112,7 +1112,7 @@ class ACMECertificateDomain extends Model {
         $this->dpi_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dpidpi_key',
             conditions: ['method' => 'dns_dpi'],
             help_text: 'Dnspod API Key',
@@ -1120,7 +1120,7 @@ class ACMECertificateDomain extends Model {
         $this->dh_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dreamhostdh_api_key',
             conditions: ['method' => 'dns_dreamhost'],
             help_text: 'Dreamhost API Token',
@@ -1128,7 +1128,7 @@ class ACMECertificateDomain extends Model {
         $this->duckdns_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_duckdnsduckdns_token',
             conditions: ['method' => 'dns_duckdns'],
             help_text: 'DuckDNS API Token (Look in DuckDNS account settings)',
@@ -1143,7 +1143,7 @@ class ACMECertificateDomain extends Model {
         $this->dd_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_durablednsdd_api_key',
             conditions: ['method' => 'dns_durabledns'],
             help_text: 'DurableDNS API Key',
@@ -1165,7 +1165,7 @@ class ACMECertificateDomain extends Model {
         $this->dyn_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dyndyn_password',
             conditions: ['method' => 'dns_dyn'],
             help_text: 'dyn.com Password',
@@ -1180,7 +1180,7 @@ class ACMECertificateDomain extends Model {
         $this->df_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dfdf_password',
             conditions: ['method' => 'dns_df'],
             help_text: 'dyndnsfree.de Password',
@@ -1195,7 +1195,7 @@ class ACMECertificateDomain extends Model {
         $this->dynu_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_dynudynu_secret',
             conditions: ['method' => 'dns_dynu'],
             help_text: 'Dynu API Secret',
@@ -1203,7 +1203,7 @@ class ACMECertificateDomain extends Model {
         $this->easydns_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_easydnseasydns_key',
             conditions: ['method' => 'dns_easydns'],
             help_text: 'easyDNS API Key. Sign up for a key at https://cp.easydns.com/manage/security/api/signup.php',
@@ -1211,7 +1211,7 @@ class ACMECertificateDomain extends Model {
         $this->easydns_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_easydnseasydns_token',
             conditions: ['method' => 'dns_easydns'],
             help_text: 'easyDNS API Token',
@@ -1226,7 +1226,7 @@ class ACMECertificateDomain extends Model {
         $this->euserv_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_euserveuserv_password',
             conditions: ['method' => 'dns_euserv'],
             help_text: 'Euserv.eu Password',
@@ -1234,7 +1234,7 @@ class ACMECertificateDomain extends Model {
         $this->exoscale_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_exoscaleexoscale_api_key',
             conditions: ['method' => 'dns_exoscale'],
             help_text: 'Exoscale API Key',
@@ -1242,7 +1242,7 @@ class ACMECertificateDomain extends Model {
         $this->exoscale_secret_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_exoscaleexoscale_secret_key',
             conditions: ['method' => 'dns_exoscale'],
             help_text: 'Exoscale Secret Key',
@@ -1250,7 +1250,7 @@ class ACMECertificateDomain extends Model {
         $this->fornex_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_fornexfornex_api_key',
             conditions: ['method' => 'dns_fornex'],
             help_text: 'Fornex API Key',
@@ -1265,7 +1265,7 @@ class ACMECertificateDomain extends Model {
         $this->freedns_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_freednsfreedns_password',
             conditions: ['method' => 'dns_freedns'],
             help_text: 'FreeDNS Password',
@@ -1273,7 +1273,7 @@ class ACMECertificateDomain extends Model {
         $this->gandi_livedns_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_gandi_livednsgandi_livedns_key',
             conditions: ['method' => 'dns_gandi_livedns'],
             help_text: 'Gandi LiveDNS API Key, retrieved from <a href="https://account.gandi.net">https://account.gandi.net</a>',
@@ -1281,7 +1281,7 @@ class ACMECertificateDomain extends Model {
         $this->gcore_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_gcoregcore_key',
             conditions: ['method' => 'dns_gcore'],
             help_text: 'Gcore API Key',
@@ -1296,7 +1296,7 @@ class ACMECertificateDomain extends Model {
         $this->geoscaling_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_geoscalinggeoscaling_password',
             conditions: ['method' => 'dns_geoscaling'],
             help_text: 'Password',
@@ -1311,7 +1311,7 @@ class ACMECertificateDomain extends Model {
         $this->gd_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_gdgd_secret',
             conditions: ['method' => 'dns_gd'],
             help_text: 'GoDaddy API Secret',
@@ -1319,7 +1319,7 @@ class ACMECertificateDomain extends Model {
         $this->googledomains_access_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_googledomainsgoogledomains_access_token',
             conditions: ['method' => 'dns_googledomains'],
             help_text: 'Google Domains API Access Token',
@@ -1334,7 +1334,7 @@ class ACMECertificateDomain extends Model {
         $this->hetzner_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_hetznerhetzner_token',
             conditions: ['method' => 'dns_hetzner'],
             help_text: 'Hetzner API Token. Visit https://dns.hetzner.com/settings/api-token to retrieve.',
@@ -1349,7 +1349,7 @@ class ACMECertificateDomain extends Model {
         $this->hexonet_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_hexonethexonet_password',
             conditions: ['method' => 'dns_hexonet'],
             help_text: 'Hexonet Password',
@@ -1364,7 +1364,7 @@ class ACMECertificateDomain extends Model {
         $this->huaweicloud_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_huaweicloudhuaweicloud_password',
             conditions: ['method' => 'dns_huaweicloud'],
             help_text: 'Password',
@@ -1386,7 +1386,7 @@ class ACMECertificateDomain extends Model {
         $this->he_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_hehe_password',
             conditions: ['method' => 'dns_he'],
             help_text: 'Hurricane Electric password',
@@ -1394,7 +1394,7 @@ class ACMECertificateDomain extends Model {
         $this->hostingde_apikey = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_hostingdehostingde_apikey',
             conditions: ['method' => 'dns_hostingde'],
             help_text: 'Hosting.de API Key',
@@ -1409,7 +1409,7 @@ class ACMECertificateDomain extends Model {
         $this->infoblox_creds = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_infobloxinfoblox_creds',
             conditions: ['method' => 'dns_infoblox'],
             help_text: 'Infoblox credentials in <strong>username:password</strong> format',
@@ -1431,7 +1431,7 @@ class ACMECertificateDomain extends Model {
         $this->infomaniak_api_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_infomaniakinfomaniak_api_token',
             conditions: ['method' => 'dns_infomaniak'],
             help_text: 'Infomaniak API token. Visit https://manager.infomaniak.com/v3/&lt;account_id&gt;/api/dashboard and generate a token with the scope Domain.',
@@ -1460,7 +1460,7 @@ class ACMECertificateDomain extends Model {
         $this->ionos_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_ionosionos_secret',
             conditions: ['method' => 'dns_ionos'],
             help_text: 'Secret. Read https://beta.developer.hosting.ionos.de/docs/getstarted to learn how to get a prefix and secret.',
@@ -1468,7 +1468,7 @@ class ACMECertificateDomain extends Model {
         $this->ipv64_token = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_ipv64ipv64_token',
             conditions: ['method' => 'dns_ipv64'],
             help_text: 'IPv64.net Access Token',
@@ -1476,7 +1476,7 @@ class ACMECertificateDomain extends Model {
         $this->internetbs_api_key = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_internetbsinternetbs_api_key',
             conditions: ['method' => 'dns_internetbs'],
             help_text: 'Internet.BS API Key',
@@ -1484,7 +1484,7 @@ class ACMECertificateDomain extends Model {
         $this->internetbs_api_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_internetbsinternetbs_api_password',
             conditions: ['method' => 'dns_internetbs'],
             help_text: 'Internet.BS API Password',
@@ -1499,7 +1499,7 @@ class ACMECertificateDomain extends Model {
         $this->inwx_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_inwxinwx_password',
             conditions: ['method' => 'dns_inwx'],
             help_text: 'INWX.de password',
@@ -1507,7 +1507,7 @@ class ACMECertificateDomain extends Model {
         $this->inwx_shared_secret = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_inwxinwx_shared_secret',
             conditions: ['method' => 'dns_inwx'],
             help_text: 'INWX.de shared secret',
@@ -1522,7 +1522,7 @@ class ACMECertificateDomain extends Model {
         $this->ispc_password = new StringField(
             default: '',
             allow_empty: true,
-            write_only: true,
+            sensitive: true,
             internal_name: 'dns_ispconfigispc_password',
             conditions: ['method' => 'dns_ispconfig'],
             help_text: 'ISPConfig remotePassword',

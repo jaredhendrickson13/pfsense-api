@@ -46,6 +46,7 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
             'dev_mode' => 'tun',
             'protocol' => 'UDP4',
             'interface' => 'wan',
+            'use_tls' => true,
             'tls' => $this->tls_key,
             'tls_type' => 'auth',
             'dh_length' => '2048',
@@ -435,5 +436,12 @@ class APIModelsOpenVPNServerTestCase extends TestCase {
                 $ovpns->validate();
             },
         );
+    }
+
+    /**
+     * Checks that the 'generate_tls_key()' method correctly generates a new OpenVPN TLS key
+     */
+    public function test_generate_tls_key(): void {
+        $this->assert_str_contains(OpenVPNServer::generate_tls_key(), '-----BEGIN OpenVPN Static key V1-----');
     }
 }

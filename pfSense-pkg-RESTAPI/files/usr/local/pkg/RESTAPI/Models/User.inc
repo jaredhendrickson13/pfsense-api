@@ -48,7 +48,7 @@ class User extends Model {
         );
         $this->password = new StringField(
             required: true,
-            write_only: true,
+            sensitive: true,
             internal_name: $this->get_config('system/webgui/pwhash', 'bcrypt') . '-hash',
             help_text: 'The password of this local user.',
         );

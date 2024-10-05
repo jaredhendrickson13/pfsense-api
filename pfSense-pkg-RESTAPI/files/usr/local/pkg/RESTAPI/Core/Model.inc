@@ -22,6 +22,7 @@ use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
+use RESTAPI\Responses\ServiceUnavailableError;
 use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
@@ -36,6 +37,11 @@ const DEFAULT_CLIENT_IP_ADDRESS = '127.0.0.1';
  */
 class Model {
     use BaseTraits;
+
+    /**
+     * @const string $READ_LOCK_FILE
+     */
+    const WRITE_LOCK_FILE = '/tmp/.RESTAPI.write_config.lock';
 
     /**
      * @var string|null $config_path
@@ -76,11 +82,27 @@ class Model {
     public mixed $id = null;
 
     /**
+     * @var string $id_type
+     * The data type of the ID field for this Model. In most cases, this should be set to 'integer'. In some cases,
+     * the ID field may be a 'string'. This field should be set accordingly to ensure documentation and validation
+     * processes are accurate. This applies exclusively to Models with $many enabled.
+     */
+    public string $id_type = 'integer';
+
+    /**
      * @var mixed $parent_id
      * For Models acting as children to a different Model class, this property will contain the ID of the parent model
      * object. If a $parent_model_class is defined, this value MUST be specified during object construction.
      */
     public mixed $parent_id = null;
+
+    /**
+     * @var string $parent_id_type
+     * The data type of the parent ID field for this Model. In most cases, this should be set to 'integer'. In some cases,
+     * the parent ID field may be a 'string'. This field should be set accordingly to ensure documentation and validation
+     * processes are accurate. This applies exclusively to Models with a $parent_model_class assigned.
+     */
+    public string $parent_id_type = 'integer';
 
     /**
      * @var string $parent_model_class
@@ -192,21 +214,21 @@ class Model {
     public int|null $placement = null;
 
     /**
-     * @var int|null $sort_option
+     * @var int|null $sort_order
      * For $many enabled Models, this property can be used to set the PHP sort option used when writing Model objects to
      * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
      * to Models with a $config_path defined. For valid value options for this property, refer to:
      * https://www.php.net/manual/en/function.array-multisort.php
      */
-    public int|null $sort_option = null;
+    public int|null $sort_order = null;
 
     /**
-     * @var string|null $sort_by_field
-     * Sets the field name this Model will use when sorting objects written to the pfSense configuration. This field must
+     * @var array|null $sort_by
+     * Sets the field names this Model will use when sorting objects written to the pfSense configuration. These fields must
      * be set to an existing property name from this Model, and that property must be assigned a Field class. Leave empty
      * to disable sorting for this Model. In most cases, sorting should not be used.
      */
-    public string|null $sort_by_field = null;
+    public array|null $sort_by = null;
 
     /**
      * @var string $subsystem
@@ -615,17 +637,15 @@ class Model {
     /**
      * Write configuration changes to the config file
      * @param string $change_note The message to write to the change log.
+     * @param int $attempts The number of write attempts to make before giving up in the event that a lock is present.
      */
-    final protected function write_config(string $change_note) {
-        # Local variables
-        $lock_file = '/tmp/.RESTAPI.write_config.lock';
-
+    final public function write_config(string $change_note, int $attempts = 60): void {
         # Ensure there is not an API config lock, loop until the lock is released
-        foreach (range(0, 60) as $attempt) {
+        foreach (range(0, $attempts) as $attempt) {
             # Only write to the config if there is not an active lock
-            if (!file_exists($lock_file)) {
+            if (!file_exists(self::WRITE_LOCK_FILE)) {
                 # Create a lock on API config writes while we write changes
-                file_put_contents($lock_file, microtime());
+                file_put_contents(self::WRITE_LOCK_FILE, microtime());
 
                 # Start a temporary session to write the config that contains the user's username in the config history
                 session_start();
@@ -640,20 +660,26 @@ class Model {
                 }
 
                 # Remove the temporary session and write lock
-                unlink($lock_file);
+                unlink(self::WRITE_LOCK_FILE);
                 return;
             }
 
             # Delay attempts by 1 second
             sleep(1);
         }
+
+        # If the lock was not released after the attempts, throw an error
+        throw new ServiceUnavailableError(
+            message: 'Failed to write to the configuration file after multiple attempts.',
+            response_id: 'MODEL_WRITE_CONFIG_LOCKED',
+        );
     }
 
     /**
      * Reloads the configuration to include any changes that may have occurred since the last config reload
      * @param bool $force_parse Force an entire reparse of the config.xml file instead of the cached config.
      */
-    public function reload_config(bool $force_parse = false): void {
+    public static function reload_config(bool $force_parse = false): void {
         global $config;
         $config = parse_config(parse: $force_parse);
     }
@@ -894,6 +920,9 @@ class Model {
     final public function to_representation(): array {
         # Variables
         $representation = [];
+        $pkg_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
+        $hateos_enabled = $pkg_config['hateoas'] === 'enabled';
+        $expose_sensitive_fields = $pkg_config['expose_sensitive_fields'] === 'enabled';
 
         # Embed this object's parent ID if set
         if (isset($this->parent_id)) {
@@ -907,14 +936,22 @@ class Model {
 
         # Loop through each of this Model's Fields and add its value to a serializable array
         foreach ($this->get_fields() as $field) {
-            # Only add this field if it is not a `write_only` field.
-            if (!$this->$field->write_only) {
-                $representation[$field] = $this->$field->value;
+            # Skip adding this field if it's a write only field
+            if ($this->$field->write_only) {
+                continue;
             }
+
+            # Skip adding this field if it is sensitive and sensitive fields are not exposed
+            if ($this->$field->sensitive and !$expose_sensitive_fields) {
+                continue;
+            }
+
+            # Add this field's representation value to the representation array
+            $representation[$field] = $this->$field->value;
         }
 
         # Append any related HATEOAS links if HATEOAS is enabled
-        if (RESTAPI\Models\RESTAPISettings::get_pkg_config()['hateoas'] === 'enabled') {
+        if ($hateos_enabled) {
             $representation += $this->get_related_links()->to_representation();
         }
 
@@ -1024,6 +1061,28 @@ class Model {
         }
 
         return null;
+    }
+
+    /**
+     * Determines if this Model applies changes immediately or if they must applied manually after changes are made.
+     * This is intended to be used to more accurately determine the 'Applies immediately' value in the API documentation
+     * to prevent misleading information.
+     * @return bool|null Returns true if this Model applies changes immediately, false if changes must be applied
+     * manually, or null if this does not apply to this Model.
+     */
+    public function does_apply_immediately(): ?bool {
+        # If this Model does not have a `config_path` set, this is not relevant. Return null.
+        if (!$this->config_path) {
+            return null;
+        }
+
+        # If this Model has the `always_apply` property set, changes always apply immediately. Return true.
+        if ($this->always_apply) {
+            return true;
+        }
+
+        # Otherwise, changes must be applied manually. Return false.
+        return false;
     }
 
     /**
@@ -1575,9 +1634,9 @@ class Model {
      * Sorts `many` Model entries internally before writing the changes to config. This is useful for Model's whose
      * internal objects must be written in a specific order.
      */
-    protected function sort() {
-        # Do not sort if there is no `sort_option` or `sort_by_field` set
-        if (!$this->sort_option or !$this->sort_by_field) {
+    protected function sort(): void {
+        # Do not sort if there is no `sort_order` or `sort_by` set
+        if (!$this->sort_order or !$this->sort_by) {
             return;
         }
 
@@ -1589,43 +1648,25 @@ class Model {
             );
         }
 
-        $internal_objects = $this->get_config($this->get_config_path(), []);
-        $criteria = [];
+        # Obtain all Model objects for this Model and sort them by the requested criteria
+        $modelset = $this->query(parent_id: $this->parent_id, sort_by: $this->sort_by, sort_order: $this->sort_order);
 
-        # Loop through each rule and map its sort field value to our sort criteria array
-        foreach ($internal_objects as $id => $internal_object) {
-            # Store the internal object's existing ID so we can locate new IDs after sorting
-            $internal_objects[$id]['original_id'] = $id;
-
-            # Use the `internal_name` of the assigned `sort_by_field` since we are dealing with internal objects
-            $sort_by_field_internal_name = $this->{$this->sort_by_field}->internal_name;
-
-            # Map the real field if it's not empty, otherwise assume an empty string
-            if (!empty($internal_object[$sort_by_field_internal_name])) {
-                $criteria[$id] = $internal_object[$sort_by_field_internal_name];
-            } else {
-                $criteria[$id] = '';
-            }
-        }
-
-        # Sort the internal objects using the previously determined criteria
-        array_multisort($criteria, $this->sort_option, $internal_objects);
-
-        # Loop through the sorted internal objects and find $this object's new ID
+        # Loop through the sorted object and assign it's internal value
+        $internal_objects = [];
         $id_found = false;
-        foreach ($internal_objects as $new_id => $sorted_internal_object) {
-            # Check if this sorted internal object contains $this objects original ID
-            if (!$id_found and $this->id === $sorted_internal_object['original_id']) {
-                $id_found = true;
-                $this->id = $new_id;
-            }
+        foreach ($modelset->model_objects as $id => $sorted_model_object) {
+            # Assign the internal object to the internal objects array
+            $internal_objects[] = $this->get_config($sorted_model_object->get_config_path())[$sorted_model_object->id];
 
-            # Remove the `original_id` value so we don't save it to config
-            unset($internal_objects[$new_id]['original_id']);
+            # If the sorted object's ID matches this object's ID, update this object's ID.
+            if (!$id_found and $this->id === $sorted_model_object->id) {
+                $this->id = $id;
+                $id_found = true;
+            }
         }
 
         # Sets the sorted internal objects to the pfSense config
-        $this->set_config($this->get_config_path(), array_values($internal_objects));
+        $this->set_config($this->get_config_path(), $internal_objects);
     }
 
     /**
@@ -1818,18 +1859,23 @@ class Model {
         int $limit = 0,
         int $offset = 0,
         bool $reverse = false,
+        ?array $sort_by = null,
+        int $sort_order = SORT_ASC,
         ...$vl_query_params,
     ): ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
         $query_params = array_merge($query_params, $vl_query_params);
 
-        # If no query parameters were provided, just run read_all() with pagination for optimal performance
-        if (!$query_params) {
+        # If no query or sort parameters were provided, just run read_all() with pagination for optimal performance
+        if (!$query_params and $sort_by === null) {
             return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset, reverse: $reverse);
         }
 
         # Perform the query against all Model objects for this Model first
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
+
+        # Sort the set if a sort field was provided
+        $modelset = $sort_by ? $modelset->sort(fields: $sort_by, order: $sort_order, retain_ids: true) : $modelset;
 
         # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);

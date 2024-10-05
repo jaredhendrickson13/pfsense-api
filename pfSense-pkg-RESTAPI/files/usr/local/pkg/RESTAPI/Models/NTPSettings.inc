@@ -130,7 +130,7 @@ class NTPSettings extends Model {
         );
         $this->serverauthkey = new Base64Field(
             required: true,
-            write_only: true,
+            sensitive: true,
             conditions: ['serverauth' => true],
             validators: [new LengthValidator(minimum: 1, maximum: 64)],
             help_text: 'The NTP server authentication key.',

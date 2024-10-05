@@ -25,6 +25,7 @@ use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\VirtualIP;
 use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\MethodNotAllowedError;
+use RESTAPI\Responses\NotAcceptableError;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ServiceUnavailableError;
 use RESTAPI\Responses\Success;
@@ -74,6 +75,14 @@ class Endpoint {
     protected array $errors = [];
 
     /**
+     * @var array $response_types
+     * An array of Response classes that can be returned by this Endpoint. This array
+     * should contain the class names of the Response objects that can be returned by
+     * this Endpoint.
+     */
+    public array $response_types = [];
+
+    /**
      * @var Auth $client
      * The \RESTAPI\Core\Auth object created by this Endpoint during API calls, contains
      * client authentication information.
@@ -116,6 +125,22 @@ class Endpoint {
      * DELETE will use the Model's `delete()` method.
      */
     public array $request_method_options = [];
+
+    /**
+     * @var array $encode_content_handlers
+     * Defines which ContentHandler class (as shortnames) can be used to encode the API response. If this array is
+     * empty, all ContentHandlers with encode capabilities can be used. This directly relates to which MIME-types
+     * this endpoint supports in the Accept header.
+     */
+    public array $encode_content_handlers = [];
+
+    /**
+     * @var array $decode_content_handlers
+     * Defines which ContentHandler class (as shortnames) can be used to decode the API request. If this array is
+     * empty, all ContentHandlers with decode capabilities can be used. This directly relates to which MIME-types
+     * this endpoint supports in the Content-Type header.
+     */
+    public array $decode_content_handlers = [];
 
     /**
      * @property bool $requires_auth
@@ -289,6 +314,24 @@ class Endpoint {
      * If set to `true`, the Model objects in the `data` section of the response will be reversed.
      */
     public bool $reverse = false;
+
+    /**
+     * @var string|null $sort_by
+     * Sets the default value(s) for the `sort_by` field in the request data. This value is used to control the sorting of
+     * the Model objects returned by this Endpoint. This value can be overridden by the client in the request data. Use
+     * caution when assigning this value as it may force objects to be sorted in this order when they are written to the
+     * configuration file.
+     */
+    public string|array|null $sort_by = null;
+
+    /**
+     * @var string $sort_order
+     * Sets the default value for the `sort_order` field in the request data. This value is used to control the sorting
+     * order of the Model objects returned by this Endpoint. This value can be overridden by the client in the request
+     * data. This value only takes effect when the `sort_by` field is also set. This value must be the name of a valid
+     * PHP sort order constant ('SORT_ASC' or 'SORT_DESC').
+     */
+    public string $sort_order = 'SORT_ASC';
 
     /**
      * @var bool $append
@@ -523,6 +566,40 @@ class Endpoint {
     }
 
     /**
+     * Checks if the requested decode ContentHandler is supported.
+     * @throws NotAcceptableError When the requested ContentHandler is not supported.
+     */
+    public function check_decode_content_handler_supported(ContentHandler $content_handler): void {
+        # Obtain the shortname for the class
+        $content_handler_sn = $content_handler->get_class_shortname();
+
+        # Check that this ContentHandler is allowed to decode the client's request
+        if ($this->decode_content_handlers and !in_array($content_handler_sn, $this->decode_content_handlers)) {
+            throw new NotAcceptableError(
+                message: "The requested Content-Type '$content_handler->mime_type' is not supported by this endpoint.",
+                response_id: 'ENDPOINT_CONTENT_TYPE_NOT_SUPPORTED',
+            );
+        }
+    }
+
+    /**
+     * Checks if the requested encode ContentHandler is supported.
+     * @throws NotAcceptableError When the requested ContentHandler is not supported.
+     */
+    public function check_encode_content_handler_supported(ContentHandler $content_handler): void {
+        # Obtain the shortname for the class
+        $content_handler_sn = $content_handler->get_class_shortname();
+
+        # Check that this ContentHandler is allowed to encode the client's request
+        if ($this->encode_content_handlers and !in_array($content_handler_sn, $this->encode_content_handlers)) {
+            throw new NotAcceptableError(
+                message: "The requested Accept value '$content_handler->mime_type' is not supported by this endpoint.",
+                response_id: 'ENDPOINT_ACCEPT_NOT_SUPPORTED',
+            );
+        }
+    }
+
+    /**
      * Checks if authentication and authorization for this Endpoint is successful. This will attempt authentication
      * and authorization for each allowed auth method. Only one auth method needs to succeed to allow access.
      */
@@ -652,6 +729,11 @@ class Endpoint {
     private function check_request_data(): void {
         # Obtain the ContentHandler associated with the HTTP Content-Type header sent by the client
         $content_handler = ContentHandler::get_decode_handler();
+
+        # Ensure this endpoint supports the decode handler
+        $this->check_decode_content_handler_supported($content_handler);
+
+        # Decode the request data
         $this->request_data = $content_handler->decode();
         $this->validate_endpoint_fields();
     }
@@ -699,6 +781,76 @@ class Endpoint {
             # Update the reverse property to use the client's requested value and remove it from the request data
             $this->reverse = $this->request_data['reverse'];
             unset($this->request_data['reverse']);
+        }
+    }
+
+    /**
+     * Validates the $sort_by common control parameter for this request.
+     * @note If the `sort_by` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $sort_by property value.
+     * @throws ValidationError When the `sort_by` field is not a string or is not a valid field in the Model.
+     */
+    private function validate_sort_by(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['sort_by'])) {
+            # Ensure value is an array
+            $this->request_data['sort_by'] = is_array($this->request_data['sort_by'])
+                ? $this->request_data['sort_by']
+                : [$this->request_data['sort_by']];
+
+            # Check each field in the array
+            foreach ($this->request_data['sort_by'] as $sort_by) {
+                # Ensure value is a string
+                if (!is_string($sort_by)) {
+                    throw new ValidationError(
+                        message: 'Field `sort_by` must be of type `string`.',
+                        response_id: 'ENDPOINT_SORT_BY_FIELD_INVALID_TYPE',
+                    );
+                }
+
+                # Ensure the field is a valid field in the Model
+                if (!in_array($sort_by, $this->model->get_fields())) {
+                    throw new ValidationError(
+                        message: 'Field `sort_by` must be a valid field in the Model.',
+                        response_id: 'ENDPOINT_SORT_BY_FIELD_NON_EXISTENT_FIELD',
+                    );
+                }
+            }
+
+            # Update the sort_by property to use the client's requested value and remove it from the request data
+            $this->sort_by = $this->request_data['sort_by'];
+            unset($this->request_data['sort_by']);
+        }
+    }
+
+    /**
+     * Validates the $sort_order common control parameter for this request.
+     * @note If the `sort_order` field was not provided in the request data, the request will default to the Endpoint's assigned
+     * $sort_order property value.
+     * @throws ValidationError When the `sort_order` field is not a string or is not a valid sort order constant.
+     */
+    private function validate_sort_order(): void {
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['sort_order'])) {
+            # Ensure value is a string
+            if (!is_string($this->request_data['sort_order'])) {
+                throw new ValidationError(
+                    message: 'Field `sort_order` must be of type `string`.',
+                    response_id: 'ENDPOINT_SORT_ORDER_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Ensure the field is a valid sort order constant
+            if (!in_array($this->request_data['sort_order'], ['SORT_ASC', 'SORT_DESC'])) {
+                throw new ValidationError(
+                    message: 'Field `sort_order` must be one of: [\'SORT_ASC\', \'SORT_DESC\'].',
+                    response_id: 'ENDPOINT_SORT_ORDER_FIELD_UNKNOWN_SORT_ORDER',
+                );
+            }
+
+            # Update the sort_order property to use the client's requested value and remove it from the request data
+            $this->sort_order = $this->request_data['sort_order'];
+            unset($this->request_data['sort_order']);
         }
     }
 
@@ -810,6 +962,8 @@ class Endpoint {
         # Ensure control parameters are of the correct type if the client requested them
         $this->validate_async();
         $this->validate_reverse();
+        $this->validate_sort_by();
+        $this->validate_sort_order();
         $this->validate_append();
         $this->validate_remove();
         $this->validate_limit();
@@ -845,6 +999,9 @@ class Endpoint {
             # Ensure we can obtain the ContentHandler that will be responsible for encoding response content
             # This will throw an error if the client's Accept header is not supported by an existing ContentHandler
             $content_handler = ContentHandler::get_encode_handler();
+
+            # Ensure the ContentHandler is also supported by this Endpoint
+            $this->check_encode_content_handler_supported($content_handler);
 
             # Checks that request data was properly received and parsed.
             $this->check_request_method();
@@ -896,9 +1053,19 @@ class Endpoint {
             );
         }
 
+        # Send the Response through the response handler for any final processing
+        $response = $this->response_handler($response);
+
         # Format the HTTP response as JSON and set response code
-        http_response_code($response->code);
-        return $content_handler->encode($response->to_representation()) . PHP_EOL;
+        try {
+            http_response_code($response->code);
+            return $content_handler->encode($response->to_representation(), context: $response) . PHP_EOL;
+        } catch (Response $response) {
+            # If an error occurs during the response encoding process, return the error message as JSON
+            http_response_code($response->code);
+            $content_handler = new JSONContentHandler();
+            return $content_handler->encode($response->to_representation(), context: $response) . PHP_EOL;
+        }
     }
 
     /**
@@ -913,6 +1080,8 @@ class Endpoint {
                 limit: $this->limit,
                 offset: $this->offset,
                 reverse: $this->reverse,
+                sort_by: $this->sort_by,
+                sort_order: constant($this->sort_order),
             );
         }
         # For GET requests on many Endpoints, obtain all objects from the assigned Model.
@@ -928,8 +1097,16 @@ class Endpoint {
     protected function post(): Model|ModelSet {
         # POST request cannot include an ID, strip the ID if present
         unset($this->request_data['id']);
+
+        # Construct the model from representation using the client's request data
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
+
+        # Allow the endpoint/client to override the Model's sort_by and sort_order properties
+        $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
+        $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
+
+        # Create the object and return it
         return $this->model->create(apply: $this->request_data['apply'] === true);
     }
 
@@ -944,8 +1121,15 @@ class Endpoint {
      * Updates an existing object for the assigned Model using the data submitted in a PATCH request.
      */
     protected function patch(): Model|ModelSet {
+        # Construct the model from representation using the client's request data
         $this->model->from_representation(data: $this->request_data);
         $this->model->placement = $this->request_data['placement'] ?? null;
+
+        # Allow the endpoint/client to override the Model's sort_by and sort_order properties
+        $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
+        $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
+
+        # Update the object and return it
         return $this->model->update(
             apply: $this->request_data['apply'] === true,
             append: $this->append,
@@ -984,6 +1168,17 @@ class Endpoint {
     final protected function options(): void {
         header('access-control-allow-methods: ' . implode(', ', $this->request_method_options));
         header('Allow: ' . implode(', ', $this->request_method_options));
+    }
+
+    /**
+     * Defines a middleware method that can be used to handle the call's Response object before it is sent back to the
+     * client. This can be used by child Endpoints to extend or override the default Response handling behavior.
+     * @param Response $response The Response object handle before it is sent back to the client by process_request()
+     * @returns Response The Response object to send back to the client.
+     */
+    public function response_handler(Response $response): Response {
+        # Simply return the Response object as-is by default
+        return $response;
     }
 
     /**

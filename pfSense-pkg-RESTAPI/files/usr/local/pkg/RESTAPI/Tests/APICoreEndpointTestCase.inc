@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\ContentHandlers\JSONContentHandler;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Endpoints\DiagnosticsARPTableEndpoint;
 use RESTAPI\Endpoints\FirewallAliasEndpoint;
@@ -678,5 +679,135 @@ class APICoreEndpointTestCase extends TestCase {
         $resp = json_decode($json_resp);
         $this->assert_equals($resp->code, 200);
         $this->assert_equals(count($resp->data), 4);
+    }
+
+    /**
+     * Checks that the encode_content_handler property controls which ContentHandlers can be used to encode the response
+     * for the endpoint.
+     */
+    public function test_encode_content_handler(): void {
+        $this->assert_throws_response(
+            response_id: 'ENDPOINT_ACCEPT_NOT_SUPPORTED',
+            code: 406,
+            callable: function () {
+                # Use the FirewallAliasEndpoint to test this
+                $endpoint = new FirewallAliasEndpoint();
+
+                # Only allow the 'BinaryContentHandler' to encode responses
+                $endpoint->encode_content_handlers = ['BinaryContentHandler'];
+
+                # Try to get JSONContentHandler to encode the response. This should throw our error.
+                $endpoint->check_encode_content_handler_supported(new JSONContentHandler());
+            },
+        );
+    }
+
+    /**
+     * Checks that the decode_content_handler property controls which ContentHandlers can be used to decode requests
+     * for the endpoint.
+     */
+    public function test_decode_content_handler(): void {
+        $this->assert_throws_response(
+            response_id: 'ENDPOINT_CONTENT_TYPE_NOT_SUPPORTED',
+            code: 406,
+            callable: function () {
+                # Use the FirewallAliasEndpoint to test this
+                $endpoint = new FirewallAliasEndpoint();
+
+                # Only allow the 'URLContentHandler' to decode requests
+                $endpoint->decode_content_handlers = ['URLContentHandler'];
+
+                # Try to get JSONContentHandler to decode the request. This should throw our error.
+                $endpoint->check_decode_content_handler_supported(new JSONContentHandler());
+            },
+        );
+    }
+
+    /**
+     * Ensure any errors which occur during the encoding process get encoded using the default JSONContentHandler.
+     */
+    public function test_encode_error_uses_json_as_response(): void {
+        # Try to request the FirewallAliasesEndpoint to return data as binary data (application/octet-stream)
+        $endpoint = new FirewallAliasesEndpoint();
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['HTTP_ACCEPT'] = 'application/octet-stream';
+        $_SERVER['PHP_AUTH_USER'] = 'admin';
+        $_SERVER['PHP_AUTH_PW'] = 'pfsense';
+        $resp = $endpoint->process_request();
+
+        # Ensure the response is JSON
+        $this->assert_equals(json_decode($resp)->code, 406);
+    }
+
+    /**
+     * Ensure the 'sort_by' common control parameter must be the name of a Model field.
+     */
+    public function test_sort_by_must_be_model_field_name(): void {
+        # Use a GET request to request a non-string field to sort by
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 12345],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        # Ensure the response threw a ENDPOINT_SORT_BY_FIELD_INVALID_TYPE error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_BY_FIELD_INVALID_TYPE');
+        $this->assert_equals($resp->code, 400);
+
+        # Make another request to sort by a field that does not exist in the Model
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'non_existent_field'],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure the response threw a ENDPOINT_SORT_BY_FIELD_NON_EXISTENT_FIELD error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_BY_FIELD_NON_EXISTENT_FIELD');
+        $this->assert_equals($resp->code, 400);
+    }
+
+    /**
+     * Ensure the 'sort_order' common control parameter must be the name of a valid PHP sort constant.
+     */
+    public function test_sort_order_must_be_php_sort_constant(): void {
+        # Use a GET request to request a non-string sort order
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'name', 'sort_order' => 12345],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        # Ensure the response threw a ENDPOINT_SORT_ORDER_FIELD_INVALID_TYPE error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_ORDER_FIELD_INVALID_TYPE');
+        $this->assert_equals($resp->code, 400);
+
+        # Make another request to sort order that is not known
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'name', 'sort_order' => 'unknown_sort_order'],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure the response threw a ENDPOINT_SORT_ORDER_FIELD_UNKNOWN_SORT_ORDER error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_ORDER_FIELD_UNKNOWN_SORT_ORDER');
+        $this->assert_equals($resp->code, 400);
     }
 }

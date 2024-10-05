@@ -64,7 +64,7 @@ class CertificateAuthority extends Model {
         );
         $this->prv = new Base64Field(
             required: true,
-            write_only: true,
+            sensitive: true,
             validators: [new X509Validator(allow_prv: true, allow_ecprv: true)],
             help_text: 'The X509 private key string.',
         );
@@ -119,6 +119,24 @@ class CertificateAuthority extends Model {
                 message: 'Certificate authority cannot be deleted because it is in use.',
                 response_id: 'CERTIFICATE_AUTHORITY_CANNOT_BE_DELETED_WHILE_IN_USE',
             );
+        }
+
+        # Remove references to this CA from any existing certificates
+        $cert_q = Certificate::query(reverse: true, caref: $this->refid->value);
+        foreach ($cert_q->model_objects as $cert) {
+            $this->del_config("cert/$cert->id/caref");
+        }
+
+        # Remove any CRLs associated with this CA
+        $crl_q = CertificateRevocationList::query(reverse: true, caref: $this->refid->value);
+        foreach ($crl_q->model_objects as $crl) {
+            $this->del_config("crl/$crl->id");
+        }
+
+        # Delete an intermediate CAs signed by this CA
+        $ca_q = CertificateAuthority::query(reverse: true, caref: $this->refid->value, id__except: $this->id);
+        foreach ($ca_q->model_objects as $ca) {
+            $this->del_config("ca/$ca->id");
         }
 
         parent::_delete();

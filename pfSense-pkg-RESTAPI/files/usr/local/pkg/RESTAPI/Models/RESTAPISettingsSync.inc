@@ -26,6 +26,7 @@ class RESTAPISettingsSync extends Model {
         $this->sync_data = new StringField(
             required: true,
             representation_only: true,
+            maximum_length: 65535,
             help_text: 'The serialized REST API settings data to be synced.',
         );
 

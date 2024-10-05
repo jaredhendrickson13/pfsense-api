@@ -152,7 +152,7 @@ class AuthServer extends Model {
         );
         $this->ldap_bindpw = new StringField(
             required: true,
-            write_only: true,
+            sensitive: true,
             conditions: ['type' => 'ldap', '!ldap_binddn' => null],
             help_text: 'The password to use when binding to this authentication server.',
         );
@@ -216,7 +216,7 @@ class AuthServer extends Model {
         );
         $this->radius_secret = new StringField(
             required: true,
-            write_only: true,
+            sensitive: true,
             conditions: ['type' => 'radius'],
             help_text: 'The shared secret to use when authenticating to this RADIUS server.',
         );

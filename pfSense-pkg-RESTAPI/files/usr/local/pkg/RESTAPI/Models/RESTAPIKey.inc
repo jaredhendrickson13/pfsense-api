@@ -68,7 +68,7 @@ class RESTAPIKey extends Model {
         );
         $this->hash = new StringField(
             allow_null: true,
-            write_only: true, # Don't allow the hash to be read via API
+            sensitive: true, # Don't allow the hash to be read via API
             help_text: 'The hash of the generated API key',
         );
 

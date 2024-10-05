@@ -4,6 +4,7 @@ namespace RESTAPI\ContentHandlers;
 
 use JsonException;
 use RESTAPI\Core\ContentHandler;
+use RESTAPI\Core\Response;
 use RESTAPI\Responses\ValidationError;
 
 /**
@@ -11,14 +12,19 @@ use RESTAPI\Responses\ValidationError;
  * REST API and corresponds with the 'application/json' MIME type.
  */
 class JSONContentHandler extends ContentHandler {
+    /**
+     * The MIME type associated with this content handler.
+     * @var string $mime_type
+     */
     public string $mime_type = 'application/json';
 
     /**
      * Encodes the given content as JSON.
      * @param mixed|null $content The content to encode.
+     * @param Response|null $context The Response object that contains the content to encode.
      * @return mixed The encoded content.
      */
-    protected function _encode(mixed $content = null): mixed {
+    protected function _encode(mixed $content = null, ?Response $context = null): mixed {
         return $content ? json_encode($content) : [];
     }
 

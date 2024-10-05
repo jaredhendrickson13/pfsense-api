@@ -2,8 +2,12 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Models\Certificate;
 use RESTAPI\Models\CertificateAuthority;
+use RESTAPI\Models\CertificateAuthorityGenerate;
+use RESTAPI\Models\CertificateGenerate;
 use RESTAPI\Models\CertificateRevocationList;
 
 class APIModelsCertificateRevocationListTestCase extends TestCase {
@@ -70,6 +74,60 @@ sJ2heugpAOP3tLQrMgGw6M9XBPjVBsnErVgRu11OJnUttL7kUgWcrTlaOYhPqvYx
 O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
 -----END X509 CRL-----";
 
+    /**
+     * @var CertificateAuthority|Model $ca The CertificateAuthority model to use for testing.
+     */
+    private CertificateAuthority|Model $ca;
+
+    /**
+     * @var Certificate|Model $cert The Certificate model to use for testing.
+     */
+    private Certificate|Model $cert;
+
+    /**
+     * Sets up the test cases by ensuring a CA and certificate are generated
+     */
+    public function setup(): void {
+        $this->ca = new CertificateAuthorityGenerate(
+            descr: 'test_ca',
+            trust: true,
+            randomserial: true,
+            is_intermediate: false,
+            keytype: 'RSA',
+            keylen: 2048,
+            digest_alg: 'sha256',
+            lifetime: 3650,
+            dn_country: 'US',
+            dn_state: 'UT',
+            dn_city: 'Salt Lake City',
+            dn_organization: 'ACME Org',
+            dn_organizationalunit: 'IT',
+        );
+        $this->ca->create();
+        $this->ca = CertificateAuthority::query(refid: $this->ca->refid->value)->first();
+
+        $cert = new CertificateGenerate(
+            descr: 'testcert',
+            caref: $this->ca->refid->value,
+            keytype: 'RSA',
+            keylen: 2048,
+            digest_alg: 'sha256',
+            lifetime: 3650,
+            type: 'user',
+            dn_commonname: 'testcert.example.com',
+        );
+        $cert->create();
+        $this->cert = Certificate::query(descr: 'testcert')->first();
+    }
+
+    /**
+     * Cleans up the test cases by deleting the CA and certificate
+     */
+    public function teardown(): void {
+        $this->cert->delete();
+        $this->ca->delete();
+    }
+
     /*
      * Ensures CRLs can be created and deleted
      */
@@ -106,5 +164,66 @@ O2KYIqqr1w7O0epy0oKKZSHlwQoIOy8S1CNCIrFiYx4BJ9Gq34cjZ/OpkQPijQ==
 
         # Ensure there are no more CRLs
         $this->assert_equals(count(CertificateRevocationList::read_all()->model_objects), 0);
+    }
+
+    /*
+     * Ensures the 'to_x509_crl' method works as expected
+     */
+    public function test_to_x509_crl(): void {
+        # Ensure an undefined CRL method throws an error
+        $this->assert_throws_response(
+            response_id: 'CERTIFICATE_REVOCATION_LIST_FAILED_TO_GENERATE_CRL',
+            code: 500,
+            callable: function () {
+                $internal_crl = new CertificateRevocationList();
+                $internal_crl->to_x509_crl();
+            },
+        );
+
+        # Ensure a valid internal CRL outputs the raw CRL data
+        $internal_crl = new CertificateRevocationList(
+            descr: 'test_internal_ca',
+            caref: $this->ca->refid->value,
+            method: 'internal',
+            lifetime: 730,
+            serial: 1,
+        );
+        $internal_crl->create();
+        $this->assert_str_contains($internal_crl->to_x509_crl(), '-----BEGIN X509 CRL-----');
+
+        # Delete the CRL
+        $internal_crl->delete();
+    }
+
+    /**
+     * Ensure CRL can be generated with certificates being revoked
+     */
+    public function test_generate_with_revoked_certificates(): void {
+        # Create a CRL with a revoked certificate
+        $crl = new CertificateRevocationList(
+            descr: 'test_crl',
+            caref: $this->ca->refid->value,
+            method: 'internal',
+            lifetime: 730,
+            serial: 1,
+            cert: [
+                [
+                    'certref' => $this->cert->refid->value,
+                    'reason' => 1,
+                ],
+            ],
+        );
+        $crl->create();
+
+        # Ensure we have CRL data
+        $this->assert_str_contains($crl->text->value, '-----BEGIN X509 CRL-----');
+
+        # Update the CRL and ensure the serial number is incremented
+        $crl_serial = $crl->serial->value;
+        $crl->update();
+        $this->assert_equals($crl->serial->value, $crl_serial + 1);
+
+        # Delete the CRL
+        $crl->delete();
     }
 }

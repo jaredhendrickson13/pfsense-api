@@ -52,6 +52,7 @@ class DHCPServer extends Model {
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define Model attributes
         $this->config_path = 'dhcpd';
+        $this->id_type = 'string';
         $this->many = true;
         $this->subsystem = 'dhcpd';
         $this->update_strategy = 'merge';

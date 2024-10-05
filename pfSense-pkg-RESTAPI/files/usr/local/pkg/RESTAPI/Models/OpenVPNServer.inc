@@ -34,6 +34,7 @@ class OpenVPNServer extends Model {
     public StringField $protocol;
     public InterfaceField $interface;
     public PortField $local_port;
+    public BooleanField $use_tls;
     public Base64Field $tls;
     public StringField $tls_type;
     public StringField $tlsauth_keydir;
@@ -169,16 +170,24 @@ class OpenVPNServer extends Model {
             allow_range: false,
             help_text: 'The port used by OpenVPN to receive client connections.',
         );
+        $this->use_tls = new BooleanField(
+            default: false,
+            representation_only: true,
+            indicates_true: true,
+            indicates_false: false,
+            help_text: 'Enables or disables the use of a TLS key for this OpenVPN server.',
+        );
         $this->tls = new Base64Field(
-            default: null,
-            allow_null: true,
+            default_callable: 'generate_tls_key',
+            sensitive: true,
+            conditions: ['use_tls' => true],
             help_text: 'The TLS key this OpenVPN server will use to sign control channel packets with an HMAC ' .
                 'signature for authentication when establishing the tunnel.',
         );
         $this->tls_type = new StringField(
             required: true,
             choices: ['auth', 'crypt'],
-            conditions: ['!tls' => null],
+            conditions: ['use_tls' => true],
             help_text: 'The TLS key usage type. In `auth` mode, the TLS key is used only as HMAC authentication for ' .
                 'the control channel, protecting the peers from unauthorized connections. The `crypt` mode encrypts ' .
                 'the control channel communication in addition to providing authentication, providing more privacy ' .
@@ -187,7 +196,7 @@ class OpenVPNServer extends Model {
         $this->tlsauth_keydir = new StringField(
             default: 'default',
             choices: ['default', '0', '1', '2'],
-            conditions: ['!tls' => null],
+            conditions: ['use_tls' => true],
             help_text: 'The TLS key direction. This must be set to complementary values on the client and server. ' .
                 'For example, if the server is set to 0, the client must be set to 1. Both may be set to omit the ' .
                 'direction, in which case the TLS Key will be used bidirectionally.',
@@ -649,6 +658,23 @@ class OpenVPNServer extends Model {
     }
 
     /**
+     * Populates the internal value of the `use_tls` field since this is not a stored value.
+     * @return bool The `use_tls` value's internal value
+     */
+    public function from_internal_use_tls(): bool {
+        # We know TLS is enabled if we have a TLS key stored
+        return (bool) $this->tls->value;
+    }
+
+    /**
+     * Generates a new OpenVPN TLS key.
+     * @return string The generated TLS key
+     */
+    public static function generate_tls_key(): string {
+        return openvpn_create_key();
+    }
+
+    /**
      * Adds extra validation to the `disable` field.
      * @param bool $disable The incoming value to validate.
      * @return bool The validated value to be assigned.
@@ -707,7 +733,7 @@ class OpenVPNServer extends Model {
      */
     public function validate_tls(string $tls): string {
         # Ensure this TLS key begins with the OpenVPN key prefix and suffix
-        if (!str_contains($tls, self::STATIC_KEY_PREFIX) and !str_contains($tls, self::STATIC_KEY_SUFFIX)) {
+        if ($tls and !str_contains($tls, self::STATIC_KEY_PREFIX) and !str_contains($tls, self::STATIC_KEY_SUFFIX)) {
             throw new ValidationError(
                 message: 'Field `tls` must be a valid OpenVPN TLS key.',
                 response_id: 'OPENVPN_SERVER_TLS_INVALID_KEY',

@@ -94,7 +94,7 @@ class WireGuardPeer extends Model {
      */
     public function validate_presharedkey(string $presharedkey): string {
         # Throw an error if this value is not a valid WireGuard key
-        if (!wg_is_valid_key($presharedkey)) {
+        if ($presharedkey and !wg_is_valid_key($presharedkey)) {
             throw new ValidationError(
                 message: 'Field `presharedkey` must be a valid WireGuard pre-shared key.',
                 response_id: 'WIREGUARD_PEER_PRESHAREDKEY_INVALID',

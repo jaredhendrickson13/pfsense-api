@@ -127,14 +127,13 @@ class MakePackage:
     def build_on_remote_host(self):
         """Runs the build on a remote host using SSH."""
         # Automate the process to pull, install dependencies, build and retrieve the package on a remote host
-        includes_dir = f"~/build/{REPO_NAME}/{PKG_NAME}/files/usr/local/pkg/RESTAPI/.resources/includes/"
+        includes_dir = f"~/build/{REPO_NAME}/{PKG_NAME}/files/usr/local/pkg/RESTAPI/.resources/vendor/"
         build_cmds = [
             "mkdir -p ~/build/",
             f"rm -rf ~/build/{REPO_NAME}",
             f"git clone https://github.com/{REPO_OWNER}/{REPO_NAME}.git ~/build/{REPO_NAME}/",
             f"git -C ~/build/{REPO_NAME} checkout " + self.args.branch,
             f"composer install --working-dir ~/build/{REPO_NAME}",
-            f"rm -rf ~/build/{REPO_NAME}/vendor/composer && rm ~/build/{REPO_NAME}/vendor/autoload.php",
             f"cp -r ~/build/{REPO_NAME}/vendor/* {includes_dir}",
             f"python3 ~/build/{REPO_NAME}/tools/make_package.py --tag {self.args.tag}",
         ]

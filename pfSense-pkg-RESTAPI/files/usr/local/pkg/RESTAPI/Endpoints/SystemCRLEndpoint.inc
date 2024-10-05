@@ -15,7 +15,7 @@ class SystemCRLEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/system/crl';
         $this->model_name = 'CertificateRevocationList';
-        $this->request_method_options = ['GET', 'POST', 'DELETE'];
+        $this->request_method_options = ['GET', 'POST', 'PATCH', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();

@@ -16,10 +16,11 @@ Keep the following limitations in mind when using this API:
 I'd love for it to be an official package! A few years back, Netgate opened a friendly dialogue about the
 possibility of making this package official. There was some back and forth about the direction of the package and pfSense
 itself. Since then, I have been working on addressing most of the items that were brought up during the discussions but
-it seems interest has waned on Netgate's side. I am still open to the idea of making this an official package and would
-still love to work with Netgate to make that happen.
+it seems it is no longer in Netgate's interest to make this package official. I am still open to the idea of making this
+package official, but sadly with the announcement of pfSense Plus's [multi-instance management](https://www.netgate.com/multi-instance-management-pfsense-plus)
+it seems highly unlikely that this package will ever be made official.
 
-For now, I will say there are still some benefits to this package being unofficial. It allows for more rapid development and
+There are still some benefits to this package being unofficial. It allows for more rapid development and
 more flexibility in the direction of the package. It also allows for more community involvement in the development of the
 package. It also ensures the package remains free and open-source.
 
@@ -39,3 +40,11 @@ designed to comply with RESTful principles and was only meant to be REST-like. T
 up with RESTful principles in mind and is a much more accurate representation of a RESTful API, therefor it was decided 
 to create a new package to reflect this change while also differentiating it from Netgate's supposed RESTCONF plans.
 
+### Why can I not see passwords/keys/hashes in API responses?
+
+By default, sensitive fields such as passwords, keys and hashes are **not** included in API responses. This is an important
+security measure to help prevent critical information from being leaked. Although it is highly advised you keep these
+sensitive fields hidden, you can override this behavior by enabling the 'Expose Sensitive Fields' option in 
+System > REST API > Settings, or by setting the `expose_sensitive_fields` option in a `PATCH` request to 
+[/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint).
+If you do choose to expose sensitive fields, it's recommended you only do so temporarily and only when necessary.

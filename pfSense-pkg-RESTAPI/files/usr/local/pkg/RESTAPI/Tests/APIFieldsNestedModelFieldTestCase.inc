@@ -136,14 +136,14 @@ class APIFieldsNestedModelFieldTestCase extends TestCase {
     /**
      * Ensures the `sort()` method correctly sorts values based on the nested Model's sort criteria.
      */
-    public function test_sort() {
+    public function test_sort(): void {
         # Create a NestedModelObject to test with.
         $field = new NestedModelField('FirewallAlias', required: true);
         $field->name = 'test';
 
         # Assign the nested Model sort criteria for testing - by field `name` in alphabetical order
-        $field->model->sort_by_field = 'name';
-        $field->model->sort_option = SORT_ASC;
+        $field->model->sort_by = ['name'];
+        $field->model->sort_order = SORT_ASC;
 
         # Set the value to an array of alias objects that are out of order
         $field->value = [
@@ -153,23 +153,26 @@ class APIFieldsNestedModelFieldTestCase extends TestCase {
             ['name' => 'bbb', 'type' => 'network'],
         ];
 
+        # Ensure we validate the value to populate the ModelSet
+        $field->validate();
+
         # Sort the values and ensure they are now placed in alphabetical order
         $field->sort();
         $this->assert_equals($field->value, [
-            ['name' => 'aaa', 'type' => 'port'],
-            ['name' => 'bbb', 'type' => 'network'],
-            ['name' => 'ccc', 'type' => 'host'],
-            ['name' => 'ddd', 'type' => 'host'],
+            ['id' => 0, 'name' => 'aaa', 'type' => 'port', 'descr' => '', 'address' => [], 'detail' => []],
+            ['id' => 1, 'name' => 'bbb', 'type' => 'network', 'descr' => '', 'address' => [], 'detail' => []],
+            ['id' => 2, 'name' => 'ccc', 'type' => 'host', 'descr' => '', 'address' => [], 'detail' => []],
+            ['id' => 3, 'name' => 'ddd', 'type' => 'host', 'descr' => '', 'address' => [], 'detail' => []],
         ]);
 
         # Sort again but this time in descending order
-        $field->model->sort_option = SORT_DESC;
+        $field->model->sort_order = SORT_DESC;
         $field->sort();
         $this->assert_equals($field->value, [
-            ['name' => 'ddd', 'type' => 'host'],
-            ['name' => 'ccc', 'type' => 'host'],
-            ['name' => 'bbb', 'type' => 'network'],
-            ['name' => 'aaa', 'type' => 'port'],
+            ['id' => 0, 'name' => 'ddd', 'type' => 'host', 'descr' => '', 'address' => [], 'detail' => []],
+            ['id' => 1, 'name' => 'ccc', 'type' => 'host', 'descr' => '', 'address' => [], 'detail' => []],
+            ['id' => 2, 'name' => 'bbb', 'type' => 'network', 'descr' => '', 'address' => [], 'detail' => []],
+            ['id' => 3, 'name' => 'aaa', 'type' => 'port', 'descr' => '', 'address' => [], 'detail' => []],
         ]);
     }
 }

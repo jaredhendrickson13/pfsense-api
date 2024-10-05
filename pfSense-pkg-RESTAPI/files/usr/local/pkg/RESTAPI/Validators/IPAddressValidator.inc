@@ -12,35 +12,24 @@ use RESTAPI\Responses\ValidationError;
  * Defines a Validator that checks if a given value is a valid IPv4 or IPv6 address.
  */
 class IPAddressValidator extends RESTAPI\Core\Validator {
-    public bool $allow_ipv4;
-    public bool $allow_ipv6;
-    public bool $allow_ipv6_link_local;
-    public bool $allow_alias;
-    public bool $allow_fqdn;
-    public array $allow_keywords;
-
     /**
      * @param bool $allow_ipv4 Allow value to be an IPv4 address.
      * @param bool $allow_ipv6 Allow value to be an IPv6 address.
      * @param bool $allow_ipv6_link_local Allow value to be an IPv6 link local address. Only applies if $allow_ipv6
      * is `true`.
      * @param bool $allow_fqdn Allow value to be an FQDN.
+     * @param bool $allow_port Allow value to end with a port number (e.g. `:80`).
      * @param array $allow_keywords An array of non IP/FQDN values to allow.
      */
     public function __construct(
-        bool $allow_ipv4 = true,
-        bool $allow_ipv6 = true,
-        bool $allow_ipv6_link_local = true,
-        bool $allow_alias = false,
-        bool $allow_fqdn = false,
-        array $allow_keywords = [],
+        public bool $allow_ipv4 = true,
+        public bool $allow_ipv6 = true,
+        public bool $allow_ipv6_link_local = true,
+        public bool $allow_alias = false,
+        public bool $allow_fqdn = false,
+        public bool $allow_port = false,
+        public array $allow_keywords = [],
     ) {
-        $this->allow_ipv4 = $allow_ipv4;
-        $this->allow_ipv6 = $allow_ipv6;
-        $this->allow_ipv6_link_local = $allow_ipv6_link_local;
-        $this->allow_alias = $allow_alias;
-        $this->allow_fqdn = $allow_fqdn;
-        $this->allow_keywords = $allow_keywords;
     }
 
     /**
@@ -49,7 +38,12 @@ class IPAddressValidator extends RESTAPI\Core\Validator {
      * @param string $field_name The field name of the value being validated. This is used for error messages.
      * @throws \RESTAPI\Responses\ValidationError When the value is not a valid IPv4 address.
      */
-    public function validate(mixed $value, string $field_name = '') {
+    public function validate(mixed $value, string $field_name = ''): void {
+        # Allow the value to end with a port number if allowed
+        if ($this->allow_port) {
+            $value = $this->validate_port_suffix($value, $field_name);
+        }
+
         # Non-port alias values are valid if allowed
         $alias_query = FirewallAlias::query(['name' => $value, 'type__except' => 'port']);
         if ($this->allow_alias and $alias_query->exists()) {
@@ -95,5 +89,33 @@ class IPAddressValidator extends RESTAPI\Core\Validator {
             message: "Field `$field_name` must be a valid $allowed_options_str, received `$value`.",
             response_id: 'IP_ADDRESS_VALIDATOR_FAILED',
         );
+    }
+
+    /**
+     * Checks if a given value is a valid socket address (ADDR:PORT) and validates that the port number is valid.
+     * @param mixed $value The value to be validated.
+     * @param string $field_name
+     * @return string
+     */
+    private function validate_port_suffix(mixed $value, string $field_name): string {
+        # Check if the value has a port suffix, if not return the value as is
+        if (!str_contains($value, ':')) {
+            return $value;
+        }
+
+        # Split the value into the IP address and port number
+        $split_value = explode(':', $value);
+        $ip_address = $split_value[0];
+        $port_number = $split_value[1];
+
+        # Ensure the port number is a valid port number
+        if (!is_port($port_number)) {
+            throw new ValidationError(
+                message: "Field `$field_name` contains an invalid port suffix `$port_number`.",
+                response_id: 'IP_ADDRESS_VALIDATOR_INVALID_PORT_SUFFIX',
+            );
+        }
+
+        return $ip_address;
     }
 }

@@ -7,6 +7,7 @@ classes are also responsible for following:
 - Defining the URL path for the endpoint.
 - Specifying which request methods are allowed.
 - Adding additional documentation to the endpoint's OpenAPI definition.
+- Defining an associated GraphQL query/mutation type.
 - Generating the PHP file in the pfSense web root to expose the endpoint.
 
 ## Getting Started
@@ -240,10 +241,10 @@ and the endpoint will be accessible via the REST API.
 
 ## Generating Documentation
 
-To regenerate the OpenAPI documentation for all Endpoint classes, run the following command:
+To regenerate the OpenAPI and GraphQL schemas for all Endpoint classes, run the following command:
 
 ```shell
-pfsense-restapi generatedocs
+pfsense-restapi buildschemas
 ```
 
 ## Examples
