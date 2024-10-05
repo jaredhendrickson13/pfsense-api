@@ -50,6 +50,14 @@ class APIModelsWireGuardPeerTestCase extends TestCase {
                 $peer->validate();
             },
         );
+
+        # Ensure empty PSK does not throw an error
+        $this->assert_does_not_throw(
+            callable: function () {
+                $peer = new WireGuardPeer(publickey: 'KG0BA4UyPilHH5qnXCfr6Lw8ynecOPor88tljLy3AHk=', presharedkey: '');
+                $peer->validate();
+            },
+        );
     }
 
     /**
