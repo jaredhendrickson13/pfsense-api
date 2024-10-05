@@ -43,8 +43,8 @@ to create a new package to reflect this change while also differentiating it fro
 ### Why can I not see passwords/keys/hashes in API responses?
 
 By default, sensitive fields such as passwords, keys and hashes are **not** included in API responses. This is an important
-security measure to help prevent critical information from being leaked. All though it is highly advised you keep these
+security measure to help prevent critical information from being leaked. Although it is highly advised you keep these
 sensitive fields hidden, you can override this behavior by enabling the 'Expose Sensitive Fields' option in 
-System > REST API > Settings, or by setting the 'expose_sensitive_fields' option in a `PATCH` request to 
+System > REST API > Settings, or by setting the `expose_sensitive_fields` option in a `PATCH` request to 
 [/api/v2/system/restapi/settings](https://pfrest.org/api-docs/#/SYSTEM/patchSystemRESTAPISettingsEndpoint).
 If you do choose to expose sensitive fields, it's recommended you only do so temporarily and only when necessary.

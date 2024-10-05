@@ -20,7 +20,7 @@ characteristics of the endpoint. These characteristics include:
 #### Endpoint type
 
 Displays the [Endpoint type](ENDPOINT_TYPES.md) for the endpoint. This will tell you if the endpoint interacts with a 
-single objects or multiple objects at once.
+single object or multiple objects at once.
 
 #### Associated model
 
@@ -83,7 +83,7 @@ restarted/reloaded. This is typically done by calling the relevant service's `ap
 
 Indicates whether the Model class associated with the endpoint utilizes a cache to populate data. This attribute will
 display the name of the [Cache class used](https://pfrest.org/php-docs/namespaces/restapi-caches.html) by the Model class.
-If a cache is utilized, data returned by the endpoint is fetch periodically in the background on a schedule. This means
+If a cache is utilized, data returned by the endpoint is fetched periodically in the background on a schedule. This means
 the data returned by the endpoint may not always be up-to-date.
 
 ## OpenAPI Schema
