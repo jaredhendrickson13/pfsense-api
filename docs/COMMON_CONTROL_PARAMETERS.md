@@ -81,9 +81,9 @@ parameters you can use:
     you want to remove from. Then, make another request for the fields you want to replace.
 
 !!! Notes
-  - This parameter is only available for `PATCH` requests.
-  - This parameter is only applicable to array fields.
-  - If the submitted array values match the existing array values exactly, the API will not make any changes to that field to avoid removing all values unintentionally.
+    - This parameter is only available for `PATCH` requests.
+    - This parameter is only applicable to array fields.
+    - If the submitted array values match the existing array values exactly, the API will not make any changes to that field to avoid removing all values unintentionally.
 
 ## reverse
 
