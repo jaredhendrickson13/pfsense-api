@@ -39,7 +39,7 @@ class MakePackage:
         self.port_revision = self.args.tag.split("_", maxsplit=1)[1]
 
         # Allow package to build on systems that no longer have upstream ports support
-        os.environ['ALLOW_UNSUPPORTED_SYSTEM'] = 'yes'
+        os.environ["ALLOW_UNSUPPORTED_SYSTEM"] = "yes"
 
         # Run tasks for build mode
         if self.args.host:
