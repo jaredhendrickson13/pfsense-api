@@ -17,6 +17,7 @@
             <log_successful_auth>disabled</log_successful_auth>
             <hateoas>disabled</hateoas>
             <expose_sensitive_fields>disabled</expose_sensitive_fields>
+            <override_sensitive_fields></override_sensitive_fields>
             <allow_pre_releases>disabled</allow_pre_releases>
             <allowed_interfaces></allowed_interfaces>
             <represent_interfaces_as>id</represent_interfaces_as>

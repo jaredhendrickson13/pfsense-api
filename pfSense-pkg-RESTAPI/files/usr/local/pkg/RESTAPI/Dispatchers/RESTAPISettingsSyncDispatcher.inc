@@ -10,6 +10,7 @@ use RESTAPI\Models\RESTAPISettingsSync;
  */
 class RESTAPISettingsSyncDispatcher extends Dispatcher {
     public int $timeout = 60;
+    public int $max_queue = 1024;
 
     /**
      * Starts the REST API settings sync to HA peers.

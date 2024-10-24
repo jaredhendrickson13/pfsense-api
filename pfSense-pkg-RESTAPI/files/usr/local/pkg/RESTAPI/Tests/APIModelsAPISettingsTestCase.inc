@@ -567,4 +567,26 @@ class APIModelsAPISettingsTestCase extends TestCase {
         $user = new User(id: 0);
         $this->assert_is_empty($user->to_representation()['password']);
     }
+
+    /**
+     * Checks that the `override_sensitive_fields` field successfully overrides specified sensitive fields in the Model's
+     * representation.
+     */
+    public function test_override_sensitive_fields(): void {
+        # Ignore the sensitive flag for the User model's password field
+        $api_settings = new RESTAPISettings(override_sensitive_fields: ['User:password']);
+        $api_settings->update();
+
+        # Ensure we can now read the password field in the User model's representation
+        $user = new User(id: 0);
+        $this->assert_is_not_empty($user->to_representation()['password']);
+
+        # Reset the override_sensitive_fields setting
+        $api_settings = new RESTAPISettings(override_sensitive_fields: []);
+        $api_settings->update();
+
+        # Ensure we can no longer read the password
+        $user = new User(id: 0);
+        $this->assert_is_empty($user->to_representation()['password']);
+    }
 }

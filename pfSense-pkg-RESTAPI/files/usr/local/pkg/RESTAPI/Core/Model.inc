@@ -936,13 +936,8 @@ class Model {
 
         # Loop through each of this Model's Fields and add its value to a serializable array
         foreach ($this->get_fields() as $field) {
-            # Skip adding this field if it's a write only field
-            if ($this->$field->write_only) {
-                continue;
-            }
-
-            # Skip adding this field if it is sensitive and sensitive fields are not exposed
-            if ($this->$field->sensitive and !$expose_sensitive_fields) {
+            # Skip adding this field if it's hidden
+            if ($this->is_field_hidden($field)) {
                 continue;
             }
 
@@ -1061,6 +1056,42 @@ class Model {
         }
 
         return null;
+    }
+
+    /**
+     * Determines if a given Model field should be hidden in responses.
+     * @param string $field The field name to check for sensitivity.
+     * @return bool Returns true if the field is sensitive, false if it is not.
+     */
+    private function is_field_hidden(string $field): bool {
+        # Variable
+        $pkg_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
+        $expose_sensitive_fields = $pkg_config['expose_sensitive_fields'] === 'enabled';
+        $overridden_sensitive_fields = explode(',', $pkg_config['override_sensitive_fields']);
+        $model_field_mapping = "{$this->get_class_shortname()}:$field";
+
+        # Field is hidden if it is 'write_only'
+        if ($this->$field->write_only) {
+            return true;
+        }
+
+        # Field is not hidden if the sensitive property is not set
+        if (!$this->$field->sensitive) {
+            return false;
+        }
+
+        # Field is not hidden if the 'expose_sensitive_fields' setting is enabled
+        if ($expose_sensitive_fields) {
+            return false;
+        }
+
+        # Field is not hidden if the field is in the 'override_sensitive_fields' setting
+        if (in_array($model_field_mapping, $overridden_sensitive_fields)) {
+            return false;
+        }
+
+        # Field is hidden if none of the above conditions are met
+        return true;
     }
 
     /**

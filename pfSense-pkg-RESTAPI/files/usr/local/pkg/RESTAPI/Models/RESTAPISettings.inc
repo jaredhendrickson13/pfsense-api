@@ -34,6 +34,7 @@ class RESTAPISettings extends Model {
     public BooleanField $allow_pre_releases;
     public BooleanField $hateoas;
     public BooleanField $expose_sensitive_fields;
+    public StringField $override_sensitive_fields;
     public InterfaceField $allowed_interfaces;
     public StringField $represent_interfaces_as;
     public StringField $auth_methods;
@@ -118,6 +119,15 @@ class RESTAPISettings extends Model {
             verbose_name: 'expose sensitive fields',
             help_text: 'Enables or disables exposing sensitive fields in API responses. When enabled, sensitive fields ' .
                 'such as passwords, private keys, and other sensitive data will be included in API responses.',
+        );
+        $this->override_sensitive_fields = new StringField(
+            default: [],
+            choices_callable: 'get_override_sensitive_fields_choices',
+            many: true,
+            conditions: ['expose_sensitive_fields' => false],
+            help_text: 'Specifies a list of fields (formatted as ModelName:FieldName) that should have their sensitive ' .
+                'attribute overridden. Fields selected here will not be considered sensitive and will be included in ' .
+                'API responses regardless of the `expose_sensitive_fields` setting.',
         );
         $this->allowed_interfaces = new InterfaceField(
             default: [],
@@ -210,6 +220,28 @@ class RESTAPISettings extends Model {
         foreach (get_classes_from_namespace(namespace: '\\RESTAPI\\Auth\\') as $auth_class) {
             $auth = new $auth_class();
             $choices[$auth->get_class_shortname()] = $auth->verbose_name;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * Obtains the choices for the `override_sensitive_fields` field. This will dynamically populate a choice for each
+     * Model and Field in the \RESTAPI\Models namespace.
+     */
+    public function get_override_sensitive_fields_choices(): array {
+        # Variables
+        $choices = [];
+
+        # Format choices so they include the class's verbose name as the choice's verbose name
+        foreach (get_classes_from_namespace(namespace: '\\RESTAPI\\Models\\') as $model_class) {
+            $model = new $model_class();
+            foreach ($model->get_fields() as $field) {
+                if ($model->$field->sensitive) {
+                    $choices[$model->get_class_shortname() . ':' . $field] =
+                        $model->get_class_shortname() . ':' . $field;
+                }
+            }
         }
 
         return $choices;

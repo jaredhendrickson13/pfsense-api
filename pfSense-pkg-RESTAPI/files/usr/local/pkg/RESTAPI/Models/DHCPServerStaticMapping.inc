@@ -41,6 +41,7 @@ class DHCPServerStaticMapping extends Model {
         $this->config_path = 'staticmap';
         $this->subsystem = 'dhcpd';
         $this->many = true;
+        $this->sort_by = ['ipaddr'];
 
         # Define model Fields
         $this->mac = new StringField(

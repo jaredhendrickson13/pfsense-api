@@ -34,6 +34,7 @@ class SystemRESTAPISettingsForm extends Form {
                 'login_protection',
                 'log_successful_auth',
                 'expose_sensitive_fields',
+                'override_sensitive_fields',
             ],
         ],
         'Advanced Settings' => [

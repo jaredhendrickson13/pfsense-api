@@ -110,7 +110,7 @@ class IPsecPhase1 extends Model {
         );
         $this->myid_type = new StringField(
             required: true,
-            choices: ['myaddress', 'address', 'fqdn', 'user_fqdn', 'asn1dn', 'keyid tag', 'dyn_dns'],
+            choices: ['myaddress', 'address', 'fqdn', 'user_fqdn', 'asn1dn', 'keyid tag', 'dyn_dns', 'auto'],
             help_text: 'The identifier type used by the local end of the tunnel.',
         );
         $this->myid_data = new StringField(
@@ -121,7 +121,7 @@ class IPsecPhase1 extends Model {
         );
         $this->peerid_type = new StringField(
             required: true,
-            choices: ['any', 'peeraddress', 'address', 'fqdn', 'user_fqdn', 'asn1dn', 'keyid tag', 'dyn_dns'],
+            choices: ['any', 'peeraddress', 'address', 'fqdn', 'user_fqdn', 'asn1dn', 'keyid tag', 'dyn_dns', 'auto'],
             help_text: 'The identifier type used by the remote end of the tunnel.',
         );
         $this->peerid_data = new StringField(
