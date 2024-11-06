@@ -222,7 +222,8 @@ class MakePackage:
             "--notests",
             dest="notests",
             action="store_true",
-            help="Exclude tests from the package build.",)
+            help="Exclude tests from the package build.",
+        )
         self.args = parser.parse_args()
 
 
