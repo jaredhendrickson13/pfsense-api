@@ -35,7 +35,7 @@ class WireGuardPeerAllowedIP extends Model {
         );
         $this->mask = new IntegerField(
             required: true,
-            minimum: 1,
+            minimum: 0,
             maximum: 128,
             help_text: 'The subnet mask for this peer IP.',
         );
