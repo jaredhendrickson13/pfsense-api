@@ -69,6 +69,10 @@ class MakePackage:
         }
         excluded_files = ["pkg-deinstall.in", "pkg-install.in", "etc", "usr"]
 
+        # Remove tests from the package if the user has specified to do so
+        if self.args.notests:
+            os.system(f"rm -rf {files_dir.joinpath('usr/local/pkg/RESTAPI/Tests')}")
+
         # Set Jijna2 environment and variables
         j2_env = jinja2.Environment(
             autoescape=jinja2.select_autoescape([]),
@@ -131,6 +135,7 @@ class MakePackage:
         """Runs the build on a remote host using SSH."""
         # Automate the process to pull, install dependencies, build and retrieve the package on a remote host
         includes_dir = f"~/build/{REPO_NAME}/{PKG_NAME}/files/usr/local/pkg/RESTAPI/.resources/vendor/"
+        notests = "--notests" if self.args.notests else ""
         build_cmds = [
             "mkdir -p ~/build/",
             f"rm -rf ~/build/{REPO_NAME}",
@@ -138,7 +143,7 @@ class MakePackage:
             f"git -C ~/build/{REPO_NAME} checkout " + self.args.branch,
             f"composer install --working-dir ~/build/{REPO_NAME}",
             f"cp -r ~/build/{REPO_NAME}/vendor/* {includes_dir}",
-            f"python3 ~/build/{REPO_NAME}/tools/make_package.py --tag {self.args.tag}",
+            f"python3 ~/build/{REPO_NAME}/tools/make_package.py --tag {self.args.tag} {notests}",
         ]
 
         # Run each command and exit on bad status if failure
@@ -212,6 +217,12 @@ class MakePackage:
             default=".",
             required=False,
             help="filename to use for the built package file.",
+        )
+        parser.add_argument(
+            "--notests",
+            dest="notests",
+            action="store_true",
+            help="Exclude tests from the package build.",
         )
         self.args = parser.parse_args()
 

@@ -44,7 +44,7 @@ jobs:
       - name: Build pfSense-pkg-RESTAPI on FreeBSD
         run: |
           /usr/bin/ssh -o StrictHostKeyChecking=no ${{ matrix.FREEBSD_VERSION }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
-          /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.FREEBSD_VERSION }}.jaredhendrickson.com --branch ${{ github.sha }} --tag ${{ github.ref_name }} --filename pfSense-${{ matrix.PFSENSE_VERSION }}-pkg-RESTAPI.pkg
+          /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.FREEBSD_VERSION }}.jaredhendrickson.com --branch ${{ github.sha }} --tag ${{ github.ref_name }} --filename pfSense-${{ matrix.PFSENSE_VERSION }}-pkg-RESTAPI.pkg --notests
 
       - name: Teardown FreeBSD build VM
         if: "${{ always() }}"
