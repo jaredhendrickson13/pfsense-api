@@ -45,6 +45,10 @@ Install on pfSense Plus:
 pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-24.03-pkg-RESTAPI.pkg
 ```
 
+## Support for pfSense Plus 24.11
+
+Working on supporting in https://github.com/jaredhendrickson13/pfsense-api/discussions/610
+
 > [!IMPORTANT]
 > You may need to customize the installation command to reference the package built for your pfSense version. Check
 > the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
