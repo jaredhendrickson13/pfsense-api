@@ -319,7 +319,7 @@ class Form {
      */
     final public function print_form(): void {
         # Print the static pfSense UI and include any custom CSS or JS files
-        global $config, $user_settings;
+        global $user_settings;
         $pgtitle = $this->title_path;
         include 'head.inc';
         echo "<link rel='stylesheet' href='$this->custom_css'/>";

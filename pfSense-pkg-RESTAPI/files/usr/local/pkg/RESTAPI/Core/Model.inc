@@ -550,8 +550,7 @@ class Model {
      */
     protected static function init_config(string $path) {
         # Initialize the configuration array of a specified path.
-        global $config;
-        array_init_path($config, $path);
+        config_init_path($path);
     }
 
     /**
@@ -562,8 +561,7 @@ class Model {
      *          path keys an empty string and $default is non-null
      */
     public static function get_config(string $path, mixed $default = null) {
-        global $config;
-        return array_get_path($config, $path, $default);
+        return config_get_path($path, $default);
     }
 
     /**
@@ -574,8 +572,7 @@ class Model {
      * @returns mixed $val or $default if the path prefix does not exist
      */
     public static function set_config(string $path, mixed $value, mixed $default = null) {
-        global $config;
-        return array_set_path($config, $path, $value, $default);
+        return config_set_path($path, $value, $default);
     }
 
     /**
@@ -616,8 +613,7 @@ class Model {
      * @returns array copy of the removed value or null
      */
     public static function del_config(string $path): mixed {
-        global $config;
-        return array_del_path($config, $path);
+        return config_del_path($path);
     }
 
     /**
@@ -630,8 +626,7 @@ class Model {
      * non-null value, otherwise false.
      */
     public static function is_config_enabled(string $path, string $enable_key = 'enable'): bool {
-        global $config;
-        return array_path_enabled($config, $path, $enable_key);
+        return config_path_enabled($path, $enable_key);
     }
 
     /**
@@ -680,8 +675,7 @@ class Model {
      * @param bool $force_parse Force an entire reparse of the config.xml file instead of the cached config.
      */
     public static function reload_config(bool $force_parse = false): void {
-        global $config;
-        $config = parse_config(parse: $force_parse);
+        config_set_path("", parse_config(parse: $force_parse));
     }
 
     /**

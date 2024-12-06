@@ -44,9 +44,6 @@ class TestCase {
      * @throws Error|Exception The exception thrown by failed Tests, typically an AssertionError.
      */
     public function run(): void {
-        # Need direct config access to revert any changes made by Tests
-        global $config;
-
         # Collect available environment variables
         $this->get_envs();
 
@@ -64,7 +61,7 @@ class TestCase {
             # If this method starts with `test`, run the function.
             if (str_starts_with($method, 'test')) {
                 # Backup the current config so we can undo any changes made during the test
-                $original_config = unserialize(serialize($config));
+                $original_config = config_get_path("");
 
                 # Set the current method undergoing testing
                 $this->method = $method;
@@ -78,14 +75,14 @@ class TestCase {
                     $this->$method();
                 } catch (Error | Exception $e) {
                     # Restore the original configuration, teardown the TestCase and throw the encountered error
-                    $config = $original_config;
+                    config_set_path("", $original_config);
                     write_config("Restored config after API test '$method'");
                     $this->teardown();
                     throw $e;
                 }
 
                 # Restore the config as it was when the test began.
-                $config = $original_config;
+                config_set_path("", $original_config);
                 write_config("Restored config after API test '$method'");
             }
         }

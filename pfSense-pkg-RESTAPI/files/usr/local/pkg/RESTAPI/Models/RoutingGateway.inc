@@ -207,8 +207,8 @@ class RoutingGateway extends Model {
             # Ensure the gateway cannot be disabled while it is in use by a system DNS server
             # TODO: replace with a Model query when the SystemDNSServer Model is developed
             $dnsgw_counter = 1;
-            while (isset($config['system']["dns{$dnsgw_counter}gw"])) {
-                if ($this->name->value == $config['system']["dns{$dnsgw_counter}gw"]) {
+            while ($this->get_config("system/dns{$dnsgw_counter}gw")) {
+                if ($this->name->value == $this->get_config("system/dns{$dnsgw_counter}gw")) {
                     throw new ValidationError(
                         message: 'Gateway cannot be disabled because it is in use by a system DNS ' .
                             "server with ID `$dnsgw_counter`",
