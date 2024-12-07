@@ -166,7 +166,7 @@ class Auth {
         # Start with pfSense 24.11, getUserEntry returns an array with the key 'item' containing the user data.
         # We need to handle both cases to support both.
         $user_ent = getUserEntry($this->username);
-        $user_ent = (array_key_exists('item', $user_ent)) ? $user_ent['item'] : $user_ent;
+        $user_ent = array_key_exists('item', $user_ent) ? $user_ent['item'] : $user_ent;
 
         # Obtain the client's privileges and check if they have the required privileges
         $this->client_privileges = get_user_privileges($user_ent);
