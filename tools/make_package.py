@@ -104,7 +104,7 @@ class MakePackage:
             "mkdir -p ~/build/",
             "rm -rf ~/build/pfsense-api",
             "git clone https://github.com/jaredhendrickson13/pfsense-api.git ~/build/pfsense-api/",
-            "git -C ~/build/pfsense-api checkout " + self.args.branch,
+            f"git -C ~/build/pfsense-api checkout '{self.args.branch}'",
             "composer install --working-dir ~/build/pfsense-api",
             "rm -rf ~/build/pfsense-api/vendor/composer && rm ~/build/pfsense-api/vendor/autoload.php",
             "cp -r ~/build/pfsense-api/vendor/* ~/build/pfsense-api/pfSense-pkg-API/files/etc/inc/",
