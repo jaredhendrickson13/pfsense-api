@@ -38,7 +38,7 @@ class APISystemCertificateCreate extends APIModel {
         $this->set_config("cert/{$this->id}",  $this->validated_data);
 
         # If user requests this cert to be active, configure it as the wc cert
-        if ($this->initial_data["active"] === true and $this->validated_data["type"] === "server") {
+        if ($this->initial_data["active"] === true) {
             $this->set_config("system/webgui/ssl-certref", $this->validated_data["refid"]);
         }
 
