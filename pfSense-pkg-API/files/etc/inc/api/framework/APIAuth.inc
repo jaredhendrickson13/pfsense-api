@@ -129,7 +129,10 @@ class APIAuth {
     public function authorize() {
         # Local variables
         $authorized = false;
-        $client_config =& getUserEntry($this->username);;
+
+        # Starting with pfSense Plus 24.11, the client config is nested under an 'item' key. Handle both cases.
+        $client_config =& getUserEntry($this->username);
+        $client_config = (array_key_exists('item', $client_config)) ? $client_config['item'] : $client_config;
         $this->privs = get_user_privileges($client_config);
 
         # If no require privileges were given, assume call is always authorized
