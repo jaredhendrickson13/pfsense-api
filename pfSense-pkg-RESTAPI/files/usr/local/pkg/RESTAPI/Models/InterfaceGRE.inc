@@ -146,8 +146,7 @@ class InterfaceGRE extends Model {
     /**
      * Extend the default _create method to create the GRE interface and obtain the real interface name.
      */
-    public function _create(): void
-    {
+    public function _create(): void {
         $this->greif->value = interface_gre_configure($this->to_internal());
         parent::_create();
     }
