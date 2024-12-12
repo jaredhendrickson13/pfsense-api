@@ -129,11 +129,6 @@ class InterfaceGRE extends Model {
      * Applies changes to this Interface GRE Tunnel.
      */
     public function apply(): void {
-        # Create the GRE interface if no greif exists
-        if (!$this->greif->value) {
-            interface_gre_configure($this->to_internal());
-        }
-
         # If the greif is already assigned to an interface, reconfigure the interface
         $if_q = NetworkInterface::query(if: $this->greif->value);
         if ($if_q->exists()) {
@@ -146,6 +141,23 @@ class InterfaceGRE extends Model {
      */
     public function apply_delete(): void {
         pfSense_interface_destroy($this->greif->value);
+    }
+
+    /**
+     * Extend the default _create method to create the GRE interface and obtain the real interface name.
+     */
+    public function _create(): void
+    {
+        $this->greif->value = interface_gre_configure($this->to_internal());
+        parent::_create();
+    }
+
+    /**
+     * Extend the default _update method to reconfigure the GRE interface.
+     */
+    public function _update(): void {
+        interface_gre_configure($this->to_internal());
+        parent::_update();
     }
 
     /**
