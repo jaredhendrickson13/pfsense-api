@@ -120,7 +120,7 @@ class InterfaceGRE extends Model {
         if (!$this->tunnel_local_addr->value and !$this->tunnel_local_addr6->value) {
             throw new ValidationError(
                 message: 'GRE tunnel must have a `tunnel_local_addr` and/or `tunnel_local_addr6`.',
-                response_id: 'INTERFACE_GRE_NO_LOCAL_ADDRESS',
+                response_id: 'INTERFACE_GRE_HAS_NO_LOCAL_ADDRESS',
             );
         }
     }
