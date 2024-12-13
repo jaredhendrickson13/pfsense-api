@@ -350,7 +350,7 @@ class OpenAPISchema extends Schema {
                             'explode' => true,
                             'description' =>
                                 'The arbitrary query parameters to include in the request.<br><br>' .
-                                'Note: This does not define a real parameter (e.g. there is no `query` parameter), '.
+                                'Note: This does not define a real parameter (e.g. there is no `query` parameter), ' .
                                 'rather it allows for any arbitrary query parameters to be included in the request.',
                             'schema' => [
                                 'type' => 'object',
