@@ -68,7 +68,16 @@ class RoutingGatewayGroup extends Model {
     protected function from_internal_ipprotocol(): string {
         # Check the IP protocol of the gateways in this group
         foreach ($this->priorities->value as $priority) {
-            $gw_obj = RoutingGateway::query(name: $priority['gateway'])->first();
+            # Query for the gateway related to this priority
+            $gw_q = RoutingGateway::query(name: $priority['gateway']);
+
+            # Skip this priority if the gateway does not exist. This can happen if the gateway is not in config.
+            if (!$gw_q->exists()) {
+                continue;
+            }
+
+            # Check the IP protocol of the gateway
+            $gw_obj = $gw_q->first();
             if ($gw_obj->ipprotocol->value === 'inet') {
                 return 'inet';
             } elseif ($gw_obj->ipprotocol->value === 'inet6') {
