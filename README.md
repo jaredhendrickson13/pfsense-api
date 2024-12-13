@@ -33,10 +33,6 @@ API package and provide you with the information you need to configure and use t
 For new users, it is recommended to refer to the links in the [Getting Started section](#getting-started) to begin. Otherwise, the installation
 commands are included below for quick reference.
 
-> [!WARNING]
-> Before installing the package, always ensure your pfSense version is supported! Support version are listed [here](https://pfrest.org/INSTALL_AND_CONFIG/#supported-pfsense-versions).
-> Installation of the package on unsupported versions of pfSense may result in unexpected behavior and/or system instability.
-
 Install on pfSense CE:
 
 ```bash
@@ -49,7 +45,11 @@ Install on pfSense Plus:
 pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-24.03-pkg-RESTAPI.pkg
 ```
 
-> [!IMPORTANT]
+> [!WARNING]
+> Before installing the package, always ensure your pfSense version is supported! Supported version are listed [here](https://pfrest.org/INSTALL_AND_CONFIG/#supported-pfsense-versions).
+> Installation of the package on unsupported versions of pfSense may result in unexpected behavior and/or system instability.
+
+> [!TIP]
 > You may need to customize the installation command to reference the package built for your pfSense version. Check
 > the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
 > your version of pfSense.
