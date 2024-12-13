@@ -675,7 +675,8 @@ class Model {
      * @param bool $force_parse Force an entire reparse of the config.xml file instead of the cached config.
      */
     public static function reload_config(bool $force_parse = false): void {
-        config_set_path('', parse_config(parse: $force_parse));
+        global $config;
+        $config = parse_config(parse: $force_parse);
     }
 
     /**
