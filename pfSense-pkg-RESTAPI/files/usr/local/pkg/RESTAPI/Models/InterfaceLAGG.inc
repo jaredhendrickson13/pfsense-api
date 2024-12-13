@@ -27,7 +27,6 @@ class InterfaceLAGG extends Model {
 
         # Set model fields
         $this->laggif = new StringField(
-            required: true,
             read_only: true,
             maximum_length: 32,
             help_text: 'The real name of the LAGG interface.',
@@ -126,8 +125,7 @@ class InterfaceLAGG extends Model {
     }
 
     /**
-     * Extends the default _delete method to prevent deletion of the LAGG interface if it is in use, and remove
-     * the LAGG interface from the system if it is not in use.
+     * Extends the default _delete method to prevent deletion of the LAGG interface if it is in use.
      */
     public function _delete(): void {
         # Query for an interface using this lagg
@@ -140,8 +138,30 @@ class InterfaceLAGG extends Model {
             );
         }
 
-        # Remove the LAGG interface from the system
-        pfSense_interface_destroy($this->laggif->value);
         parent::_delete();
+    }
+
+    /**
+     * Reconfigures VLANs and interfaces using this LAGG after successful creation or update.
+     */
+    public function apply(): void {
+        # Check for interfaces using this LAGG and reconfigure them
+        $if_q = NetworkInterface::query(if: $this->laggif->value);
+        foreach ($if_q->model_objects as $if) {
+            interface_configure($if->id);
+        }
+
+        # Check for VLANs using this LAGG and reconfigure them
+        $vlan_q = InterfaceVLAN::query(if: $this->laggif->value);
+        foreach ($vlan_q->model_objects as $vlan) {
+            interface_vlan_configure($vlan->to_internal());
+        }
+    }
+
+    /**
+     * Applies the deletion of this LAGG interface.
+     */
+    public function apply_delete(): void {
+        pfSense_interface_destroy($this->laggif->value);
     }
 }
