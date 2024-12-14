@@ -54,7 +54,6 @@ pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/re
 > the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
 > your version of pfSense.
 
-
 ## Disclaimers
 
 > [!CAUTION]
