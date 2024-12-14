@@ -74,22 +74,22 @@ class APIModelsInterfaceGRETestCase extends TestCase {
         # Create a new GRE tunnel and ensure it's interface is seen in ifconfig
         $gre = new InterfaceGRE(
             if: 'lan',
-            remote_addr: '1.2.3.4',
-            tunnel_local_addr: '4.3.2.1',
-            tunnel_remote_addr: '1.1.2.2',
+            remote_addr: '127.1.2.3',
+            tunnel_local_addr: '127.3.2.1',
+            tunnel_remote_addr: '127.5.5.5',
             tunnel_remote_net: 32,
         );
         $gre->create();
         $ifconfig_output = new Command('ifconfig');
         $this->assert_str_contains($ifconfig_output->output, $gre->greif->value);
-        $this->assert_str_contains($ifconfig_output->output, 'tunnel inet 192.168.1.1 --> 1.2.3.4');
-        $this->assert_str_contains($ifconfig_output->output, 'inet 4.3.2.1 --> 1.1.2.2 netmask 0xffffffff');
+        $this->assert_str_contains($ifconfig_output->output, 'tunnel inet 192.168.1.1 --> 127.1.2.3');
+        $this->assert_str_contains($ifconfig_output->output, 'inet 127.3.2.1 --> 127.5.5.5 netmask 0xffffffff');
 
         # Update the GRE tunnel and ensure the changes are reflected in ifconfig
         $gre->remote_addr->value = '2.3.4.5';
         $gre->update();
         $ifconfig_output = new Command('ifconfig');
-        $this->assert_str_does_not_contain($ifconfig_output->output, 'tunnel inet 192.168.1.1 --> 1.2.3.4');
+        $this->assert_str_does_not_contain($ifconfig_output->output, 'tunnel inet 192.168.1.1 --> 127.1.2.3');
         $this->assert_str_contains($ifconfig_output->output, 'tunnel inet 192.168.1.1 --> 2.3.4.5');
 
         # Delete the GRE tunnel and ensure it's interface is no longer seen in ifconfig
