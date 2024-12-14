@@ -46,7 +46,7 @@ pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/re
 ```
 
 > [!WARNING]
-> Before installing the package, always ensure your pfSense version is supported! Supported version are listed [here](https://pfrest.org/INSTALL_AND_CONFIG/#supported-pfsense-versions).
+> Before installing the package, always ensure your pfSense version is supported! Supported versions are listed [here](https://pfrest.org/INSTALL_AND_CONFIG/#supported-pfsense-versions).
 > Installation of the package on unsupported versions of pfSense may result in unexpected behavior and/or system instability.
 
 > [!TIP]
