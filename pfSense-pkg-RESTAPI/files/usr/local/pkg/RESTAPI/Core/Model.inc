@@ -358,6 +358,22 @@ class Model {
     }
 
     /**
+     * Creates an unlinked copy of this Model object.
+     * @return Model The cloned Model object.
+     */
+    public function copy(): Model {
+        # Create a copy of this object by serializing and unserializing it
+        $copy = unserialize(serialize($this));
+
+        # Reassign the parent Model object if it exists
+        if ($this->parent_model) {
+            $copy->parent_model = $this->parent_model;
+        }
+
+        return $copy;
+    }
+
+    /**
      * Checks for options passed in during object construction and maps known options to Model properties. Any
      * options that are not known options to the core Model will be returned so they can be merged into
      * the Model data during construction.
@@ -409,7 +425,7 @@ class Model {
             if ($this->config_path or $this->internal_callable) {
                 $this->id = $id;
                 $this->from_internal();
-                $this->initial_object = unserialize(serialize($this));
+                $this->initial_object = $this->copy();
             }
         }
     }
@@ -989,7 +1005,7 @@ class Model {
 
             # Obtain the object from its internal form
             $this->from_internal();
-            $this->initial_object = unserialize(serialize($this));
+            $this->initial_object = $this->copy();
         }
 
         # Loop through each field in this Model and assign their values using the `representation_data`.
@@ -2028,7 +2044,7 @@ class Model {
             }
 
             # Refresh the initial object
-            $this->initial_object = unserialize(serialize($this));
+            $this->initial_object = $this->copy();
         }
 
         # Return the current representation of this object
@@ -2118,7 +2134,7 @@ class Model {
             }
 
             # Refresh the initial object
-            $this->initial_object = unserialize(serialize($this));
+            $this->initial_object = $this->copy();
         }
 
         # Return the current representation of this object
@@ -2296,7 +2312,7 @@ class Model {
             }
 
             # Refresh the initial object
-            $this->initial_object = unserialize(serialize($this));
+            $this->initial_object = $this->copy();
         }
 
         # Return the current representation of this object

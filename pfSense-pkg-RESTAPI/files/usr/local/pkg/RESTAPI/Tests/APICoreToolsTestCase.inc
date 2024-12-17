@@ -6,6 +6,7 @@ require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\TestCase;
 use function RESTAPI\Core\Tools\bandwidth_to_bits;
+use function RESTAPI\Core\Tools\generate_mac_address;
 use function RESTAPI\Core\Tools\is_assoc_array;
 use function RESTAPI\Core\Tools\to_upper_camel_case;
 
@@ -51,5 +52,14 @@ class APICoreToolsTestCase extends TestCase {
         $this->assert_equals(to_upper_camel_case('this-is-a-test'), 'ThisIsATest');
         $this->assert_equals(to_upper_camel_case('this is a test'), 'ThisIsATest');
         $this->assert_equals(to_upper_camel_case('_this is-a test'), 'ThisIsATest');
+    }
+
+    /**
+     * Checks that the generate_mac_address() function correctly generates a random MAC address.
+     */
+    public function test_generate_mac_address(): void {
+        $mac_address = generate_mac_address();
+        $this->assert_equals(strlen($mac_address), 17);
+        $this->assert_is_true(preg_match('/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/', $mac_address) === 1);
     }
 }
