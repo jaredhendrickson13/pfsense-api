@@ -4,6 +4,8 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\Certificate;
+use RESTAPI\Models\CertificateAuthorityGenerate;
+use RESTAPI\Models\CertificateGenerate;
 
 class APIModelsCertificateTestCase extends TestCase {
     const EXAMPLE_CRT = "-----BEGIN CERTIFICATE-----
@@ -109,5 +111,57 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
                 $cert->delete();
             },
         );
+    }
+
+    /**
+     * Checks that certificates are relinked to their CAs (if found) when they are created/imported.
+     */
+    public function test_certificate_is_relinked_to_ca_on_create(): void {
+        # Create a CA we can use to test the relinking
+        $ca = new CertificateAuthorityGenerate(
+            descr: 'test_ca',
+            trust: true,
+            randomserial: true,
+            is_intermediate: false,
+            keytype: 'RSA',
+            keylen: 2048,
+            digest_alg: 'sha256',
+            lifetime: 3650,
+            dn_country: 'US',
+            dn_state: 'UT',
+            dn_city: 'Salt Lake City',
+            dn_organization: 'ACME Org',
+            dn_organizationalunit: 'IT',
+        );
+        $ca->always_apply = false; # Disable always_apply so we can test the create method without overloading cpu
+        $ca->create();
+
+        # Generate a new certificates using the CA
+        $cert = new CertificateGenerate(
+            descr: 'testcert',
+            caref: $ca->refid->value,
+            keytype: 'RSA',
+            keylen: 2048,
+            digest_alg: 'sha256',
+            lifetime: 3650,
+            type: 'user',
+            dn_country: 'US',
+            dn_state: 'UT',
+            dn_city: 'Salt Lake City',
+            dn_organization: 'ACME Org',
+            dn_organizationalunit: 'IT',
+            dn_commonname: 'testcert.example.com',
+        );
+        $cert->create();
+
+        # Capture the crt and prv values of the certificate and delete it
+        $crt = $cert->crt->value;
+        $prv = $cert->prv->value;
+        $cert->delete();
+
+        # Import the certificate and ensure it is automatically relinked to the CA
+        $cert = new Certificate(descr: 'testcert', type: 'user', crt: $crt, prv: $prv);
+        $cert->create();
+        $this->assert_equals($ca->refid->value, $cert->caref->value);
     }
 }
