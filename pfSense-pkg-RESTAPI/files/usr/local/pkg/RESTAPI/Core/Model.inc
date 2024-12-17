@@ -343,6 +343,21 @@ class Model {
     }
 
     /**
+     * Magic method to serialize only the necessary properties of this Model object.
+     * @return int[]|string[]
+     */
+    public function __sleep() {
+        # Variables
+        $excluded_properties = ['initial_object', 'client', 'parent_model', 'related_objects'];
+        $properties = array_keys(get_object_vars($this));
+
+        # Filter out excluded properties from the list of properties to serialize
+        return array_filter($properties, function ($prop) use ($excluded_properties) {
+            return !in_array($prop, $excluded_properties, true);
+        });
+    }
+
+    /**
      * Checks for options passed in during object construction and maps known options to Model properties. Any
      * options that are not known options to the core Model will be returned so they can be merged into
      * the Model data during construction.
