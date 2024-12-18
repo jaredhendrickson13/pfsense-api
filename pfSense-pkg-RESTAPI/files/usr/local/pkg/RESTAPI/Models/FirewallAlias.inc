@@ -93,34 +93,39 @@ class FirewallAlias extends Model {
      * @returns string The validated value to set.
      * @throws ValidationError When the `address` value is invalid.
      */
-    public function validate_address(string $addresses): string {
+    public function validate_address(string $address): string {
+        # Variables
+        $aliases = $this->read_all();
+        $type = $this->type->value;
+
         # Ensure value is a port, port range or port alias when `type` is `port`
-        if ($this->type->value === 'port' and !is_port_or_range_or_alias($addresses)) {
+        $port_alias_q = $aliases->query(name: $address, type: 'port');
+        if ($type === 'port' and !is_port_or_range($address) and !$port_alias_q->exists()) {
             throw new ValidationError(
-                message: "Port alias 'address' value '$addresses' is not a valid port, range, or alias.",
+                message: "Port alias 'address' value '$address' is not a valid port, range, or alias.",
                 response_id: 'INVALID_PORT_ALIAS_ADDRESS',
             );
         }
 
         # Ensure value is an IP, FQDN or alias when `type` is `host`
-        if ($this->type->value === 'host' and !is_ipaddroralias($addresses) and !is_fqdn($addresses)) {
+        $host_alias_q = $aliases->query(name: $address, type: 'host');
+        if ($type === 'host' and !is_ipaddr($address) and !is_fqdn($address) and !$host_alias_q->exists()) {
             throw new ValidationError(
-                message: "Host alias 'address' value '$addresses' is not a valid IP, FQDN, or alias.",
+                message: "Host alias 'address' value '$address' is not a valid IP, FQDN, or alias.",
                 response_id: 'INVALID_HOST_ALIAS_ADDRESS',
             );
         }
 
         # Ensure value is a CIDR, FQDN or alias when `type` is `network`
-        if ($this->type->value === 'network') {
-            if (!is_subnet($addresses) and alias_get_type($addresses) != 'network' and !is_fqdn($addresses)) {
-                throw new ValidationError(
-                    message: "Host alias 'address' value '$addresses' is not a valid CIDR, FQDN, or alias.",
-                    response_id: 'INVALID_NETWORK_ALIAS_ADDRESS',
-                );
-            }
+        $network_alias_q = $aliases->query(name: $address, type: 'network');
+        if ($type === 'network' and !is_subnet($address) and !is_fqdn($address) and !$network_alias_q->exists()) {
+            throw new ValidationError(
+                message: "Host alias 'address' value '$address' is not a valid CIDR, FQDN, or alias.",
+                response_id: 'INVALID_NETWORK_ALIAS_ADDRESS',
+            );
         }
 
-        return $addresses;
+        return $address;
     }
 
     /**
