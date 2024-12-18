@@ -168,3 +168,28 @@ function get_classes_from_namespace(string $namespace, bool $shortnames = false)
 
     return $classes;
 }
+
+/**
+ * Generates a random MAC address string.
+ * @returns string A random MAC address string.
+ */
+function generate_mac_address(): string {
+    # Generate the first three octets (OUI) with fixed bits for unicast and locally administered addresses
+    $first_octet = dechex((mt_rand(0x00, 0xff) & 0xfe) | 0x02); // Ensure it is locally administered
+    $mac = [
+        $first_octet,
+        dechex(mt_rand(0x00, 0xff)),
+        dechex(mt_rand(0x00, 0xff)),
+        dechex(mt_rand(0x00, 0xff)),
+        dechex(mt_rand(0x00, 0xff)),
+        dechex(mt_rand(0x00, 0xff)),
+    ];
+
+    # Zero-pad single-character hex values and return the MAC address
+    return implode(
+        ':',
+        array_map(function ($part) {
+            return str_pad($part, 2, '0', STR_PAD_LEFT);
+        }, $mac),
+    );
+}

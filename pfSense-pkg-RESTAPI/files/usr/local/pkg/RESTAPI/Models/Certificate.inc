@@ -17,6 +17,7 @@ use RESTAPI\Validators\X509Validator;
 class Certificate extends Model {
     public StringField $descr;
     public UIDField $refid;
+    public StringField $caref;
     public StringField $type;
     public Base64Field $csr;
     public Base64Field $crt;
@@ -36,6 +37,13 @@ class Certificate extends Model {
         $this->refid = new UIDField(
             help_text: 'The unique ID assigned to this certificate for internal system use. This value is generated ' .
                 'by this system and cannot be changed.',
+        );
+        $this->caref = new StringField(
+            default: null,
+            allow_null: true,
+            read_only: true,
+            help_text: 'The unique ID of the existing pfSense Certificate Authority that signed this certificate.' .
+                'This value is assigned by this system and cannot be changed.',
         );
         $this->type = new StringField(
             default: 'server',
@@ -81,6 +89,19 @@ class Certificate extends Model {
         }
 
         return $prv;
+    }
+
+    /**
+     * Extends the default _create() method to ensure the certificate is fully imported before creating it.
+     */
+    public function _create(): void {
+        # Import the cert first using pfSense's cert_import function and relink CAs (if necessary)
+        $config_data = $this->to_internal();
+        cert_import($config_data, $this->crt->value, $this->prv->value);
+        $this->caref->value = $config_data['caref'] ?? null;
+
+        # Create the Certificate object
+        parent::_create();
     }
 
     /**

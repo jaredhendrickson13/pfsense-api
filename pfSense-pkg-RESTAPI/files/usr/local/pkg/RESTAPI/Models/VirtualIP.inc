@@ -31,6 +31,8 @@ class VirtualIP extends Model {
     public IntegerField $advskew;
     public StringField $password;
     public StringField $carp_status;
+    public StringField $carp_mode;
+    public StringField $carp_peer;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Define model attributes
@@ -121,6 +123,20 @@ class VirtualIP extends Model {
             conditions: ['mode' => 'carp'],
             help_text: 'The current CARP status of this virtual IP. This will display show whether this CARP node ' .
                 'is the primary or backup peer.',
+        );
+        $this->carp_mode = new StringField(
+            default: 'mcast',
+            choices: ['mcast', 'ucast'],
+            conditions: ['mode' => 'carp'],
+            help_text: 'The CARP mode to use for this virtual IP. Please note this field is exclusive to ' .
+                'pfSense Plus and has no effect on CE.',
+        );
+        $this->carp_peer = new StringField(
+            required: true,
+            conditions: ['carp_mode' => 'ucast'],
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true)],
+            help_text: 'The IP address of the CARP peer. Please note this field is exclusive to pfSense Plus and ' .
+                'has no effect on CE.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);

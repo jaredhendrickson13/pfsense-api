@@ -140,7 +140,7 @@ class MakePackage:
             "mkdir -p ~/build/",
             f"rm -rf ~/build/{REPO_NAME}",
             f"git clone https://github.com/{REPO_OWNER}/{REPO_NAME}.git ~/build/{REPO_NAME}/",
-            f"git -C ~/build/{REPO_NAME} checkout " + self.args.branch,
+            f"git -C ~/build/{REPO_NAME} checkout '{self.args.branch}'",
             f"composer install --working-dir ~/build/{REPO_NAME}",
             f"cp -r ~/build/{REPO_NAME}/vendor/* {includes_dir}",
             f"python3 ~/build/{REPO_NAME}/tools/make_package.py --tag {self.args.tag} {notests}",

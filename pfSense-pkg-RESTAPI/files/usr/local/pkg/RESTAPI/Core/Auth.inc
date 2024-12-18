@@ -162,7 +162,14 @@ class Auth {
     public function authorize(): bool {
         # Variables
         $is_not_authorized = false;
-        $this->client_privileges = get_user_privileges(getUserEntry($this->username));
+
+        # Start with pfSense 24.11, getUserEntry returns an array with the key 'item' containing the user data.
+        # We need to handle both cases to support both.
+        $user_ent = getUserEntry($this->username);
+        $user_ent = array_key_exists('item', $user_ent) ? $user_ent['item'] : $user_ent;
+
+        # Obtain the client's privileges and check if they have the required privileges
+        $this->client_privileges = get_user_privileges($user_ent);
 
         # This client is not authorized if the client does not have at least one of the required privileges
         if ($this->required_privileges and !array_intersect($this->required_privileges, $this->client_privileges)) {

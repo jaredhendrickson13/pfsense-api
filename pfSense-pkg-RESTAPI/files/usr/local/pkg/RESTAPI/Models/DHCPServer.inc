@@ -252,22 +252,22 @@ class DHCPServer extends Model {
     }
 
     /**
-     * Initializes configurations objects for defined interface that have not yet configured the DHCP server
+     * Initializes configuration objects for defined interface that have not yet configured the DHCP server
      */
     private function init_interfaces(): void {
         # Variables
-        $ifs_using_dhcpd = array_keys($this->get_config(path: $this->config_path, default: []));
+        $ifs_using_dhcp_server = array_keys($this->get_config(path: $this->config_path, default: []));
 
         # Loop through each defined interface
-        foreach (NetworkInterface::read_all()->model_objects as $if) {
+        foreach ($this->get_config('interfaces', []) as $if_id => $if) {
             # Skip this interface if it is not a static interface or the subnet value is greater than or equal to 31
-            if ($if->typev4->value !== 'static' or $if->subnet->value >= 31) {
+            if (empty($if['ipaddr']) or $if['ipaddr'] === 'dhcp' or $if->subnet->value >= 31) {
                 continue;
             }
 
             # Otherwise, make this interface eligible for a DHCP server
-            if (!in_array($if->id, $ifs_using_dhcpd)) {
-                $this->set_config(path: "$this->config_path/$if->id", value: []);
+            if (!in_array($if_id, $ifs_using_dhcp_server)) {
+                $this->set_config(path: "$this->config_path/$if_id", value: []);
             }
         }
     }

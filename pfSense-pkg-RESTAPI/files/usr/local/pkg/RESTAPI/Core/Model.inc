@@ -343,6 +343,37 @@ class Model {
     }
 
     /**
+     * Magic method to serialize only the necessary properties of this Model object.
+     * @return int[]|string[]
+     */
+    public function __sleep() {
+        # Variables
+        $excluded_properties = ['initial_object', 'client', 'parent_model', 'related_objects'];
+        $properties = array_keys(get_object_vars($this));
+
+        # Filter out excluded properties from the list of properties to serialize
+        return array_filter($properties, function ($prop) use ($excluded_properties) {
+            return !in_array($prop, $excluded_properties, true);
+        });
+    }
+
+    /**
+     * Creates an unlinked copy of this Model object.
+     * @return Model The cloned Model object.
+     */
+    public function copy(): Model {
+        # Create a copy of this object by serializing and unserializing it
+        $copy = unserialize(serialize($this));
+
+        # Reassign the parent Model object if it exists
+        if ($this->parent_model) {
+            $copy->parent_model = $this->parent_model;
+        }
+
+        return $copy;
+    }
+
+    /**
      * Checks for options passed in during object construction and maps known options to Model properties. Any
      * options that are not known options to the core Model will be returned so they can be merged into
      * the Model data during construction.
@@ -394,7 +425,7 @@ class Model {
             if ($this->config_path or $this->internal_callable) {
                 $this->id = $id;
                 $this->from_internal();
-                $this->initial_object = unserialize(serialize($this));
+                $this->initial_object = $this->copy();
             }
         }
     }
@@ -550,8 +581,7 @@ class Model {
      */
     protected static function init_config(string $path) {
         # Initialize the configuration array of a specified path.
-        global $config;
-        array_init_path($config, $path);
+        config_init_path($path);
     }
 
     /**
@@ -562,8 +592,7 @@ class Model {
      *          path keys an empty string and $default is non-null
      */
     public static function get_config(string $path, mixed $default = null) {
-        global $config;
-        return array_get_path($config, $path, $default);
+        return config_get_path($path, $default);
     }
 
     /**
@@ -574,8 +603,7 @@ class Model {
      * @returns mixed $val or $default if the path prefix does not exist
      */
     public static function set_config(string $path, mixed $value, mixed $default = null) {
-        global $config;
-        return array_set_path($config, $path, $value, $default);
+        return config_set_path($path, $value, $default);
     }
 
     /**
@@ -616,8 +644,7 @@ class Model {
      * @returns array copy of the removed value or null
      */
     public static function del_config(string $path): mixed {
-        global $config;
-        return array_del_path($config, $path);
+        return config_del_path($path);
     }
 
     /**
@@ -630,8 +657,7 @@ class Model {
      * non-null value, otherwise false.
      */
     public static function is_config_enabled(string $path, string $enable_key = 'enable'): bool {
-        global $config;
-        return array_path_enabled($config, $path, $enable_key);
+        return config_path_enabled($path, $enable_key);
     }
 
     /**
@@ -979,7 +1005,7 @@ class Model {
 
             # Obtain the object from its internal form
             $this->from_internal();
-            $this->initial_object = unserialize(serialize($this));
+            $this->initial_object = $this->copy();
         }
 
         # Loop through each field in this Model and assign their values using the `representation_data`.
@@ -2018,7 +2044,7 @@ class Model {
             }
 
             # Refresh the initial object
-            $this->initial_object = unserialize(serialize($this));
+            $this->initial_object = $this->copy();
         }
 
         # Return the current representation of this object
@@ -2108,7 +2134,7 @@ class Model {
             }
 
             # Refresh the initial object
-            $this->initial_object = unserialize(serialize($this));
+            $this->initial_object = $this->copy();
         }
 
         # Return the current representation of this object
@@ -2286,7 +2312,7 @@ class Model {
             }
 
             # Refresh the initial object
-            $this->initial_object = unserialize(serialize($this));
+            $this->initial_object = $this->copy();
         }
 
         # Return the current representation of this object

@@ -30,6 +30,8 @@ jobs:
             PFSENSE_VERSION: "2.7.2"
           - FREEBSD_VERSION: FreeBSD-15.0-CURRENT
             PFSENSE_VERSION: "24.03"
+          - FREEBSD_VERSION: FreeBSD-15.0-CURRENT
+            PFSENSE_VERSION: "24.11"
 
     steps:
       - uses: actions/checkout@v4

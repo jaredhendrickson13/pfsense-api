@@ -144,4 +144,22 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             },
         );
     }
+
+    /**
+     * Checks that we can reference a nested alias during replace_all() calls. This is regression test for #619.
+     */
+    public function test_nested_alias_reference_in_replace_all(): void {
+        # Ensure we can reference a nested alias during replace_all() calls without an error being thrown
+        $this->assert_does_not_throw(
+            callable: function () {
+                $alias = new FirewallAlias();
+                $alias->replace_all(
+                    data: [
+                        ['name' => 'test_alias1', 'type' => 'host', 'address' => []],
+                        ['name' => 'test_alias2', 'type' => 'host', 'address' => ['test_alias1']],
+                    ],
+                );
+            },
+        );
+    }
 }

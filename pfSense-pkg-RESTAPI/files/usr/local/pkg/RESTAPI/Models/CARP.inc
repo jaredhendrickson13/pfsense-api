@@ -69,7 +69,7 @@ class CARP extends Model {
     public function get_carp_internal(): array {
         return [
             'enable' => $this->is_carp_enabled(),
-            'maintenance_mode' => $this->is_config_enabled('/', 'virtualip_carp_maintenancemode'),
+            'maintenance_mode' => $this->is_config_enabled('', 'virtualip_carp_maintenancemode'),
         ];
     }
 

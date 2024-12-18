@@ -7,10 +7,13 @@ use RESTAPI;
 use RESTAPI\Caches\RESTAPIVersionReleasesCache;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Models\DHCPServer;
+use RESTAPI\Models\DHCPServerStaticMapping;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\InterfaceVLAN;
 use RESTAPI\Models\SystemStatus;
 use RESTAPI\Models\Test;
+use function RESTAPI\Models\DHCPServerStaticMapping;
 
 class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
@@ -1196,5 +1199,53 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
 
         # Remove the write lock
         unlink(Model::WRITE_LOCK_FILE);
+    }
+
+    /**
+     * Ensure the copy() method creates an unlinked copy of the Model object.
+     */
+    public function test_copy(): void {
+        # Create a new FirewallAlias model to test with
+        $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['1.2.3.4']);
+        $alias->id = 5;
+        $alias_copy = $alias->copy();
+
+        # Ensure the values are equal
+        $this->assert_equals($alias->to_internal(), $alias_copy->to_internal());
+        $this->assert_equals($alias_copy->id, 5);
+        $this->assert_equals($alias->to_representation(), $alias_copy->to_representation());
+
+        # Change the copy's values and ensure the original values are not changed
+        $alias_copy->name->value = 'new_name';
+        $this->assert_not_equals($alias->name->value, $alias_copy->name->value);
+    }
+
+    /**
+     * Ensure the copy() method does not use excessive memory in larger datasets. This is a regression test for #617.
+     */
+    public function test_copy_memory_usage(): void {
+        # Generate lots of DHCP Server Static Mappings
+        $static_mappings = [];
+        $used_macs = [];
+        while (count($static_mappings) < 450) {
+            # Generate a unique mac address for each static mapping
+            $mac = RESTAPI\Core\Tools\generate_mac_address();
+            if (in_array($mac, $used_macs)) {
+                continue;
+            }
+            $static_mappings[] = ['mac' => $mac];
+        }
+
+        # Update the DHCP server with our static mappings
+        $dhcp_server = new DHCPServer(id: 'lan', staticmap: $static_mappings);
+        $dhcp_server->update();
+
+        # Read a static mapping and copy it
+        $static_mapping = new DHCPServerStaticMapping(id: 50, parent_id: 'lan');
+        $static_mapping->copy();
+
+        # Remove the static mappings
+        $dhcp_server->staticmap->value = [];
+        $dhcp_server->update(apply: true);
     }
 }
