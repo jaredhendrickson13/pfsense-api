@@ -5,7 +5,9 @@ include_once("guiconfig.inc");
 session_start();
 
 # Redirect user if they do not have privilege to access this page
-$user_privs = get_user_privileges(getUserEntry($_SESSION["Username"]));
+$client_config =& getUserEntry($_SESSION["Username"]);
+$client_config = (array_key_exists('item', $client_config)) ? $client_config['item'] : $client_config;
+$user_privs = get_user_privileges($client_config);
 if (!in_array("page-system-api", $user_privs) and !in_array("page-all", $user_privs)) {
     header("Location: /");
     exit();
