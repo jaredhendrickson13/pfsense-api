@@ -131,7 +131,7 @@ class OpenVPNClient extends Model {
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true)],
             help_text: 'The IP address or hostname of the OpenVPN server this client will connect to.',
         );
-        $this->local_port = new PortField(
+        $this->server_port = new PortField(
             required: true,
             allow_alias: false,
             allow_range: false,
