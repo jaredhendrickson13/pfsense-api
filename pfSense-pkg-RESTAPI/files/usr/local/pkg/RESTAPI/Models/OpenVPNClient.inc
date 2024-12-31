@@ -32,6 +32,7 @@ class OpenVPNClient extends Model {
     public StringField $protocol;
     public InterfaceField $interface;
     public StringField $server_addr;
+    public StringField $server_port;
     public PortField $local_port;
     public StringField $proxy_addr;
     public PortField $proxy_port;
@@ -129,6 +130,13 @@ class OpenVPNClient extends Model {
             required: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true)],
             help_text: 'The IP address or hostname of the OpenVPN server this client will connect to.',
+        );
+        $this->server_port = new PortField(
+            required: true,
+            allow_alias: false,
+            allow_range: false,
+            allow_null: false,
+            help_text: 'The port used by the server to receive client connections.',
         );
         $this->local_port = new PortField(
             default: null,

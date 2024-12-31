@@ -42,6 +42,7 @@ class APIModelsOpenVPNClientTestCase extends TestCase {
             'protocol' => 'UDP4',
             'interface' => 'wan',
             'server_addr' => 'example.com',
+            'server_port' => '1194',
             'tls' => $this->tls_key,
             'tls_type' => 'auth',
             'dh_length' => '2048',
