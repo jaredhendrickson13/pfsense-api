@@ -135,7 +135,7 @@ class OpenVPNClient extends Model {
             required: true,
             allow_alias: false,
             allow_range: false,
-            allow_null: true,
+            allow_null: false,
             help_text: 'The port used by the server to receive client connections.',
         );
         $this->local_port = new PortField(
