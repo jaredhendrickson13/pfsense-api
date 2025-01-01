@@ -1,4 +1,4 @@
-jinja2~=3.1.4
+jinja2~=3.1.5
 requests~=2.32.3
 urllib3~=2.2.3
 pylint~=3.2.7
