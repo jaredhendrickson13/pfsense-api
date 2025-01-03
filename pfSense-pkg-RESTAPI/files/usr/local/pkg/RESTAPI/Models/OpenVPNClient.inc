@@ -32,7 +32,7 @@ class OpenVPNClient extends Model {
     public StringField $protocol;
     public InterfaceField $interface;
     public StringField $server_addr;
-    public StringField $server_port;
+    public PortField $server_port;
     public PortField $local_port;
     public StringField $proxy_addr;
     public PortField $proxy_port;
