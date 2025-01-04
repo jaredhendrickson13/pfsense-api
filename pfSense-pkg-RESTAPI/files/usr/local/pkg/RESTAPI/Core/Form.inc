@@ -132,7 +132,7 @@ class Form {
 
         # Gather information about the authenticated user
         $client = new Auth();
-        $client->username = $_SESSION['Username'] ?: DEFAULT_CLIENT_USERNAME;
+        $client->username = $_SESSION['Username'];
 
         # Obtain the `id` from URL parameters
         $this->id = is_numeric($_GET['id']) ? intval($_GET['id']) : null;
@@ -403,7 +403,9 @@ class Form {
         }
 
         try {
-            (new $this->model(id: $id))->delete();
+            $model_to_delete = new $this->model(id: $id);
+            $model_to_delete->client = $this->model->client;
+            $model_to_delete->delete();
             $this->print_success_banner("Deleted {$this->model->verbose_name} with ID $id.");
         } catch (Response $resp_error) {
             $error_message = $resp_error->getMessage();
