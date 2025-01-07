@@ -6,6 +6,7 @@ use RESTAPI;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Fields\IntegerField;
 
 /**
  * Defines a Model that represents the status of services on this system.
@@ -16,6 +17,9 @@ class Service extends Model {
     public StringField $description;
     public BooleanField $enabled;
     public BooleanField $status;
+    
+    public StringField $mode;
+    public IntegerField $vpnid;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set Model attributes
@@ -46,6 +50,16 @@ class Service extends Model {
             indicates_true: true,
             indicates_false: false,
             help_text: 'Indicates if the service is actively running.',
+        );
+        $this->mode = new StringField(
+            required: false,
+            allow_null: true,
+            help_text: 'Mode of OpenVPN service (server/client).',
+        );
+        $this->vpnid = new IntegerField(
+            required: false,
+            allow_null: true,
+            help_text: 'VPN ID for OpenVPN services.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
@@ -92,24 +106,44 @@ class Service extends Model {
     }
 
     /**
+     * Gets the representation ID for a given service vpnid.
+     * @param int $vpnid The internal service to obtain the ID for.
+     * @return int The representation ID of the service with this vpnid.
+     */
+    public function get_id_by_vpnid(int $vpnid): int {
+        return $this->query(['vpnid' => $vpnid])->first()->id;
+    }
+
+    /**
      * Starts or stops a specified service.
      */
     public function _create() {
-        # Trigger the requested service action
+        $extras = [];
+        if (isset($this->mode->value)) {
+            $extras['vpnmode'] = $this->mode->value;
+        }
+        if (isset($this->vpnid->value)) {
+            $extras['id'] = $this->vpnid->value;
+        }
+
         switch ($this->action->value) {
             case 'start':
-                service_control_start(name: $this->name->value, extras: []);
+                service_control_start($this->name->value, $extras);
                 break;
             case 'stop':
-                service_control_stop(name: $this->name->value, extras: []);
+                service_control_stop($this->name->value, $extras);
                 break;
             case 'restart':
-                service_control_restart(name: $this->name->value, extras: []);
+                service_control_restart($this->name->value, $extras);
                 break;
         }
 
         # Populate the current status of the service with this name so this object is up-to-date.
-        $this->id = $this->get_id_by_name($this->name->value);
+        if (isset($this->vpnid->value)) {
+            $this->id = $this->get_id_by_vpnid($this->vpnid->value);
+        } else {
+            $this->id = $this->get_id_by_name($this->name->value);
+        }
         $this->from_internal();
     }
 }
