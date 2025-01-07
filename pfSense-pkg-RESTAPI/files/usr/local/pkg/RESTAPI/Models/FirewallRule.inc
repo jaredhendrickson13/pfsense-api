@@ -35,6 +35,7 @@ class FirewallRule extends Model {
     public StringField $descr;
     public BooleanField $disabled;
     public BooleanField $log;
+    public StringField $tag;
     public StringField $statetype;
     public BooleanField $tcp_flags_any;
     public StringField $tcp_flags_out_of;
@@ -171,6 +172,10 @@ class FirewallRule extends Model {
             default: false,
             help_text: 'Enable or disable logging of traffic that matches this rule.',
         );
+        $this->tag = new StringField(
+            default: '',
+            help_text: 'A packet matching this rule can be marked and this mark used to match on other NAT/filter rules. It is called ',
+        );
         $this->statetype = new StringField(
             default: 'keep state',
             choices: ['keep state', 'sloppy state', 'synproxy state', 'none'],
@@ -200,7 +205,7 @@ class FirewallRule extends Model {
             help_text: 'The TCP flags that must be set for this rule to match.',
         );
         $this->gateway = new ForeignModelField(
-            model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
+            model_name: ['RoutingGateway', 'RoutingGatewayGroup', 'RoutingGatewayStatus'],
             model_field: 'name',
             default: null,
             allow_null: true,
