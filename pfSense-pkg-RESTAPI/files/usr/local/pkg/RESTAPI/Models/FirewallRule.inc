@@ -174,6 +174,7 @@ class FirewallRule extends Model {
         );
         $this->tag = new StringField(
             default: '',
+            allow_empty: true,
             help_text: 'A packet matching this rule can be marked and this mark used to match on other NAT/filter rules. It is called ',
         );
         $this->statetype = new StringField(
