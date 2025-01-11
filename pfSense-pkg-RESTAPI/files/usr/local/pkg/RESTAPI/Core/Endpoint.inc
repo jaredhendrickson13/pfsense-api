@@ -1208,6 +1208,8 @@ class Endpoint {
             "<?php\n" .
             "\$include = include('RESTAPI/Endpoints/$nq_class_name.inc');\n" .
             "if (!\$include) {\n" .
+            "    header('Content-Type: application/json');\n" .
+            "    http_response_code(503);\n" .
             "    echo '$unavailable_error_json';\n" .
             "    exit(503);\n" .
             "}\n" .

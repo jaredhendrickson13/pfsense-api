@@ -533,9 +533,10 @@ class Form {
             "require_once('guiconfig.inc');\n" .
             "\$include = include('RESTAPI/Forms/$nq_class_name.inc');\n" .
             "if (!\$include) {\n" .
+            "    http_response_code(503);\n" .
             "    echo '<h1>Service Unavailable</h1>';\n" .
             "    echo 'This resource is either not installed or is currently updating. Please try again later.';\n" .
-            "    exit(503);\n" .
+            "    exit();\n" .
             "}\n" .
             "(new $fq_class_name())->print_form();\n";
 
@@ -549,7 +550,6 @@ class Form {
         if (is_file($filename)) {
             return true;
         }
-
         return false;
     }
 }
