@@ -4,6 +4,7 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
+use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
@@ -72,7 +73,7 @@ class HAProxyBackend extends Model {
     public NestedModelField $errorfiles;
     public BooleanField $cookie_attribute_secure;
     public StringField $advanced;
-    public StringField $advanced_backend;
+    public Base64Field $advanced_backend;
     public BooleanField $transparent_clientip;
     public InterfaceField $transparent_interface;
 
@@ -439,7 +440,7 @@ class HAProxyBackend extends Model {
             allow_empty: true,
             help_text: 'The per server pass thru to apply to each server line.',
         );
-        $this->advanced_backend = new StringField(
+        $this->advanced_backend = new Base64Field(
             default: '',
             allow_empty: true,
             help_text: 'The backend pass thru to apply to the backend section.',
