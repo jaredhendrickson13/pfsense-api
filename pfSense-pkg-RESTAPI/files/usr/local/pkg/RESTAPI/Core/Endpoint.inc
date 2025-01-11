@@ -1199,9 +1199,18 @@ class Endpoint {
         $nq_class_name = $this->get_class_shortname();
 
         # Specify the PHP code to write to the Endpoints index.php file
+        $unavailable_error = new ServiceUnavailableError(
+            message: 'This resource is either not installed or is currently updating. Please try again later.',
+            response_id: 'ENDPOINT_UNAVAILABLE',
+        );
+        $unavailable_error_json = json_encode($unavailable_error->to_representation());
         $code =
             "<?php\n" .
-            "require_once('RESTAPI/Endpoints/$nq_class_name.inc');\n" .
+            "\$include = include('RESTAPI/Endpoints/$nq_class_name.inc');\n" .
+            "if (!\$include) {\n" .
+            "    echo '$unavailable_error_json';\n" .
+            "    exit(503);\n" .
+            "}\n" .
             "echo (new $fq_class_name())->process_request();\n" .
             "header('Referer: no-referrer');\n" .
             "session_destroy();\n" .
