@@ -387,6 +387,12 @@ class OpenVPNClient extends Model {
             allow_null: true,
             help_text: 'The send and receive buffer size for OpenVPN. Set to null to use the system default.',
         );
+        $this->create_gw = new StringField(
+            default: 'both',
+            choices: ['both', 'v4only', 'v6only'],
+            help_text: 'The gateway type(s) that will be created when a virtual interface is assigned ' .
+                'to this OpenVPN server',
+        );
         $this->verbosity_level = new IntegerField(
             default: 1,
             choices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
