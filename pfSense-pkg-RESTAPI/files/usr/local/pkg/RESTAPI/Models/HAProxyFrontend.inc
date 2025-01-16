@@ -96,6 +96,19 @@ class HAProxyFrontend extends Model {
             allow_null: true,
             help_text: 'The default backend to use for this frontend.',
         );
+        $this->ssloffload = new ForeignModelField(
+            model_name: 'Certificate',
+            model_field: 'refid',
+            default: null,
+            allow_null: true,
+            help_text: 'The default SSL/TLS certificate to use for this frontend.',
+        );
+        $this->ha_certificates = new NestedModelField(
+            model_class: 'HAProxyFrontendCertificate',
+            default: [],
+            allow_empty: true,
+            help_text: 'The additional SSL/TLS certificates to use on this frontend.',
+        );
         $this->socket_stats = new BooleanField(
             default: false,
             indicates_true: 'yes',
