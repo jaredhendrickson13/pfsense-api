@@ -7,7 +7,7 @@ use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\ForeignModelField;
 
 /**
- * Defines a Model for HAProxy Frontend Access Control Lists.
+ * Defines a Model for additional HAProxy Frontend Certificates.
  */
 class HAProxyFrontendCertificate extends Model {
     public ForeignModelField $refid;
@@ -26,7 +26,7 @@ class HAProxyFrontendCertificate extends Model {
             model_field: 'refid',
             default: null,
             allow_null: true,
-            help_text: 'The default SSL/TLS certificate to use for this frontend.',
+            help_text: 'The SSL/TLS certificate refid to add to this frontend.',
         ); 
     }
 
