@@ -27,7 +27,7 @@ class HAProxyFrontendCertificate extends Model {
             default: null,
             allow_null: true,
             help_text: 'The SSL/TLS certificate refid to add to this frontend.',
-        ); 
+        );
     }
 
     /**
@@ -43,5 +43,4 @@ class HAProxyFrontendCertificate extends Model {
     public function apply(): void {
         (new HAProxyApplyDispatcher(async: $this->async))->spawn_process();
     }
-
 }
