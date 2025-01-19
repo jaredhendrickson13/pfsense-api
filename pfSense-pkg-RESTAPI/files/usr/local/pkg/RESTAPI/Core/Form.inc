@@ -529,14 +529,16 @@ class Form {
 
         # Specify the PHP code to write to the Endpoints index.php file
         $code =
-            "<?php
-            require_once('RESTAPI/Forms/" .
-            $nq_class_name .
-            ".inc');
-            require_once('guiconfig.inc');
-            (new " .
-            $fq_class_name .
-            '())->print_form();';
+            "<?php\n" .
+            "require_once('guiconfig.inc');\n" .
+            "\$include = include('RESTAPI/Forms/$nq_class_name.inc');\n" .
+            "if (!\$include) {\n" .
+            "    http_response_code(503);\n" .
+            "    echo '<h1>Service Unavailable</h1>';\n" .
+            "    echo 'This resource is either not installed or is currently updating. Please try again later.';\n" .
+            "    exit();\n" .
+            "}\n" .
+            "(new $fq_class_name())->print_form();\n";
 
         # Assign the absolute path to the file. Assume index.php filename if not specified.
         $filename = "/usr/local/www/$this->url";
@@ -548,7 +550,6 @@ class Form {
         if (is_file($filename)) {
             return true;
         }
-
         return false;
     }
 }
