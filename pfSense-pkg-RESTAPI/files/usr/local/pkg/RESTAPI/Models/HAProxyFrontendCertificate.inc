@@ -10,7 +10,7 @@ use RESTAPI\Fields\ForeignModelField;
  * Defines a Model for additional HAProxy Frontend Certificates.
  */
 class HAProxyFrontendCertificate extends Model {
-    public ForeignModelField $refid;
+    public ForeignModelField $ssl_certificate;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
@@ -28,6 +28,9 @@ class HAProxyFrontendCertificate extends Model {
             allow_null: true,
             help_text: 'The SSL/TLS certificate refid to add to this frontend.',
         );
+
+        parent::__construct($id, $parent_id, $data, ...$options);
+
     }
 
     /**
