@@ -419,7 +419,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
         """Checks if our CARP is present after creating a CARP VIP"""
         # Local variables
         carp_subnet = CARP_SUBNET_CREATE
-        carp_ip = carp_subnet.split("/")[0]
+        carp_ip = carp_subnet.split('/', maxsplit=1)[0]
         carp_bitmask = int(carp_subnet.split("/")[1])
         carp_interface = CARP_INTERFACE_CREATE
         carp_vhid = CARP_VHID_CREATE
@@ -444,8 +444,8 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
         """Checks if our CARP is present after creating a CARP VIP"""
         # Local variables
         carp_subnet = CARP_SUBNET_UPDATE
-        carp_ip = carp_subnet.split("/")[0]
-        carp_ip_prev = CARP_SUBNET_CREATE.split("/")[0]
+        carp_ip = carp_subnet.split('/', maxsplit=1)[0]
+        carp_ip_prev = CARP_SUBNET_CREATE.split('/', maxsplit=1)[0]
         carp_bitmask = int(carp_subnet.split("/")[1])
         carp_interface = CARP_INTERFACE_UPDATE
         carp_vhid = CARP_VHID_UPDATE
@@ -488,7 +488,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
         """Checks if our IPALIAS is present after creating an IPALIAS VIP"""
         # Local variables
         ipalias_subnet = IPALIAS_SUBNET_CREATE
-        ipalias_ip = ipalias_subnet.split("/")[0]
+        ipalias_ip = ipalias_subnet.split('/', maxsplit=1)[0]
         ipalias_bitmask = int(ipalias_subnet.split("/")[1])
         ipalias_interface = IPALIAS_INTERFACE_CREATE
         ifconfig_out = self.pfsense_shell("ifconfig")
@@ -501,8 +501,8 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
         """Checks if our IPALIAS is present after creating an IPALIAS VIP"""
         # Local variables
         ipalias_subnet = IPALIAS_SUBNET_UPDATE
-        ipalias_ip = ipalias_subnet.split("/")[0]
-        ipalias_ip_prev = IPALIAS_SUBNET_CREATE.split("/")[0]
+        ipalias_ip = ipalias_subnet.split('/', maxsplit=1)[0]
+        ipalias_ip_prev = IPALIAS_SUBNET_CREATE.split('/', maxsplit=1)[0]
         ipalias_bitmask = int(ipalias_subnet.split("/")[1])
         ipalias_interface = IPALIAS_INTERFACE_UPDATE
         ifconfig_out = self.pfsense_shell("ifconfig")
