@@ -42,8 +42,7 @@ class HAProxyApply extends Model {
     /**
      * Overrides the default _create method to do nothing. We only want to apply.
      */
-    public function _create() {
-    }
+    public function _create() {}
 
     /**
      * Applies changes to the HAProxy configuration.

@@ -361,8 +361,7 @@ class Form {
      * Performs tasks when the Form page is initially loaded. This method is intended to be overridden by the child
      * class.
      */
-    public function on_load(): void {
-    }
+    public function on_load(): void {}
 
     /**
      * Performs validation and saves the Model assigned to this ModelForm.

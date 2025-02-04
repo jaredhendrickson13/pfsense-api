@@ -129,15 +129,13 @@ class TestCase {
      * Sets up the test case before tests are run. This can be overridden by your TestCase to setup shared resources
      * required for your tests.
      */
-    public function setup(): void {
-    }
+    public function setup(): void {}
 
     /**
      * Tears down the test case after tests are run. This can be overridden by your TestCase to destroy resources
      * that may have been created during tests.
      */
-    public function teardown(): void {
-    }
+    public function teardown(): void {}
 
     /**
      * Obtains the environment variable with a given name.
