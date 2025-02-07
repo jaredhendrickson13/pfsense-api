@@ -101,15 +101,13 @@ class Auth {
      * Provides additional logic whenever authentication is successful. This is intended to be overridden by a
      * child Auth class when it needs something specific to happen after a client successfully authenticates.
      */
-    protected function on_successful_auth(): void {
-    }
+    protected function on_successful_auth(): void {}
 
     /**
      * Provides additional logic whenever authentication has failed. This is intended to be overridden by a
      * child Auth class when it needs something specific to happen after a client fails to authenticate.
      */
-    protected function on_failed_auth(): void {
-    }
+    protected function on_failed_auth(): void {}
 
     /**
      * Defines the steps required for users to authenticate wit this authentication method. This method must be
