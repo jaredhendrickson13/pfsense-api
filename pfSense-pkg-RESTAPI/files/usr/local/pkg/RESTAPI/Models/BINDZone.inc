@@ -35,10 +35,10 @@ class BINDZone extends Model {
     public StringField $nameserver;
     public StringField $mail;
     public IntegerField $serial;
-    public IntegerField $refresh;
-    public IntegerField $retry;
-    public IntegerField $expire;
-    public IntegerField $minimum;
+    public StringField $refresh;
+    public StringField $retry;
+    public StringField $expire;
+    public StringField $minimum;
     public BooleanField $enable_updatepolicy;
     public StringField $updatepolicy;
     public ForeignModelField $allowupdate;
@@ -161,30 +161,34 @@ class BINDZone extends Model {
             conditions: ['type' => ['master', 'redirect']],
             help_text: 'The SOA serial number for this zone.',
         );
-        $this->refresh = new IntegerField(
+        $this->refresh = new StringField(
             default: null,
             allow_null: true,
             conditions: ['type' => ['master', 'redirect']],
-            help_text: 'The SOA refresh interval (in seconds) for this zone.',
+            help_text: 'The SOA refresh interval for this zone. TTL-style time-unit suffixes are ' .
+                'supported (e.g. 1h, 1d, 1w), otherwise time in seconds is assumed.',
         );
-        $this->retry = new IntegerField(
+        $this->retry = new StringField(
             default: null,
             allow_null: true,
             conditions: ['type' => ['master', 'redirect']],
-            help_text: 'The SOA retry interval (in seconds) for this zone.',
+            help_text: 'The SOA retry interval for this zone. TTL-style time-unit suffixes are ' .
+                'supported (e.g. 1h, 1d, 1w), otherwise time in seconds is assumed.',
         );
-        $this->expire = new IntegerField(
+        $this->expire = new StringField(
             default: null,
             allow_null: true,
             conditions: ['type' => ['master', 'redirect']],
-            help_text: 'The SOA expiry interval (in seconds) for this zone.',
+            help_text: 'The SOA expiry interval for this zone. TTL-style time-unit suffixes are ' .
+                'supported (e.g. 1h, 1d, 1w), otherwise time in seconds is assumed.',
         );
-        $this->minimum = new IntegerField(
+        $this->minimum = new StringField(
             default: null,
             allow_null: true,
             conditions: ['type' => ['master', 'redirect']],
             help_text: 'The SOA minimum TTL interval (in seconds) for this zone. This is also referred to as the ' .
-                'negative TTL.',
+                'negative TTL. TTL-style time-unit suffixes are supported (e.g. 1h, 1d, 1w), otherwise time in ' .
+                'seconds is assumed.',
         );
         $this->enable_updatepolicy = new BooleanField(
             default: false,

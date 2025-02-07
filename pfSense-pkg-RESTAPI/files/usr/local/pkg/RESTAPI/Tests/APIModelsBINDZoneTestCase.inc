@@ -49,10 +49,10 @@ class APIModelsBINDZoneTestCase extends TestCase {
             nameserver: 'ns1.example.com',
             mail: 'admin.example.com',
             serial: 123456,
-            refresh: 3605,
-            retry: 605,
-            expire: 86405,
-            minimum: 2605,
+            refresh: '3605',
+            retry: '605',
+            expire: '86405',
+            minimum: '2605',
             records: [
                 ['name' => 'a.example.com.', 'type' => 'A', 'rdata' => '4.3.2.1'],
                 ['name' => 'mx.example.com.', 'type' => 'MX', 'rdata' => 'mail.example.com.', 'priority' => 5],
@@ -92,10 +92,10 @@ class APIModelsBINDZoneTestCase extends TestCase {
         $zone->nameserver->value = 'ns2.example.com';
         $zone->mail->value = 'admin2.example.com';
         $zone->serial->value = 654321;
-        $zone->refresh->value = 3606;
-        $zone->retry->value = 606;
-        $zone->expire->value = 86406;
-        $zone->minimum->value = 2606;
+        $zone->refresh->value = '3606';
+        $zone->retry->value = '606';
+        $zone->expire->value = '86406';
+        $zone->minimum->value = '2606';
         $zone->records->value = [
             ['name' => 'a2.example.com.', 'type' => 'A', 'rdata' => '5.5.5.5'],
             ['name' => 'mx2.example.com.', 'type' => 'MX', 'rdata' => 'mail2.example.com.', 'priority' => 15],
