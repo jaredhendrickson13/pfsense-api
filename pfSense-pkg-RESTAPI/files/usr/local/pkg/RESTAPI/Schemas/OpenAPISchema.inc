@@ -336,11 +336,28 @@ class OpenAPISchema extends Schema {
                         [
                             'in' => 'query',
                             'name' => 'sort_order',
-                            'description' => 'Sort the response data in descending order.',
+                            'description' => 'The order to sort response data by.',
                             'schema' => [
                                 'type' => 'string',
                                 'enum' => ['SORT_ASC', 'SORT_DESC'],
                                 'nullable' => true,
+                            ],
+                        ],
+                        [
+                            'in' => 'query',
+                            'name' => 'sort_flags',
+                            'description' => 'The sort flag to use to customize the behavior of the sort.',
+                            'schema' => [
+                                'type' => 'string',
+                                'nullable' => true,
+                                'enum' => [
+                                    'SORT_REGULAR',
+                                    'SORT_NUMERIC',
+                                    'SORT_STRING',
+                                    'SORT_LOCALE_STRING',
+                                    'SORT_NATURAL',
+                                    'SORT_FLAG_CASE'
+                                ]
                             ],
                         ],
                         [
