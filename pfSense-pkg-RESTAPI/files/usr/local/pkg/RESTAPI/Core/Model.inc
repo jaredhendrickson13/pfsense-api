@@ -223,6 +223,15 @@ class Model {
     public int|null $sort_order = null;
 
     /**
+     * @var int|null $sort_flags
+     * For $many enabled Models, this property can be used to set the PHP sort flags used when writing Model objects to
+     * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
+     * to Models with a $config_path defined. For valid value options for this property, refer to:
+     * https://www.php.net/manual/en/function.array-multisort.php
+     */
+    public int|null $sort_flags = null;
+
+    /**
      * @var array|null $sort_by
      * Sets the field names this Model will use when sorting objects written to the pfSense configuration. These fields must
      * be set to an existing property name from this Model, and that property must be assigned a Field class. Leave empty
@@ -1703,7 +1712,12 @@ class Model {
         }
 
         # Obtain all Model objects for this Model and sort them by the requested criteria
-        $modelset = $this->query(parent_id: $this->parent_id, sort_by: $this->sort_by, sort_order: $this->sort_order);
+        $modelset = $this->query(
+            parent_id: $this->parent_id,
+            sort_by: $this->sort_by,
+            sort_order: $this->sort_order,
+            sort_flags: $this->sort_flags
+        );
 
         # Loop through the sorted object and assign it's internal value
         $internal_objects = [];
@@ -1915,6 +1929,7 @@ class Model {
         bool $reverse = false,
         ?array $sort_by = null,
         int $sort_order = SORT_ASC,
+        int $sort_flags = SORT_REGULAR,
         ...$vl_query_params,
     ): ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
@@ -1929,7 +1944,11 @@ class Model {
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
 
         # Sort the set if a sort field was provided
-        $modelset = $sort_by ? $modelset->sort(fields: $sort_by, order: $sort_order, retain_ids: true) : $modelset;
+        if ($sort_by) {
+            $modelset = $modelset->sort(
+                fields: $sort_by, order: $sort_order, flags: $sort_flags, retain_ids: true
+            );
+        }
 
         # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);
