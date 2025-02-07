@@ -479,8 +479,7 @@ class Field {
      * @param mixed $value The value being validated. In the event that this is a `many` field, this method will
      * receive each value of the array individually, not the array value itself.
      */
-    public function validate_extra(mixed $value): void {
-    }
+    public function validate_extra(mixed $value): void {}
 
     /**
      * Ensures this field has a parent model context assigned if a parent model context is required.
