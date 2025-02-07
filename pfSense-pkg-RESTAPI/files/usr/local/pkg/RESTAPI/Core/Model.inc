@@ -1288,8 +1288,7 @@ class Model {
      * Allows child classes to define extra validation for their Models. This can be used to build complex validations
      * that check conditions between multiple Model fields.
      */
-    public function validate_extra(): void {
-    }
+    public function validate_extra(): void {}
 
     /**
      * Performs a full validation on the API model. This includes checking that required packages are installed and
@@ -1612,15 +1611,13 @@ class Model {
      * Initializes the default 'pre_apply' method. This method is intended to be overidden by a child model class and
      * is called immediately before the 'apply' method. This method runs regardless of whether an apply was requested.
      */
-    protected function pre_apply() {
-    }
+    protected function pre_apply() {}
 
     /**
      * Initializes the default 'apply' method. This method is intended to be overridden by a child model class and is
      * responsible for reloading/restarting services after changes occur.
      */
-    public function apply() {
-    }
+    public function apply() {}
 
     /**
      * Initializes the default 'pre_apply_create' method. This method is intended to be overridden by a child model class and

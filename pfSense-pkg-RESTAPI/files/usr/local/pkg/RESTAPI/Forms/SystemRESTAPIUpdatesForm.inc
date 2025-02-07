@@ -31,8 +31,10 @@ class SystemRESTAPIUpdatesForm extends Form {
 
     public function on_save(string $success_banner_msg = ''): void {
         parent::on_save(
-            success_banner_msg: 'The requested version is being installed in the background. Check this page again ' .
-                'later to see the status.',
+            success_banner_msg: 'The requested version is being installed in the background. During the update, the ' .
+                "REST API may be intermittently unavailable. Attempts to access the REST API's endpoints and web " .
+                'pages during the update may result in errors until it completes. Check this page again later to see ' .
+                'the status.',
         );
     }
 }

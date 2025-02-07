@@ -468,18 +468,14 @@ class GraphQLSchema extends Schema {
         # Require an ID if the Model is a many Model
         if ($endpoint->model->many) {
             $args['id'] = [
-                'type' => $this->get_model_object_type($endpoint->model_name)
-                    ->getField('id')
-                    ->getType(),
+                'type' => $this->get_model_object_type($endpoint->model_name)->getField('id')->getType(),
                 'description' => 'The ID of the object to read.',
             ];
         }
         # Require a parent ID if the Model has a parent Model
         if ($endpoint->model->parent_model_class) {
             $args['parent_id'] = [
-                'type' => $this->get_model_object_type($endpoint->model_name)
-                    ->getField('parent_id')
-                    ->getType(),
+                'type' => $this->get_model_object_type($endpoint->model_name)->getField('parent_id')->getType(),
                 'description' => 'The parent ID of the object to read.',
             ];
         }

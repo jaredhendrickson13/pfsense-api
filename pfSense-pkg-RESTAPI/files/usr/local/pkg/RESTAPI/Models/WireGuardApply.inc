@@ -41,8 +41,7 @@ class WireGuardApply extends Model {
     /**
      * Override the _create method so it does nothing. We only want to apply changes when this is called.
      */
-    public function _create(): void {
-    }
+    public function _create(): void {}
 
     /**
      * Applies pending DNS Resolver changes.
