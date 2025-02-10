@@ -743,7 +743,7 @@ class Endpoint {
         $this->check_decode_content_handler_supported($content_handler);
 
         # Decode the request data
-        $this->request_data = $content_handler->decode();
+        $this->request_data = $content_handler->decode() ?? [];
         $this->validate_endpoint_fields();
     }
 
