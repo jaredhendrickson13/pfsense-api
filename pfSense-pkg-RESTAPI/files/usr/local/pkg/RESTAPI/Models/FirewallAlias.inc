@@ -120,7 +120,7 @@ class FirewallAlias extends Model {
         $network_alias_q = $aliases->query(name: $address, type: 'network');
         if ($type === 'network' and !is_subnet($address) and !is_fqdn($address) and !$network_alias_q->exists()) {
             throw new ValidationError(
-                message: "Host alias 'address' value '$address' is not a valid CIDR, FQDN, or alias.",
+                message: "Network alias 'address' value '$address' is not a valid CIDR, FQDN, or alias.",
                 response_id: 'INVALID_NETWORK_ALIAS_ADDRESS',
             );
         }
