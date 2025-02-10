@@ -341,4 +341,34 @@ class APIModelsStaticRouteTestCase extends TestCase {
         # Delete the gateway used for testing
         $test_gw->delete(apply: true);
     }
+
+    /**
+     * Checks that we can update a newly created static route that has not yet been applied. Regression test for #654.
+     */
+    public function test_update_static_route_before_its_applied(): void {
+        # Create a gateway to use for testing
+        $test_gw = new RoutingGateway(
+            name: 'TESTGW',
+            interface: 'lan',
+            ipprotocol: 'inet',
+            gateway: '192.168.1.10',
+            async: false,
+        );
+        $test_gw->create();
+
+        # Create a static route using the gateway above, but do not apply it!
+        $test_route = new StaticRoute(
+            gateway: $test_gw->name->value,
+            network: '1.2.3.4/32'
+        );
+        $test_route->create();
+
+        # Ensure we can update the static route before applying it
+        $test_route->network->value = '4.3.2.1/32';
+        $test_route->update();
+
+        # Remove the static route and gateway
+        $test_route->delete();
+        $test_gw->delete(apply: true);
+    }
 }
