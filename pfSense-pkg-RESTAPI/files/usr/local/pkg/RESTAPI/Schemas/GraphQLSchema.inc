@@ -216,7 +216,7 @@ class GraphQLSchema extends Schema {
         foreach ($model->get_fields() as $field) {
             # For NestedModelFields, ensure we pass the Type for the nested Model
             if ($model->$field instanceof NestedModelField) {
-                $nested_model_type = $this->get_model_object_type($model->$field->model_class);
+                $nested_model_type = $this->get_model_input_object_type($model->$field->model_class);
                 $fields[$field]['type'] = $this->field_to_type(field: $model->$field, type: $nested_model_type);
                 $fields[$field]['description'] = $model->$field->help_text;
                 continue;

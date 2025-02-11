@@ -214,22 +214,22 @@ class Model {
     public int|null $placement = null;
 
     /**
-     * @var int|null $sort_order
+     * @var int $sort_order
      * For $many enabled Models, this property can be used to set the PHP sort option used when writing Model objects to
      * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
      * to Models with a $config_path defined. For valid value options for this property, refer to:
      * https://www.php.net/manual/en/function.array-multisort.php
      */
-    public int|null $sort_order = null;
+    public int $sort_order = SORT_ASC;
 
     /**
-     * @var int|null $sort_flags
+     * @var int $sort_flags
      * For $many enabled Models, this property can be used to set the PHP sort flags used when writing Model objects to
      * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
      * to Models with a $config_path defined. For valid value options for this property, refer to:
      * https://www.php.net/manual/en/function.array-multisort.php
      */
-    public int|null $sort_flags = null;
+    public int $sort_flags = SORT_REGULAR;
 
     /**
      * @var array|null $sort_by
@@ -1698,8 +1698,8 @@ class Model {
      * internal objects must be written in a specific order.
      */
     protected function sort(): void {
-        # Do not sort if there is no `sort_order` or `sort_by` set
-        if (!$this->sort_order or !$this->sort_by) {
+        # Do not sort if there is no `sort_by` fields set
+        if (!$this->sort_by) {
             return;
         }
 
