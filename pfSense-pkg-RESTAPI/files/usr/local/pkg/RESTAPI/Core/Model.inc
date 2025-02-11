@@ -1716,7 +1716,7 @@ class Model {
             parent_id: $this->parent_id,
             sort_by: $this->sort_by,
             sort_order: $this->sort_order,
-            sort_flags: $this->sort_flags
+            sort_flags: $this->sort_flags,
         );
 
         # Loop through the sorted object and assign it's internal value
@@ -1945,9 +1945,7 @@ class Model {
 
         # Sort the set if a sort field was provided
         if ($sort_by) {
-            $modelset = $modelset->sort(
-                fields: $sort_by, order: $sort_order, flags: $sort_flags, retain_ids: true
-            );
+            $modelset = $modelset->sort(fields: $sort_by, order: $sort_order, flags: $sort_flags, retain_ids: true);
         }
 
         # Apply pagination to limit the number of objects returned and/or reverse the order if requested

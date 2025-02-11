@@ -91,7 +91,7 @@ class ModelSet {
         string|array $fields,
         int $order = SORT_ASC,
         int $flags = SORT_REGULAR,
-        bool $retain_ids = false
+        bool $retain_ids = false,
     ): ModelSet {
         # Variables
         $model_objects = $this->model_objects;

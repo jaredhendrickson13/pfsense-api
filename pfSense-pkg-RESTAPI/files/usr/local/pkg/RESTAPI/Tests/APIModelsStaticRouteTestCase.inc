@@ -357,10 +357,7 @@ class APIModelsStaticRouteTestCase extends TestCase {
         $test_gw->create();
 
         # Create a static route using the gateway above, but do not apply it!
-        $test_route = new StaticRoute(
-            gateway: $test_gw->name->value,
-            network: '1.2.3.4/32'
-        );
+        $test_route = new StaticRoute(gateway: $test_gw->name->value, network: '1.2.3.4/32');
         $test_route->create();
 
         # Ensure we can update the static route before applying it

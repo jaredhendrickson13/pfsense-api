@@ -869,11 +869,15 @@ class Endpoint {
      * Endpoint's assigned $sort_flags property value.
      * @throws ValidationError When the `sort_flags` field is not a string or is not a valid sort flags constant.
      */
-    private function validate_sort_flags(): void
-    {
+    private function validate_sort_flags(): void {
         # Valid sort_flags options
         $flag_opts = [
-            'SORT_REGULAR', 'SORT_NUMERIC', 'SORT_STRING', 'SORT_LOCALE_STRING', 'SORT_NATURAL', 'SORT_FLAG_CASE'
+            'SORT_REGULAR',
+            'SORT_NUMERIC',
+            'SORT_STRING',
+            'SORT_LOCALE_STRING',
+            'SORT_NATURAL',
+            'SORT_FLAG_CASE',
         ];
 
         # Only validate this field if the client specifically requested it in the request data
