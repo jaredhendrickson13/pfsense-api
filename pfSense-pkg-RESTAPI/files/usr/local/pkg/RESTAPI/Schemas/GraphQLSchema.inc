@@ -218,8 +218,7 @@ class GraphQLSchema extends Schema {
             if ($model->$field instanceof NestedModelField) {
                 if ($input) {
                     $nested_model_type = $this->get_model_input_object_type($model->$field->model_class);
-                }
-                else {
+                } else {
                     $nested_model_type = $this->get_model_object_type($model->$field->model_class);
                 }
                 $fields[$field]['type'] = $this->field_to_type(field: $model->$field, type: $nested_model_type);
