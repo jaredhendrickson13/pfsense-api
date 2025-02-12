@@ -93,36 +93,33 @@ class ModelSet {
         int $flags = SORT_REGULAR,
         bool $retain_ids = false,
     ): ModelSet {
-        # Variables
-        $model_objects = $this->model_objects;
+        # Ensure fields is an array
         $fields = is_array($fields) ? $fields : [$fields];
+
+        # Extract sorting values for each field
         $sort_criteria = [];
-
-        # Loop through each Model object and add the field values to the sort criteria
-        foreach ($this->model_objects as $model_object) {
-            # Loop variables
-            $sort_values = [];
-
-            # Loop through each field to sort by and extract it's value
-            foreach ($fields as $field) {
-                $sort_values[] = $field === 'id' ? $model_object->id : $model_object->$field->value;
-            }
-
-            # Add the sort values to the sort criteria
-            $sort_criteria[] = $sort_values;
+        foreach ($fields as $field) {
+            $sort_criteria[] = array_map(
+                fn($model) => $field === 'id' ? $model->id : $model->$field->value, $this->model_objects
+            );
+            $sort_criteria[] = $order;
+            $sort_criteria[] = $flags;
         }
 
-        # Sort using array_multisort
-        array_multisort($sort_criteria, $order, $flags, $model_objects);
+        # Append the actual model objects array for sorting
+        $sort_criteria[] = &$this->model_objects;
 
-        # Re-assign the model object IDs if they should not be retained
+        # Sort the array
+        array_multisort(...$sort_criteria);
+
+        # Re-assign model object IDs if they should not be retained
         if (!$retain_ids) {
-            foreach ($model_objects as $id => $model_object) {
+            foreach ($this->model_objects as $id => $model_object) {
                 $model_object->id = $id;
             }
         }
 
-        return new ModelSet($model_objects);
+        return new ModelSet($this->model_objects);
     }
 
     /**

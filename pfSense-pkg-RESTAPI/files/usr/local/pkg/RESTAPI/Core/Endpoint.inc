@@ -1133,7 +1133,7 @@ class Endpoint {
                 reverse: $this->reverse,
                 sort_by: $this->sort_by,
                 sort_order: constant($this->sort_order),
-                sort_flags: constant($this->sort_flags),
+                sort_flags: $this->sort_flags ? constant($this->sort_flags) : $this->model->sort_flags,
             );
         }
         # For GET requests on many Endpoints, obtain all objects from the assigned Model.
