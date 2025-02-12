@@ -334,13 +334,13 @@ class Endpoint {
     public string $sort_order = 'SORT_ASC';
 
     /**
-     * @var string $sort_flags
+     * @var string|null $sort_flags
      * Sets the default value for the `sort_flags` field in the request data. This value is used to control the sorting
      * flags of the Model objects returned by this Endpoint. This value can be overridden by the client in the request
      * data. This value only takes effect when the `sort_by` field is also set. This value must be the name of a valid
      * PHP sort flags constant (e.g. 'SORT_REGULAR', 'SORT_NATURAL')
      */
-    public string $sort_flags = 'SORT_REGULAR';
+    public string|null $sort_flags = null;
 
     /**
      * @var bool $append
@@ -1157,7 +1157,7 @@ class Endpoint {
         # Allow the endpoint/client to override the Model's sort_by and sort_order properties
         $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
         $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
-        $this->model->sort_flags = constant($this->sort_flags) ?? $this->model->sort_flags;
+        $this->model->sort_flags = $this->sort_flags ? constant($this->sort_flags) : $this->model->sort_flags;
 
         # Create the object and return it
         return $this->model->create(apply: $this->request_data['apply'] === true);
@@ -1181,7 +1181,7 @@ class Endpoint {
         # Allow the endpoint/client to override the Model's sort_by and sort_order properties
         $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
         $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
-        $this->model->sort_flags = constant($this->sort_flags) ?? $this->model->sort_flags;
+        $this->model->sort_flags = $this->sort_flags ? constant($this->sort_flags) : $this->model->sort_flags;
 
         # Update the object and return it
         return $this->model->update(
