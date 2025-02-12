@@ -155,6 +155,8 @@ jobs:
         run: |
           pfsense-vshell --host ${{ matrix.PFSENSE_VERSION }}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
           pfsense-vshell --host ${{ matrix.PFSENSE_VERSION }}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
+          pfsense-vshell --host ${{ matrix.PFSENSE_VERSION }}.jaredhendrickson.com -u admin -p pfsense -c "pkill ntpd" -k
+          pfsense-vshell --host ${{ matrix.PFSENSE_VERSION }}.jaredhendrickson.com -u admin -p pfsense -c "ntpdate pool.ntp.org" -k
           scp -o StrictHostKeyChecking=no pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg/pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg admin@${{ matrix.PFSENSE_VERSION }}.jaredhendrickson.com:/tmp/
 
       - name: Install pfSense-pkg-RESTAPI on pfSense

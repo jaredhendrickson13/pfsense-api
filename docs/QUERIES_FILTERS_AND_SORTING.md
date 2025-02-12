@@ -122,8 +122,8 @@ For advanced users, the REST API's framework allows for custom query filter clas
 ## Sorting
 
 Sorting can be used to order the data that is returned from the API based on specific criteria, as well as sorting the
-objects written to the pfSense configuration. Sorting is controlled by two common control parameters: 
-[`sort_by`](COMMON_CONTROL_PARAMETERS.md#sort_by) and [`sort_order`](COMMON_CONTROL_PARAMETERS.md#sort_order).
+objects written to the pfSense configuration. Sorting is controlled by three common control parameters: 
+[`sort_by`](COMMON_CONTROL_PARAMETERS.md#sort_by), [`sort_flags`](COMMON_CONTROL_PARAMETERS.md#sort_flags), and [`sort_order`](COMMON_CONTROL_PARAMETERS.md#sort_order).
 
 !!! Note
     - Sorting is only available for model objects that allow many instances, meaning multiple objects of its type can

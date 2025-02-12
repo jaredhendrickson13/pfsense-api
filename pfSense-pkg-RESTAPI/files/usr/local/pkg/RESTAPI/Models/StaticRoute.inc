@@ -221,6 +221,7 @@ class StaticRoute extends Model {
      */
     private function serialize_route(): void {
         global $g;
+        $old_network = [];
 
         # Include pending route changes that haven't been applied yet, or simply initialize our pending change var
         if (file_exists("{$g['tmp_path']}/.system_routes.apply")) {

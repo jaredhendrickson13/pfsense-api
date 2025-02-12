@@ -102,6 +102,21 @@ parameters you can use:
   behavior of this parameter varies based on the request method and endpoint type. Refer to the 
   [Sorting](QUERIES_FILTERS_AND_SORTING.md#sorting) section for more information.
 
+## sort_flags
+
+- Type: String
+- Default: `SORT_REGULAR`
+- Choices:
+    - `SORT_REGULAR`
+    - `SORT_NUMERIC`
+    - `SORT_STRING`
+    - `SORT_NATURAL`
+    - `SORT_FLAG_CASE`
+    - `SORT_FLAG_LOCALE_STRING`
+- Description: This parameter allows you to control the sorting behavior of the objects related to the endpoint. The
+  behavior of this parameter varies based on the request method and endpoint type. Refer to the
+  [Sorting](QUERIES_FILTERS_AND_SORTING.md#sorting) section for more information.
+
 ## sort_order
 
 - Type: String

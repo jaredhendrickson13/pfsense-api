@@ -325,6 +325,7 @@ class OpenVPNServer extends Model {
             default: [],
             allow_empty: true,
             many: true,
+            many_maximum: 10000,
             conditions: ['gwredir' => false],
             validators: [new SubnetValidator(allow_ipv4: true, allow_ipv6: false, allow_alias: true)],
             help_text: 'The IPv4 networks that will be accessible from the remote endpoint. Expressed as a ' .
