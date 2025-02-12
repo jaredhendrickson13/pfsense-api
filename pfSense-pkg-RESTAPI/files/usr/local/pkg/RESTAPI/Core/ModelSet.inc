@@ -100,7 +100,8 @@ class ModelSet {
         $sort_criteria = [];
         foreach ($fields as $field) {
             $sort_criteria[] = array_map(
-                fn($model) => $field === 'id' ? $model->id : $model->$field->value, $this->model_objects
+                fn($model) => $field === 'id' ? $model->id : $model->$field->value,
+                $this->model_objects,
             );
             $sort_criteria[] = $order;
             $sort_criteria[] = $flags;
