@@ -810,4 +810,77 @@ class APICoreEndpointTestCase extends TestCase {
         $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_ORDER_FIELD_UNKNOWN_SORT_ORDER');
         $this->assert_equals($resp->code, 400);
     }
+
+    /**
+     * Ensure the 'sort_flags' common control parameter must be a valid PHP sort constant.
+     */
+    public function test_sort_flags_must_be_php_sort_constant(): void {
+        # Use a GET request to request a non-string sort order
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'name', 'sort_flags' => 12345],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        # Ensure the response threw a ENDPOINT_SORT_FLAGS_FIELD_INVALID_TYPE error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_FLAGS_FIELD_INVALID_TYPE');
+        $this->assert_equals($resp->code, 400);
+
+        # Make another request to sort order that is not known
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'name', 'sort_flags' => 'unknown_sort_flags'],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure the response threw a ENDPOINT_SORT_FLAGS_FIELD_UNKNOWN_SORT_FLAGS error
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->response_id, 'ENDPOINT_SORT_FLAGS_FIELD_UNKNOWN_SORT_FLAGS');
+        $this->assert_equals($resp->code, 400);
+    }
+
+    /**
+     * Ensure clients can specify the 'sort_flags' common control parameter to sort the returned data.
+     */
+    public function test_sort_flags(): void {
+        # Use a PUT request to create new aliases
+        \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'PUT',
+            data: [
+                ['name' => 'alias_a', 'type' => 'host', 'descr' => '127.0.0.22'],
+                ['name' => 'alias_b', 'type' => 'host', 'descr' => '127.0.0.2'],
+                ['name' => 'alias_c', 'type' => 'host', 'descr' => '127.0.0.100'],
+                ['name' => 'alias_d', 'type' => 'host', 'descr' => '127.0.0.10'],
+            ],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+
+        # Ensure we can make a successful GET request to a `many` endpoint with the 'sort_flags' control parameter
+        $json_resp = \RESTAPI\Core\Tools\http_request(
+            url: 'https://localhost/api/v2/firewall/aliases',
+            method: 'GET',
+            data: ['sort_by' => 'descr', 'sort_flags' => 'SORT_NATURAL'],
+            headers: ['Content-Type' => 'application/json'],
+            username: 'admin',
+            password: 'pfsense',
+            validate_certs: false,
+        );
+        $resp = json_decode($json_resp);
+        $this->assert_equals($resp->data[0]->name, 'alias_b');
+        $this->assert_equals($resp->data[1]->name, 'alias_d');
+        $this->assert_equals($resp->data[2]->name, 'alias_a');
+        $this->assert_equals($resp->data[3]->name, 'alias_c');
+    }
 }
