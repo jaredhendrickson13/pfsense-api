@@ -435,4 +435,36 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
             $host_9,
         ]);
     }
+
+    /**
+     * Checks that ModelSets can be sorted using the requested sort flags
+     */
+    public function test_sort_flags(): void {
+        # Create test firewall aliases with descriptions set to IP addresses
+        $alias_a = new FirewallAlias(name: 'alias_a', type: 'host', descr: '127.0.0.22');
+        $alias_b = new FirewallAlias(name: 'alias_b', type: 'host', descr: '127.0.0.200');
+        $alias_c = new FirewallAlias(name: 'alias_c', type: 'host', descr: '127.0.0.100');
+        $alias_a->create();
+        $alias_b->create();
+        $alias_c->create();
+
+        # Read the firewall aliases and use regular sorting to ensure the order is correct
+        # This should sort the IP address out of logical order since SORT_REGULAR does not sort numerically
+        $modelset = FirewallAlias::read_all()->sort(['descr'], order: SORT_ASC, flags: SORT_REGULAR);
+        $this->assert_equals($modelset->model_objects[0]->name->value, 'alias_c');
+        $this->assert_equals($modelset->model_objects[1]->name->value, 'alias_b');
+        $this->assert_equals($modelset->model_objects[2]->name->value, 'alias_a');
+
+        # Read the firewall aliases and use natural sorting to ensure the order is correct
+        # This should sort the IP address in numerical order since SORT_NATURAL does sort numerically
+        $modelset = FirewallAlias::read_all()->sort(['descr'], order: SORT_ASC, flags: SORT_NATURAL);
+        $this->assert_equals($modelset->model_objects[0]->name->value, 'alias_a');
+        $this->assert_equals($modelset->model_objects[1]->name->value, 'alias_c');
+        $this->assert_equals($modelset->model_objects[2]->name->value, 'alias_b');
+
+        # Delete the firewall aliases
+        $alias_a->delete();
+        $alias_b->delete();
+        $alias_c->delete();
+    }
 }
