@@ -205,8 +205,8 @@ class PortForward extends Model {
                 protocol: $this->protocol->value,
                 source: $this->source->value,
                 source_port: $this->source_port->value,
-                destination: $this->destination->value,
-                destination_port: $this->destination_port->value,
+                destination: $this->target->value,
+                destination_port: $this->local_port->value,
                 descr: "Associated rule for port forward rule {$this->associated_rule_id->value}",
                 client: $this->client,
             );
@@ -246,8 +246,8 @@ class PortForward extends Model {
                 protocol: $this->protocol->value,
                 source: $this->source->value,
                 source_port: $this->source_port->value,
-                destination: $this->destination->value,
-                destination_port: $this->destination_port->value,
+                destination: $this->target->value,
+                destination_port: $this->local_port->value,
             );
 
             # Format any errors that occur during the update of the rule so its clear that its associated with the linked rule

@@ -108,7 +108,7 @@ class FirewallAlias extends Model {
         }
 
         # Ensure value is an IP, FQDN or alias when `type` is `host`
-        $host_alias_q = $aliases->query(name: $address, type: 'host');
+        $host_alias_q = $aliases->query(name: $address, type__except: 'port');
         if ($type === 'host' and !is_ipaddr($address) and !is_fqdn($address) and !$host_alias_q->exists()) {
             throw new ValidationError(
                 message: "Host alias 'address' value '$address' is not a valid IP, FQDN, or alias.",
@@ -116,8 +116,8 @@ class FirewallAlias extends Model {
             );
         }
 
-        # Ensure value is a CIDR, FQDN or alias when `type` is `network`
-        $network_alias_q = $aliases->query(name: $address, type: 'network');
+        # Ensure value is a CIDR, FQDN or non-port alias when `type` is `network`
+        $network_alias_q = $aliases->query(name: $address, type__except: 'port');
         if ($type === 'network' and !is_subnet($address) and !is_fqdn($address) and !$network_alias_q->exists()) {
             throw new ValidationError(
                 message: "Network alias 'address' value '$address' is not a valid CIDR, FQDN, or alias.",
