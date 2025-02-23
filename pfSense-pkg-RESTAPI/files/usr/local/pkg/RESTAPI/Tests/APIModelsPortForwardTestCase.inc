@@ -182,7 +182,7 @@ class APIModelsPortForwardTestCase extends TestCase {
     /**
      * Checks that port forwards with associated firewall rules correctly create, update and delete the associated rule
      */
-    public function test_associated_firewall_rules() {
+    public function test_associated_firewall_rules(): void {
         # Create a port forward to test with
         $port_forward = new PortForward(
             interface: 'wan',
@@ -208,8 +208,8 @@ class APIModelsPortForwardTestCase extends TestCase {
         $this->assert_equals($rule_q->first()->protocol->value, 'tcp');
         $this->assert_equals($rule_q->first()->source->value, '1.2.3.4');
         $this->assert_equals($rule_q->first()->source_port->value, '1234');
-        $this->assert_equals($rule_q->first()->destination->value, '4.3.2.1');
-        $this->assert_equals($rule_q->first()->destination_port->value, '4321');
+        $this->assert_equals($rule_q->first()->destination->value, '127.0.0.1');
+        $this->assert_equals($rule_q->first()->destination_port->value, '1234');
 
         # Update the port forward and ensure the associated rule is updated
         $port_forward->from_representation(
@@ -228,8 +228,8 @@ class APIModelsPortForwardTestCase extends TestCase {
         $this->assert_equals($rule_q->first()->protocol->value, 'udp');
         $this->assert_equals($rule_q->first()->source->value, '4321::1');
         $this->assert_equals($rule_q->first()->source_port->value, '4321');
-        $this->assert_equals($rule_q->first()->destination->value, '1234::1');
-        $this->assert_equals($rule_q->first()->destination_port->value, '1234');
+        $this->assert_equals($rule_q->first()->destination->value, 'fe80::1');
+        $this->assert_equals($rule_q->first()->destination_port->value, '4321');
 
         # Delete the port forward and ensure the associated rule is deleted
         $port_forward->delete();
