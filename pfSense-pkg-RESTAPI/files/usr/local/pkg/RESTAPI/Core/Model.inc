@@ -2218,7 +2218,7 @@ class Model {
             unset($representation_object['id']);
 
             # Define a new Model object using this representation and validate
-            $model_object = new $this(data: $representation_object, skip_init: true);
+            $model_object = new $this(data: $representation_object, skip_init: true, client: $this->client);
             $model_object->id = $model_object->get_next_id();
             $model_object->validate(modelset: $new_objects);
 
