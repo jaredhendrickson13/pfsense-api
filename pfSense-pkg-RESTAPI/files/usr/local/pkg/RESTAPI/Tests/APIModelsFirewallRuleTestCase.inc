@@ -909,12 +909,11 @@ class APIModelsFirewallRuleTestCase extends TestCase {
     /**
      * Checks that the username of the client is correctly identified when replace_all is called.
      */
-    public function test_replace_all_retains_client_username(): void
-    {
+    public function test_replace_all_retains_client_username(): void {
         # Mock the authenticated client
         $client = new Auth();
-        $client->username = "testuser";
-        $client->ip_address = "127.1.2.3";
+        $client->username = 'testuser';
+        $client->ip_address = '127.1.2.3';
 
         # Replace all firewall rules with a new set
         $rule_model = new FirewallRule(client: $client);
@@ -936,7 +935,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
                     'destination' => 'any',
                     'descr' => 'test description 2',
                 ],
-            ]
+            ],
         );
 
         # Ensure the client username and IP are correctly set in the new rules
