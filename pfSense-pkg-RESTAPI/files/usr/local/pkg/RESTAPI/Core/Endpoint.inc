@@ -316,7 +316,7 @@ class Endpoint {
     public bool $reverse = false;
 
     /**
-     * @var string|null $sort_by
+     * @var string|array|null $sort_by
      * Sets the default value(s) for the `sort_by` field in the request data. This value is used to control the sorting of
      * the Model objects returned by this Endpoint. This value can be overridden by the client in the request data. Use
      * caution when assigning this value as it may force objects to be sorted in this order when they are written to the
@@ -332,6 +332,15 @@ class Endpoint {
      * PHP sort order constant ('SORT_ASC' or 'SORT_DESC').
      */
     public string $sort_order = 'SORT_ASC';
+
+    /**
+     * @var string|null $sort_flags
+     * Sets the default value for the `sort_flags` field in the request data. This value is used to control the sorting
+     * flags of the Model objects returned by this Endpoint. This value can be overridden by the client in the request
+     * data. This value only takes effect when the `sort_by` field is also set. This value must be the name of a valid
+     * PHP sort flags constant (e.g. 'SORT_REGULAR', 'SORT_NATURAL')
+     */
+    public string|null $sort_flags = null;
 
     /**
      * @var bool $append
@@ -734,7 +743,7 @@ class Endpoint {
         $this->check_decode_content_handler_supported($content_handler);
 
         # Decode the request data
-        $this->request_data = $content_handler->decode();
+        $this->request_data = $content_handler->decode() ?? [];
         $this->validate_endpoint_fields();
     }
 
@@ -855,6 +864,47 @@ class Endpoint {
     }
 
     /**
+     * Validates the $sort_flags common control parameter for this request.
+     * @note If the `sort_flags` field was not provided in the request data, the request will default to the
+     * Endpoint's assigned $sort_flags property value.
+     * @throws ValidationError When the `sort_flags` field is not a string or is not a valid sort flags constant.
+     */
+    private function validate_sort_flags(): void {
+        # Valid sort_flags options
+        $flag_opts = [
+            'SORT_REGULAR',
+            'SORT_NUMERIC',
+            'SORT_STRING',
+            'SORT_LOCALE_STRING',
+            'SORT_NATURAL',
+            'SORT_FLAG_CASE',
+        ];
+
+        # Only validate this field if the client specifically requested it in the request data
+        if (isset($this->request_data['sort_flags'])) {
+            # Ensure value is a string
+            if (!is_string($this->request_data['sort_flags'])) {
+                throw new ValidationError(
+                    message: 'Field `sort_flags` must be of type `string`.',
+                    response_id: 'ENDPOINT_SORT_FLAGS_FIELD_INVALID_TYPE',
+                );
+            }
+
+            # Ensure the field is a valid sort flags constant
+            if (!in_array($this->request_data['sort_flags'], $flag_opts)) {
+                throw new ValidationError(
+                    message: 'Field `sort_flags` must be one of: ' . json_encode($flag_opts),
+                    response_id: 'ENDPOINT_SORT_FLAGS_FIELD_UNKNOWN_SORT_FLAGS',
+                );
+            }
+
+            # Update the sort_flags property to use the client's requested value and remove it from the request data
+            $this->sort_flags = $this->request_data['sort_flags'];
+            unset($this->request_data['sort_flags']);
+        }
+    }
+
+    /**
      * Validates the $append common control parameter for this request.
      * @note If the `append` field was not provided in the request data, the request will default to the Endpoint's assigned
      * $append property value.
@@ -964,6 +1014,7 @@ class Endpoint {
         $this->validate_reverse();
         $this->validate_sort_by();
         $this->validate_sort_order();
+        $this->validate_sort_flags();
         $this->validate_append();
         $this->validate_remove();
         $this->validate_limit();
@@ -1082,6 +1133,7 @@ class Endpoint {
                 reverse: $this->reverse,
                 sort_by: $this->sort_by,
                 sort_order: constant($this->sort_order),
+                sort_flags: $this->sort_flags ? constant($this->sort_flags) : $this->model->sort_flags,
             );
         }
         # For GET requests on many Endpoints, obtain all objects from the assigned Model.
@@ -1105,6 +1157,7 @@ class Endpoint {
         # Allow the endpoint/client to override the Model's sort_by and sort_order properties
         $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
         $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
+        $this->model->sort_flags = $this->sort_flags ? constant($this->sort_flags) : $this->model->sort_flags;
 
         # Create the object and return it
         return $this->model->create(apply: $this->request_data['apply'] === true);
@@ -1128,6 +1181,7 @@ class Endpoint {
         # Allow the endpoint/client to override the Model's sort_by and sort_order properties
         $this->model->sort_by = $this->sort_by ?? $this->model->sort_by;
         $this->model->sort_order = constant($this->sort_order) ?? $this->model->sort_order;
+        $this->model->sort_flags = $this->sort_flags ? constant($this->sort_flags) : $this->model->sort_flags;
 
         # Update the object and return it
         return $this->model->update(
@@ -1199,9 +1253,20 @@ class Endpoint {
         $nq_class_name = $this->get_class_shortname();
 
         # Specify the PHP code to write to the Endpoints index.php file
+        $unavailable_error = new ServiceUnavailableError(
+            message: 'This resource is either not installed or is currently updating. Please try again later.',
+            response_id: 'ENDPOINT_UNAVAILABLE',
+        );
+        $unavailable_error_json = json_encode($unavailable_error->to_representation());
         $code =
             "<?php\n" .
-            "require_once('RESTAPI/Endpoints/$nq_class_name.inc');\n" .
+            "\$include = include('RESTAPI/Endpoints/$nq_class_name.inc');\n" .
+            "if (!\$include) {\n" .
+            "    header('Content-Type: application/json');\n" .
+            "    http_response_code(503);\n" .
+            "    echo '$unavailable_error_json';\n" .
+            "    exit(503);\n" .
+            "}\n" .
             "echo (new $fq_class_name())->process_request();\n" .
             "header('Referer: no-referrer');\n" .
             "session_destroy();\n" .

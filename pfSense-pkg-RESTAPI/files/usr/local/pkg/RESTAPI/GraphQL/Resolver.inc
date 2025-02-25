@@ -18,8 +18,7 @@ class Resolver {
      * Constructs the GraphQLResolver object with a given Model object.
      * @param Model $model The Model object to be used for resolving queries and mutations.
      */
-    public function __construct(public Model $model) {
-    }
+    public function __construct(public Model $model) {}
 
     /**
      * A resolver that maps a GraphQL query to the Model's 'query' method.

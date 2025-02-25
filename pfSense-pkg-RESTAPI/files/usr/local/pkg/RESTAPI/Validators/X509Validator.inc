@@ -38,8 +38,7 @@ class X509Validator extends Validator {
         public bool $allow_prv = false,
         public bool $allow_rsa = false,
         public bool $allow_ecprv = false,
-    ) {
-    }
+    ) {}
 
     /**
      * Checks if a given value is a valid X509 string.

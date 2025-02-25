@@ -214,13 +214,22 @@ class Model {
     public int|null $placement = null;
 
     /**
-     * @var int|null $sort_order
+     * @var int $sort_order
      * For $many enabled Models, this property can be used to set the PHP sort option used when writing Model objects to
      * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
      * to Models with a $config_path defined. For valid value options for this property, refer to:
      * https://www.php.net/manual/en/function.array-multisort.php
      */
-    public int|null $sort_order = null;
+    public int $sort_order = SORT_ASC;
+
+    /**
+     * @var int $sort_flags
+     * For $many enabled Models, this property can be used to set the PHP sort flags used when writing Model objects to
+     * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
+     * to Models with a $config_path defined. For valid value options for this property, refer to:
+     * https://www.php.net/manual/en/function.array-multisort.php
+     */
+    public int $sort_flags = SORT_REGULAR;
 
     /**
      * @var array|null $sort_by
@@ -1288,8 +1297,7 @@ class Model {
      * Allows child classes to define extra validation for their Models. This can be used to build complex validations
      * that check conditions between multiple Model fields.
      */
-    public function validate_extra(): void {
-    }
+    public function validate_extra(): void {}
 
     /**
      * Performs a full validation on the API model. This includes checking that required packages are installed and
@@ -1612,15 +1620,13 @@ class Model {
      * Initializes the default 'pre_apply' method. This method is intended to be overidden by a child model class and
      * is called immediately before the 'apply' method. This method runs regardless of whether an apply was requested.
      */
-    protected function pre_apply() {
-    }
+    protected function pre_apply() {}
 
     /**
      * Initializes the default 'apply' method. This method is intended to be overridden by a child model class and is
      * responsible for reloading/restarting services after changes occur.
      */
-    public function apply() {
-    }
+    public function apply() {}
 
     /**
      * Initializes the default 'pre_apply_create' method. This method is intended to be overridden by a child model class and
@@ -1692,8 +1698,8 @@ class Model {
      * internal objects must be written in a specific order.
      */
     protected function sort(): void {
-        # Do not sort if there is no `sort_order` or `sort_by` set
-        if (!$this->sort_order or !$this->sort_by) {
+        # Do not sort if there is no `sort_by` fields set
+        if (!$this->sort_by) {
             return;
         }
 
@@ -1706,7 +1712,12 @@ class Model {
         }
 
         # Obtain all Model objects for this Model and sort them by the requested criteria
-        $modelset = $this->query(parent_id: $this->parent_id, sort_by: $this->sort_by, sort_order: $this->sort_order);
+        $modelset = $this->query(
+            parent_id: $this->parent_id,
+            sort_by: $this->sort_by,
+            sort_order: $this->sort_order,
+            sort_flags: $this->sort_flags,
+        );
 
         # Loop through the sorted object and assign it's internal value
         $internal_objects = [];
@@ -1918,6 +1929,7 @@ class Model {
         bool $reverse = false,
         ?array $sort_by = null,
         int $sort_order = SORT_ASC,
+        int $sort_flags = SORT_REGULAR,
         ...$vl_query_params,
     ): ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
@@ -1932,7 +1944,9 @@ class Model {
         $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
 
         # Sort the set if a sort field was provided
-        $modelset = $sort_by ? $modelset->sort(fields: $sort_by, order: $sort_order, retain_ids: true) : $modelset;
+        if ($sort_by) {
+            $modelset = $modelset->sort(fields: $sort_by, order: $sort_order, flags: $sort_flags, retain_ids: true);
+        }
 
         # Apply pagination to limit the number of objects returned and/or reverse the order if requested
         $modelset->model_objects = self::paginate($modelset->model_objects, $limit, $offset);
@@ -2204,7 +2218,7 @@ class Model {
             unset($representation_object['id']);
 
             # Define a new Model object using this representation and validate
-            $model_object = new $this(data: $representation_object, skip_init: true);
+            $model_object = new $this(data: $representation_object, skip_init: true, client: $this->client);
             $model_object->id = $model_object->get_next_id();
             $model_object->validate(modelset: $new_objects);
 
