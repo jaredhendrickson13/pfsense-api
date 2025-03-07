@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\Auth;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallRule;
@@ -903,5 +904,46 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->delete(apply: true);
         $limiter2->delete(apply: true);
         $limiter1->delete(apply: true);
+    }
+
+    /**
+     * Checks that the username of the client is correctly identified when replace_all is called.
+     */
+    public function test_replace_all_retains_client_username(): void {
+        # Mock the authenticated client
+        $client = new Auth();
+        $client->username = 'testuser';
+        $client->ip_address = '127.1.2.3';
+
+        # Replace all firewall rules with a new set
+        $rule_model = new FirewallRule(client: $client);
+        $rules = $rule_model->replace_all(
+            data: [
+                [
+                    'type' => 'pass',
+                    'interface' => ['lan'],
+                    'ipprotocol' => 'inet',
+                    'source' => 'any',
+                    'destination' => 'any',
+                    'descr' => 'test description',
+                ],
+                [
+                    'type' => 'pass',
+                    'interface' => ['lan'],
+                    'ipprotocol' => 'inet',
+                    'source' => 'any',
+                    'destination' => 'any',
+                    'descr' => 'test description 2',
+                ],
+            ],
+        );
+
+        # Ensure the client username and IP are correctly set in the new rules
+        foreach ($rules->model_objects as $rule) {
+            $this->assert_equals($rule->client->username, $client->username);
+            $this->assert_equals($rule->client->ip_address, $client->ip_address);
+            $this->assert_equals($rule->created_by->value, "$client->username@$client->ip_address (API)");
+            $this->assert_equals($rule->updated_by->value, "$client->username@$client->ip_address (API)");
+        }
     }
 }
