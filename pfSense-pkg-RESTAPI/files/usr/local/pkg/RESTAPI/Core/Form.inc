@@ -513,6 +513,7 @@ class Form {
             $this->get_priv_name() => [
                 'name' => 'WebCfg - ' . $this->verbose_name,
                 'descr' => "Allow access to the $this->url page.",
+                'match' => [substr($this->url, 1)]
             ],
         ];
     }
