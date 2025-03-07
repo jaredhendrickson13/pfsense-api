@@ -25,10 +25,10 @@ class PrivilegesCache extends Cache {
             $privs += $endpoint_object->generate_pfsense_privs();
         }
 
-        # Obtain privileges for each Endpoint class
-        foreach (get_classes_from_namespace('\\RESTAPI\\Forms\\') as $endpoint_class) {
-            $endpoint_object = new $endpoint_class();
-            $privs += $endpoint_object->generate_pfsense_privs();
+        # Obtain privileges for each Form class
+        foreach (get_classes_from_namespace('\\RESTAPI\\Forms\\') as $form_class) {
+            $form_object = new $form_class();
+            $privs += $form_object->generate_pfsense_privs();
         }
 
         return $privs;
