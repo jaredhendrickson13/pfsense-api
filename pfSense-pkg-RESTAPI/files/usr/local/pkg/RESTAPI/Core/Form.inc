@@ -165,7 +165,17 @@ class Form {
     private function generate_verbose_name(): string {
         # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
         $form_name = $this->get_class_shortname();
-        return preg_replace('/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ': ', $form_name);
+        $verbose_name = preg_replace('/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ', $form_name);
+
+        # Add a colon after the first word if the class name is more than one word
+        if (str_contains($verbose_name, ' ')) {
+            $verbose_name = explode(' ', $verbose_name);
+            $verbose_name[0] .= ': ';
+            $verbose_name = implode(' ', $verbose_name);
+        }
+
+        # Return the verbose name with the 'Form' suffix removed
+        return str_replace(' Form', '', $verbose_name);
     }
 
     /**
