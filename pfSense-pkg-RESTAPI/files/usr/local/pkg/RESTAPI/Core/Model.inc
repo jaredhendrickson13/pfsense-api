@@ -90,6 +90,15 @@ class Model {
     public string $id_type = 'integer';
 
     /**
+     * @var bool $auto_create_id
+     * Enables or disables automatic creation of an ID for this Model object when the `create()` method is called. If
+     * set to `true`, the ID will be automatically generated. If set to `false`, an ID must be provided before the
+     * `create()` method is called. This applies exclusively to Models with $many enabled and is usually only
+     * relevant to Model classes that use an internal callable method.
+     */
+    public bool $auto_create_id = true;
+
+    /**
      * @var mixed $parent_id
      * For Models acting as children to a different Model class, this property will contain the ID of the parent model
      * object. If a $parent_model_class is defined, this value MUST be specified during object construction.
@@ -2036,7 +2045,7 @@ class Model {
      */
     final public function create(bool $apply = false): Model {
         # Ensure all object Fields and validations succeed for proceeding.
-        if ($this->validate(create_id: true)) {
+        if ($this->validate(requires_id: !$this->auto_create_id, create_id: $this->auto_create_id)) {
             # Check if creating this object would put the total number of objects over the $many_maximum
             $this->check_many_maximum();
 

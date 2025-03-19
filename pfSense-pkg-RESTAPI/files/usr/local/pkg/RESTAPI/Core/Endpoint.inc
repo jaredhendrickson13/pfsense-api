@@ -1147,8 +1147,10 @@ class Endpoint {
      * Creates a new object for the assigned Model using the data submitted in a POST request.
      */
     protected function post(): Model|ModelSet {
-        # POST request cannot include an ID, strip the ID if present
-        unset($this->request_data['id']);
+        # POST requests cannot include an ID unless auto_create_id is off
+        if ($this->model->auto_create_id) {
+            unset($this->request_data['id']);
+        }
 
         # Construct the model from representation using the client's request data
         $this->model->from_representation(data: $this->request_data);
