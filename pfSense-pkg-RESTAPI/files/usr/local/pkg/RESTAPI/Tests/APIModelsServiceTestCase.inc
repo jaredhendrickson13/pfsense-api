@@ -27,7 +27,7 @@ class APIModelsServiceTestCase extends TestCase {
      */
     public function test_can_perform_service_actions(): void {
         # Obtain a Service to test with
-        $test_service = Service::query(name: "ntpd")->first();
+        $test_service = Service::query(name: 'ntpd')->first();
 
         # Ensure the service can be stopped
         $test_service->action->value = 'stop';
