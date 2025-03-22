@@ -22,7 +22,7 @@ class DHCPRelay extends Model {
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
-        $this->config_path = 'dhrelay';
+        $this->config_path = 'dhcrelay';
         $this->many = false;
         $this->always_apply = true;
 
