@@ -319,7 +319,7 @@ class DHCPServer extends Model {
         $dhcp_relay = new DHCPRelay();
         if (in_array($this->interface->value, $dhcp_relay->interface->value)) {
             throw new ValidationError(
-                message: "DHCP server cannot be enabled while a DHCP Relay is enabled on " .
+                message: 'DHCP server cannot be enabled while a DHCP Relay is enabled on ' .
                     "interface {$this->interface->value}.",
                 response_id: 'DHCP_SERVER_CANNOT_BE_ENABLED_WITH_DHCP_RELAY',
             );
