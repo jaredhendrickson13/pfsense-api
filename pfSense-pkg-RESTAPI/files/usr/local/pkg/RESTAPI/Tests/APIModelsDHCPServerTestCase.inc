@@ -43,7 +43,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
                 $dhcp_server = new DHCPServer(id: 'lan', async: false);
 
                 # Temporarily change the `lan` interface to use dhcp IPv4
-                Model::set_config('dhcrelay/0/interface', 'lan');
+                Model::set_config('dhcrelay/interface', 'lan');
 
                 # Try to enable the DHCP server
                 $dhcp_server->validate_enable(enable: true);
