@@ -32,7 +32,7 @@ class APIModelsDHCPRelayTestCase extends TestCase {
         # Ensure we can enable the DHCPRelay
         $this->assert_does_not_throw(
             callable: function () {
-                $dhcp_relay = new DHCPRelay(enable: true, server: ["1.2.3.4"]);
+                $dhcp_relay = new DHCPRelay(enable: true, server: ['1.2.3.4']);
                 $dhcp_relay->update();
             },
         );
