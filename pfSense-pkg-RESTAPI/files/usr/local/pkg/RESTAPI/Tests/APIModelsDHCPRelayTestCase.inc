@@ -18,7 +18,7 @@ class APIModelsDHCPRelayTestCase extends TestCase {
             $dhcp_server->update();
         }
         if ($apply) {
-            (new DHCPServer())->apply();
+            (new DHCPServer(async: false))->apply();
         }
     }
 
@@ -81,7 +81,7 @@ class APIModelsDHCPRelayTestCase extends TestCase {
         $this->disable_dhcp_servers(apply: true);
 
         # Ensure the DHCPRelay is enabled
-        $dhcp_relay = new DHCPRelay(enable: true, server: ['1.2.3.4']);
+        $dhcp_relay = new DHCPRelay(enable: true, interface: ["lan"], server: ['1.2.3.4']);
         $dhcp_relay->update();
 
         # Ensure the DHCP relay service is running with the correct arguments
@@ -90,7 +90,7 @@ class APIModelsDHCPRelayTestCase extends TestCase {
         $wan_if = $this->env['PFREST_WAN_IF'];
         $this->assert_str_contains(
             $dhcrelay_process->output,
-            "/usr/local/sbin/dhcrelay -id $lan_if -iu $wan_if -a -m replace 1.2.3.4",
+            "/usr/local/sbin/dhcrelay -id $lan_if -iu $wan_if 1.2.3.4",
         );
 
         # Disable the DHCPRelay
