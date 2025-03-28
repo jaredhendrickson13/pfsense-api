@@ -40,7 +40,7 @@ class IPsecChildSAStatus extends Model {
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
-        $this->internal_callable = 'get_ipsec_child SA_statuses';
+        $this->internal_callable = 'get_ipsec_sa_statuses';
         $this->parent_model_class = 'IPsecSAStatus';
         $this->verbose_name = 'IPsec Child SA Status';
         $this->many = true;
