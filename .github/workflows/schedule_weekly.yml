@@ -23,4 +23,4 @@ jobs:
             This pull request has been automatically marked as stale because it has had no recent activity in the last ${{ env.DAYS_BEFORE_STALE }} days.
           days-before-stale: ${{ env.DAYS_BEFORE_STALE }}
           days-before-close: 0
-          exempt-issue-labels: "feature request,enhancement"
+          exempt-issue-labels: "feature request,enhancement,bug"
