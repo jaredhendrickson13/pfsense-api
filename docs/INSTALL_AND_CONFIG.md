@@ -47,7 +47,9 @@ pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/re
       the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
       your version of pfSense.
     - When updating pfSense, **you must reinstall this package afterward** as pfSense removes unofficial packages during
-      system updates and has no way to automatically reinstall them.
+      system updates and has no way to automatically reinstall them. 
+    - If you're looking for a method of programmatically installing the package without SSH, check out 
+      [pfsense-vshell](https://github.com/jaredhendrickson13/pfsense-vshell)!
 
 ## Configuring the package
 
