@@ -1248,4 +1248,23 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $dhcp_server->staticmap->value = [];
         $dhcp_server->update(apply: true);
     }
+
+    /**
+     * Checks that all Model classes with an internal_callable assigned have an existing callable assigned.
+     */
+    public function test_model_internal_callables_exist(): void {
+        # Loop through all Model classes
+        foreach (Model::get_all_model_classes() as $model_class) {
+            # Create a new instance of the Model class
+            $model_obj = new $model_class(skip_init: true);
+
+            # Skip models that don't have an internal callable assigned
+            if (!$model_obj->internal_callable) {
+                continue;
+            }
+
+            # Ensure the internal callable exists
+            $this->assert_is_true(method_exists($model_obj, $model_obj->internal_callable));
+        }
+    }
 }
