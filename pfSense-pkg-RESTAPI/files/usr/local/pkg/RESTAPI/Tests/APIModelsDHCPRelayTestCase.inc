@@ -81,7 +81,7 @@ class APIModelsDHCPRelayTestCase extends TestCase {
         $this->disable_dhcp_servers(apply: true);
 
         # Ensure the DHCPRelay is enabled
-        $dhcp_relay = new DHCPRelay(enable: true, interface: ["lan"], server: ['1.2.3.4']);
+        $dhcp_relay = new DHCPRelay(enable: true, interface: ['lan'], server: ['1.2.3.4']);
         $dhcp_relay->update();
 
         # Ensure the DHCP relay service is running with the correct arguments
