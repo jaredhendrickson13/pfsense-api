@@ -315,15 +315,13 @@ class DHCPServer extends Model {
             );
         }
 
-        # Do not allow the DHCP server to be enabled if this interface is already running a DHCP relay
-        # TODO: Replace this with a Model query when the DHCPRelay Model is developed
-        foreach ($this->get_config('dhcrelay', []) as $dhcp_relay) {
-            if ($this->id === $dhcp_relay['interface']) {
-                throw new ValidationError(
-                    message: 'DHCP server cannot be enabled because a DHCP relay is already running.',
-                    response_id: 'DHCP_SERVER_CANNOT_BE_ENABLED_WITH_DHCP_RELAY',
-                );
-            }
+        # Do not allow the DHCP server to be enabled if any interface is running a DHCP relay
+        $dhcp_relay = new DHCPRelay();
+        if ($dhcp_relay->enable->value) {
+            throw new ValidationError(
+                message: 'DHCP server cannot be enabled while the DHCP Relay is enabled.',
+                response_id: 'DHCP_SERVER_CANNOT_BE_ENABLED_WITH_DHCP_RELAY',
+            );
         }
 
         return $enable;

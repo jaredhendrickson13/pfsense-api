@@ -34,7 +34,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
     /**
      * Ensures that a DHCP server cannot be enabled on an interface is already running a DHCP relay.
      */
-    public function test_cannot_enable_dhcp_server_with_relay_running() {
+    public function test_cannot_enable_dhcp_server_with_relay_running(): void {
         $this->assert_throws_response(
             response_id: 'DHCP_SERVER_CANNOT_BE_ENABLED_WITH_DHCP_RELAY',
             code: 400,
@@ -43,7 +43,7 @@ class APIModelsDHCPServerTestCase extends TestCase {
                 $dhcp_server = new DHCPServer(id: 'lan', async: false);
 
                 # Temporarily change the `lan` interface to use dhcp IPv4
-                Model::set_config('dhcrelay/0/interface', 'lan');
+                Model::set_config('dhcrelay/enable', '');
 
                 # Try to enable the DHCP server
                 $dhcp_server->validate_enable(enable: true);

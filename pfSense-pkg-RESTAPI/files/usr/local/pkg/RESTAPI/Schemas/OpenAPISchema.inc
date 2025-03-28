@@ -184,7 +184,7 @@ class OpenAPISchema extends Schema {
                     }
 
                     # For non `many` Endpoints with `many` Models, add the ID to the schema and make it required
-                    if (!$endpoint->many and $model->many and $request_method !== 'post') {
+                    if (!$endpoint->many and $model->many and ($request_method !== 'post' or !$model->auto_create_id)) {
                         $schema = [
                             'schema' => [
                                 'allOf' => [
