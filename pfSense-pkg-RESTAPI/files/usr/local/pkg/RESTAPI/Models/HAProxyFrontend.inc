@@ -180,4 +180,18 @@ class HAProxyFrontend extends Model {
 
         parent::__construct($id, $parent_id, $data, ...$options);
     }
+
+    /**
+     * Ensures haproxy is marked as dirty before applying.
+     */
+    public function pre_apply(): void {
+        touch('/var/run/haproxy.conf.dirty');
+    }
+
+    /**
+     * Applies changes to the HAProxy configuration.
+     */
+    public function apply(): void {
+        (new HAProxyApplyDispatcher(async: $this->async))->spawn_process();
+    }
 }
