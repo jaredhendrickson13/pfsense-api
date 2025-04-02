@@ -20,20 +20,17 @@ class Service extends Model {
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set Model attributes
         $this->internal_callable = 'get_services';
+        $this->auto_create_id = false; // We don't create services with create(), we just control existing ones
         $this->many = true;
 
         # Set Model Fields
-        $this->name = new StringField(
-            required: true,
-            choices_callable: 'get_service_name_choices',
-            help_text: 'The internal name of the service.',
-        );
         $this->action = new StringField(
             required: true,
             choices: ['start', 'stop', 'restart'],
             write_only: true,
             help_text: 'The action to perform against this service.',
         );
+        $this->name = new StringField(read_only: true, help_text: 'The internal name of the service.');
         $this->description = new StringField(read_only: true, help_text: 'The full descriptive name of the service.');
         $this->enabled = new BooleanField(
             read_only: true,
@@ -57,59 +54,52 @@ class Service extends Model {
      * @return array An array of available pfSense services and their current statuses.
      */
     public static function get_services(): array {
-        # Variables
-        $services = get_services();
-
-        # Loop through each service and set the proper values
-        foreach ($services as $id => $service) {
-            # Ensure the $enabled and $status values are always present
-            $services[$id]['enabled'] = is_service_enabled($service['name']);
-            $services[$id]['status'] = is_service_running($service['name']);
-        }
-
-        return $services;
-    }
-
-    /**
-     * Obtains all internal service choices for the `name` field.
-     * @return array An array of available service names.
-     */
-    public function get_service_name_choices(): array {
-        $choices = [];
-        foreach ($this->get_services() as $service) {
-            $choices[] = $service['name'];
-        }
-        return $choices;
-    }
-
-    /**
-     * Gets the representation ID for a given service name.
-     * @param string $name The internal service to obtain the ID for.
-     * @return int The representation ID of the service with this name.
-     */
-    public function get_id_by_name(string $name): int {
-        return $this->query(['name' => $name])->first()->id;
+        return get_services();
     }
 
     /**
      * Starts or stops a specified service.
      */
-    public function _create() {
+    public function _create(): void {
+        # Obtain the extras for this service. Provides additional info required for some services to be controlled.
+        $extras = $this->_format_extra_data($this->get_services()[$this->id]);
+
         # Trigger the requested service action
         switch ($this->action->value) {
             case 'start':
-                service_control_start(name: $this->name->value, extras: []);
+                service_control_start(name: $this->name->value, extras: $extras);
                 break;
             case 'stop':
-                service_control_stop(name: $this->name->value, extras: []);
+                service_control_stop(name: $this->name->value, extras: $extras);
                 break;
             case 'restart':
-                service_control_restart(name: $this->name->value, extras: []);
+                service_control_restart(name: $this->name->value, extras: $extras);
                 break;
         }
 
-        # Populate the current status of the service with this name so this object is up-to-date.
-        $this->id = $this->get_id_by_name($this->name->value);
+        # Recheck the service status after the action has been performed to ensure the correct status is returned
         $this->from_internal();
+    }
+
+    /**
+     * Formats the 'extra' service data required for some services to be restarted to the weird format pfSense
+     * sometimes expects. In the webConfigurator, this process is obfuscated by AJAX calls and JavaScript so there
+     * is no direct function to format this data. This function is a workaround to provide the correct data format.
+     *
+     * @param array $service The service data to format.
+     * @return array The formatted service data suitable for the service control functions 'extras' parameter.
+     */
+    public function _format_extra_data(array $service): array {
+        # Format OpenVPN service extra data for service control
+        if ($service['name'] === 'openvpn') {
+            # 'mode' changes to 'vpnmode'
+            $service['vpnmode'] = $service['mode'];
+            unset($service['mode']);
+
+            # 'vpnid' changes to just 'id'
+            $service['id'] = $service['vpnid'];
+        }
+
+        return $service;
     }
 }

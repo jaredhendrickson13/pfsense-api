@@ -139,4 +139,18 @@ class APIModelsHAProxyBackendTestCase extends TestCase {
         $backend->delete();
         $this->assert_is_false(HAProxyBackend::query(id: $backend->id)->exists());
     }
+
+    /**
+     * Ensure that the HAProxyBackend::$advanced_backend property is base64 encoded internally.
+     */
+    public function test_advanced_backend_is_base64(): void {
+        # Ensure the advanced_backend property is base64 encoded when converted to internal config value
+        $backend = new HAProxyBackend(advanced_backend: 'test');
+        $this->assert_equals($backend->advanced_backend->to_internal(), base64_encode('test'));
+
+        # Ensure the advanced_backend property is base64 decoded when converted from internal config value
+        $backend = new HAProxyBackend();
+        $backend->advanced_backend->from_internal(base64_encode('test'));
+        $this->assert_equals($backend->advanced_backend->value, 'test');
+    }
 }

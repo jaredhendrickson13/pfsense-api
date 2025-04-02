@@ -1,0 +1,26 @@
+name: Weekly Schedule
+
+on:
+  workflow_dispatch: # Enable manual triggering
+  schedule:
+    - cron: "0 18 * * 1"
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    env:
+      DAYS_BEFORE_STALE: 60
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has had no recent activity in the last ${{ env.DAYS_BEFORE_STALE }} days.
+          stale-pr-message: |
+            This pull request has been automatically marked as stale because it has had no recent activity in the last ${{ env.DAYS_BEFORE_STALE }} days.
+          days-before-stale: ${{ env.DAYS_BEFORE_STALE }}
+          days-before-close: 0
+          exempt-issue-labels: "feature request,enhancement,bug"

@@ -17,6 +17,7 @@ nav:
   - Advanced Topics:
       - Introduction: ADVANCED_TOPICS_INTRO.md
       - Contributing & Development: CONTRIBUTING.md
+      - Security Policy: SECURITY.md
       - Building Custom Authentication: BUILDING_CUSTOM_AUTH_CLASSES.md
       - Building Custom Query Filters: BUILDING_CUSTOM_QUERY_FILTER_CLASSES.md
       - Building Custom Models: BUILDING_CUSTOM_MODEL_CLASSES.md

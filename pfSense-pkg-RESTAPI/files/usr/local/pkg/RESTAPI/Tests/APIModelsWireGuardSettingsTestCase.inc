@@ -19,12 +19,12 @@ class APIModelsWireGuardSettingsTestCase extends TestCase {
         # Enable WireGuard and ensure the service is running
         $wg = new WireGuardSettings(enable: true, async: false);
         $wg->update(apply: true);
-        $this->assert_is_true(Service::query(name: 'wireguard', status: true)->exists());
+        $this->assert_is_true(is_service_running('wireguard'));
 
         # Disable WireGuard and ensure the service is stopped
         $wg->enable->value = false;
         $wg->update(apply: true);
-        $this->assert_is_true(Service::query(name: 'wireguard', status: false)->exists());
+        $this->assert_is_false(is_service_running('wireguard'));
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\HAProxyApplyDispatcher;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
@@ -96,6 +97,19 @@ class HAProxyFrontend extends Model {
             allow_null: true,
             help_text: 'The default backend to use for this frontend.',
         );
+        $this->ssloffloadcert = new ForeignModelField(
+            model_name: 'Certificate',
+            model_field: 'refid',
+            default: null,
+            allow_null: true,
+            help_text: 'The default SSL/TLS certificate refid to use for this frontend.',
+        );
+        $this->ha_certificates = new NestedModelField(
+            model_class: 'HAProxyFrontendCertificate',
+            default: [],
+            allow_empty: true,
+            help_text: 'The additional SSL/TLS certificates to use on this frontend.',
+        );
         $this->socket_stats = new BooleanField(
             default: false,
             indicates_true: 'yes',
@@ -166,5 +180,19 @@ class HAProxyFrontend extends Model {
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
+    }
+
+    /**
+     * Ensures haproxy is marked as dirty before applying.
+     */
+    public function pre_apply(): void {
+        touch('/var/run/haproxy.conf.dirty');
+    }
+
+    /**
+     * Applies changes to the HAProxy configuration.
+     */
+    public function apply(): void {
+        (new HAProxyApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
