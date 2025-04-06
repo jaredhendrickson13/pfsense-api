@@ -149,7 +149,7 @@ class DNSResolverSettings extends Model {
      * Obtains all available Python module options.
      * @return array The available Python module options.
      */
-    protected function get_python_script_options(): array {
+    public function get_python_script_options(): array {
         # Use glob to obtain all .py files in /var/unbound/
         $files = glob('/var/unbound/*.py');
 
