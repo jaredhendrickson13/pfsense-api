@@ -74,4 +74,14 @@ class APIModelsDNSResolverSettingsTestCase extends TestCase {
         $unbound_config = file_get_contents('/var/unbound/unbound.conf');
         $this->assert_str_contains($unbound_config, 'test: test');
     }
+
+    /**
+     * Checks that the `get_python_script_options` method correctly retrieves the available Python scripts.
+     */
+    public function test_get_python_script_options(): void {
+        # Add a mock script to /var/unbound/ to populate an option
+        touch('/var/unbound/test_option1.py');
+        $settings = new DNSResolverSettings(async: false);
+        $this->assert_equals($settings->get_python_script_options(), ['test_option1']);
+    }
 }
