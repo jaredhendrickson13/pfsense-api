@@ -83,5 +83,6 @@ class APIModelsDNSResolverSettingsTestCase extends TestCase {
         touch('/var/unbound/test_option1.py');
         $settings = new DNSResolverSettings(async: false);
         $this->assert_equals($settings->get_python_script_options(), ['test_option1']);
+        unlink('/var/unbound/test_option1.py');
     }
 }
