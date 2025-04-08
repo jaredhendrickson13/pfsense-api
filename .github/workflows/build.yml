@@ -59,6 +59,8 @@ jobs:
         include:
           - PFSENSE_VERSION: pfSense-2.7.2-RELEASE
             FREEBSD_ID: freebsd14
+          - PFSENSE_VERSION: pfSense-2.8.0-BETA
+            FREEBSD_ID: freebsd15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -107,6 +109,8 @@ jobs:
         include:
           - PFSENSE_VERSION: pfSense-2.7.2-RELEASE
             FREEBSD_ID: freebsd14
+          - PFSENSE_VERSION: pfSense-2.8.0-BETA
+            FREEBSD_ID: freebsd15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -134,6 +138,8 @@ jobs:
         include:
           - PFSENSE_VERSION: pfSense-2.7.2-RELEASE
             FREEBSD_ID: freebsd14
+          - PFSENSE_VERSION: pfSense-2.8.0-BETA
+            FREEBSD_ID: freebsd15
 
     steps:
       - uses: actions/checkout@v4
