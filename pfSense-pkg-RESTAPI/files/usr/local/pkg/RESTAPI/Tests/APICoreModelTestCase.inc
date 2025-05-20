@@ -1267,4 +1267,26 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             $this->assert_is_true(method_exists($model_obj, $model_obj->internal_callable));
         }
     }
+
+    /**
+     * Checks that all Model class fields with a 'choices_callable' assigned have an existing callable assigned.
+     */
+    public function test_model_field_choices_callables_exist(): void {
+        # Loop through all Model classes
+        foreach (Model::get_all_model_classes() as $model_class) {
+            # Create a new instance of the Model class
+            $model_obj = new $model_class(skip_init: true);
+
+            # Loop through all the fields in the Model class
+            foreach ($model_obj->get_fields() as $field) {
+                # Skip fields that don't have a choices callable assigned
+                if (!$field->choices_callable) {
+                    continue;
+                }
+
+                # Ensure the choices callable exists
+                $this->assert_is_true(method_exists($model_obj, $field->choices_callable));
+            }
+        }
+    }
 }
