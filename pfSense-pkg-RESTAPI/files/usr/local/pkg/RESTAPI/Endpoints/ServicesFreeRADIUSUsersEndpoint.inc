@@ -24,4 +24,3 @@ class ServicesFreeRADIUSUsersEndpoint extends Endpoint {
         parent::__construct();
     }
 }
-

@@ -23,7 +23,6 @@ use RESTAPI\Validators\RegexValidator;
  * Defines a Model that represents OpenVPN Client config Export.
  */
 class FreeRADIUSUser extends Model {
-
     public StringField $username;
     public StringField $password;
     public StringField $password_encryption;
@@ -50,11 +49,7 @@ class FreeRADIUSUser extends Model {
         #
         # Set model fields
         #
-        $this->username = new StringField(
-            required: true,
-            unique: true,
-            internal_name: 'varusersusername',
-        );
+        $this->username = new StringField(required: true, unique: true, internal_name: 'varusersusername');
 
         $this->password = new StringField(
             required: true,
@@ -67,20 +62,20 @@ class FreeRADIUSUser extends Model {
         $this->password_encryption = new StringField(
             required: false,
             conditions: ['motp_enable' => 'off'],
-            choices: [ 'Cleartext-Password', 'MD5-Password', 'MD5-Password-hashed', 'NT-Password-hashed' ],
+            choices: ['Cleartext-Password', 'MD5-Password', 'MD5-Password-hashed', 'NT-Password-hashed'],
             default: 'Cleartext-Password',
             internal_name: 'varuserspasswordencryption',
         );
 
         $this->motp_enable = new StringField(
             required: true,
-            choices: [ 'on', 'off' ],
+            choices: ['on', 'off'],
             internal_name: 'varusersmotpenable',
         );
         $this->motp_authmethod = new StringField(
             required: false,
             conditions: ['motp_enable' => 'on'],
-            choices: [ 'motp', 'googleauth' ],
+            choices: ['motp', 'googleauth'],
             default: 'googleauth',
             internal_name: 'varusersauthmethod',
         );
@@ -111,15 +106,17 @@ class FreeRADIUSUser extends Model {
         $this->description = new StringField(
             required: false,
             allow_empty: true,
-            default: "",
+            default: '',
             validators: [
-                new RegexValidator(pattern: "/^[a-zA-Z0-9 _,.;:+=()-]*$/", error_msg: 'Value contains invalid characters.'),
+                new RegexValidator(
+                    pattern: "/^[a-zA-Z0-9 _,.;:+=()-]*$/",
+                    error_msg: 'Value contains invalid characters.',
+                ),
             ],
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
     }
-
 
     /**
      *
@@ -127,7 +124,7 @@ class FreeRADIUSUser extends Model {
     public function _create() {
         $input_errors = [];
 
-        if ( $this->motp_enable->value == 'off' ) {
+        if ($this->motp_enable->value == 'off') {
             $this->motp_enable->value = '';
         }
 
@@ -135,16 +132,15 @@ class FreeRADIUSUser extends Model {
 
         freeradius_validate_users($user, $input_errors);
 
-        if ( ! empty($input_errors) ) {
+        if (!empty($input_errors)) {
             throw new ServerError(
                 message: "Some errors occured: input_errors={$input_errors[0]}",
-                response_id: 'FIELD_INVALID_CHOICE'
+                response_id: 'FIELD_INVALID_CHOICE',
             );
         }
 
         parent::_create();
     }
-
 
     /**
      * Apply the creation of this User.
@@ -160,4 +156,3 @@ class FreeRADIUSUser extends Model {
         freeradius_users_resync();
     }
 }
-

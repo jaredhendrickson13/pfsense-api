@@ -24,4 +24,3 @@ class FreeRADIUSUser extends Endpoint {
         parent::__construct();
     }
 }
-
