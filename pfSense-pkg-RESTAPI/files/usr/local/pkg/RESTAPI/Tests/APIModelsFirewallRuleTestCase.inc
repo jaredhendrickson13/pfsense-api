@@ -280,7 +280,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
 
         # Ensure the pfctl rule with this rule object's tracker is set to sloppy
         $pfctl_rules = file_get_contents('/tmp/rules.debug');
-        $pfctl_rule = "ridentifier {$rule->tracker->value} keep state ( sloppy  )";
+        $pfctl_rule = "ridentifier {$rule->tracker->value} keep state (sloppy)";
         $this->assert_str_contains($pfctl_rules, $pfctl_rule);
 
         # Delete the firewall rule
