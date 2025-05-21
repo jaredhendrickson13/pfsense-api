@@ -137,7 +137,7 @@ class User extends Model {
         if ($this->initial_object->password->value !== $password) {
             $hash = [];
             local_user_set_password($hash, $password);
-            return $hash[$this->password->internal_name];
+            return $hash["item"][$this->password->internal_name];
         }
 
         return $password;
