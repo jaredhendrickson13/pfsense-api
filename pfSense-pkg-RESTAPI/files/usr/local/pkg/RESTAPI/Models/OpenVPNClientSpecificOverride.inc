@@ -30,7 +30,7 @@ class OpenVPNClientSpecificOverride extends Model {
     public StringField $remote_networkv6;
     public BooleanField $gwredir;
     public BooleanField $push_reset;
-    public BooleanField $remove_route;
+    public StringField $remove_options;
     public StringField $dns_domain;
     public StringField $dns_server1;
     public StringField $dns_server2;
@@ -134,12 +134,25 @@ class OpenVPNClientSpecificOverride extends Model {
             indicates_false: '',
             help_text: 'Enables or disables preventing this client from receiving any server-defined client settings.',
         );
-        $this->remove_route = new BooleanField(
-            default: false,
-            indicates_true: 'yes',
-            indicates_false: '',
-            help_text: 'Enables or disables preventing this client from receiving any server-defined routes ' .
-                'without removing any other options.',
+        $this->remove_options = new StringField(
+            default: [],
+            choices: [
+                'remove_route',
+                'remove_iroute',
+                'remove_redirect_gateway',
+                'remove_inactive',
+                'remove_ping',
+                'remove_ping_action',
+                'remove_dnsdomain',
+                'remove_dnsservers',
+                'remove_blockoutsidedns',
+                'remove_ntpservers',
+                'remove_netbios_ntype',
+                'remove_netbios_scope',
+                'remove_wins',
+            ],
+            many: true,
+            help_text: 'Specifies the push-remove options to apply to the client',
         );
         $this->dns_domain = new StringField(
             default: '',
