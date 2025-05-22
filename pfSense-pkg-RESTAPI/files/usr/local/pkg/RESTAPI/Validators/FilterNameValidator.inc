@@ -22,10 +22,10 @@ class FilterNameValidator extends Validator {
      * @throws ValidationError When the value is not a valid firewall filter name.
      */
     public function validate(mixed $value, string $field_name = ''): void {
-        global $pf_reserved_keywords, $reserved_table_names;
+        $reserved_names = get_pf_reserved();
 
         # Throw an exception if this name is reserved
-        if (in_array($value, array_merge($pf_reserved_keywords, $reserved_table_names))) {
+        if (in_array($value, $reserved_names)) {
             throw new ValidationError(
                 message: "Field '$field_name' cannot be '$value' because it is a name reserved by the system.",
                 response_id: 'FILTER_NAME_VALIDATOR_RESERVED_NAME_USED',
