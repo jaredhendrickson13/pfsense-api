@@ -152,6 +152,7 @@ class OpenVPNClientSpecificOverride extends Model {
                 'remove_wins',
             ],
             many: true,
+            conditions: ['push_reset' => false],
             help_text: 'Specifies the push-remove options to apply to the client',
         );
         $this->dns_domain = new StringField(
