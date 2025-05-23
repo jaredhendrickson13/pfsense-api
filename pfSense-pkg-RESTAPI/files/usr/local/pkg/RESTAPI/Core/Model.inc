@@ -598,7 +598,10 @@ class Model {
      * @param $path string config path with '/' as separators
      */
     protected static function init_config(string $path) {
-        # Initialize the configuration array of a specified path.
+        # Remove leading slashes and extra slashes
+        $path = trim($path, '/');
+
+        # Initialize the configuration array of a specified path
         config_init_path($path);
     }
 
@@ -610,6 +613,9 @@ class Model {
      *          path keys an empty string and $default is non-null
      */
     public static function get_config(string $path, mixed $default = null) {
+        # Remove leading slashes and extra slashes
+        $path = trim($path, '/');
+
         return config_get_path($path, $default);
     }
 
@@ -621,6 +627,9 @@ class Model {
      * @returns mixed $val or $default if the path prefix does not exist
      */
     public static function set_config(string $path, mixed $value, mixed $default = null) {
+        # Remove leading slashes and extra slashes
+        $path = trim($path, '/');
+
         return config_set_path($path, $value, $default);
     }
 
@@ -631,6 +640,9 @@ class Model {
      * @param $path string The Model config path including any Model ID
      */
     public function merge_config(string $path) {
+        # Remove leading slashes and extra slashes
+        $path = trim($path, '/');
+
         # Loop through each field known to this Model
         foreach ($this->get_fields() as $field) {
             # Determine the field path
@@ -662,6 +674,9 @@ class Model {
      * @returns array copy of the removed value or null
      */
     public static function del_config(string $path): mixed {
+        # Remove leading slashes and extra slashes
+        $path = trim($path, '/');
+
         return config_del_path($path);
     }
 
@@ -675,6 +690,9 @@ class Model {
      * non-null value, otherwise false.
      */
     public static function is_config_enabled(string $path, string $enable_key = 'enable'): bool {
+        # Remove leading slashes and extra slashes
+        $path = trim($path, '/');
+
         return config_path_enabled($path, $enable_key);
     }
 
