@@ -130,8 +130,6 @@ class OpenVPNClientSpecificOverride extends Model {
         );
         $this->push_reset = new BooleanField(
             default: false,
-            indicates_true: 'yes',
-            indicates_false: '',
             help_text: 'Enables or disables preventing this client from receiving any server-defined client settings.',
         );
         $this->remove_options = new StringField(
