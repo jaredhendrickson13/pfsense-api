@@ -30,7 +30,7 @@ class ConfigHistoryRevision extends Model {
             help_text: 'The configuration version associated with this change.',
         );
         $this->filesize = new IntegerField(
-            default: 0,
+            default: -1,
             help_text: 'The file size (in bytes) of the configuration file associated with this change.',
         );
 
@@ -42,8 +42,18 @@ class ConfigHistoryRevision extends Model {
      * @return array The configuration history as an array of objects.
      */
     protected function get_config_history(): array {
+        # Get our current configuration history, but remove the versions key. These are not needed for the Model.
         $config_history = get_backups();
         unset($config_history['versions']);
+
+        # Loop through each entry in the configuration history and normalize the data
+        foreach ($config_history as &$entry) {
+            # If filesize is not a numeric, set it to the default
+            if (!is_numeric($entry['filesize'])) {
+                $entry['filesize'] = $this->filesize->default;
+            }
+        }
+
         return $config_history;
     }
 
