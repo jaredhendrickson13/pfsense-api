@@ -14,5 +14,6 @@ class DHCPServerApplyDispatcher extends Dispatcher {
      */
     protected function _process(mixed ...$arguments): void {
         services_dhcpd_configure();
+        clear_subsystem_dirty('dhcpd');
     }
 }
