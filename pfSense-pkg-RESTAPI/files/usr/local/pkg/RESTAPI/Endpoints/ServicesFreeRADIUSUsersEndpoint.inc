@@ -7,8 +7,8 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Endpoint;
 
 /**
- * Defines an Endpoint for interacting with a single OpenVPNExport Model object at
- * /api/v2/vpn/openvpn/clientexport.
+ * Defines an Endpoint for interacting with a many FreeRADIUSUser Model objects at
+ * /api/v2/services/freeradius/users
  */
 class ServicesFreeRADIUSUsersEndpoint extends Endpoint {
     public function __construct() {
