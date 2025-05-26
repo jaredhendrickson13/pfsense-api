@@ -97,6 +97,7 @@ class APIModelsPortForwardTestCase extends TestCase {
         $rules_debug = file_get_contents('/tmp/rules.debug');
         $purenat_rule = "rdr on {$this->env['PFREST_LAN_IF']} inet proto tcp from any to 127.3.2.1 port 8443 -> 127.1.2.3";
         $purenat_rule_ovpn = "rdr on { {$this->env['PFREST_LAN_IF']} openvpn } inet proto tcp from any to 127.3.2.1 port 8443 -> 127.1.2.3";
+        var_dump($rules_debug);
         $this->assert_is_true(
             str_contains($rules_debug, $purenat_rule) or str_contains($rules_debug, $purenat_rule_ovpn),
         );
