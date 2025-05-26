@@ -26,10 +26,8 @@ jobs:
       matrix:
         include:
           # Note: The first item in this matrix must use env.DEFAULT_PFSENSE_VERSION as the PFSENSE_VERSION!
-          - FREEBSD_VERSION: FreeBSD-14.0-CURRENT
-            PFSENSE_VERSION: "2.7.2"
           - FREEBSD_VERSION: FreeBSD-15.0-CURRENT
-            PFSENSE_VERSION: "24.03"
+            PFSENSE_VERSION: "2.8.0"
           - FREEBSD_VERSION: FreeBSD-15.0-CURRENT
             PFSENSE_VERSION: "24.11"
 
