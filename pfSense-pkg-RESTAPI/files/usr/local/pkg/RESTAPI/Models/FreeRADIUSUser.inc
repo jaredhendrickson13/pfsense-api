@@ -20,7 +20,7 @@ use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\RegexValidator;
 
 /**
- * Defines a Model that represents OpenVPN Client config Export.
+ * Defines a Model that represents FreeRADIUS Users
  */
 class FreeRADIUSUser extends Model {
     public StringField $username;
