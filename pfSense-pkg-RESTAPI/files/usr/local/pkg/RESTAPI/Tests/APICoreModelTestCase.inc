@@ -1294,10 +1294,10 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that the normalize_config_path() method correctly removes extra slashes in the config path
      */
     public function test_normalize_config_path(): void {
-        $this->assert_equals(Model::normalize_config_path("/test/path"), "test/path");
-        $this->assert_equals(Model::normalize_config_path("/test//path"), "test/path");
-        $this->assert_equals(Model::normalize_config_path("test/path/"), "test/path");
-        $this->assert_equals(Model::normalize_config_path("/test//path/"), "test/path");
-        $this->assert_equals(Model::normalize_config_path("test"), "test");
+        $this->assert_equals(Model::normalize_config_path('/test/path'), 'test/path');
+        $this->assert_equals(Model::normalize_config_path('/test//path'), 'test/path');
+        $this->assert_equals(Model::normalize_config_path('test/path/'), 'test/path');
+        $this->assert_equals(Model::normalize_config_path('/test//path/'), 'test/path');
+        $this->assert_equals(Model::normalize_config_path('test'), 'test');
     }
 }

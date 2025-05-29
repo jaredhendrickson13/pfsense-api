@@ -99,7 +99,7 @@ class CertificateAuthorityRenew extends Model {
         $this->id = $ca_config['idx'];
 
         # The pfSense cert_renew() function expects a 'path' key with the config path
-        $ca_config["path"] = "ca/{$ca_config['idx']}";
+        $ca_config['path'] = "ca/{$ca_config['idx']}";
 
         # Renew the cert using pfSense's built in cert_renew function
         $renewed = cert_renew(

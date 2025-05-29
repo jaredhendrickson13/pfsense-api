@@ -135,7 +135,7 @@ class CertificateRevocationList extends Model {
     public function to_x509_crl(): string {
         # Prep the CRL config for generation
         $crl_config = [];
-        $crl_config["item"] = $this->to_internal();
+        $crl_config['item'] = $this->to_internal();
         $crl_config['idx'] = $this->id;
 
         # Attempt to update/generate the CRL

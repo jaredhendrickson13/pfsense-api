@@ -80,7 +80,7 @@ class CertificateRenew extends Model {
     public function validate_certref(string $certref): string {
         # Ensure the Certificate is capable of being renewed.
         $cert = lookup_cert($certref);
-        if (!is_cert_locally_renewable($cert["item"])) {
+        if (!is_cert_locally_renewable($cert['item'])) {
             throw new NotAcceptableError(
                 message: "Certificate with refid `$certref` is not capable of being renewed.",
                 response_id: 'CERTIFICATE_RENEW_UNAVAILABLE',
@@ -99,7 +99,7 @@ class CertificateRenew extends Model {
         $this->oldserial->value = cert_get_serial($cert_config['item']['crt']);
 
         # The pfSense cert_renew() function expects a 'path' key with the config path
-        $cert_config["path"] = "cert/{$cert_config['idx']}";
+        $cert_config['path'] = "cert/{$cert_config['idx']}";
 
         # Renew the cert using pfSense's built in cert_renew function
         $renewed = cert_renew(
