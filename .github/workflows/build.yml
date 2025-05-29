@@ -21,8 +21,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - FREEBSD_VERSION: FreeBSD-14.0-CURRENT
-            FREEBSD_ID: freebsd14
           - FREEBSD_VERSION: FreeBSD-15.0-CURRENT
             FREEBSD_ID: freebsd15
 
@@ -57,8 +55,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - PFSENSE_VERSION: pfSense-2.7.2-RELEASE
-            FREEBSD_ID: freebsd14
           - PFSENSE_VERSION: pfSense-2.8.0-BETA
             FREEBSD_ID: freebsd15
     steps:
@@ -134,8 +130,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - PFSENSE_VERSION: pfSense-2.7.2-RELEASE
-            FREEBSD_ID: freebsd14
           - PFSENSE_VERSION: pfSense-2.8.0-BETA
             FREEBSD_ID: freebsd15
 
