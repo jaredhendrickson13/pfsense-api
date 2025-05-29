@@ -23,6 +23,7 @@ class HAProxyBackendServer extends Model {
     public BooleanField $ssl;
     public BooleanField $sslserververify;
     public IntegerField $serverid;
+    public StringField $advanced;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
@@ -80,6 +81,12 @@ class HAProxyBackendServer extends Model {
             help_text: 'The unique ID for this backend server. This value is set by the system for internal use and ' .
                 'cannot be changed.',
         );
+        $this->advanced = new StringField(
+            default: '',
+            allow_empty: true,
+            help_text: 'Allows adding custom HAProxy server settings to the server.',
+        );
+
         parent::__construct($id, $parent_id, $data, ...$options);
     }
 
