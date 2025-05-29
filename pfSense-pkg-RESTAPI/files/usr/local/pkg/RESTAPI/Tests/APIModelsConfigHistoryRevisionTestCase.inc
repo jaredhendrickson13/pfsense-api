@@ -15,7 +15,7 @@ class APIModelsConfigHistoryRevisionTestCase extends TestCase {
         $this->assert_is_not_empty($config_history->time->value);
         $this->assert_is_not_empty($config_history->description->value);
         $this->assert_is_not_empty($config_history->version->value);
-        $this->assert_is_not_empty($config_history->filesize->value);
+        $this->assert_is_true(is_integer($config_history->filesize->value));
     }
 
     /**

@@ -30,7 +30,7 @@ class ConfigHistoryRevision extends Model {
             help_text: 'The configuration version associated with this change.',
         );
         $this->filesize = new IntegerField(
-            default: -1,
+            default: 0,
             help_text: 'The file size (in bytes) of the configuration file associated with this change.',
         );
 
