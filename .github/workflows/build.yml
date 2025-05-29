@@ -55,7 +55,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - PFSENSE_VERSION: pfSense-2.8.0-BETA
+          - PFSENSE_VERSION: pfSense-2.8.0-RELEASE
             FREEBSD_ID: freebsd15
     steps:
       - uses: actions/checkout@v4
@@ -103,7 +103,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - PFSENSE_VERSION: pfSense-2.8.0-BETA
+          - PFSENSE_VERSION: pfSense-2.8.0-RELEASE
             FREEBSD_ID: freebsd15
     steps:
       - uses: actions/checkout@v4
@@ -130,7 +130,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - PFSENSE_VERSION: pfSense-2.8.0-BETA
+          - PFSENSE_VERSION: pfSense-2.8.0-RELEASE
             FREEBSD_ID: freebsd15
 
     steps:
