@@ -285,7 +285,7 @@ class Form {
             $tb .= '<td>';
             if ($this->editable) {
                 $tb .=
-                    "<a class='fa fa-pencil' title='Edit " .
+                    "<a class='fa-solid fa-pencil' title='Edit " .
                     gettext($model_object->verbose_name) .
                     "' href='" .
                     $this->many_sub_url .
@@ -295,7 +295,7 @@ class Form {
             }
             if ($this->deletable) {
                 $tb .=
-                    "<a class='fa fa-trash' title='Delete " .
+                    "<a class='fa-solid fa-trash-can' title='Delete " .
                     gettext($model_object->verbose_name) .
                     "' href='" .
                     $this->url .
@@ -315,7 +315,7 @@ class Form {
         $tb .=
             "<nav class='action-buttons'><a href='" .
             $this->many_sub_url .
-            "' class='btn btn-sm btn-success'><i class='fa fa-plus icon-embed-btn'></i>" .
+            "' class='btn btn-success'><i class='fa fa-plus icon-embed-btn'></i>" .
             gettext('Add') .
             '</a></nav>';
         $tb .= '</div>';
