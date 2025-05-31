@@ -115,7 +115,7 @@ class FreeRADIUSUser extends Model {
     }
 
     /**
-     *
+     * Perform additional validation on the Model's fields and data.
      */
     public function validate_extra(): void {
         # Run service level validations
