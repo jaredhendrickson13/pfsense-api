@@ -46,7 +46,7 @@ class FreeRADIUSUser extends Model {
             allow_null: false,
             sensitive: true,
             internal_name: 'varuserspassword',
-            conditions: ['motp_enable' => 'off'],
+            conditions: ['motp_enable' => false],
             help_text: 'The password for this username.',
         );
         $this->password_encryption = new StringField(
@@ -54,7 +54,7 @@ class FreeRADIUSUser extends Model {
             default: 'Cleartext-Password',
             choices: ['Cleartext-Password', 'MD5-Password', 'MD5-Password-hashed', 'NT-Password-hashed'],
             internal_name: 'varuserspasswordencryption',
-            conditions: ['motp_enable' => 'off'],
+            conditions: ['motp_enable' => false],
             help_text: 'The encryption method for the password.',
         );
         $this->motp_enable = new BooleanField(
@@ -69,7 +69,7 @@ class FreeRADIUSUser extends Model {
             default: 'googleauth',
             choices: ['motp', 'googleauth'],
             internal_name: 'varusersauthmethod',
-            conditions: ['motp_enable' => 'on'],
+            conditions: ['motp_enable' => true],
             help_text: 'The authentication method for the Mobile One-Time Password (MOTP).',
         );
         $this->motp_secret = new StringField(
@@ -77,7 +77,7 @@ class FreeRADIUSUser extends Model {
             allow_null: false,
             sensitive: true,
             internal_name: 'varusersmotpinitsecret',
-            conditions: ['motp_enable' => 'on'],
+            conditions: ['motp_enable' => true],
             help_text: 'The secret for the Mobile One-Time Password (MOTP).',
         );
         $this->motp_pin = new StringField(
@@ -87,7 +87,7 @@ class FreeRADIUSUser extends Model {
             minimum_length: 4,
             maximum_length: 4,
             internal_name: 'varusersmotppin',
-            conditions: ['motp_enable' => 'on'],
+            conditions: ['motp_enable' => true],
             help_text: 'The PIN for the Mobile One-Time Password (MOTP). It must be exactly 4 digits.',
         );
         $this->motp_offset = new IntegerField(
@@ -95,7 +95,7 @@ class FreeRADIUSUser extends Model {
             default: 0,
             allow_null: false,
             internal_name: 'varusersmotpoffset',
-            conditions: ['motp_enable' => 'on'],
+            conditions: ['motp_enable' => true],
             help_text: 'The timezone offset for this user.',
         );
         $this->description = new StringField(
