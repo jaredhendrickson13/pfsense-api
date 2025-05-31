@@ -42,7 +42,12 @@ class FreeRADIUSUser extends Model {
         $this->always_apply = true;
 
         # Set model fields
-        $this->username = new StringField(required: true, unique: true, internal_name: 'varusersusername');
+        $this->username = new StringField(
+            required: true,
+            unique: true,
+            internal_name: 'varusersusername',
+            help_text: 'The username for this user.',
+        );
         $this->password = new StringField(
             required: true,
             allow_empty: false,
@@ -50,6 +55,7 @@ class FreeRADIUSUser extends Model {
             sensitive: true,
             internal_name: 'varuserspassword',
             conditions: ['motp_enable' => 'off'],
+            help_text: 'The password for this username.',
         );
         $this->password_encryption = new StringField(
             required: false,
@@ -57,11 +63,13 @@ class FreeRADIUSUser extends Model {
             choices: ['Cleartext-Password', 'MD5-Password', 'MD5-Password-hashed', 'NT-Password-hashed'],
             internal_name: 'varuserspasswordencryption',
             conditions: ['motp_enable' => 'off'],
+            help_text: 'The encryption method for the password.',
         );
         $this->motp_enable = new StringField(
             required: true,
             choices: ['on', 'off'],
             internal_name: 'varusersmotpenable',
+            help_text: 'Enable or disable the use of Mobile One-Time Password (MOTP) for this user.',
         );
         $this->motp_authmethod = new StringField(
             required: false,
@@ -69,6 +77,7 @@ class FreeRADIUSUser extends Model {
             choices: ['motp', 'googleauth'],
             internal_name: 'varusersauthmethod',
             conditions: ['motp_enable' => 'on'],
+            help_text: 'The authentication method for the Mobile One-Time Password (MOTP).',
         );
         $this->motp_secret = new StringField(
             required: true,
@@ -76,6 +85,7 @@ class FreeRADIUSUser extends Model {
             sensitive: true,
             internal_name: 'varusersmotpinitsecret',
             conditions: ['motp_enable' => 'on'],
+            help_text: 'The secret for the Mobile One-Time Password (MOTP).',
         );
         $this->motp_pin = new StringField(
             required: true,
@@ -85,6 +95,7 @@ class FreeRADIUSUser extends Model {
             maximum_length: 4,
             internal_name: 'varusersmotppin',
             conditions: ['motp_enable' => 'on'],
+            help_text: 'The PIN for the Mobile One-Time Password (MOTP). It must be exactly 4 digits.',
         );
         $this->motp_offset = new IntegerField(
             required: false,
@@ -92,6 +103,7 @@ class FreeRADIUSUser extends Model {
             allow_null: false,
             internal_name: 'varusersmotpoffset',
             conditions: ['motp_enable' => 'on'],
+            help_text: 'The timezone offset for this user.',
         );
         $this->description = new StringField(
             required: false,
@@ -103,6 +115,7 @@ class FreeRADIUSUser extends Model {
                     error_msg: 'Value contains invalid characters.',
                 ),
             ],
+            help_text: 'A description for this user.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
