@@ -5,18 +5,10 @@ namespace RESTAPI\Models;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Model;
-use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\BooleanField;
-use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
-use RESTAPI\Fields\PortField;
-use RESTAPI\Fields\ObjectField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ValidationError;
-use RESTAPI\Responses\ServerError;
-use RESTAPI\Validators\HostnameValidator;
-use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\RegexValidator;
 
 /**
