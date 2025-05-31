@@ -3,16 +3,16 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\FirewallLog;
+use RESTAPI\Models\AuthLog;
 
-class APIModelsFirewallLogTestCase extends TestCase {
+class APIModelsAuthLogTestCase extends TestCase {
     /**
-     * Checks if we can correctly read the firewall logs.
+     * Checks if we can correctly read the auth logs.
      */
     public function test_read(): void {
-        $firewall_logs = FirewallLog::read_all(limit: 5);
-        foreach ($firewall_logs->model_objects as $firewall_log) {
-            $this->assert_is_not_empty($firewall_log->text->value);
+        $auth_logs = AuthLog::read_all(limit: 5);
+        foreach ($auth_logs->model_objects as $auth_log) {
+            $this->assert_is_not_empty($auth_log->text->value);
         }
     }
 }

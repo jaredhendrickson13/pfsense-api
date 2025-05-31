@@ -33,40 +33,31 @@ class FreeRADIUSUser extends Model {
     public IntegerField $motp_offset;
     public StringField $description;
 
-    /**
-     *
-     */
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
-        #
         # Set model attributes
-        #
         $this->packages = ['pfSense-pkg-freeradius3'];
         $this->package_includes = ['freeradius.inc'];
         $this->config_path = 'installedpackages/freeradius/config';
         $this->many = true;
         $this->always_apply = true;
 
-        #
         # Set model fields
-        #
         $this->username = new StringField(required: true, unique: true, internal_name: 'varusersusername');
-
         $this->password = new StringField(
             required: true,
-            conditions: ['motp_enable' => 'off'],
             allow_empty: false,
             allow_null: false,
-            internal_name: 'varuserspassword',
             sensitive: true,
+            internal_name: 'varuserspassword',
+            conditions: ['motp_enable' => 'off'],
         );
         $this->password_encryption = new StringField(
             required: false,
-            conditions: ['motp_enable' => 'off'],
-            choices: ['Cleartext-Password', 'MD5-Password', 'MD5-Password-hashed', 'NT-Password-hashed'],
             default: 'Cleartext-Password',
+            choices: ['Cleartext-Password', 'MD5-Password', 'MD5-Password-hashed', 'NT-Password-hashed'],
             internal_name: 'varuserspasswordencryption',
+            conditions: ['motp_enable' => 'off'],
         );
-
         $this->motp_enable = new StringField(
             required: true,
             choices: ['on', 'off'],
@@ -74,39 +65,38 @@ class FreeRADIUSUser extends Model {
         );
         $this->motp_authmethod = new StringField(
             required: false,
-            conditions: ['motp_enable' => 'on'],
-            choices: ['motp', 'googleauth'],
             default: 'googleauth',
+            choices: ['motp', 'googleauth'],
             internal_name: 'varusersauthmethod',
+            conditions: ['motp_enable' => 'on'],
         );
         $this->motp_secret = new StringField(
             required: true,
-            conditions: ['motp_enable' => 'on'],
             allow_null: false,
-            internal_name: 'varusersmotpinitsecret',
             sensitive: true,
+            internal_name: 'varusersmotpinitsecret',
+            conditions: ['motp_enable' => 'on'],
         );
         $this->motp_pin = new StringField(
             required: true,
-            conditions: ['motp_enable' => 'on'],
             allow_null: false,
+            sensitive: true,
             minimum_length: 4,
             maximum_length: 4,
             internal_name: 'varusersmotppin',
-            sensitive: true,
+            conditions: ['motp_enable' => 'on'],
         );
         $this->motp_offset = new IntegerField(
             required: false,
-            conditions: ['motp_enable' => 'on'],
-            allow_null: false,
             default: 0,
+            allow_null: false,
             internal_name: 'varusersmotpoffset',
+            conditions: ['motp_enable' => 'on'],
         );
-
         $this->description = new StringField(
             required: false,
-            allow_empty: true,
             default: '',
+            allow_empty: true,
             validators: [
                 new RegexValidator(
                     pattern: "/^[a-zA-Z0-9 _,.;:+=()-]*$/",
