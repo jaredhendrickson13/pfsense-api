@@ -26,7 +26,7 @@ class FreeRADIUSUser extends Model {
     public StringField $username;
     public StringField $password;
     public StringField $password_encryption;
-    public StringField $motp_enable;
+    public BooleanField $motp_enable;
     public StringField $motp_authmethod;
     public StringField $motp_secret;
     public StringField $motp_pin;
@@ -65,9 +65,10 @@ class FreeRADIUSUser extends Model {
             conditions: ['motp_enable' => 'off'],
             help_text: 'The encryption method for the password.',
         );
-        $this->motp_enable = new StringField(
+        $this->motp_enable = new BooleanField(
             required: true,
-            choices: ['on', 'off'],
+            indicates_true: 'on',
+            indicates_false: 'off',
             internal_name: 'varusersmotpenable',
             help_text: 'Enable or disable the use of Mobile One-Time Password (MOTP) for this user.',
         );
