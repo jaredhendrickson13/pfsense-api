@@ -54,6 +54,7 @@ class WireGuardTunnel extends Model {
         $this->descr = new StringField(
             required: false,
             default: '',
+            allow_empty: true,
             help_text: 'A description for this WireGuard tunnel.',
         );
         $this->listenport = new PortField(
