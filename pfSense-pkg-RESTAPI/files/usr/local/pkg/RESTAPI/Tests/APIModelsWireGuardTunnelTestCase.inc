@@ -124,6 +124,7 @@ class APIModelsWireGuardTunnelTestCase extends TestCase {
         $tunnel = new WireGuardTunnel(
             privatekey: 'KG0BA4UyPilHH5qnXCfr6Lw8ynecOPor88tljLy3AHk=',
             listenport: '55000',
+            descr: 'test',
             async: false,
         );
         $tunnel->create(apply: true);
@@ -134,6 +135,7 @@ class APIModelsWireGuardTunnelTestCase extends TestCase {
         $this->assert_str_contains($wg_showconf->output, 'ListenPort = ' . $tunnel->listenport->value);
         $this->assert_str_contains($wg_showconf->output, 'PrivateKey = ' . $tunnel->privatekey->value);
         $this->assert_str_contains($wg_show->output, 'public key: ' . $tunnel->publickey->value);
+        $this->assert_equals($tunnel->descr->value, 'test');
 
         # Update the tunnel with new values
         $tunnel->from_representation(privatekey: 'GNdQw+ujEIVgys4B2dDCXcBpiiQsNd2bAq5hnTp+smg=', listenport: '51820');

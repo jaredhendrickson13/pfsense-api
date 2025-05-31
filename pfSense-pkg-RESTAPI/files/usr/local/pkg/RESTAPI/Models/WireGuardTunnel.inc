@@ -51,6 +51,11 @@ class WireGuardTunnel extends Model {
             indicates_false: 'no',
             help_text: 'Enables or disables this tunnels and any associated peers.',
         );
+        $this->descr = new StringField(
+            required: false,
+            default: '',
+            help_text: 'A description for this WireGuard tunnel.',
+        );
         $this->listenport = new PortField(
             unique: true,
             default: '51820',
