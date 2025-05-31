@@ -19,10 +19,6 @@ class Dispatcher {
      * @const DISPATCH_SCRIPT The absolute file path to the dispatch.sh helper script.
      */
     const DISPATCH_SCRIPT = '/usr/local/pkg/RESTAPI/.resources/scripts/dispatch.sh';
-    /**
-     * @const SCHEDULE_OPTIONS The cron event schedules supported by Dispatchers.
-     */
-    const SCHEDULE_OPTIONS = ['hourly', 'daily', 'weekly'];
 
     /**
      * @var string $full_name
@@ -297,27 +293,27 @@ class Dispatcher {
         # Only proceed if a schedule was requested
         if ($this->schedule) {
             # Ensure the requested schedule is supported
-            if (!in_array($this->schedule, self::SCHEDULE_OPTIONS)) {
+            if (count(explode(' ', $this->schedule)) !== 5) {
                 throw new ServerError(
                     message: "Dispatcher schedule `$this->schedule` is not a supported schedule frequency.",
                     response_id: 'DISPATCHER_SCHEDULE_UNSUPPORTED',
                 );
             }
 
-            # Check if a cron job already exists for this dispatcher
-            $dispatcher_cron_job_q = CronJob::query(command: $this->schedule_command);
-
-            # Delete the cron job for this dispatcher if it exists, so we can recreate it with current values
-            if ($dispatcher_cron_job_q->exists()) {
-                $existing_cron_job = $dispatcher_cron_job_q->first();
-                $existing_cron_job->packages = []; // Don't require the pfSense-pkg-Cron package to delete
-                $existing_cron_job->delete();
-            }
+            # Remove any existing scheduled CronJob for this Dispatcher
+            $this->remove_schedule();
 
             # Create the cron job for this dispatcher
+            $cron_expr = explode(' ', $this->schedule);
             $cron_job = new CronJob(
-                data: ['minute' => "@$this->schedule", 'who' => 'root', 'command' => $this->schedule_command],
                 require_pkg: false,
+                minute: $cron_expr[0],
+                hour: $cron_expr[1],
+                mday: $cron_expr[2],
+                month: $cron_expr[3],
+                wday: $cron_expr[4],
+                who: 'root',
+                command: $this->schedule_command,
             );
             $cron_job->create();
 
@@ -329,5 +325,20 @@ class Dispatcher {
         }
 
         return null;
+    }
+
+    /**
+     * Removes the scheduled CronJob for this Dispatcher if it exists.
+     */
+    public function remove_schedule(): void {
+        # Check if a cron job already exists for this dispatcher
+        $dispatcher_cron_job_q = CronJob::query(command: $this->schedule_command);
+
+        # Delete the cron job for this dispatcher if it exists, so we can recreate it with current values
+        if ($dispatcher_cron_job_q->exists()) {
+            $existing_cron_job = $dispatcher_cron_job_q->first();
+            $existing_cron_job->packages = []; // Don't require the pfSense-pkg-Cron package to delete
+            $existing_cron_job->delete();
+        }
     }
 }
