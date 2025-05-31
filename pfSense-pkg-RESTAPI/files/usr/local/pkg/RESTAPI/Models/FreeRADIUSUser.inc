@@ -125,25 +125,21 @@ class FreeRADIUSUser extends Model {
     /**
      *
      */
-    public function _create() {
+    public function validate_extra(): void {
+        # Run service level validations
         $input_errors = [];
-
-        if ($this->motp_enable->value == 'off') {
-            $this->motp_enable->value = '';
-        }
-
         $user = $this->to_internal();
-
         freeradius_validate_users($user, $input_errors);
 
+        # If there were validation errors that were not caught by the model fields, throw a ValidationError.
+        # Ideally the Model should catch all validation errors itself so prompt the user to report this error
         if (!empty($input_errors)) {
-            throw new ServerError(
-                message: "Some errors occured: input_errors={$input_errors[0]}",
-                response_id: 'FIELD_INVALID_CHOICE',
+            throw new ValidationError(
+                message: "An unexpected validation error has occurred: $input_errors[0]. Please report this issue at " .
+                    'https://github.com/jaredhendrickson13/pfsense-api/issues/new',
+                response_id: 'FREERADIUS_USER_UNEXPECTED_VALIDATION_ERROR',
             );
         }
-
-        parent::_create();
     }
 
     /**
