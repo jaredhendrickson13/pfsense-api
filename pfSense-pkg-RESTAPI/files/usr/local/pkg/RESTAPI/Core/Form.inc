@@ -562,4 +562,21 @@ class Form {
         }
         return false;
     }
+
+    /**
+     * Deletes the Form's endpoint file from the pfSense webroot.
+     * @returns bool Returns true if the file was successfully deleted, otherwise false.
+     */
+    public function delete_form_url(): bool {
+        # Assign the absolute path to the file. Assume index.php filename if not specified.
+        $filename = "/usr/local/www/$this->url";
+        $filename = str_ends_with($filename, '.php') ? $filename : "$filename/index.php";
+        $content = file_get_contents($filename);
+
+        # Delete the file and return true if it was successfully deleted
+        if (is_file($filename) and str_contains($content, 'RESTAPI/Forms') and unlink($filename)) {
+            return true;
+        }
+        return false;
+    }
 }

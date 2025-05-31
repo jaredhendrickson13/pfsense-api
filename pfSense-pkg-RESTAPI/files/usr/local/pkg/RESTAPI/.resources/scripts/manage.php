@@ -83,6 +83,31 @@ function build_forms(): void {
 }
 
 /**
+ * Removes Forms (UI pages) built by the REST API package.
+ */
+function remove_forms(): void {
+    # Print that we are starting to remove forms
+    print 'Removing forms... ';
+
+    # Import each form class
+    foreach (glob('/usr/local/pkg/RESTAPI/Forms/*.inc') as $file) {
+        # Import classes files and create object
+        require_once $file;
+        $form_class = '\\RESTAPI\\Forms\\' . str_replace('.inc', '', basename($file));
+        $form_obj = new $form_class();
+
+        # Remove the form URL
+        if (!$form_obj->delete_form_url()) {
+            print "failed! ($form_obj->url)";
+            exit(1);
+        }
+    }
+
+    # Print that the removal is done if we made it through the loop
+    print 'done.' . PHP_EOL;
+}
+
+/**
  * Automatically creates pfSense privileges for each Endpoint class defined in \RESTAPI\Endpoints and each Form class
  * defined in \RESTAPI\Forms.
  */
@@ -176,6 +201,30 @@ function schedule_dispatchers(): void {
             }
 
             # Print that we are done setting up the schedule for this Dispatcher
+            echo 'done.' . PHP_EOL;
+        }
+    }
+}
+
+/**
+ * Removes the cron jobs for all Dispatcher classes in \RESTAPI\Dispatchers and all Cache classes in \RESTAPI\Caches
+ * with configured schedules.
+ */
+function unschedule_dispatchers(): void {
+    # Variables
+    $dispatchers = get_classes_from_namespace('\\RESTAPI\\Dispatchers\\');
+    $caches = get_classes_from_namespace('\\RESTAPI\\Caches\\');
+
+    # Include both Dispatcher classes and Cache classes. Cache classes inherit from the Dispatcher class.
+    $classes = array_merge($dispatchers, $caches);
+
+    # Loop through each defined Dispatcher class and remove the cron jobs for dispatchers with schedules
+    foreach ($classes as $class) {
+        $dispatcher = new $class();
+        if ($dispatcher->schedule) {
+            # Start removing the schedules
+            echo "Removing schedule for $class... ";
+            $dispatcher->remove_schedule();
             echo 'done.' . PHP_EOL;
         }
     }
@@ -367,7 +416,7 @@ function revert(string $tag): void {
 /**
  * Delete the REST API package and restart the webConfigurator to remove nginx changes.
  */
-function delete() {
+function delete(): void {
     echo shell_exec('/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI');
     echo shell_exec('/etc/rc.restart_webgui');
 }
@@ -400,30 +449,36 @@ function help(): void {
     echo 'SYNTAX:' . PHP_EOL;
     echo '  pfsense-restapi <command> <args>' . PHP_EOL;
     echo 'COMMANDS:' . PHP_EOL;
-    echo '  version             : Display the current package version and build information' . PHP_EOL;
-    echo '  help                : Display the help page (this page)' . PHP_EOL;
-    echo '  buildendpoints      : Build all REST API Endpoints included in this package' . PHP_EOL;
-    echo '  buildforms          : Build all REST API Forms included in this package' . PHP_EOL;
-    echo '  buildprivs          : Build all REST API privileges included in this package' . PHP_EOL;
-    echo '  buildschemas        : Build all Schema/documentation files' . PHP_EOL;
-    echo '  notifydispatcher    : Start a dispatcher process' . PHP_EOL;
-    echo '  scheduledispatchers : Sets up cron jobs for dispatchers and caches on a schedule.' . PHP_EOL;
-    echo '  refreshcache        : Refresh the cache file for a given cache class.' . PHP_EOL;
-    echo '  runtests            : Run all REST API unit Tests. Warning: this may be disruptive!' . PHP_EOL;
-    echo '  restartwebgui       : Restart the webConfigurator in the background' . PHP_EOL;
-    echo '  update              : Update package to the latest stable version available' . PHP_EOL;
-    echo '  revert              : Revert package to a specified version' . PHP_EOL;
-    echo '  delete              : Delete package from this system' . PHP_EOL;
-    echo '  rotateserverkey     : Rotate the REST API server key and remove all existing tokens' . PHP_EOL;
-    echo '  backup              : Create a backup of the REST API configuration' . PHP_EOL;
-    echo '  restore             : Restore the REST API configuration from the latest backup' . PHP_EOL;
-    echo "  sync                : Sync this system's REST API configuration to configured HA nodes" . PHP_EOL;
+    echo '  version               : Display the current package version and build information' . PHP_EOL;
+    echo '  help                  : Display the help page (this page)' . PHP_EOL;
+    echo '  buildendpoints        : Build all REST API Endpoints included in this package' . PHP_EOL;
+    echo '  buildforms            : Build all REST API Forms included in this package' . PHP_EOL;
+    echo '  removeforms           : Remove all REST API Forms included in this package' . PHP_EOL;
+    echo '  buildprivs            : Build all REST API privileges included in this package' . PHP_EOL;
+    echo '  buildschemas          : Build all Schema/documentation files' . PHP_EOL;
+    echo '  notifydispatcher      : Start a dispatcher process' . PHP_EOL;
+    echo '  scheduledispatchers   : Sets up cron jobs for dispatchers and caches on a schedule.' . PHP_EOL;
+    echo '  unscheduledispatchers : Removes cron jobs for dispatchers and caches on a schedule.' . PHP_EOL;
+    echo '  refreshcache          : Refresh the cache file for a given cache class.' . PHP_EOL;
+    echo '  runtests              : Run all REST API unit Tests. Warning: this may be disruptive!' . PHP_EOL;
+    echo '  restartwebgui         : Restart the webConfigurator in the background' . PHP_EOL;
+    echo '  update                : Update package to the latest stable version available' . PHP_EOL;
+    echo '  revert                : Revert package to a specified version' . PHP_EOL;
+    echo '  delete                : Delete package from this system' . PHP_EOL;
+    echo '  rotateserverkey       : Rotate the REST API server key and remove all existing tokens' . PHP_EOL;
+    echo '  backup                : Create a backup of the REST API configuration' . PHP_EOL;
+    echo '  restore               : Restore the REST API configuration from the latest backup' . PHP_EOL;
+    echo "  sync                  : Sync this system's REST API configuration to configured HA nodes" . PHP_EOL;
     echo PHP_EOL;
 }
 
 # BUILD_FORMS COMMAND
 if ($argv[1] == 'buildforms') {
     build_forms();
+}
+# REMOVE_FORMS COMMAND
+elseif ($argv[1] == 'removeforms') {
+    remove_forms();
 }
 # BUILDENDPOINTS COMMAND
 elseif ($argv[1] == 'buildendpoints') {
@@ -446,6 +501,10 @@ elseif ($argv[1] == 'notifydispatcher') {
 # SCHEDULE_DISPATCHER COMMAND
 elseif ($argv[1] == 'scheduledispatchers') {
     schedule_dispatchers();
+}
+# UNSCHEDULE_DISPATCHER COMMAND
+elseif ($argv[1] == 'unscheduledispatchers') {
+    unschedule_dispatchers();
 }
 # REFRESH_CACHE COMMAND
 elseif ($argv[1] == 'refreshcache') {
