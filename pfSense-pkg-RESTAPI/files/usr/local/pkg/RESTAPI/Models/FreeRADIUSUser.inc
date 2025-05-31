@@ -60,7 +60,7 @@ class FreeRADIUSUser extends Model {
         $this->motp_enable = new BooleanField(
             required: true,
             indicates_true: 'on',
-            indicates_false: 'off',
+            indicates_false: '',
             internal_name: 'varusersmotpenable',
             help_text: 'Enable or disable the use of Mobile One-Time Password (MOTP) for this user.',
         );
@@ -135,16 +135,9 @@ class FreeRADIUSUser extends Model {
     }
 
     /**
-     * Apply the creation of this User.
+     * Apply the changes made to this Model to the FreeRADIUS configuration.
      */
-    public function apply_create(): void {
-        freeradius_users_resync();
-    }
-
-    /**
-     * Apply the deletion of this User.
-     */
-    public function apply_delete(): void {
+    public function apply(): void {
         freeradius_users_resync();
     }
 }

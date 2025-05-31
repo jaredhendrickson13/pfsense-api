@@ -18,7 +18,7 @@ class ServicesFreeRADIUSUsersEndpoint extends Endpoint {
         $this->url = '/api/v2/services/freeradius/users';
         $this->model_name = 'FreeRADIUSUser';
         $this->many = true;
-        $this->request_method_options = ['GET', 'DELETE'];
+        $this->request_method_options = ['GET', 'PUT', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();
