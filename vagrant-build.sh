@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Set build variables
-FREEBSD_VERSION=${FREEBSD_VERSION:-"freebsd/FreeBSD-14.0-CURRENT"}
+FREEBSD_VERSION=${FREEBSD_VERSION:-"freebsd/FreeBSD-15.0-CURRENT"}
 BUILD_VERSION=${BUILD_VERSION:-"0.0_0-dev"}
 
 # Start the vagrant box
@@ -19,7 +19,7 @@ rsync -avz --progress -e "ssh -F $SSH_CONFIG_FILE" ../pfsense-api vagrant@defaul
 cat << END | vagrant ssh
 composer install --working-dir /home/vagrant/build/pfsense-api
 cp -r /home/vagrant/build/pfsense-api/vendor/* /home/vagrant/build/pfsense-api/pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/.resources/vendor/
-python3.8 /home/vagrant/build/pfsense-api/tools/make_package.py -t $BUILD_VERSION
+python3.11 /home/vagrant/build/pfsense-api/tools/make_package.py -t $BUILD_VERSION
 END
 
 # Copy the built package back to the host using SCP
