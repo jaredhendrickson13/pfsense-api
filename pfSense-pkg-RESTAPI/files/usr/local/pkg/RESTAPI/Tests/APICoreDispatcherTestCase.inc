@@ -134,7 +134,7 @@ class APICoreDispatcherTestCase extends TestCase {
         $this->assert_equals($dispatcher->setup_schedule(), null);
 
         # Assign the dispatcher a schedule and ensure setup_schedule() returns a CronJob object with the correct schedule
-        $dispatcher->schedule = 'daily';
+        $dispatcher->schedule = '* 12 * * *';
         $dispatcher_cron_job = $dispatcher->setup_schedule();
         $cron_job_cmd = '/usr/local/pkg/RESTAPI/.resources/scripts/manage.php notifydispatcher Dispatcher';
         $this->assert_equals($dispatcher_cron_job->minute->value, "@$dispatcher->schedule");
