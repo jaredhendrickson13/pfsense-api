@@ -137,14 +137,14 @@ class FreeRADIUSUser extends Model {
     /**
      * Apply the creation of this User.
      */
-    public function apply_create() {
+    public function apply_create(): void {
         freeradius_users_resync();
     }
 
     /**
      * Apply the deletion of this User.
      */
-    public function apply_delete() {
+    public function apply_delete(): void {
         freeradius_users_resync();
     }
 }
