@@ -137,11 +137,11 @@ class APICoreDispatcherTestCase extends TestCase {
         $dispatcher->schedule = '1 2 3 4 5';
         $dispatcher_cron_job = $dispatcher->setup_schedule();
         $cron_job_cmd = '/usr/local/pkg/RESTAPI/.resources/scripts/manage.php notifydispatcher Dispatcher';
-        $this->assert_equals($dispatcher_cron_job->minute->value, "1");
-        $this->assert_equals($dispatcher_cron_job->hour->value, "2");
-        $this->assert_equals($dispatcher_cron_job->mday->value, "3");
-        $this->assert_equals($dispatcher_cron_job->month->value, "4");
-        $this->assert_equals($dispatcher_cron_job->wday->value, "5");
+        $this->assert_equals($dispatcher_cron_job->minute->value, '1');
+        $this->assert_equals($dispatcher_cron_job->hour->value, '2');
+        $this->assert_equals($dispatcher_cron_job->mday->value, '3');
+        $this->assert_equals($dispatcher_cron_job->month->value, '4');
+        $this->assert_equals($dispatcher_cron_job->wday->value, '5');
         $this->assert_equals($dispatcher_cron_job->command->value, $cron_job_cmd);
 
         # Delete the CronJob
