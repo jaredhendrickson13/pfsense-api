@@ -285,7 +285,7 @@ class Form {
             $tb .= '<td>';
             if ($this->editable) {
                 $tb .=
-                    "<a class='fa fa-pencil' title='Edit " .
+                    "<a class='fa-solid fa-pencil' title='Edit " .
                     gettext($model_object->verbose_name) .
                     "' href='" .
                     $this->many_sub_url .
@@ -295,7 +295,7 @@ class Form {
             }
             if ($this->deletable) {
                 $tb .=
-                    "<a class='fa fa-trash' title='Delete " .
+                    "<a class='fa-solid fa-trash-can' title='Delete " .
                     gettext($model_object->verbose_name) .
                     "' href='" .
                     $this->url .
@@ -315,7 +315,7 @@ class Form {
         $tb .=
             "<nav class='action-buttons'><a href='" .
             $this->many_sub_url .
-            "' class='btn btn-sm btn-success'><i class='fa fa-plus icon-embed-btn'></i>" .
+            "' class='btn btn-success'><i class='fa fa-plus icon-embed-btn'></i>" .
             gettext('Add') .
             '</a></nav>';
         $tb .= '</div>';
@@ -558,6 +558,23 @@ class Form {
 
         # Return true if the form was successfully built
         if (is_file($filename)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Deletes the Form's endpoint file from the pfSense webroot.
+     * @returns bool Returns true if the file was successfully deleted, otherwise false.
+     */
+    public function delete_form_url(): bool {
+        # Assign the absolute path to the file. Assume index.php filename if not specified.
+        $filename = "/usr/local/www/$this->url";
+        $filename = str_ends_with($filename, '.php') ? $filename : "$filename/index.php";
+        $content = file_get_contents($filename);
+
+        # Delete the file and return true if it was successfully deleted
+        if (is_file($filename) and str_contains($content, 'RESTAPI/Forms') and unlink($filename)) {
             return true;
         }
         return false;

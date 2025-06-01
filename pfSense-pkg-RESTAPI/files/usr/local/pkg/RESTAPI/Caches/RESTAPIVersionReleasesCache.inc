@@ -15,7 +15,7 @@ class RESTAPIVersionReleasesCache extends Cache {
     const RELEASES_URL = 'https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases';
 
     public int $timeout = 30;
-    public string $schedule = 'hourly';
+    public string $schedule = '0 * * * *';
 
     /**
      * Retrieves available release information from external repos and updates the releases cache files.

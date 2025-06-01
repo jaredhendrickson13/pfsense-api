@@ -84,8 +84,8 @@ class APIModelsOpenVPNClientSpecificOverrideTestCase extends TestCase {
             remote_network: ['10.1.2.0/24'],
             remote_networkv6: ['1234::/64'],
             gwredir: true,
-            push_reset: true,
-            remove_route: true,
+            push_reset: false,
+            remove_options: ['remove_route'],
             dns_domain: 'example.com',
             dns_server1: '127.0.0.1',
             dns_server2: '127.0.0.2',
@@ -105,7 +105,7 @@ class APIModelsOpenVPNClientSpecificOverrideTestCase extends TestCase {
             "/var/etc/openvpn/server{$this->ovpns->vpnid->value}/csc/{$cso->common_name->value}",
         );
         $this->assert_str_contains($cso_conf, 'disable'); // For `block` field
-        $this->assert_str_contains($cso_conf, 'push-reset');
+        $this->assert_str_does_not_contain($cso_conf, 'push-reset');
         $this->assert_str_contains($cso_conf, 'push-remove route');
         $this->assert_str_contains($cso_conf, 'push "route 10.1.2.0 255.255.255.0"');
         $this->assert_str_contains($cso_conf, 'push "route-ipv6 1234::/64"');
@@ -137,8 +137,8 @@ class APIModelsOpenVPNClientSpecificOverrideTestCase extends TestCase {
             remote_network: ['10.2.3.0/24'],
             remote_networkv6: ['4321::/64'],
             gwredir: false,
-            push_reset: false,
-            remove_route: false,
+            push_reset: true,
+            remove_options: [],
             dns_domain: 'updated.example.com',
             dns_server1: '127.0.1.1',
             dns_server2: '127.0.1.2',
@@ -158,7 +158,7 @@ class APIModelsOpenVPNClientSpecificOverrideTestCase extends TestCase {
             "/var/etc/openvpn/server{$this->ovpns->vpnid->value}/csc/{$cso->common_name->value}",
         );
         $this->assert_str_does_not_contain($cso_conf, 'disable'); // For `block` field
-        $this->assert_str_does_not_contain($cso_conf, 'push-reset');
+        $this->assert_str_contains($cso_conf, 'push-reset');
         $this->assert_str_does_not_contain($cso_conf, 'push-remove route');
         $this->assert_str_contains($cso_conf, 'push "route 10.2.3.0 255.255.255.0"');
         $this->assert_str_contains($cso_conf, 'push "route-ipv6 4321::/64"');

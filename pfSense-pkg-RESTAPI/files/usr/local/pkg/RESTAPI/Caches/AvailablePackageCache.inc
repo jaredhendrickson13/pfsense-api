@@ -12,8 +12,7 @@ use function RESTAPI\Dispatchers\get_pkg_info;
  */
 class AvailablePackageCache extends Cache {
     public int $timeout = 120;
-    public string $schedule = 'hourly';
-
+    public string $schedule = '12 * * * *'; # Run at irregular interval to avoid conflicts with repo jobs
     /**
      * Retrieves the available package information to cache from external repos
      */

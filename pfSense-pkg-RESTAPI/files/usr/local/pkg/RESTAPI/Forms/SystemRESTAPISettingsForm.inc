@@ -52,14 +52,14 @@ class SystemRESTAPISettingsForm extends Form {
     public array $buttons = [
         'rotate_server_key' => [
             'title' => 'Rotate Server Key',
-            'icon' => 'fa-repeat',
-            'classes' => ['btn-success', 'btn-sm'],
+            'icon' => 'fa-solid fa-turn-up',
+            'classes' => ['btn-success'],
             'on_click' => "return confirm(\"Rotating the server key will void any existing JWTs. Proceed?\");",
             'callable' => 'rotate_server_key',
         ],
         'report_an_issue' => [
             'title' => 'Report an Issue',
-            'icon' => 'fa-question-circle',
+            'icon' => 'fa-solid fa-question-circle',
             'link' => 'https://github.com/jaredhendrickson13/pfsense-api/issues/new/choose',
             'classes' => ['btn-info'],
         ],

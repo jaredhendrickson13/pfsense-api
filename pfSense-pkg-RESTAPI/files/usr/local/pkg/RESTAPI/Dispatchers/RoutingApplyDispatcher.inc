@@ -15,10 +15,12 @@ class RoutingApplyDispatcher extends Dispatcher {
     public function process(...$arguments): void {
         global $g;
 
+        # Clear the gateway cache to ensure the latest status is fetched during routing changes
+        unset($GLOBALS['GatewaysCache']);
+
         # Check for the pending changes file and unserialize it
         if (file_exists("{$g['tmp_path']}/.system_routes.apply")) {
             $to_apply_list = unserialize(file_get_contents("{$g['tmp_path']}/.system_routes.apply"));
-
             # Run commands to apply these changes
             foreach ($to_apply_list as $to_apply) {
                 mwexec("{$to_apply}");

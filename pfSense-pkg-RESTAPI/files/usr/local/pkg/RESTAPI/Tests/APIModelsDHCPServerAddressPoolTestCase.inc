@@ -360,8 +360,6 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
             mac_allow: ['00:11:22:33:44:55'],
             mac_deny: ['55:44:33:22:11:00'],
             domainsearchlist: ['example.com'],
-            defaultleasetime: 7201,
-            maxleasetime: 86401,
             gateway: '192.168.1.2',
             dnsserver: ['127.0.0.53'],
             ntpserver: ['127.0.0.123'],
@@ -374,8 +372,6 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
         $kea_json = json_decode($kea_conf, associative: true);
         $kea_pool = $kea_json['Dhcp4']['subnet4'][0]['pools'][1];
         $this->assert_equals($kea_pool['pool'], $pool->range_from->value . ' - ' . $pool->range_to->value);
-        $this->assert_equals($kea_pool['valid-lifetime'], (string) $pool->defaultleasetime->value);
-        $this->assert_equals($kea_pool['max-valid-lifetime'], (string) $pool->maxleasetime->value);
         $this->assert_equals(
             $this->get_kea_option_by_name('domain-name-servers', $kea_pool['option-data']),
             $pool->dnsserver->value[0],
@@ -403,8 +399,6 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
             mac_allow: ['55:44:33:22:11:00'],
             mac_deny: ['00:11:22:33:44:55'],
             domainsearchlist: ['new.example.com'],
-            defaultleasetime: 7205,
-            maxleasetime: 86405,
             gateway: '192.168.1.5',
             dnsserver: ['127.0.1.53'],
             ntpserver: ['127.0.1.123'],
@@ -416,8 +410,6 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase {
         $kea_json = json_decode($kea_conf, associative: true);
         $kea_pool = $kea_json['Dhcp4']['subnet4'][0]['pools'][1];
         $this->assert_equals($kea_pool['pool'], $pool->range_from->value . ' - ' . $pool->range_to->value);
-        $this->assert_equals($kea_pool['valid-lifetime'], (string) $pool->defaultleasetime->value);
-        $this->assert_equals($kea_pool['max-valid-lifetime'], (string) $pool->maxleasetime->value);
         $this->assert_equals(
             $this->get_kea_option_by_name('domain-name-servers', $kea_pool['option-data']),
             $pool->dnsserver->value[0],

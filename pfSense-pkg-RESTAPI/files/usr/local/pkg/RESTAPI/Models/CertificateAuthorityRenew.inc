@@ -95,7 +95,11 @@ class CertificateAuthorityRenew extends Model {
     public function _create(): void {
         # Extract details from the Certificate Authority to renew
         $ca_config = &lookup_ca($this->caref->value);
-        $this->oldserial->value = cert_get_serial($ca_config['crt']);
+        $this->oldserial->value = cert_get_serial($ca_config['item']['crt']);
+        $this->id = $ca_config['idx'];
+
+        # The pfSense cert_renew() function expects a 'path' key with the config path
+        $ca_config['path'] = "ca/{$ca_config['idx']}";
 
         # Renew the cert using pfSense's built in cert_renew function
         $renewed = cert_renew(
@@ -114,8 +118,8 @@ class CertificateAuthorityRenew extends Model {
         }
 
         # Otherwise, continue with the renewal
-        $this->newserial->value = cert_get_serial($ca_config['crt']);
-        $msg = "Renewed CA {$ca_config['descr']} ({$ca_config['refid']}) - Serial {$this->oldserial->value} -> {$this->newserial->value}";
+        $this->newserial->value = cert_get_serial($ca_config['item']['crt']);
+        $msg = "Renewed CA {$ca_config['item']['descr']} ({$ca_config['item']['refid']}) - Serial {$this->oldserial->value} -> {$this->newserial->value}";
         $this->log_error($msg);
         $this->write_config($msg);
     }

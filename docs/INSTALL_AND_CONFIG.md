@@ -10,19 +10,18 @@ run pfSense. It's recommended to follow Netgate's [minimum hardware requirements
 !!! Warning
     - The package is currently not compatible with 32-bit builds of pfSense. It is recommended to use the [legacy v1 package](https://github.com/jaredhendrickson13/pfsense-api/tree/legacy) for 32-bit systems.
     - While the package should behave identically on 64-bit architectures other than amd64, automated testing only covers amd64
-    builds of pfSense. Support on other architectures is not guaranteed.
+    builds of pfSense CE. Support on other architectures is not guaranteed.
 
 ### Supported pfSense versions
 
-- pfSense CE 2.7.2
-- pfSense Plus 24.03
+- pfSense CE 2.8.0
 - pfSense Plus 24.11
 
 !!! Warning
     Installation of the package on unsupported versions of pfSense may result in unexpected behavior and/or system instability.
     
 !!! Tip
-    Don't see your version of pfSense? Older versions of pfSense may be supported by older versions of this package.
+    Don't see your version of pfSense listed? Older versions of pfSense may be supported by older versions of this package.
     Check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases).
 
 ## Installing the package
@@ -33,13 +32,13 @@ The pfSense REST API package is built just like any other pfSense package and ca
 **Install on pfSense CE**
 
 ```bash
-pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7.2-pkg-RESTAPI.pkg
+pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.8.0-pkg-RESTAPI.pkg
 ```
 
 **Install on pfSense Plus**
 
 ```bash
-pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-24.03-pkg-RESTAPI.pkg
+pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-24.11-pkg-RESTAPI.pkg
 ```
 
 !!! Important

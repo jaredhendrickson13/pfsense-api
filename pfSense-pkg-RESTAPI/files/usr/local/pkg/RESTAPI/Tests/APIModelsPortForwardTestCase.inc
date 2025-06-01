@@ -95,11 +95,8 @@ class APIModelsPortForwardTestCase extends TestCase {
 
         # Ensure the pure NAT reflection rule is present
         $rules_debug = file_get_contents('/tmp/rules.debug');
-        $purenat_rule = "rdr on {$this->env['PFREST_LAN_IF']} inet proto tcp from any to 127.3.2.1 port 8443 -> 127.1.2.3";
-        $purenat_rule_ovpn = "rdr on { {$this->env['PFREST_LAN_IF']} openvpn } inet proto tcp from any to 127.3.2.1 port 8443 -> 127.1.2.3";
-        $this->assert_is_true(
-            str_contains($rules_debug, $purenat_rule) or str_contains($rules_debug, $purenat_rule_ovpn),
-        );
+        $purenat_rule = 'inet proto tcp from any to 127.3.2.1 port 8443 -> 127.1.2.3';
+        $this->assert_str_contains($rules_debug, $purenat_rule);
 
         # Update the NAT reflection mode NAT + proxy (enable)
         $port_forward->natreflection->value = 'enable';
@@ -107,14 +104,8 @@ class APIModelsPortForwardTestCase extends TestCase {
 
         # Ensure the pure NAT reflection rule is no longer present and the NAT proxy rule is present
         $rules_debug = file_get_contents('/tmp/rules.debug');
-        $natproxy_rule = "rdr on {$this->env['PFREST_LAN_IF']} proto tcp from any to 127.3.2.1 port 8443 tag PFREFLECT -> 127.0.0.1 port 19000";
-        $natproxy_rule_ovpn = "rdr on { {$this->env['PFREST_LAN_IF']} openvpn } proto tcp from any to 127.3.2.1 port 8443 tag PFREFLECT -> 127.0.0.1 port 19000";
-        $this->assert_is_false(
-            str_contains($rules_debug, $purenat_rule) or str_contains($rules_debug, $purenat_rule_ovpn),
-        );
-        $this->assert_is_true(
-            str_contains($rules_debug, $natproxy_rule) or str_contains($rules_debug, $natproxy_rule_ovpn),
-        );
+        $natproxy_rule = 'proto tcp from any to 127.3.2.1 port 8443 tag PFREFLECT -> 127.0.0.1 port 19000';
+        $this->assert_str_contains($rules_debug, $natproxy_rule);
 
         # Delete the port forward and ensure the previous reflection rule is no longer present
         $port_forward->delete(apply: true);

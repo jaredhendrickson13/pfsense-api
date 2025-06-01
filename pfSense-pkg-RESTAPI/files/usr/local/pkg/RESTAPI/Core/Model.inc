@@ -594,12 +594,28 @@ class Model {
     }
 
     /**
+     * Normalizes a config path by removing extra slashes and ensuring it is not empty.
+     * @param string $path The config path to normalize. This is usually a string with '/' as separators.
+     * @return string The normalized config path
+     */
+    public static function normalize_config_path(string $path): string {
+        # Remove leading and trailing slashes, and duplicate slashes, if slashes are present
+        if (str_contains($path, '/')) {
+            $path = trim($path, '/');
+            $path = preg_replace('/\/+/', '/', $path);
+        }
+
+        # Return the normalized config path
+        return $path;
+    }
+
+    /**
      * Initialize the configuration array of a specific config path
      * @param $path string config path with '/' as separators
      */
-    protected static function init_config(string $path) {
-        # Initialize the configuration array of a specified path.
-        config_init_path($path);
+    protected static function init_config(string $path): void {
+        # Initialize the configuration array of a specified path
+        config_init_path(self::normalize_config_path($path));
     }
 
     /**
@@ -609,8 +625,8 @@ class Model {
      * @returns mixed value at path or $default if the path does not exist or if the
      *          path keys an empty string and $default is non-null
      */
-    public static function get_config(string $path, mixed $default = null) {
-        return config_get_path($path, $default);
+    public static function get_config(string $path, mixed $default = null): mixed {
+        return config_get_path(self::normalize_config_path($path), $default);
     }
 
     /**
@@ -620,8 +636,8 @@ class Model {
      * @param $default mixed value to return if the path is not found
      * @returns mixed $val or $default if the path prefix does not exist
      */
-    public static function set_config(string $path, mixed $value, mixed $default = null) {
-        return config_set_path($path, $value, $default);
+    public static function set_config(string $path, mixed $value, mixed $default = null): mixed {
+        return config_set_path(self::normalize_config_path($path), $value, $default);
     }
 
     /**
@@ -630,7 +646,10 @@ class Model {
      * object that are not defined in a Field assigned to this Model will be left unchanged.
      * @param $path string The Model config path including any Model ID
      */
-    public function merge_config(string $path) {
+    public function merge_config(string $path): void {
+        # Remove leading slashes and extra slashes
+        $path = self::normalize_config_path($path);
+
         # Loop through each field known to this Model
         foreach ($this->get_fields() as $field) {
             # Determine the field path
@@ -662,7 +681,7 @@ class Model {
      * @returns array copy of the removed value or null
      */
     public static function del_config(string $path): mixed {
-        return config_del_path($path);
+        return config_del_path(self::normalize_config_path($path));
     }
 
     /**
@@ -675,7 +694,7 @@ class Model {
      * non-null value, otherwise false.
      */
     public static function is_config_enabled(string $path, string $enable_key = 'enable'): bool {
-        return config_path_enabled($path, $enable_key);
+        return config_path_enabled(self::normalize_config_path($path), $enable_key);
     }
 
     /**
