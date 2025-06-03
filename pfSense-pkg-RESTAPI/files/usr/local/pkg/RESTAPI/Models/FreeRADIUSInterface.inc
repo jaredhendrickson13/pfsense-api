@@ -48,23 +48,22 @@ class FreeRADIUSInterface extends Model {
         # Set model fields
         #
         $this->addr = new StringField(
-            required: true,
-//            unique: true,
             internal_name: 'varinterfaceip',
+            required: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_keywords: ['*'])],
             help_text: 'The IP address of the listening interface. If you choose * then it means all interfaces.'
         );
         $this->port = new PortField(
-            required: false,
             internal_name: 'varinterfaceport',
+            required: false,
             allow_alias: false,
             allow_range: false,
             default: '1812',
             help_text: 'The port number of the listening interface. Different interface types need different ports.'
         );
         $this->type = new StringField(
-            required: false,
             internal_name: 'varinterfacetype',
+            required: false,
             choices: [ 'auth', 'acct' ],
             default: 'auth',
             help_text: 'The type of the listening interface: Authentication/Accounting.'
@@ -73,7 +72,8 @@ class FreeRADIUSInterface extends Model {
             internal_name: 'varinterfaceipversion',
             choices: [ 'ipaddr', 'ipv6addr' ],
             allow_empty: true,
-            default: 'ipaddr',
+            required: true,
+            conditions: [ 'addr' => '*' ],
             help_text: 'The IP version of the listening interface.'
         );
         $this->description = new StringField(
@@ -118,14 +118,14 @@ class FreeRADIUSInterface extends Model {
             throw new ValidationError(
                 message: "An unexpected validation error has occurred: $input_errors[0]. Please report this issue at " .
                     'https://github.com/jaredhendrickson13/pfsense-api/issues/new',
-                response_id: 'FREERADIUS_USER_UNEXPECTED_VALIDATION_ERROR',
+                response_id: 'FREERADIUS_INTERFACE_UNEXPECTED_VALIDATION_ERROR',
             );
         }
     }
 
 
     /**
-     * Apply the creation of this User.
+     * Apply the action on Interface(s)
      */
     public function apply() {
         freeradius_settings_resync();
