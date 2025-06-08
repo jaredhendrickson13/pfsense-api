@@ -23,7 +23,6 @@ use RESTAPI\Validators\RegexValidator;
  * Defines a Model that represents FreeRADIUS Interfaces
  */
 class FreeRADIUSInterface extends Model {
-
     public StringField $addr;
     public PortField $port;
     public StringField $type;
@@ -51,7 +50,7 @@ class FreeRADIUSInterface extends Model {
             internal_name: 'varinterfaceip',
             required: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_keywords: ['*'])],
-            help_text: 'The IP address of the listening interface. If you choose * then it means all interfaces.'
+            help_text: 'The IP address of the listening interface. If you choose * then it means all interfaces.',
         );
         $this->port = new PortField(
             internal_name: 'varinterfaceport',
@@ -59,36 +58,38 @@ class FreeRADIUSInterface extends Model {
             allow_alias: false,
             allow_range: false,
             default: '1812',
-            help_text: 'The port number of the listening interface. Different interface types need different ports.'
+            help_text: 'The port number of the listening interface. Different interface types need different ports.',
         );
         $this->type = new StringField(
             internal_name: 'varinterfacetype',
             required: false,
-            choices: [ 'auth', 'acct' ],
+            choices: ['auth', 'acct'],
             default: 'auth',
-            help_text: 'The type of the listening interface: Authentication/Accounting.'
+            help_text: 'The type of the listening interface: Authentication/Accounting.',
         );
         $this->ipv = new StringField(
             internal_name: 'varinterfaceipversion',
-            choices: [ 'ipaddr', 'ipv6addr' ],
+            choices: ['ipaddr', 'ipv6addr'],
             allow_empty: true,
             required: true,
-            conditions: [ 'addr' => '*' ],
-            help_text: 'The IP version of the listening interface.'
+            conditions: ['addr' => '*'],
+            help_text: 'The IP version of the listening interface.',
         );
         $this->description = new StringField(
             required: false,
             allow_empty: true,
-            default: "",
+            default: '',
             validators: [
-                new RegexValidator(pattern: "/^[a-zA-Z0-9 _,.;:+=()-]*$/", error_msg: 'Value contains invalid characters.'),
+                new RegexValidator(
+                    pattern: "/^[a-zA-Z0-9 _,.;:+=()-]*$/",
+                    error_msg: 'Value contains invalid characters.',
+                ),
             ],
-            help_text: 'The description for this interface.'
+            help_text: 'The description for this interface.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
     }
-
 
     /**
      * Perform additional validation on the Model's fields and data.
@@ -97,10 +98,10 @@ class FreeRADIUSInterface extends Model {
         $input_errors = [];
 
         $iface_addr = $this->addr->value;
-        if ( $iface_addr != '*' ) {
-            if ( is_ipaddrv4($iface_addr) ) {
+        if ($iface_addr != '*') {
+            if (is_ipaddrv4($iface_addr)) {
                 $this->ipv->value = 'ipaddr';
-            } elseif ( is_ipaddrv6($iface_addr) ) {
+            } elseif (is_ipaddrv6($iface_addr)) {
                 $this->ipv->value = 'ipv6addr';
             } else {
                 // we don't must be here because Model validator for $this->addr
@@ -122,7 +123,6 @@ class FreeRADIUSInterface extends Model {
             );
         }
     }
-
 
     /**
      * Apply the action on Interface(s)
