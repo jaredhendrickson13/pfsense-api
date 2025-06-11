@@ -24,6 +24,7 @@ class SystemTimezone extends Model {
             allow_empty: false,
             allow_null: false,
             many: false,
+            choices_callable: 'get_timezone_choices',
             help_text: 'Set geographic region name (Continent/Location) to determine the timezone for the firewall.'
         );
 
@@ -40,16 +41,7 @@ class SystemTimezone extends Model {
     /*
      *
      */
-    public function validate_extra(): void {
-        $tzlist = system_get_timezone_list();
-
-        $tz = $this->timezone->value;
-
-        if ( ! in_array($tz, $tzlist) ) {
-            throw new ValidationError(
-                message: "Unknown timezone={$tz}",
-                response_id: 'TIMEZONE_UNKNOWN_TIMEZONE',
-            );
-        }
+    public function get_timezone_choices(): array {
+        return system_get_timezone_list();
     }
 }
