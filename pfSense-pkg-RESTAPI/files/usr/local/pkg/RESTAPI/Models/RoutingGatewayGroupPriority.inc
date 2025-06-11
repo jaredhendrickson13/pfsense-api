@@ -22,6 +22,7 @@ class RoutingGatewayGroupPriority extends Model {
         $this->parent_model_class = 'RoutingGatewayGroup';
         $this->config_path = 'item';
         $this->subsystem = 'staticroutes';
+        $this->update_strategy = 'replace';
         $this->many = true;
         $this->many_minimum = 1;
 

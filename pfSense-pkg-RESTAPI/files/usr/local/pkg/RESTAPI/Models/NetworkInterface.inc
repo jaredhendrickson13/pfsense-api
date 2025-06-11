@@ -165,7 +165,7 @@ class NetworkInterface extends Model {
         $this->gateway = new ForeignModelField(
             model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
             model_field: 'name',
-            model_query: ['ipprotocol' => 'inet', 'interface' => &$this->id],
+            model_query: ['ipprotocol' => 'inet'],
             allow_null: true,
             conditions: ['typev4' => 'static'],
             help_text: 'Sets the upstream gateway this interface will use. This is only applicable for WAN-type interfaces.',
@@ -313,7 +313,7 @@ class NetworkInterface extends Model {
         $this->gatewayv6 = new ForeignModelField(
             model_name: ['RoutingGateway', 'RoutingGatewayGroup'],
             model_field: 'name',
-            model_query: ['ipprotocol' => 'inet6', 'interface' => &$this->id],
+            model_query: ['ipprotocol' => 'inet6'],
             allow_null: true,
             conditions: ['typev6' => 'staticv6'],
             help_text: 'Sets the upstream IPv6 gateway this interface will use. This is only applicable for WAN-type interfaces.',
