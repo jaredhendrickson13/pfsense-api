@@ -59,10 +59,7 @@ class APIModelsRoutingGatewayGroupPriorityTestCase extends TestCase {
         $gateway_prio->update();
 
         # Ensure the priority was actually updated
-        $this->assert_equals(
-            RoutingGatewayGroupPriority::query(id: $gateway_prio->id)->first()->tier->value,
-            3
-        );
+        $this->assert_equals(RoutingGatewayGroupPriority::query(id: $gateway_prio->id)->first()->tier->value, 3);
 
         # Delete the gateway group priority object and ensure it was deleted
         $gateway_prio->delete();
