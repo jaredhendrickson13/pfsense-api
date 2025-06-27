@@ -116,7 +116,7 @@ class SystemStatus extends Model {
             allow_null: true,
             read_only: true,
             many: true,
-            delimiter: ', ',
+            delimiter: ' ',
             help_text: 'The CPU load averages. The first value represents the load average for the last minute, the ' .
                 'second value represents the load average for the last 5 minutes, and the third value represents the ' .
                 'load average for the last 15 minutes.',
@@ -181,7 +181,7 @@ class SystemStatus extends Model {
             'mds_mitigation' => get_single_sysctl('hw.mds_disable_state'),
             'temp_c' => $this->get_system_temp(),
             'temp_f' => $this->get_system_temp(as_fahrenheit: true),
-            'cpu_load_avg' => get_load_average(),
+            'cpu_load_avg' => $this->get_cpu_load_average(),
             'cpu_count' => get_single_sysctl('hw.ncpu'),
             'cpu_usage' => $this->get_cpu_usage(),
             'mbuf_usage' => $this->get_mbuf_usage(),
@@ -221,6 +221,24 @@ class SystemStatus extends Model {
 
         # Convert the value to Fahrenheit if requested, otherwise leave as is for Celsius
         return $as_fahrenheit ? $temp * 1.8 + 32 : $temp;
+    }
+
+    /**
+     * Obtains the CPU load average. This method is responsible for obtaining the raw load average string from pfSense
+     * and ensuring it is formatted correctly before the cpu_load_average field splits it into an array.
+     * @return string|null The CPU load average as a string or null if it could not be obtained.
+     */
+    private function get_cpu_load_average(): ?string {
+        # Obtain the load average using pfSense's get_load_average() function
+        $load_avg = get_load_average();
+
+        # The system language may affect the load average's delimiter (missing a comma in some languages)
+        # ensure values are only ever separated by a single space (no commas). #716
+        if (str_contains(", ", $load_avg)) {
+            $load_avg = str_replace(', ', ' ', $load_avg);
+        }
+
+        return $load_avg ?? null;
     }
 
     /**
