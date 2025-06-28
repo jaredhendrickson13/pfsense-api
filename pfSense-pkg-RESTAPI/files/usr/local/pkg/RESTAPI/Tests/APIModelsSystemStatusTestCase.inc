@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Command;
+use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\SystemStatus;
 
@@ -42,6 +43,35 @@ class APIModelsSystemStatusTestCase extends TestCase {
         $this->assert_equals(
             $system_status->bios_date->value,
             (new Command(command: '/bin/kenv -q smbios.bios.reldate 2>/dev/null', trim_whitespace: true))->output,
+        );
+    }
+
+    /**
+     * Checks that the load average can can be read correctly despite the system's assign language. Normally,
+     * the load average format can change based on the systems assigned language and cause issues parsing the
+     * value into an array. This is a regression test for #716.
+     */
+    public function test_language_does_not_change_cpu_load_avg(): void {
+        # Change the language to German
+        Model::set_config("system/language", "de_DE");
+        set_language();
+
+        # Ensure we can read the SystemStatus cpu_load_average without an error
+        $this->assert_does_not_throw(
+            callable: function () {
+                $system_status = new SystemStatus();
+                $this->assert_equals(count($system_status->cpu_load_avg->value), 3);
+            }
+        );
+
+        # Reset the language to English and check again
+        Model::set_config("system/language", "en_US");
+        set_language();
+        $this->assert_does_not_throw(
+            callable: function () {
+                $system_status = new SystemStatus();
+                $this->assert_equals(count($system_status->cpu_load_avg->value), 3);
+            }
         );
     }
 }
