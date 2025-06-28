@@ -234,7 +234,7 @@ class SystemStatus extends Model {
 
         # The system language may affect the load average's delimiter (missing a comma in some languages)
         # ensure values are only ever separated by a single space (no commas). #716
-        if (str_contains($load_avg, ", ")) {
+        if (str_contains($load_avg, ', ')) {
             $load_avg = str_replace(', ', ' ', $load_avg);
         }
 

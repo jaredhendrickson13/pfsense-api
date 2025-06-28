@@ -53,7 +53,7 @@ class APIModelsSystemStatusTestCase extends TestCase {
      */
     public function test_language_does_not_change_cpu_load_avg(): void {
         # Change the language to German
-        Model::set_config("system/language", "de_DE");
+        Model::set_config('system/language', 'de_DE');
         set_language();
 
         # Ensure we can read the SystemStatus cpu_load_average without an error
@@ -61,17 +61,17 @@ class APIModelsSystemStatusTestCase extends TestCase {
             callable: function () {
                 $system_status = new SystemStatus();
                 $this->assert_equals(count($system_status->cpu_load_avg->value), 3);
-            }
+            },
         );
 
         # Reset the language to English and check again
-        Model::set_config("system/language", "en_US");
+        Model::set_config('system/language', 'en_US');
         set_language();
         $this->assert_does_not_throw(
             callable: function () {
                 $system_status = new SystemStatus();
                 $this->assert_equals(count($system_status->cpu_load_avg->value), 3);
-            }
+            },
         );
     }
 }
