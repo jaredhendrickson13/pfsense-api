@@ -144,8 +144,8 @@ class FloatField extends RESTAPI\Core\Field {
 
         # Otherwise, the internal value cannot be represented by this Field. Throw an error.
         throw new RESTAPI\Responses\ServerError(
-            message: "Cannot parse FloatField '$this->name' from internal because its internal value is not
-                    a numeric value. Consider changing this field to a StringField.",
+            message: "Cannot parse FloatField '$this->name' from internal because its internal value is not " .
+                'a numeric value. Consider changing this field to a StringField.',
             response_id: 'FLOAT_FIELD_WITH_NON_FLOAT_INTERNAL_VALUE',
         );
     }
