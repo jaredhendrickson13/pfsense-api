@@ -65,7 +65,7 @@ class PortForward extends Model {
         );
         $this->protocol = new StringField(
             required: true,
-            choices: ['tcp', 'udp', 'tcp/udp', 'icmp', 'esp', 'ah', 'gre', 'ipv6', 'igmp', 'pim', 'ospf'],
+            choices: ['any', 'tcp', 'udp', 'tcp/udp', 'icmp', 'esp', 'ah', 'gre', 'ipv6', 'igmp', 'pim', 'ospf'],
             help_text: 'The IP/transport protocol this port forward rule should match.',
         );
         $this->source = new FilterAddressField(
