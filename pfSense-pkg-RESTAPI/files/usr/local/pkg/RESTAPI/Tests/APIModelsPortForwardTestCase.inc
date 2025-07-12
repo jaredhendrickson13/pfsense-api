@@ -3,8 +3,10 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
+use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\FirewallRule;
 use RESTAPI\Models\PortForward;
+use RESTAPI\Responses\ValidationError;
 
 class APIModelsPortForwardTestCase extends TestCase {
     /**
@@ -226,5 +228,59 @@ class APIModelsPortForwardTestCase extends TestCase {
         $port_forward->delete();
         $rule_q = FirewallRule::query(associated_rule_id: $port_forward->associated_rule_id->value);
         $this->assert_is_false($rule_q->exists());
+    }
+
+    /**
+     * Ensures the target field accepts IP addresses, aliases and interface IPs
+     */
+    public function test_target_validation(): void {
+        # Create an alias to test with
+        $alias = new FirewallAlias(name: "testalias", type:"host");
+        $alias->create();
+
+        # Set values we expect to be allowed vs disallowed
+        $allowed_values = ["1.2.3.4", "wan:ip", "testalias"];
+        $disallowed_values = ["example.com", "wan", "self", "l2tp", "1.2.3.4/24"];
+
+        # Check each allowed value and ensure it does not throw an exception during validation
+        foreach ($allowed_values as $value) {
+            $this->assert_does_not_throw(
+                callable: function () use ($value) {
+                    $port_forward = new PortForward(
+                        data: [
+                            'interface' => 'wan',
+                            'protocol' => 'tcp',
+                            'source' => 'any',
+                            'destination' => 'wan:ip',
+                            'destination_port' => '8443',
+                            'target' => $value,
+                            'local_port' => '4443',
+                        ],
+                    );
+                    $port_forward->validate();
+                },
+            );
+        }
+
+        # Check each disallowed value and ensure it throws an exception during validation
+        foreach ($disallowed_values as $value) {
+            $this->assert_throws(
+                exceptions: ["ValidationError"],
+                callable: function () use ($value) {
+                    $port_forward = new PortForward(
+                        data: [
+                            'interface' => 'wan',
+                            'protocol' => 'tcp',
+                            'source' => 'any',
+                            'destination' => 'wan:ip',
+                            'destination_port' => '8443',
+                            'target' => $value,
+                            'local_port' => '4443',
+                        ],
+                    );
+                    $port_forward->validate();
+                }
+            );
+        }
     }
 }
