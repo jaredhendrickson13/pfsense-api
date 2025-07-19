@@ -25,7 +25,7 @@ class SystemTimezone extends Model {
             allow_null: false,
             many: false,
             choices_callable: 'get_timezone_choices',
-            help_text: 'Set geographic region name (Continent/Location) to determine the timezone for the firewall.'
+            help_text: 'Set geographic region name (Continent/Location) to determine the timezone for the firewall.',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
