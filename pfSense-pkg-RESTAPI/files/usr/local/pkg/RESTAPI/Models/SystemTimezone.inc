@@ -4,7 +4,6 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Responses\ValidationError;
 
 /**
  * Defines a Model that represents the Timezone configuration on this system.
@@ -20,11 +19,11 @@ class SystemTimezone extends Model {
 
         # Set model Fields
         $this->timezone = new StringField(
-            default: 'Etc/GMT',
+            default: 'UTC',
+            choices_callable: 'get_timezone_choices',
             allow_empty: false,
             allow_null: false,
             many: false,
-            choices_callable: 'get_timezone_choices',
             help_text: 'Set geographic region name (Continent/Location) to determine the timezone for the firewall.',
         );
 
@@ -38,8 +37,9 @@ class SystemTimezone extends Model {
         system_timezone_configure();
     }
 
-    /*
-     *
+    /**
+     * Obtains the list of available timezones.
+     * @return array The list of timezones available to the system
      */
     public function get_timezone_choices(): array {
         return system_get_timezone_list();
