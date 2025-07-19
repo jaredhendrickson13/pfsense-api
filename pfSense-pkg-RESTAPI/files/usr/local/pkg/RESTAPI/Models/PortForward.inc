@@ -11,6 +11,7 @@ use RESTAPI\Fields\FilterAddressField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\PortField;
+use RESTAPI\Fields\SpecialNetworkField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
 use RESTAPI\Responses\ServerError;
@@ -27,7 +28,7 @@ class PortForward extends Model {
     public PortField $source_port;
     public FilterAddressField $destination;
     public PortField $destination_port;
-    public FilterAddressField $target;
+    public SpecialNetworkField $target;
     public PortField $local_port;
     public BooleanField $disabled;
     public BooleanField $nordr;
@@ -96,7 +97,7 @@ class PortForward extends Model {
             conditions: ['protocol' => ['tcp', 'udp', 'tcp/udp']],
             help_text: 'The destination port this port forward rule applies to. Set to `null` to allow any destination port.',
         );
-        $this->target = new FilterAddressField(
+        $this->target = new SpecialNetworkField(
             required: true,
             allow_ipaddr: true,
             allow_subnet: false,
@@ -104,8 +105,6 @@ class PortForward extends Model {
             allow_interface: false,
             allow_interface_ip: true,
             allow_interface_groups: false,
-            allow_any: false,
-            allow_invert: false,
             allow_self: false,
             allow_l2tp: false,
             allow_pppoe: false,
