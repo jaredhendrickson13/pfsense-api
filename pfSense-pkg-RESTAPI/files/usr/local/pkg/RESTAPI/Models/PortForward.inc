@@ -11,6 +11,7 @@ use RESTAPI\Fields\FilterAddressField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\PortField;
+use RESTAPI\Fields\SpecialNetworkField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UnixTimeField;
 use RESTAPI\Responses\ServerError;
@@ -27,7 +28,7 @@ class PortForward extends Model {
     public PortField $source_port;
     public FilterAddressField $destination;
     public PortField $destination_port;
-    public StringField $target;
+    public SpecialNetworkField $target;
     public PortField $local_port;
     public BooleanField $disabled;
     public BooleanField $nordr;
@@ -65,7 +66,7 @@ class PortForward extends Model {
         );
         $this->protocol = new StringField(
             required: true,
-            choices: ['tcp', 'udp', 'tcp/udp', 'icmp', 'esp', 'ah', 'gre', 'ipv6', 'igmp', 'pim', 'ospf'],
+            choices: ['any', 'tcp', 'udp', 'tcp/udp', 'icmp', 'esp', 'ah', 'gre', 'ipv6', 'igmp', 'pim', 'ospf'],
             help_text: 'The IP/transport protocol this port forward rule should match.',
         );
         $this->source = new FilterAddressField(
@@ -96,9 +97,17 @@ class PortForward extends Model {
             conditions: ['protocol' => ['tcp', 'udp', 'tcp/udp']],
             help_text: 'The destination port this port forward rule applies to. Set to `null` to allow any destination port.',
         );
-        $this->target = new StringField(
+        $this->target = new SpecialNetworkField(
             required: true,
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_alias: true)],
+            allow_ipaddr: true,
+            allow_subnet: false,
+            allow_alias: true,
+            allow_interface: false,
+            allow_interface_ip: true,
+            allow_interface_groups: false,
+            allow_self: false,
+            allow_l2tp: false,
+            allow_pppoe: false,
             help_text: 'The IP address or alias of the internal host to forward matching traffic to.',
         );
         $this->local_port = new PortField(
