@@ -269,17 +269,46 @@ class ContentHandler {
      * @return array This ContentHandler as an OpenAPI 'content' schema for this MIME type in a given Response object.
      */
     public function to_openapi_schema(Response $response, Endpoint $endpoint): array {
-        # Format the data schema based on the endpoint for successful responses
+        # Default to an empty schema in the event we cannot determine the schema
+        $data_schema = [
+            'oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']],
+        ];
+
+        # Ensure the 'id' field is included for success responses on many models without a parent
+        if ($response instanceof Success and $endpoint->model->many and !$endpoint->model->parent_model_class) {
+            $data_schema = [
+                'allOf' => [
+                    ['type' => 'object', 'properties' => ['id' => ['type' => $endpoint->model->id_type]]],
+                    ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"],
+                ],
+            ];
+        }
+        # Ensure the 'parent_id' and 'id' fields are included for success responses on many models with a parent
+        elseif ($response instanceof Success and $endpoint->model->many and $endpoint->model->parent_model_class) {
+            $parent_type = $endpoint->model->get_parent_model()->id_type;
+            $data_schema = [
+                'allOf' => [
+                    [
+                        'type' => 'object',
+                        'properties' => [
+                            'parent_id' => ['type' => $parent_type],
+                            'id' => ['type' => $endpoint->model->id_type],
+                        ],
+                    ],
+                    ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"],
+                ],
+            ];
+        }
+        # Do not include any extra fields for non many models
+        elseif ($response instanceof Success and !$endpoint->model->many) {
+            $data_schema = ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"];
+        }
+
+        # If this is a many endpoint, nest the data schema in an array
         if ($response instanceof Success and $endpoint->many) {
             $data_schema = [
                 'type' => 'array',
-                'items' => ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"],
-            ];
-        } elseif ($response instanceof Success and !$endpoint->many) {
-            $data_schema = ['$ref' => "#/components/schemas/{$endpoint->model->get_class_shortname()}"];
-        } else {
-            $data_schema = [
-                'oneOf' => [['type' => 'array', 'items' => ['type' => 'object']], ['type' => 'object']],
+                'items' => $data_schema,
             ];
         }
 
