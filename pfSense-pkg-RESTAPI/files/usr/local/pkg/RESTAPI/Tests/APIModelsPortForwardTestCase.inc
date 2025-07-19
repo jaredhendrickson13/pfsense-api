@@ -265,7 +265,7 @@ class APIModelsPortForwardTestCase extends TestCase {
         # Check each disallowed value and ensure it throws an exception during validation
         foreach ($disallowed_values as $value) {
             $this->assert_throws(
-                exceptions: ['ValidationError'],
+                exceptions: ['RESTAPI\Responses\ValidationError'],
                 callable: function () use ($value) {
                     $port_forward = new PortForward(
                         data: [
