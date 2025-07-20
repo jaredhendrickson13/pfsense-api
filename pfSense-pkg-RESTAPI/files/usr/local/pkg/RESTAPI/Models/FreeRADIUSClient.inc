@@ -7,7 +7,6 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
-use RESTAPI\Fields\PortField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
@@ -18,7 +17,6 @@ use RESTAPI\Validators\RegexValidator;
  */
 class FreeRADIUSClient extends Model {
     public StringField $addr;
-    public PortField $port;
     public StringField $type;
     public StringField $ip_version;
     public StringField $description;
