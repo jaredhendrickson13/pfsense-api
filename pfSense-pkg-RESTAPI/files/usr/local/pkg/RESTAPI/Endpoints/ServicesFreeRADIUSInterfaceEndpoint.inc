@@ -12,13 +12,11 @@ use RESTAPI\Core\Endpoint;
  */
 class ServicesFreeRADIUSInterfaceEndpoint extends Endpoint {
     public function __construct() {
-        /**
-         *  Set Endpoint attributes
-         */
+        # Set Endpoint attributes
         $this->url = '/api/v2/services/freeradius/interface';
         $this->model_name = 'FreeRADIUSInterface';
         $this->many = false;
-        $this->request_method_options = ['GET', 'POST', 'DELETE'];
+        $this->request_method_options = ['GET', 'POST', 'PATCH', 'DELETE'];
 
         # Construct the parent Endpoint object
         parent::__construct();
