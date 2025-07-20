@@ -5,17 +5,9 @@ namespace RESTAPI\Models;
 require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Model;
-use RESTAPI\Fields\Base64Field;
-use RESTAPI\Fields\BooleanField;
-use RESTAPI\Fields\ForeignModelField;
-use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\PortField;
-use RESTAPI\Fields\ObjectField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ValidationError;
-use RESTAPI\Responses\ServerError;
-use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\RegexValidator;
 
@@ -26,59 +18,50 @@ class FreeRADIUSInterface extends Model {
     public StringField $addr;
     public PortField $port;
     public StringField $type;
-    public StringField $ipv;
+    public StringField $ip_version;
     public StringField $description;
 
-    /**
-     *
-     */
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
-        #
         # Set model attributes
-        #
         $this->packages = ['pfSense-pkg-freeradius3'];
         $this->package_includes = ['freeradius.inc'];
         $this->config_path = 'installedpackages/freeradiusinterfaces/config';
         $this->many = true;
         $this->always_apply = true;
-        $this->unique_together_fields = ['addr', 'port', 'ipv'];
+        $this->unique_together_fields = ['addr', 'port', 'ip_version'];
 
-        #
         # Set model fields
-        #
         $this->addr = new StringField(
-            internal_name: 'varinterfaceip',
             required: true,
+            internal_name: 'varinterfaceip',
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_keywords: ['*'])],
             help_text: 'The IP address of the listening interface. If you choose * then it means all interfaces.',
         );
         $this->port = new PortField(
-            internal_name: 'varinterfaceport',
             required: false,
+            default: '1812',
             allow_alias: false,
             allow_range: false,
-            default: '1812',
+            internal_name: 'varinterfaceport',
             help_text: 'The port number of the listening interface. Different interface types need different ports.',
         );
-        $this->type = new StringField(
-            internal_name: 'varinterfacetype',
-            required: false,
-            choices: ['auth', 'acct'],
-            default: 'auth',
-            help_text: 'The type of the listening interface: Authentication/Accounting.',
-        );
-        $this->ipv = new StringField(
-            internal_name: 'varinterfaceipversion',
-            choices: ['ipaddr', 'ipv6addr'],
-            allow_empty: true,
+        $this->ip_version = new StringField(
             required: true,
-            conditions: ['addr' => '*'],
+            choices: ['ipaddr', 'ipv6addr'],
+            internal_name: 'varinterfaceipversion',
             help_text: 'The IP version of the listening interface.',
+        );
+        $this->type = new StringField(
+            required: false,
+            default: 'auth',
+            choices: ['auth', 'acct', 'proxy', 'detail', 'status', 'coa'],
+            internal_name: 'varinterfacetype',
+            help_text: 'The type of the listening interface: Authentication/Accounting.',
         );
         $this->description = new StringField(
             required: false,
-            allow_empty: true,
             default: '',
+            allow_empty: true,
             validators: [
                 new RegexValidator(
                     pattern: "/^[a-zA-Z0-9 _,.;:+=()-]*$/",
@@ -92,29 +75,44 @@ class FreeRADIUSInterface extends Model {
     }
 
     /**
+     * Perform extra validation on the Model's 'addr' field.
+     * @param string $value The value to validate.
+     * @returns string The validated value.
+     * @throws ValidationError If the value does not match IP version specified in the 'ip_version' field.
+     */
+    public function validate_addr(string $value): string {
+        # Asterisk (*) is always a valid value for the addr field, so return it without further validation
+        if ($value === '*') {
+            return $value;
+        }
+
+        # Do not allow the value to be an IPv4 address if ip_version is 'ipv6addr'
+        if ($this->addr->has_label('is_ipaddrv4') and $this->ip_version->value === 'ipv6addr') {
+            throw new ValidationError(
+                message: "Field `addr` cannot be an IPv4 address when `ip_version` is set to `ipv6addr`, received `$value`.",
+                response_id: 'FREERADIUS_INTERFACE_ADDR_IPV4_NOT_ALLOWED',
+            );
+        }
+
+        # Do not allow the value to be an IPv6 address if ip_version is 'ipaddr'
+        if ($this->addr->has_label('is_ipaddrv6') and $this->ip_version->value === 'ipaddr') {
+            throw new ValidationError(
+                message: "Field `addr` cannot be an IPv6 address when `ip_version` is set to `ipaddr`, received `$value`.",
+                response_id: 'FREERADIUS_INTERFACE_ADDR_IPV6_NOT_ALLOWED',
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Perform additional validation on the Model's fields and data.
      */
     public function validate_extra(): void {
-        $input_errors = [];
-
-        $iface_addr = $this->addr->value;
-        if ($iface_addr != '*') {
-            if (is_ipaddrv4($iface_addr)) {
-                $this->ipv->value = 'ipaddr';
-            } elseif (is_ipaddrv6($iface_addr)) {
-                $this->ipv->value = 'ipv6addr';
-            } else {
-                // we don't must be here because Model validator for $this->addr
-                $input_errors[] = "Cann't recognize IP-address={$iface_addr}";
-            }
-        }
-
-        # Run service level validations
-        $iface = $this->to_internal();
-        freeradius_validate_interfaces($iface, $input_errors);
-
         # If there were validation errors that were not caught by the model fields, throw a ValidationError.
         # Ideally the Model should catch all validation errors itself so prompt the user to report this error
+        $input_errors = [];
+        freeradius_validate_interfaces($this->to_internal(), $input_errors);
         if (!empty($input_errors)) {
             throw new ValidationError(
                 message: "An unexpected validation error has occurred: $input_errors[0]. Please report this issue at " .
@@ -127,7 +125,7 @@ class FreeRADIUSInterface extends Model {
     /**
      * Apply the action on Interface(s)
      */
-    public function apply() {
+    public function apply(): void {
         freeradius_settings_resync();
     }
 }
