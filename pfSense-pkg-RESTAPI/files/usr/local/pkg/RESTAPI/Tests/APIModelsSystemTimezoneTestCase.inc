@@ -16,7 +16,7 @@ class APIModelsSystemTimezoneTestCase extends TestCase {
 
         # Ensure the timezone was updated correctly
         $zoneinfo = file_get_contents('/var/db/zoneinfo');
-        $this->assert_equals($zoneinfo, 'America/Denver'.PHP_EOL);
+        $this->assert_equals($zoneinfo, 'America/Denver' . PHP_EOL);
 
         # Update the timezone again
         $timezone = new SystemTimezone(timezone: 'UTC');
@@ -24,7 +24,7 @@ class APIModelsSystemTimezoneTestCase extends TestCase {
 
         # Ensure the timezone was updated correctly
         $zoneinfo = file_get_contents('/var/db/zoneinfo');
-        $this->assert_equals($zoneinfo, 'UTC'.PHP_EOL);
+        $this->assert_equals($zoneinfo, 'UTC' . PHP_EOL);
     }
 
     /**
