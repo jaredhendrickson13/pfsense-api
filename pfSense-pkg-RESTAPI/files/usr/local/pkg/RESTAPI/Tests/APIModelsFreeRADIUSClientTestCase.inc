@@ -69,7 +69,7 @@ class APIModelsFreeRADIUSClientTestCase extends TestCase {
         $raddb = file_get_contents('/usr/local/etc/raddb/clients.conf');
         $this->assert_str_does_not_contain($raddb, 'client "testclient" {');
         $this->assert_str_contains($raddb, 'client "newtestclient" {');
-        $this->assert_str_contains($raddb, 'ipaddr = 4321::1');
+        $this->assert_str_contains($raddb, 'ipv6addr = 4321::1');
         $this->assert_str_contains($raddb, 'proto = tcp');
         $this->assert_str_contains($raddb, 'nas_type = cisco');
         $this->assert_str_contains($raddb, 'login = newtestlogin');
