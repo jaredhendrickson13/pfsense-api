@@ -92,7 +92,7 @@ class APIModelsFreeRADIUSClientTestCase extends TestCase {
             response_id: 'FREERADIUS_CLIENT_ADDR_IPV4_NOT_ALLOWED',
             code: 400,
             callable: function () {
-                $client = new FreeRADIUSClient(addr: "1.2.3.4", ip_version: 'ipv6addr');
+                $client = new FreeRADIUSClient(addr: '1.2.3.4', ip_version: 'ipv6addr');
                 $client->addr->validate(); # Validate to so labels are populated
                 $client->validate_addr('1.2.3.4');
             },
@@ -101,7 +101,7 @@ class APIModelsFreeRADIUSClientTestCase extends TestCase {
             response_id: 'FREERADIUS_CLIENT_ADDR_IPV6_NOT_ALLOWED',
             code: 400,
             callable: function () {
-                $client = new FreeRADIUSClient(addr: "1234::1", ip_version: 'ipaddr');
+                $client = new FreeRADIUSClient(addr: '1234::1', ip_version: 'ipaddr');
                 $client->addr->validate(); # Validate to so labels are populated
                 $client->validate_addr('1234::1');
             },
