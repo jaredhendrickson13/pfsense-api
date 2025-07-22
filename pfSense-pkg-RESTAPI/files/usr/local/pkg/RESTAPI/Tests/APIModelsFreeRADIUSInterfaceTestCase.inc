@@ -3,7 +3,6 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\FreeRADIUSfr_interface;
 use RESTAPI\Models\FreeRADIUSInterface;
 
 class APIModelsFreeRADIUSInterfaceTestCase extends TestCase {
