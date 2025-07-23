@@ -15,7 +15,7 @@ class VPNOpenVPNClientExportConfigEndpoint extends Endpoint {
         # Set Endpoint attributes
         $this->url = '/api/v2/vpn/openvpn/client_export/config';
         $this->model_name = 'OpenVPNClientExportConfig';
-        $this->request_method_options = ['GET', 'POST', "PATCH", 'DELETE'];
+        $this->request_method_options = ['GET', 'POST', 'PATCH', 'DELETE'];
         $this->many = false;
 
         # Construct the parent Endpoint object
