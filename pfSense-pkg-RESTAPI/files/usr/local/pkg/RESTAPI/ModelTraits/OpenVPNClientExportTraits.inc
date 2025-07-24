@@ -74,7 +74,7 @@ trait OpenVPNClientExportTraits {
             indicates_true: 'yes',
             indicates_false: '',
             help_text: 'Block access to DNS servers except across OpenVPN while connected, forcing clients to ' .
-            'use only VPN DNS servers.',
+                'use only VPN DNS servers.',
         );
         $this->legacy = new BooleanField(
             default: false,
@@ -92,7 +92,7 @@ trait OpenVPNClientExportTraits {
             default: 'nobind',
             choices: ['nobind', 'lport0', 'bind'],
             help_text: 'The port binding mode to use. If OpenVPN client binds to the default OpenVPN port (1194), ' .
-            'two clients may not run concurrently.',
+                'two clients may not run concurrently.',
         );
         $this->usepkcs11 = new BooleanField(
             default: false,
@@ -134,7 +134,7 @@ trait OpenVPNClientExportTraits {
             default: 'high',
             choices: ['high', 'low', 'legacy'],
             help_text: 'The level of encryption to use when exporting a PKCS#12 archive. Encryption support varies ' .
-            'by Operating System and program',
+                'by Operating System and program',
         );
         $this->useproxy = new BooleanField(
             default: false,
@@ -197,7 +197,7 @@ trait OpenVPNClientExportTraits {
             if (in_array($settings['data_ciphers_fallback'], $legacy_incompatible_ciphers)) {
                 throw new ConflictError(
                     message: 'The Fallback Data Encryption Algorithm for the selected server is not compatible with ' .
-                    'Legacy clients.',
+                        'Legacy clients.',
                     response_id: 'OPENVPN_CLIENT_EXPORT_CONFIG_LEGACY_CIPHER_NOT_COMPATIBLE',
                 );
             }

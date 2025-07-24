@@ -20,7 +20,8 @@ class VPNOpenVPNClientExportEndpoint extends Endpoint {
         $this->many = false;
 
         # Set help texts
-        $this->post_help_text = 'Export an OpenVPN Client configuration. Before using this endpoint, you must define ' .
+        $this->post_help_text =
+            'Export an OpenVPN Client configuration. Before using this endpoint, you must define ' .
             'a default export configuration for your OpenVPN server(s) using the the endpoint at ' .
             '/api/v2/openvpn/vpn/client_export/config as you will need its ID to use this endpoint. ' .
             'Any specific configurations made to this endpoint will override the default configurations, ' .

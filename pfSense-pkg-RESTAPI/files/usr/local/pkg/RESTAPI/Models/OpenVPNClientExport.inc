@@ -13,7 +13,6 @@ use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 
-
 /**
  * Defines a Model that represents an OpenVPN Client Export. This Model is responsible for generating the actual
  * client export files. It does not define or store default client export configurations in the pfSense
@@ -61,9 +60,9 @@ class OpenVPNClientExport extends Model {
                 'inst-x64-previous',
                 'inst-x86-current',
                 'inst-x64-current',
-                'visc'
+                'visc',
             ],
-            help_text: 'The type of OpenVPN client export to generate. This determines the format and content of '.
+            help_text: 'The type of OpenVPN client export to generate. This determines the format and content of ' .
                 'the export file.',
         );
         $this->username = new ForeignModelField(
@@ -72,7 +71,7 @@ class OpenVPNClientExport extends Model {
             default: null,
             allow_null: true,
             help_text: 'The username of the user this client export corresponds to. This is only applicable ' .
-            'for OpenVPN servers that use the Local Database AND client certificates.',
+                'for OpenVPN servers that use the Local Database AND client certificates.',
         );
         $this->certref = new ForeignModelField(
             model_name: 'Certificate',
@@ -123,7 +122,7 @@ class OpenVPNClientExport extends Model {
         }
 
         # Require a username to be set if the server is only using the Local Database for authentication.
-        if ($server_obj->authmode->value === ["Local Database"] and !$this->username->value) {
+        if ($server_obj->authmode->value === ['Local Database'] and !$this->username->value) {
             throw new ValidationError(
                 message: "Field 'username' is required for OpenVPN server mode '{$server_obj->mode->value}' " .
                     "with authentication mode 'Local Database'.",
@@ -141,8 +140,7 @@ class OpenVPNClientExport extends Model {
      * @return string The validated type of OpenVPN client export.
      * @throws ValidationError If the type is not compatible with the 'usetoken' field.
      */
-    public function validate_type(string $type): string
-    {
+    public function validate_type(string $type): string {
         $usetoken_forbidden_types = [
             'confzip',
             'conf_yealink_t28',
@@ -185,7 +183,6 @@ class OpenVPNClientExport extends Model {
             throw new NotFoundError(
                 message: "User '{$this->username->value}' is not assigned a certificate with reference ID '$certref'.",
                 response_id: 'OPENVPN_CLIENT_EXPORT_USER_CERT_NOT_FOUND',
-
             );
         }
 
@@ -194,7 +191,7 @@ class OpenVPNClientExport extends Model {
         if (!$cert_obj->prv->value and (!$this->usepkcs11->value or !$this->usetoken->value)) {
             throw new ValidationError(
                 message: "Certificate with reference ID '$certref' does not have a private key. " .
-                    "Ensure the certificate is valid and has a private key.",
+                    'Ensure the certificate is valid and has a private key.',
                 response_id: 'OPENVPN_CLIENT_EXPORT_CERT_NO_PRIVATE_KEY',
             );
         }
@@ -250,15 +247,15 @@ class OpenVPNClientExport extends Model {
     public function export_config(): string|null {
         return openvpn_client_export_config(
             srvid: $this->server->value,
-            usrid: ($this->username->value) ? $this->username->get_related_model()->id : null,
-            crtid: ($this->certref->value) ? $this->certref->get_related_model()->id : null,
+            usrid: $this->username->value ? $this->username->get_related_model()->id : null,
+            crtid: $this->certref->value ? $this->certref->get_related_model()->id : null,
             useaddr: $this->useaddr_hostname->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
             legacy: $this->legacy->value,
             bindmode: $this->bindmode->value,
             usetoken: $this->usetoken->value,
-            nokeys: $this->server->get_related_model()->mode->value === "server_user",
+            nokeys: $this->server->get_related_model()->mode->value === 'server_user',
             proxy: $this->__get_proxy_config(),
             expformat: str_replace(['conf_', 'conf'], '', $this->type->value),
             outpass: $this->pass->value,
@@ -268,7 +265,7 @@ class OpenVPNClientExport extends Model {
             advancedoptions: $this->advancedoptions->value,
             usepkcs11: $this->usepkcs11->value,
             pkcs11providers: $this->pkcs11providers->value,
-            pkcs11id: $this->pkcs11id->value
+            pkcs11id: $this->pkcs11id->value,
         );
     }
 
@@ -280,8 +277,8 @@ class OpenVPNClientExport extends Model {
     public function export_installer(): string|null {
         return openvpn_client_export_installer(
             srvid: $this->server->value,
-            usrid: ($this->username->value) ? $this->username->get_related_model()->id : null,
-            crtid: ($this->certref->value) ? $this->certref->get_related_model()->id : null,
+            usrid: $this->username->value ? $this->username->get_related_model()->id : null,
+            crtid: $this->certref->value ? $this->certref->get_related_model()->id : null,
             useaddr: $this->useaddr_hostnam->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
@@ -308,8 +305,8 @@ class OpenVPNClientExport extends Model {
     public function export_viscosity(): string|null {
         return viscosity_openvpn_client_config_exporter(
             srvid: $this->server->value,
-            usrid: ($this->username->value) ? $this->username->get_related_model()->id : null,
-            crtid: ($this->certref->value) ? $this->certref->get_related_model()->id : null,
+            usrid: $this->username->value ? $this->username->get_related_model()->id : null,
+            crtid: $this->certref->value ? $this->certref->get_related_model()->id : null,
             useaddr: $this->useaddr_hostname->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
@@ -332,12 +329,12 @@ class OpenVPNClientExport extends Model {
      */
     private function __get_proxy_config(): array {
         return [
-            "ip" => $this->proxyaddr->value,
-            "port" => $this->proxyport->value,
-            "user" => $this->proxyuser->value,
-            "password" => $this->proxypass->value,
-            "proxy_type" => $this->useproxytype->value,
-            "proxy_authtype" => $this->useproxypass->value,
+            'ip' => $this->proxyaddr->value,
+            'port' => $this->proxyport->value,
+            'user' => $this->proxyuser->value,
+            'password' => $this->proxypass->value,
+            'proxy_type' => $this->useproxytype->value,
+            'proxy_authtype' => $this->useproxypass->value,
         ];
     }
 
@@ -349,41 +346,41 @@ class OpenVPNClientExport extends Model {
         # Obtain the filename prefix
         $filename_prefix = openvpn_client_export_prefix(
             srvid: $this->server->value,
-            usrid: ($this->username->value) ? $this->username->get_related_model()->id : null,
-            crtid: ($this->certref->value) ? $this->certref->get_related_model()->id : null,
+            usrid: $this->username->value ? $this->username->get_related_model()->id : null,
+            crtid: $this->certref->value ? $this->certref->get_related_model()->id : null,
         );
 
         # Determine the conf file suffix based on the export type
-        if (str_starts_with($this->type->value, "conf")) {
+        if (str_starts_with($this->type->value, 'conf')) {
             $filename_suffix = match ($this->type->value) {
-                "confzip" => "-config.zip",
-                "conf_yealink_t38g", "conf_yealink_t28", "conf_yealink_t38g2" => "client.tar",
-                "conf_snom" => "vpnclient.tar",
-                "confinlinedroid" => "-android-config.ovpn",
-                "confinlineconnect" => "-connect-config.ovpn",
-                "confinlinevisc" => "-viscosity-config.ovpn",
-                default => "-config.ovpn",
+                'confzip' => '-config.zip',
+                'conf_yealink_t38g', 'conf_yealink_t28', 'conf_yealink_t38g2' => 'client.tar',
+                'conf_snom' => 'vpnclient.tar',
+                'confinlinedroid' => '-android-config.ovpn',
+                'confinlineconnect' => '-connect-config.ovpn',
+                'confinlinevisc' => '-viscosity-config.ovpn',
+                default => '-config.ovpn',
             };
         }
         # Determine the installer file suffix based on the export type
-        elseif (str_starts_with($this->type->value, "inst-")) {
+        elseif (str_starts_with($this->type->value, 'inst-')) {
             $filename_suffix = match ($this->type->value) {
-                "inst-Win7" => "$legacy_openvpn_version}-I$legacy_openvpn_version_rev-Win7.exe",
-                "inst-Win10" => "$legacy_openvpn_version-I$legacy_openvpn_version_rev-Win10.exe",
-                "inst-x86-previous" => "$previous_openvpn_version-I$previous_openvpn_version_rev-x86.exe",
-                "inst-x64-previous" => "$previous_openvpn_version-I$previous_openvpn_version_rev-amd64.exe",
-                "inst-x86-current" => "$current_openvpn_version-I$current_openvpn_version_rev-x86.exe",
-                default => "$current_openvpn_version-I$current_openvpn_version_rev-amd64.exe"
+                'inst-Win7' => "$legacy_openvpn_version}-I$legacy_openvpn_version_rev-Win7.exe",
+                'inst-Win10' => "$legacy_openvpn_version-I$legacy_openvpn_version_rev-Win10.exe",
+                'inst-x86-previous' => "$previous_openvpn_version-I$previous_openvpn_version_rev-x86.exe",
+                'inst-x64-previous' => "$previous_openvpn_version-I$previous_openvpn_version_rev-amd64.exe",
+                'inst-x86-current' => "$current_openvpn_version-I$current_openvpn_version_rev-x86.exe",
+                default => "$current_openvpn_version-I$current_openvpn_version_rev-amd64.exe",
             };
         }
         # If the type is not recognized, throw an error
         else {
             throw new ServerError(
-                message: "Could not determine appropriate file name.",
+                message: 'Could not determine appropriate file name.',
                 response_id: 'OPENVPN_CLIENT_EXPORT_FILENAME_NOT_DETERMINED',
             );
         }
 
-        return urlencode($filename_prefix.$filename_suffix);
+        return urlencode($filename_prefix . $filename_suffix);
     }
 }

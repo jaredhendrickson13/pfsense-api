@@ -7,7 +7,6 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI\Core\Model;
 use RESTAPI\ModelTraits\OpenVPNClientExportTraits;
 
-
 /**
  * Defines a Model that represents an OpenVPN Client Export default config for specific OpenVPN servers.
  */
