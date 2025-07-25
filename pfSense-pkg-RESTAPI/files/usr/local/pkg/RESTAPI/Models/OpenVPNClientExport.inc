@@ -8,6 +8,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\ModelTraits\OpenVPNClientExportTraits;
+use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\NotAcceptableError;
 use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
@@ -29,6 +30,18 @@ class OpenVPNClientExport extends Model {
     public ForeignModelField $username;
     public StringField $filename;
     public StringField $binary_data;
+
+    const USETOKEN_FORBIDDEN_TYPES = [
+        'confzip',
+        'conf_yealink_t28',
+        'conf_yealink_t38g',
+        'conf_yealink_t38g2',
+        'conf_snom',
+        'confinline',
+        'confinlinedroid',
+        'confinlineconnect',
+        'confinlinevisc',
+    ];
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
@@ -104,12 +117,12 @@ class OpenVPNClientExport extends Model {
     /**
      * Performs extra validation on the server field. This is primarily intended to ensure that the requested
      * export parameters are compatible with the OpenVPN server settings.
-     * @param string $server The OpenVPN server ID to validate.
-     * @return string The validated OpenVPN server ID.
+     * @param int $server The OpenVPN server ID to validate.
+     * @return int The validated OpenVPN server ID.
      * @throws ValidationError If the server mode requires a certificate reference but none is provided,
      * @throws ValidationError If the server mode requires a username but none is provided.
      */
-    public function validate_server(string $server): string {
+    public function validate_server(int $server): int {
         # Obtain the server object
         $server_obj = $this->server->get_related_model();
 
@@ -141,21 +154,9 @@ class OpenVPNClientExport extends Model {
      * @throws ValidationError If the type is not compatible with the 'usetoken' field.
      */
     public function validate_type(string $type): string {
-        $usetoken_forbidden_types = [
-            'confzip',
-            'conf_yealink_t28',
-            'conf_yealink_t38g',
-            'conf_yealink_t38g2',
-            'conf_snom',
-            'confinline',
-            'confinlinedroid',
-            'confinlineconnect',
-            'confinlinevisc',
-        ];
-
         # Do not allow confinline types to have 'usetoken' enabled
-        if (in_array($type, $usetoken_forbidden_types) and $this->usetoken->value) {
-            throw new ValidationError(
+        if (in_array($type, self::USETOKEN_FORBIDDEN_TYPES) and $this->usetoken->value) {
+            throw new ConflictError(
                 message: "Field 'usetoken' cannot be enabled for OpenVPN client export type '$type'.",
                 response_id: 'OPENVPN_CLIENT_EXPORT_TYPE_USETOKEN_NOT_ALLOWED',
             );
@@ -204,8 +205,8 @@ class OpenVPNClientExport extends Model {
      * @throws ServerError If the export fails for an unknown reason
      */
     protected function _create(): void {
-        global $legacy_incompatible_ciphers;
-        $legacy_incompatible_ciphers = $legacy_incompatible_ciphers ?? [];
+        global $input_errors;
+
         # Generate a the file export based on the export type
         $export_data = null;
         if (str_starts_with($this->type->value, 'conf')) {
@@ -218,11 +219,19 @@ class OpenVPNClientExport extends Model {
             $export_data = $this->export_viscosity();
         }
 
+        # If import errors were found during the export, raise an error
+        if ($input_errors) {
+            throw new ServerError(
+                message: "The OpenVPN client export failed for the following reason: $input_errors[0]",
+                response_id: 'OPENVPN_CLIENT_EXPORT_CREATION_FAILED_FOR_KNOWN_REASON',
+            );
+        }
+
         # If no valid filepath was given after generating, we know the export failed. Throw an error.
         if (!$export_data) {
             throw new ServerError(
                 message: 'The OpenVPN client export could not be created for unknown reasons.',
-                response_id: 'OPENVPN_CLIENT_EXPORT_CREATION_FAILED',
+                response_id: 'OPENVPN_CLIENT_EXPORT_CREATION_FAILED_FOR_UNKNOWN_REASON',
             );
         }
 
@@ -275,6 +284,10 @@ class OpenVPNClientExport extends Model {
      * export failed.
      */
     public function export_installer(): string|null {
+        # Ensure legacy incompatible ciphers are always an array
+        global $legacy_incompatible_ciphers;
+        $legacy_incompatible_ciphers = $legacy_incompatible_ciphers ?? [];
+
         return openvpn_client_export_installer(
             srvid: $this->server->value,
             usrid: $this->username->value ? $this->username->get_related_model()->id : null,
