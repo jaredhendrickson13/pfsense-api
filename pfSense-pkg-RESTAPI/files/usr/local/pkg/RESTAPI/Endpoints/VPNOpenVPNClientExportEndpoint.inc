@@ -21,11 +21,14 @@ class VPNOpenVPNClientExportEndpoint extends Endpoint {
 
         # Set help texts
         $this->post_help_text =
-            'Export an OpenVPN Client configuration. Before using this endpoint, you must define ' .
-            'a default export configuration for your OpenVPN server(s) using the the endpoint at ' .
-            '/api/v2/openvpn/vpn/client_export/config as you will need its ID to use this endpoint. ' .
-            'Any specific configurations made to this endpoint will override the default configurations, ' .
-            'but will not store them in the pfSense configuration.';
+            "Export an OpenVPN Client configuration.\n\n" .
+            'Before using this endpoint, you must define a default export configuration for your ' .
+            'OpenVPN server(s) using the the endpoint at /api/v2/openvpn/vpn/client_export/config ' .
+            'as you will need its ID to use this endpoint. Any specific configurations made to this ' .
+            'endpoint will override the default configurations, but will not store them in the pfSense ' .
+            "configuration.\n\n" .
+            "Exports of exe, zip and other binary file types MUST use the 'application/octet-stream' accept " .
+            'type as their data is not serializable.';
 
         # Construct the parent Endpoint object
         parent::__construct();
