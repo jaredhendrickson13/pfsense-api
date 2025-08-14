@@ -18,7 +18,7 @@ class HAProxyFrontendErrorFile extends Model {
         # Set model attributes
         $this->parent_model_class = 'HAProxyFrontend';
         $this->config_path = 'a_errorfiles/item';
-        $this->packages = ['pfSense-pkg-haproxy'];
+        $this->packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
         $this->package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
         $this->many = true;
 

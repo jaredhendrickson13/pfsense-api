@@ -17,7 +17,7 @@ class HAProxyApply extends Model {
         $this->internal_callable = 'get_applied_status';
         $this->always_apply = true;
         $this->many = false;
-        $this->packages = ['pfSense-pkg-haproxy'];
+        $this->packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
         $this->package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
 
         # Set model fields

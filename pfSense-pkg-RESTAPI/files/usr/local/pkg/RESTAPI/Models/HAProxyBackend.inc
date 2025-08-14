@@ -80,7 +80,7 @@ class HAProxyBackend extends Model {
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], ...$options) {
         # Set model attributes
         $this->config_path = 'installedpackages/haproxy/ha_pools/item';
-        $this->packages = ['pfSense-pkg-haproxy'];
+        $this->packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
         $this->package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
         $this->many = true;
 

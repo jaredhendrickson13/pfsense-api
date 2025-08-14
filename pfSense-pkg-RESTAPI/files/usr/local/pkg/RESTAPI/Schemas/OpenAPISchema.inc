@@ -132,7 +132,18 @@ class OpenAPISchema extends Schema {
                 $endpoint_type = $endpoint->many ? 'Plural' : 'Singular';
                 $parent_model_class = $model->parent_model_class ?: 'None';
                 $priv_options_str = implode(', ', $endpoint->$privilege_property);
-                $required_packages_str = $model->packages ? implode(', ', $model->packages) : 'None';
+                # Handle nested package arrays for alternative package requirements
+                $packages_for_display = [];
+                if ($model->packages) {
+                    foreach ($model->packages as $pkg) {
+                        if (is_array($pkg)) {
+                            $packages_for_display[] = '(' . implode(' OR ', $pkg) . ')';
+                        } else {
+                            $packages_for_display[] = $pkg;
+                        }
+                    }
+                }
+                $required_packages_str = $packages_for_display ? implode(', ', $packages_for_display) : 'None';
                 $requires_auth_str = $endpoint->requires_auth ? 'Yes' : 'No';
                 $auth_method_str = implode(', ', $endpoint->auth_methods ?: $auth_classes_short);
                 $cache_class = $model->cache_class ?: 'None';

@@ -15,7 +15,7 @@ class APIModelsHAProxyFrontendTestCase extends TestCase {
     private HAProxyBackend $backend;
     private Certificate $main_crt;
     private Certificate $alt_crt;
-    public array $required_packages = ['pfSense-pkg-haproxy'];
+    public array $required_packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
 
     /**
      * Setup the test case.
