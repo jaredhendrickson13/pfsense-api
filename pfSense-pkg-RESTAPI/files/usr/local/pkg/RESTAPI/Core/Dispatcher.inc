@@ -121,12 +121,30 @@ class Dispatcher {
     private function check_required_packages(): void {
         # Loop through each required package and ensure it is present on the system.
         foreach ($this->required_packages as $pkg) {
-            # Return an error if the package is not installed
-            if (!is_pkg_installed($pkg)) {
-                throw new FailedDependencyError(
-                    message: "The requested action requires the '$pkg' package but it is not installed.",
-                    response_id: 'DISPATCHER_MISSING_REQUIRED_PACKAGE',
-                );
+            # Handle array of alternative packages (any one must be installed)
+            if (is_array($pkg)) {
+                $any_installed = false;
+                foreach ($pkg as $alternative_pkg) {
+                    if (is_pkg_installed($alternative_pkg)) {
+                        $any_installed = true;
+                        break;
+                    }
+                }
+                if (!$any_installed) {
+                    $pkg_list = implode("' or '", $pkg);
+                    throw new FailedDependencyError(
+                        message: "The requested action requires one of the following packages: '$pkg_list', but none are installed.",
+                        response_id: 'DISPATCHER_MISSING_REQUIRED_PACKAGE',
+                    );
+                }
+            } else {
+                # Single package requirement
+                if (!is_pkg_installed($pkg)) {
+                    throw new FailedDependencyError(
+                        message: "The requested action requires the '$pkg' package but it is not installed.",
+                        response_id: 'DISPATCHER_MISSING_REQUIRED_PACKAGE',
+                    );
+                }
             }
         }
 

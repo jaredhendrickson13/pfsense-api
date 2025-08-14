@@ -7,7 +7,7 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\HAProxySettings;
 
 class APIModelsHAProxySettingsTestCase extends TestCase {
-    public array $required_packages = ['pfSense-pkg-haproxy'];
+    public array $required_packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
 
     /**
      * Checks that the `enable` field correctly controls the HAProxy service's enablement.

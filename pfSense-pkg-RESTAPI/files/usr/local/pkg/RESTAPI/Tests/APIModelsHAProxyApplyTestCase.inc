@@ -7,7 +7,7 @@ use RESTAPI\Models\HAProxyApply;
 use RESTAPI\Models\HAProxySettings;
 
 class APIModelsHAProxyApplyTestCase extends TestCase {
-    public array $required_packages = ['pfSense-pkg-haproxy'];
+    public array $required_packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
 
     /**
      * Checks that the `applied` field correctly indicates whether HAProxy has pending configuration chagnes.

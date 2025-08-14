@@ -23,7 +23,7 @@ class HAProxyBackendACL extends Model {
         $this->parent_model_class = 'HAProxyBackend';
         $this->config_path = 'a_acl/item';
         $this->verbose_name = 'HAProxy Backend Access Control List';
-        $this->packages = ['pfSense-pkg-haproxy'];
+        $this->packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
         $this->package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
         $this->many = true;
 

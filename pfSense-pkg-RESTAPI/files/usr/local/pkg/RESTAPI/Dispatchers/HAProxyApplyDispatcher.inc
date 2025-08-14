@@ -10,7 +10,7 @@ use RESTAPI\Core\Dispatcher;
  * Defines a Dispatcher for applying changes to the HAProxy settings.
  */
 class HAProxyApplyDispatcher extends Dispatcher {
-    protected array $required_packages = ['pfSense-pkg-haproxy'];
+    protected array $required_packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
     protected array $package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
 
     /**

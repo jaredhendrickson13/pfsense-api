@@ -50,7 +50,7 @@ class HAProxySettings extends Model {
         # Set model attributes
         $this->config_path = 'installedpackages/haproxy';
         $this->many = false;
-        $this->packages = ['pfSense-pkg-haproxy'];
+        $this->packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
         $this->package_includes = ['haproxy/haproxy.inc', 'haproxy/haproxy_utils.inc'];
 
         # Set model fields

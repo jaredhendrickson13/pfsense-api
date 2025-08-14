@@ -8,7 +8,7 @@ use RESTAPI\Models\HAProxyBackendACL;
 use RESTAPI\Models\HAProxyBackendAction;
 
 class APIModelsHAProxyBackendTestCase extends TestCase {
-    public array $required_packages = ['pfSense-pkg-haproxy'];
+    public array $required_packages = [['pfSense-pkg-haproxy', 'pfSense-pkg-haproxy-devel']];
 
     /**
      * Ensure that the HAProxyBackend model can be created, updated, and deleted.
