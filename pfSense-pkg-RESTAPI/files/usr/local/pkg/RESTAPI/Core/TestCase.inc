@@ -99,7 +99,18 @@ class TestCase {
      */
     public function install_packages(): void {
         foreach ($this->required_packages as $package) {
-            new Command("pkg install -y $package");
+            # Handle array of alternative packages (try installing any one)
+            if (is_array($package)) {
+                foreach ($package as $alternative_pkg) {
+                    $result = new Command("pkg install -y $alternative_pkg");
+                    if ($result->result_code === 0) {
+                        break; # Successfully installed, move to next package group
+                    }
+                }
+            } else {
+                # Single package requirement
+                new Command("pkg install -y $package");
+            }
             Model::reload_config(true);
         }
     }
