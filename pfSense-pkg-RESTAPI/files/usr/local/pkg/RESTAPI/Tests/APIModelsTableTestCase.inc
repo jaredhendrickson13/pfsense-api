@@ -56,6 +56,7 @@ class APIModelsTableTestCase extends TestCase {
     public function test_delete(): void {
         # Create a new pf table to test with
         new Command('/sbin/pfctl -t pfrest_test_table -T add 1.2.3.4 4.3.2.1');
+        sleep(1);
 
         # Load the Table model
         $table = new Table(id: 'pfrest_test_table');
