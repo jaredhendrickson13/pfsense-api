@@ -795,8 +795,9 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             async: false,
         );
         $rule->create(apply: true);
+        sleep(3); // Wait a bit to ensure device is not busy
 
-        # Check pfctl rules and ensure the dnpipe is correctly represented
+        # Ensure the dnpipe is correctly represented
         $pfctl = new Command('pfctl -sr');
         $this->assert_str_contains(
             $pfctl->output,
@@ -842,6 +843,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             async: false,
         );
         $rule->create(apply: true);
+        sleep(3); // Wait a bit to ensure device is not busy
 
         # Check pfctl rules and ensure the dnpipe is correctly represented
         $pfctl = new Command('pfctl -sr');
@@ -892,6 +894,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             async: false,
         );
         $rule->create(apply: true);
+        sleep(3); // Wait a bit to ensure device is not busy
 
         # Check pfctl rules and ensure the dnpipe is correctly represented
         $pfctl = new Command('pfctl -sr');
