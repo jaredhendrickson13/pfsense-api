@@ -19,7 +19,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
      */
     public function read_pfctl_rules(): Command {
         # Keywords that indicate pf is not ready yet
-        $not_ready_keywords = ['pfctl: DIOCGETRULE: Device busy'];
+        $not_ready_keywords = ['pfctl: DIOCGETRULE: Device busy', 'pfctl: DIOCGETRULENV: Device busy'];
 
         # Check the pf ruleset until it appears to be fully loaded, or until we've tried 5 times
         $attempt = 0;
