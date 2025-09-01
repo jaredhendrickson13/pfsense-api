@@ -22,7 +22,7 @@ jobs:
             pfsense_version: 24.03
         
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup FreeBSD build VM
         run: |
           /usr/local/bin/VBoxManage controlvm ${{ matrix.freebsd_version }} poweroff || true
