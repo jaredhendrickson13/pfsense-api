@@ -59,7 +59,7 @@ jobs:
             FREEBSD_ID: freebsd15
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
@@ -107,7 +107,7 @@ jobs:
             FREEBSD_ID: freebsd15
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: openapi-${{ matrix.PFSENSE_VERSION }}.json
           path: openapi-${{ matrix.PFSENSE_VERSION }}.json
@@ -136,7 +136,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
