@@ -7,14 +7,41 @@ use RESTAPI\Core\TestCase;
 use RESTAPI\Models\CARP;
 use RESTAPI\Models\Table;
 use RESTAPI\Models\VirtualIP;
+use RESTAPI\Responses\ServerError;
 
 class APIModelsTableTestCase extends TestCase {
     /**
-     * Checks that we can successful retrieve the list of available table names.
+     * Adds a new table using pfctl directly and waits until it is readable.
+     * @param string $table_name The name of the table to add.
+     * @param array $entries The entries to add to the table.
+     * @return Command The Command object representing the result of pfctl command.
+     */
+    public function add_table(string $table_name, array $entries): Command {
+        $entries_str = implode(' ', $entries);
+        $add_cmd = new Command("/sbin/pfctl -t $table_name -T add $entries_str");
+
+        # Wait until the table is readable by pfctl
+        foreach (range(1, 5) as $i) {
+            $show_cmd = new Command("/sbin/pfctl -t $table_name -T show");
+            if (str_contains($show_cmd->output, $entries[0])) {
+                return $add_cmd;
+            }
+            sleep(1);
+        }
+
+        throw new ServerError(
+            message: "Failed to add table $table_name with entries",
+            response_id: "API_MODELS_TABLE_TEST_CASE_ADD_TABLE_FAILED"
+        );
+
+    }
+
+    /**
+     * Checks that we can successfully retrieve the list of available table names.
      */
     public function test_get_available_table_names(): void {
         # Create a new pf table to test with
-        new Command('/sbin/pfctl -t pfrest_test_table -T add 1.2.3.4');
+        $this->add_table(table_name: "pfrest_test_table", entries: ["1.2.3.4"]);
 
         # Ensure get_available_table_names returns the test table
         $table = new Table();
@@ -38,7 +65,7 @@ class APIModelsTableTestCase extends TestCase {
      */
     public function test_read(): void {
         # Create a new pf table to test with
-        new Command('/sbin/pfctl -t pfrest_test_table -T add 1.2.3.4 4.3.2.1');
+        $this->add_table(table_name: "pfrest_test_table", entries: ["1.2.3.4", "4.3.2.1"]);
 
         # Load the Table model
         $table = new Table(id: 'pfrest_test_table');
@@ -55,7 +82,7 @@ class APIModelsTableTestCase extends TestCase {
      */
     public function test_delete(): void {
         # Create a new pf table to test with
-        new Command('/sbin/pfctl -t pfrest_test_table -T add 1.2.3.4 4.3.2.1');
+        $this->add_table(table_name: "pfrest_test_table", entries: ["1.2.3.4", "4.3.2.1"]);
         sleep(1);
 
         # Load the Table model
