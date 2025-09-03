@@ -31,9 +31,8 @@ class APIModelsTableTestCase extends TestCase {
 
         throw new ServerError(
             message: "Failed to add table $table_name with entries",
-            response_id: "API_MODELS_TABLE_TEST_CASE_ADD_TABLE_FAILED"
+            response_id: 'API_MODELS_TABLE_TEST_CASE_ADD_TABLE_FAILED',
         );
-
     }
 
     /**
@@ -41,7 +40,7 @@ class APIModelsTableTestCase extends TestCase {
      */
     public function test_get_available_table_names(): void {
         # Create a new pf table to test with
-        $this->add_table(table_name: "pfrest_test_table", entries: ["1.2.3.4"]);
+        $this->add_table(table_name: 'pfrest_test_table', entries: ['1.2.3.4']);
 
         # Ensure get_available_table_names returns the test table
         $table = new Table();
@@ -65,7 +64,7 @@ class APIModelsTableTestCase extends TestCase {
      */
     public function test_read(): void {
         # Create a new pf table to test with
-        $this->add_table(table_name: "pfrest_test_table", entries: ["1.2.3.4", "4.3.2.1"]);
+        $this->add_table(table_name: 'pfrest_test_table', entries: ['1.2.3.4', '4.3.2.1']);
 
         # Load the Table model
         $table = new Table(id: 'pfrest_test_table');
@@ -82,7 +81,7 @@ class APIModelsTableTestCase extends TestCase {
      */
     public function test_delete(): void {
         # Create a new pf table to test with
-        $this->add_table(table_name: "pfrest_test_table", entries: ["1.2.3.4", "4.3.2.1"]);
+        $this->add_table(table_name: 'pfrest_test_table', entries: ['1.2.3.4', '4.3.2.1']);
         sleep(1);
 
         # Load the Table model
