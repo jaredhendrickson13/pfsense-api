@@ -32,7 +32,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
 
             foreach ($not_ready_keywords as $kw) {
                 # pf is not ready if any of the keywords are found in the output
-                if (str_contains($cmd->output, $kw) or ($needle and !str_contains($cmd->output, $needle))) {
+                if (str_contains($cmd->output, $kw) or $needle and !str_contains($cmd->output, $needle)) {
                     $ready = false;
                     $attempt++;
                     sleep(1);
