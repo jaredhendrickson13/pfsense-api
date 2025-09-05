@@ -25,7 +25,7 @@ jobs:
             FREEBSD_ID: freebsd15
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup FreeBSD build VM
         run: |
           /usr/local/bin/VBoxManage controlvm ${{ matrix.FREEBSD_VERSION }} poweroff || true
@@ -60,8 +60,8 @@ jobs:
           - PFSENSE_VERSION: pfSense-2.8.1-RELEASE
             FREEBSD_ID: freebsd15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
         with:
           name: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
@@ -110,8 +110,8 @@ jobs:
           - PFSENSE_VERSION: pfSense-2.8.1-RELEASE
             FREEBSD_ID: freebsd15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
         with:
           name: openapi-${{ matrix.PFSENSE_VERSION }}.json
           path: openapi-${{ matrix.PFSENSE_VERSION }}.json
@@ -140,9 +140,9 @@ jobs:
             FREEBSD_ID: freebsd15
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg

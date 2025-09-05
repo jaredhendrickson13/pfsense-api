@@ -44,7 +44,7 @@ class LengthValidator extends RESTAPI\Core\Validator {
                 );
             }
             # Throw an error if the string contains more characters than the specified maximum
-            if (strlen($value) > $this->maximum) {
+            if ($this->maximum and strlen($value) > $this->maximum) {
                 throw new ValidationError(
                     message: "Field '$field_name' exceeds the maximum character length of $this->maximum.",
                     response_id: 'LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT',
@@ -61,7 +61,7 @@ class LengthValidator extends RESTAPI\Core\Validator {
                 );
             }
             # Throw an error if the array contains more array entries than the specified maximum
-            if (count($value) > $this->maximum) {
+            if ($this->maximum and count($value) > $this->maximum) {
                 throw new ValidationError(
                     message: "Field '$field_name' exceeds the maximum array length of $this->maximum.",
                     response_id: 'LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT',

@@ -49,6 +49,7 @@ class FirewallAlias extends Model {
             default: [],
             allow_empty: true,
             many: true,
+            many_maximum: 0, // Do not enforce a maximum number of entries
             delimiter: ' ',
             help_text: "Sets the host, network or port entries for the alias. When `type` is set to `host`, each
                 entry must be a valid IP address or FQDN. When `type` is set to `network`, each entry must be a valid
@@ -59,6 +60,7 @@ class FirewallAlias extends Model {
             default: [],
             allow_empty: true,
             many: true,
+            many_maximum: 0, // Do not enforce a maximum number of entries
             delimiter: '||',
             help_text: "Sets descriptions for each alias `address`. Values must match the order of the `address` 
                 value it relates to. For example, the first value specified here is the description for the first

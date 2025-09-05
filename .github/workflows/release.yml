@@ -38,7 +38,7 @@ jobs:
             PFSENSE_VERSION: "25.07.1"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup FreeBSD build VM
         run: |
@@ -72,9 +72,9 @@ jobs:
     runs-on: self-hosted
     needs: [release_pkg]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg
           path: pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg
@@ -129,7 +129,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Pages
         uses: actions/configure-pages@v5.0.0
@@ -149,13 +149,13 @@ jobs:
           mv ./site/* ./www/
 
       - name: Download OpenAPI schema
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: openapi.json
           path: openapi.json
 
       - name: Download GraphQL schema
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: schema.graphql
           path: schema.graphql
@@ -201,7 +201,7 @@ jobs:
           mv ./.phpdoc/build/* ./www/php-docs/
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3.0.1
+        uses: actions/upload-pages-artifact@v4.0.0
         with:
           path: "./www"
 
