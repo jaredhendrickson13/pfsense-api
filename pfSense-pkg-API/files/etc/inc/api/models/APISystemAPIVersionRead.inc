@@ -73,7 +73,7 @@ class APISystemAPIVersionRead extends APIModel {
         # Variables
         $releases_file = "/usr/local/share/pfSense-pkg-API/releases.json";
         $releases = json_decode(file_get_contents($releases_file), true);
-        $fetch_releases_cmd = "curl -s https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases -m 10";
+        $fetch_releases_cmd = "curl -sL https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases -m 10";
 
         # Check if our previous releases data is older than 120 seconds
         if ($releases["last_updated"] + 120 < time()) {
