@@ -41,6 +41,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
 
             # If pfctl is ready and either no needle was specified or the needle was found, return the output
             if ($ready and (!$needle or str_contains($cmd->output, $needle))) {
+                sleep(1);
                 return $cmd;
             }
 
@@ -516,6 +517,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             scheduler: 'FAIRQ',
             bandwidth: 100,
             bandwidthtype: 'Mb',
+            async: false,
             queue: [
                 [
                     'name' => 'TestQueue1',
@@ -550,13 +552,13 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Ensure the rule with the queue is seen in pfctl
-        $pfctl = $this->read_pfctl_rules();
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains($pfctl->output, 'ridentifier ' . $rule->tracker->value . ' queue TestQueue1');
 
         # Update the rule to use a different queue and ensure it is seen in pfctl
         $rule->defaultqueue->value = 'TestQueue2';
         $rule->update(apply: true);
-        $pfctl = $this->read_pfctl_rules();
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains($pfctl->output, 'ridentifier ' . $rule->tracker->value . ' queue TestQueue2');
 
         # Delete the rule and ensure the rule referencing the queue no longer exists
@@ -584,6 +586,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             scheduler: 'FAIRQ',
             bandwidth: 100,
             bandwidthtype: 'Mb',
+            async: false,
             queue: [
                 [
                     'name' => 'TestQueue1',
@@ -619,7 +622,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Ensure the rule with the queue is seen in pfctl
-        $pfctl = $this->read_pfctl_rules();
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains(
             $pfctl->output,
             'ridentifier ' . $rule->tracker->value . ' queue(TestQueue1, TestQueue2)',
@@ -886,7 +889,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Check pfctl rules and ensure the dnpipe is correctly represented
-        $pfctl = $this->read_pfctl_rules();
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains(
             $pfctl->output,
             "ridentifier {$rule->tracker->value} dnqueue {$queue->number->value}",
@@ -936,7 +939,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Check pfctl rules and ensure the dnpipe is correctly represented
-        $pfctl = $this->read_pfctl_rules();
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains(
             $pfctl->output,
             "ridentifier {$rule->tracker->value} dnpipe({$limiter1->number->value}, {$limiter2->number->value})",
