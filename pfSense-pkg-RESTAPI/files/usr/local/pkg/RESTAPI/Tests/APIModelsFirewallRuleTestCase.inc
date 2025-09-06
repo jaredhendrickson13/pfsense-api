@@ -15,9 +15,12 @@ use RESTAPI\Responses\ServerError;
 
 class APIModelsFirewallRuleTestCase extends TestCase {
     /**
-     * Reads the active ruleset directly from pfctl.
+     * Reads the active ruleset directly from pfctl. If pfctl is not ready, it will retry up to 5 times before
+     * throwing an error.
+     * @param string|null $needle Optional string to search for in the output before returning
+     * @return Command The Command object containing the pfctl output
      */
-    public function read_pfctl_rules(): Command {
+    public function read_pfctl_rules(?string $needle = null): Command {
         # Keywords that indicate pf is not ready yet
         $not_ready_keywords = ['pfctl: DIOCGETRULE: Device busy', 'pfctl: DIOCGETRULENV: Device busy'];
 
@@ -32,15 +35,18 @@ class APIModelsFirewallRuleTestCase extends TestCase {
                 # pf is not ready if any of the keywords are found in the output
                 if (str_contains($cmd->output, $keyword)) {
                     $ready = false;
-                    $attempt++;
-                    sleep(1);
                     break;
                 }
             }
 
-            if ($ready) {
+            # If pfctl is ready and either no needle was specified or the needle was found, return the output
+            if ($ready and (!$needle or str_contains($cmd->output, $needle))) {
                 return $cmd;
             }
+
+            # Otherwise, wait a second and try again
+            sleep(1);
+            $attempt++;
         }
 
         throw new ServerError(
@@ -833,7 +839,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Ensure the dnpipe is correctly represented
-        $pfctl = $this->read_pfctl_rules();
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains(
             $pfctl->output,
             "ridentifier {$rule->tracker->value} dnpipe {$limiter->number->value}",
