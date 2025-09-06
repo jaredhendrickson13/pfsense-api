@@ -108,6 +108,11 @@ The `tag` property is used to define the [OpenAPI tag](https://swagger.io/docs/s
 for the endpoint. This is used to group related endpoints together in the API documentation. This property is optional 
 and defaults to the first section of the URL after the `/api/v2/` prefix.
 
+### deprecated
+
+The `deprecated` property is used to indicate if the endpoint is deprecated. This property defaults to `false`. When set
+to `true`, the endpoint will be marked as deprecated in applicable documentation and schemas.
+
 ### requires_auth
 
 The `requires_auth` property is used to specify whether the endpoint requires authentication and authorization. This property

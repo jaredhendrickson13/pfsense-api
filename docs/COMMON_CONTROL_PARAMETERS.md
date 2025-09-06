@@ -1,8 +1,12 @@
 # Common Control Parameters
 
 The API utilizes a set of common parameters to control certain behaviors of API calls. These parameters are available to
-all endpoints and requests, but some endpoints may not support all parameters. Below are the available control
-parameters you can use:
+all endpoints and requests, but some endpoints may not support all parameters.
+
+!!! Note
+    Requests must pass these parameters according to your specific [content type](CONTENT_AND_ACCEPT_TYPES.md). For
+    example, if you are using the `application/json` content-type, these parameters should be included in the JSON body 
+    of your request. Content types cannot be mixed.
 
 ## append
 

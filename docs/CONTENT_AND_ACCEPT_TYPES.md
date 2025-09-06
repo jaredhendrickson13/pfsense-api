@@ -6,6 +6,10 @@ The REST API has been designed to allow multiple content and accept types to be 
 
 Content types are used to specify the format of the data being sent in your request. You must specify the content type in the `Content-Type` header of your request. The REST API supports the following content types:
 
+!!! Important
+    Only one content type can be specified per request. Data formats cannot be mixed. For example, a request cannot
+    use both a JSON body and URL query string parameters to send data.
+
 ### application/json
 - MIME Type: `application/json`
 - Description: Use this content type to send JSON data in the body of your request. The data should be formatted as a JSON object or array.

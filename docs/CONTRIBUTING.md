@@ -27,6 +27,30 @@ To make a code contribution, please follow these steps:
     If your contribution involves a security vulnerability, please do not open a public issue or pull request. Instead,
     please report the vulnerability to a [project maintainer](index.md#maintainers) directly.
 
+## Pull Requests
+
+When submitting a pull request, please be aware of the various development branches used by the project and base your branch accordingly. Ensure your pull request's target branch is set to merge into the appropriate branch.
+
+### next_patch
+
+The `next_patch` branch is used for small bug fixes, minor documentation corrections, and other small changes that do not introduce new features or break existing functionality. Changes implemented in this branch will be included in the next patch release.
+
+### next_minor
+
+The `next_minor` branch is used for new features, enhancements, fixes, and other changes that do not introduce major breaking changes. Breaking changes _are_ allowed in minor release as long as the impact is minimal and justified. Changes implemented in this branch will be included in the next minor release.
+
+### next_major
+
+The `next_major` branch is dedicated to major changes to the projects structure, schemas, and overall functionality. Pull requests to this branch are allowed, but are rarely accepted as the branch is intended for fundamental changes to the project. Changes implemented in this branch will be included in the next major release.
+
+### master
+
+The `master` branch reflects the latest stable release of the project. Pull requests should _not_ be made to this branch directly. Instead, pull requests should be made to one of the other branches and merged into `master` when a new release is ready. Notable exceptions to this rule are:
+
+- Emergency security fixes that need to be applied to the latest stable release.
+- Dependency updates that do not break existing functionality.
+- Documentation updates that are not tied to a specific release.
+
 ## Project Structure
 
 The majority of the pfSense REST API package code can be found at `pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI`.
