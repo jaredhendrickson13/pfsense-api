@@ -23,8 +23,7 @@ $pgtitle = array(gettext('System'), gettext('API'), gettext('Settings'));
 include('head.inc');
 echo "<link rel='stylesheet' href='/css/api/api.css'/>";
 echo "<script type='application/javascript' src='/js/api.js'></script>";
-$update_tab = (APISystemAPIVersionRead::is_update_available()) ? "Update (New Release Available)" : "Update";
-$tab_array = [[gettext("Settings"), true, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext($update_tab), false, "/api/update/"]];
+$tab_array = [[gettext("Settings"), true, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext("Update"), false, "/api/update/"]];
 display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top of page
 
 # Variables

@@ -25,8 +25,7 @@ echo "<link rel='stylesheet' href='/css/api/api.css'/>";
 echo "<script type='application/javascript' src='/js/api.js'></script>";
 $pkg_index = APITools\get_api_config()[0];
 $pkg_config = APITools\get_api_config()[1];
-$update_tab = (APISystemAPIVersionRead::is_update_available()) ? "Update (New Release Available)" : "Update";
-$tab_array = [[gettext("Settings"), false, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext($update_tab), true, "/api/update/"]];
+$tab_array = [[gettext("Settings"), false, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext("Update"), true, "/api/update/"]];
 display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top of page
 
 # Save changes before loading version information, so the changes will be loaded correctly afterward.
