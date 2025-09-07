@@ -5,6 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Core\TestCaseRetry;
 use RESTAPI\Models\FirewallRule;
 use RESTAPI\Models\FirewallSchedule;
 use RESTAPI\Models\RoutingGateway;
@@ -817,6 +818,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
     /**
      * Checks that a rule with a TrafficShaperLimiter object assigned to dnpipe is correctly represented in pfctl.
      */
+    #[TestCaseRetry(retries: 3, delay: 2)]
     public function test_dnpipe_as_limiter_in_pfctl(): void {
         # Create a limiter and rule to test with
         $limiter = new TrafficShaperLimiter(

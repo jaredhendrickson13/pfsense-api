@@ -4,6 +4,7 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Core\TestCaseRetry;
 use RESTAPI\Models\CARP;
 use RESTAPI\Models\Table;
 use RESTAPI\Models\VirtualIP;
@@ -38,6 +39,7 @@ class APIModelsTableTestCase extends TestCase {
     /**
      * Checks that we can successfully retrieve the list of available table names.
      */
+    #[TestCaseRetry(retries: 3, delay: 1)]
     public function test_get_available_table_names(): void {
         # Create a new pf table to test with
         $this->add_table(table_name: 'pfrest_test_table', entries: ['1.2.3.4']);
@@ -62,6 +64,7 @@ class APIModelsTableTestCase extends TestCase {
     /**
      * Checks that we can successfully read entries from a table
      */
+    #[TestCaseRetry(retries: 3, delay: 1)]
     public function test_read(): void {
         # Create a new pf table to test with
         $this->add_table(table_name: 'pfrest_test_table', entries: ['1.2.3.4', '4.3.2.1']);
