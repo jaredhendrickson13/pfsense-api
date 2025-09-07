@@ -26,6 +26,7 @@ nav:
       - Building Custom Dispatchers: BUILDING_CUSTOM_DISPATCHER_CLASSES.md
       - Building Custom Caches: BUILDING_CUSTOM_CACHE_CLASSES.md
       - Building Custom Content Handlers: BUILDING_CUSTOM_CONTENT_HANDLER_CLASSES.md
+      - Native Schema: NATIVE_SCHEMA.md
       - PHP Reference: https://pfrest.org/php-docs/
 theme:
   name: readthedocs

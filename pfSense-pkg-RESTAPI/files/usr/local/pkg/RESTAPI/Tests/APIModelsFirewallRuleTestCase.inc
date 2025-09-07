@@ -5,14 +5,58 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Core\TestCaseRetry;
 use RESTAPI\Models\FirewallRule;
 use RESTAPI\Models\FirewallSchedule;
 use RESTAPI\Models\RoutingGateway;
 use RESTAPI\Models\TrafficShaper;
 use RESTAPI\Models\TrafficShaperLimiter;
 use RESTAPI\Models\TrafficShaperLimiterQueue;
+use RESTAPI\Responses\ServerError;
 
 class APIModelsFirewallRuleTestCase extends TestCase {
+    /**
+     * Reads the active ruleset directly from pfctl. If pfctl is not ready, it will retry up to 5 times before
+     * throwing an error.
+     * @param string|null $needle Optional string to search for in the output before returning
+     * @return Command The Command object containing the pfctl output
+     */
+    public function read_pfctl_rules(?string $needle = null): Command {
+        # Keywords that indicate pf is not ready yet
+        $not_ready_keywords = ['pfctl: DIOCGETRULE: Device busy', 'pfctl: DIOCGETRULENV: Device busy'];
+
+        # Check the pf ruleset until it appears to be fully loaded, or until we've tried 5 times
+        $attempt = 0;
+        $max_attempts = 5;
+        while ($attempt < $max_attempts) {
+            $cmd = new Command('/sbin/pfctl -sr');
+            $ready = true;
+
+            foreach ($not_ready_keywords as $keyword) {
+                # pf is not ready if any of the keywords are found in the output
+                if (str_contains($cmd->output, $keyword)) {
+                    $ready = false;
+                    break;
+                }
+            }
+
+            # If pfctl is ready and either no needle was specified or the needle was found, return the output
+            if ($ready and (!$needle or str_contains($cmd->output, $needle))) {
+                sleep(1);
+                return $cmd;
+            }
+
+            # Otherwise, wait a second and try again
+            sleep(1);
+            $attempt++;
+        }
+
+        throw new ServerError(
+            message: "pfctl ruleset was not ready after $max_attempts attempts.",
+            response_id: 'API_MODELS_FIREWALL_RULE_TEST_CASE_PFCTL_NOT_READY',
+        );
+    }
+
     /**
      * Checks that multiple interfaces cannot be assigned to a FirewallRule unless `floating` is enabled.
      */
@@ -474,6 +518,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             scheduler: 'FAIRQ',
             bandwidth: 100,
             bandwidthtype: 'Mb',
+            async: false,
             queue: [
                 [
                     'name' => 'TestQueue1',
@@ -508,20 +553,20 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Ensure the rule with the queue is seen in pfctl
-        $pfctl = new Command('pfctl -sr');
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains($pfctl->output, 'ridentifier ' . $rule->tracker->value . ' queue TestQueue1');
 
         # Update the rule to use a different queue and ensure it is seen in pfctl
         $rule->defaultqueue->value = 'TestQueue2';
         $rule->update(apply: true);
-        $pfctl = new Command('pfctl -sr');
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains($pfctl->output, 'ridentifier ' . $rule->tracker->value . ' queue TestQueue2');
 
         # Delete the rule and ensure the rule referencing the queue no longer exists
         $rule->delete();
         $shaper1->delete();
         $rule->apply();
-        $pfctl = new Command('pfctl -sr');
+        $pfctl = $this->read_pfctl_rules();
         $this->assert_str_does_not_contain(
             $pfctl->output,
             'ridentifier ' . $rule->tracker->value . ' queue TestQueue1',
@@ -542,6 +587,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
             scheduler: 'FAIRQ',
             bandwidth: 100,
             bandwidthtype: 'Mb',
+            async: false,
             queue: [
                 [
                     'name' => 'TestQueue1',
@@ -577,7 +623,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Ensure the rule with the queue is seen in pfctl
-        $pfctl = new Command('pfctl -sr');
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains(
             $pfctl->output,
             'ridentifier ' . $rule->tracker->value . ' queue(TestQueue1, TestQueue2)',
@@ -587,7 +633,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->defaultqueue->value = 'TestQueue2';
         $rule->ackqueue->value = 'TestQueue1';
         $rule->update(apply: true);
-        $pfctl = new Command('pfctl -sr');
+        $pfctl = $this->read_pfctl_rules();
         $this->assert_str_contains(
             $pfctl->output,
             'ridentifier ' . $rule->tracker->value . ' queue(TestQueue2, TestQueue1)',
@@ -597,7 +643,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->delete();
         $shaper1->delete();
         $rule->apply();
-        $pfctl = new Command('pfctl -sr');
+        $pfctl = $this->read_pfctl_rules();
         $this->assert_str_does_not_contain(
             $pfctl->output,
             'ridentifier ' . $rule->tracker->value . ' queue(TestQueue1, TestQueue2)',
@@ -772,6 +818,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
     /**
      * Checks that a rule with a TrafficShaperLimiter object assigned to dnpipe is correctly represented in pfctl.
      */
+    #[TestCaseRetry(retries: 3, delay: 2)]
     public function test_dnpipe_as_limiter_in_pfctl(): void {
         # Create a limiter and rule to test with
         $limiter = new TrafficShaperLimiter(
@@ -796,8 +843,8 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         );
         $rule->create(apply: true);
 
-        # Check pfctl rules and ensure the dnpipe is correctly represented
-        $pfctl = new Command('pfctl -sr');
+        # Ensure the dnpipe is correctly represented
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains(
             $pfctl->output,
             "ridentifier {$rule->tracker->value} dnpipe {$limiter->number->value}",
@@ -844,7 +891,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Check pfctl rules and ensure the dnpipe is correctly represented
-        $pfctl = new Command('pfctl -sr');
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains(
             $pfctl->output,
             "ridentifier {$rule->tracker->value} dnqueue {$queue->number->value}",
@@ -894,7 +941,7 @@ class APIModelsFirewallRuleTestCase extends TestCase {
         $rule->create(apply: true);
 
         # Check pfctl rules and ensure the dnpipe is correctly represented
-        $pfctl = new Command('pfctl -sr');
+        $pfctl = $this->read_pfctl_rules(needle: $rule->tracker->value);
         $this->assert_str_contains(
             $pfctl->output,
             "ridentifier {$rule->tracker->value} dnpipe({$limiter1->number->value}, {$limiter2->number->value})",

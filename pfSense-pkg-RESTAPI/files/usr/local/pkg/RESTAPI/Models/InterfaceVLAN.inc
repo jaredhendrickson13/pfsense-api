@@ -43,6 +43,7 @@ class InterfaceVLAN extends Model {
             required: false,
             default: '',
             allow_empty: true,
+            read_only: true,
             help_text: 'Displays the full interface VLAN. This value is automatically populated and cannot be set.',
         );
         $this->pcp = new IntegerField(
