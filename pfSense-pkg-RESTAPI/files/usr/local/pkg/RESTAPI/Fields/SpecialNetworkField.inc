@@ -307,13 +307,14 @@ class SpecialNetworkField extends InterfaceField {
             return $representation_value;
         }
 
-        # If the value is a NetworkInterface, obtain its representation value if it's not the ID
-        $if_query = NetworkInterface::query(id: $internal_value);
-        if ($this->represented_as !== 'id' and NetworkInterface::query(id: $internal_value)->exists()) {
-            return $if_query->first()->{$this->represented_as}->value;
+        # When loading the regular internal value (from InterfaceField), if the value is different from the
+        # internal value, it means it was an interface that got converted from its internal ID. So return it.
+        $representation_value = parent::_from_internal($internal_value);
+        if ($representation_value !== $internal_value) {
+            return $representation_value;
         }
 
-        # Otherwise, just return the internal value as it is
+        # Otherwise, just return the internal value as it is (interface ID, alias, IP, subnet, keyword, etc.)
         return $internal_value;
     }
 }
