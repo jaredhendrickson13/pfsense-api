@@ -10,6 +10,7 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Fields\UIDField;
+use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\UniqueFromForeignModelValidator;
@@ -89,7 +90,6 @@ class VirtualIP extends Model {
         );
         $this->vhid = new IntegerField(
             required: true,
-            unique: true,
             minimum: 1,
             maximum: 255,
             conditions: ['mode' => 'carp'],
@@ -176,6 +176,27 @@ class VirtualIP extends Model {
         }
 
         return $subnet_bits;
+    }
+
+    /**
+     * Adds extra validation to the vhid field.
+     * @param int $vhid The incoming `vhid` value to be validated.
+     * @return int The validated `vhid` value to be set.
+     * @throws ValidationError When the `vhid` value is already used by another CARP virtual IP on the same interface.
+     */
+    public function validate_vhid(int $vhid): int {
+        # Check for an existing CARP virtual IP with the same VHID on this interface
+        $vip_q = $this->query(id__except: $this->id, mode: 'carp', interface: $this->interface->value, vhid: $vhid);
+
+        # Ensure no other CARP virtual IP on this interface is using the same VHID
+        if ($vip_q->exists()) {
+            $vip = $vip_q->first();
+            throw new ConflictError(
+                message: "Virtual IP with ID '$vip->id' is already using VHID '$vhid' on interface '{$this->interface->value}'",
+                response_id: 'VIRTUALIP_VHID_ALREADY_IN_USE',
+            );
+        }
+        return $vhid;
     }
 
     /**
