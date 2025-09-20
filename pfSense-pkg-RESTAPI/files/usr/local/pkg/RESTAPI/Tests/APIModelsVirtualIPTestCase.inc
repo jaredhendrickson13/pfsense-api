@@ -242,4 +242,45 @@ class APIModelsVirtualIPTestCase extends TestCase {
         $carp_status->update();
         $carp_vip->delete(apply: true);
     }
+
+    public function test_carp_vhid_must_be_unique_per_interface(): void {
+        # Create a virtual IP to test with
+        $vip = new VirtualIP(
+            mode: 'carp',
+            interface: 'lan',
+            subnet: '127.1.2.3',
+            subnet_bits: 32,
+            password: 'testpasswd',
+            vhid: 5,
+        );
+        $vip->create();
+
+        # Ensure we can update the existing VIP with the same VHID without issue
+        $this->assert_does_not_throw(
+            callable: function () use ($vip) {
+                $vip->validate_vhid(vhid: 5);
+            },
+        );
+
+        # Ensure we cannot create a new VIP with the same VHID on the same interface
+        $this->assert_throws_response(
+            response_id: 'VIRTUALIP_VHID_ALREADY_IN_USE',
+            code: 409,
+            callable: function () {
+                $vip = new VirtualIP(mode: 'carp', interface: 'lan');
+                $vip->validate_vhid(vhid: 5);
+            },
+        );
+
+        # Ensure we can create a new VIP with the same VHID on a different interface
+        $this->assert_does_not_throw(
+            callable: function () {
+                $vip = new VirtualIP(mode: 'carp', interface: 'wan');
+                $vip->validate_vhid(vhid: 5);
+            },
+        );
+
+        # Clean up the VIP we created
+        $vip->delete();
+    }
 }
