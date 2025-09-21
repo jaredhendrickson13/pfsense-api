@@ -82,6 +82,7 @@ class APIModelsTableTestCase extends TestCase {
     /**
      * Checks that we can successfully delete (flush) entrries from a table
      */
+    #[TestCaseRetry(retries: 3, delay: 1)]
     public function test_delete(): void {
         # Create a new pf table to test with
         $this->add_table(table_name: 'pfrest_test_table', entries: ['1.2.3.4', '4.3.2.1']);

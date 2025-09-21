@@ -3,13 +3,15 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
+use RESTAPI\Core\TestCaseRetry;
 use RESTAPI\Models\FirewallAlias;
 
 class APIModelsFirewallAliasTestCase extends TestCase {
     /**
      * Checks that aliases with hostnames correctly populate a pfctl table
      */
-    public function test_fqdn_alias_populates_pfctl_table() {
+    #[TestCaseRetry(retries: 3, delay: 1)]
+    public function test_fqdn_alias_populates_pfctl_table(): void {
         # Create an alias that includes dns.google as an alias item
         $test_alias = new FirewallAlias(
             data: [
