@@ -217,14 +217,14 @@ class ForeignModelField extends Field {
      * @return mixed The field value in its representation form.
      */
     protected function _from_internal(mixed $internal_value): mixed {
-        # If the model_field_internal, and the model_field are the same, return the internal value as-is.
-        if ($this->model_field_internal === $this->model_field) {
-            return $internal_value;
-        }
-
         # Ensure the internal field value is converted to its representation value before querying
         if ($this->model_field_internal !== 'id') {
             $internal_value = $this->models[0]->{$this->model_field_internal}->_from_internal($internal_value);
+        }
+
+        # If the model_field_internal, and the model_field are the same, return the internal value as-is.
+        if ($this->model_field_internal === $this->model_field) {
+            return $internal_value;
         }
 
         # Query for the Model object this value relates to.
