@@ -257,7 +257,7 @@ class OpenVPNClientExport extends Model {
         return openvpn_client_export_config(
             srvid: $this->server->value,
             usrid: $this->username->value ? $this->username->get_related_model()->id : null,
-            crtid: $this->certref->value ? $this->certref->get_related_model()->id : null,
+            crtid: $this->__get_crtid_from_certref(),
             useaddr: $this->useaddr_hostname->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
@@ -291,7 +291,7 @@ class OpenVPNClientExport extends Model {
         return openvpn_client_export_installer(
             srvid: $this->server->value,
             usrid: $this->username->value ? $this->username->get_related_model()->id : null,
-            crtid: $this->certref->value ? $this->certref->get_related_model()->id : null,
+            crtid: $this->__get_crtid_from_certref(),
             useaddr: $this->useaddr_hostnam->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
@@ -319,7 +319,7 @@ class OpenVPNClientExport extends Model {
         return viscosity_openvpn_client_config_exporter(
             srvid: $this->server->value,
             usrid: $this->username->value ? $this->username->get_related_model()->id : null,
-            crtid: $this->certref->value ? $this->certref->get_related_model()->id : null,
+            crtid: $this->__get_crtid_from_certref(),
             useaddr: $this->useaddr_hostname->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
@@ -334,6 +334,42 @@ class OpenVPNClientExport extends Model {
             pkcs11providers: $this->pkcs11providers->value,
             pkcs11id: $this->pkcs11id->value,
         );
+    }
+
+    /**
+     * Obtains the crtid value pfSense expects for a given certref given the current OpenVPN server and username.
+     * This is necessary because pfSense's openvpn_client_export_validate_config function sometimes expects
+     * crtid to be the index of the 'cert' config path, and sometimes expects it to be the index of the
+     * 'system/user/{$usrid}/cert' config path.
+     * @returns int|null The crtid value pfSense expects for a given certref, or null if no certref is set.
+     */
+    private function __get_crtid_from_certref(): int|null {
+        # If no certref is set, return null
+        if (!$this->certref->value) {
+            return null;
+        }
+
+        # Load related models
+        $ovpnsrv = $this->server->get_related_model();
+        $user = $this->username->get_related_model();
+        $cert = $this->certref->get_related_model();
+
+        # If a username was provided, the server is using server_tls_user and the local database, pfSense expects
+        # the crtid to be the index of the 'system/user/{$usrid}/cert' config path not the 'cert' config path.
+        if (
+            $user and
+            $ovpnsrv->mode->value === 'server_tls_user' and
+            $ovpnsrv->authmode->value === ['Local Database']
+        ) {
+            foreach ($user->cert->get_config() as $idx => $user_cert) {
+                if ($user_cert['refid'] === $cert->id) {
+                    return $idx;
+                }
+            }
+        }
+
+        # Otherwise, just return the index of the certificate directly
+        return $cert->id;
     }
 
     /**
