@@ -94,6 +94,7 @@ class IPsecPhase1 extends Model {
         );
         $this->interface = new InterfaceField(
             required: true,
+            allow_carp_interface: true,
             help_text: 'The interface for the local endpoint of this phase 1 entry. This should be an interface ' .
                 'that is reachable by the remote peer.',
         );
