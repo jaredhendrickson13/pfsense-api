@@ -15,7 +15,7 @@ jobs:
     env:
       DAYS_BEFORE_STALE: 60
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@v10
         with:
           stale-issue-message: |
             This issue has been automatically marked as stale because it has had no recent activity in the last ${{ env.DAYS_BEFORE_STALE }} days.
