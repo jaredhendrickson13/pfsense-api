@@ -283,4 +283,47 @@ class APIModelsVirtualIPTestCase extends TestCase {
         # Clean up the VIP we created
         $vip->delete();
     }
+
+    /**
+     * Ensures we can create an IP alias virtual IP nested under a parent CARP virtual IP.
+     */
+    public function test_nested_vip_under_carp_vip(): void {
+        # Create a CARP virtual IP to test with
+        $carp_vip = new VirtualIP(
+            interface: "lan",
+            mode: "carp",
+            subnet: "127.0.0.105",
+            subnet_bits: 32,
+            vhid: 105,
+            password: "test",
+            async: false
+        );
+        $carp_vip->create();
+
+        # Create a new IP alias virtual IP that uses the CARP virtual IP as its interface
+        $child_vip = new VirtualIP(
+            interface: "_vip{$carp_vip->uniqid->value}",
+            mode: "ipalias",
+            subnet: "127.0.0.106",
+            subnet_bits: 32,
+            async: false
+        );
+        $child_vip->create(apply: true);
+
+        # Ensure the parent interface shows both virtual IPs sharing the same vhid in ifconfig
+        $iface = $carp_vip->interface->get_related_model()->if->value;
+        $ifconfig = new Command("/sbin/ifconfig $iface");
+        $this->assert_str_contains(
+            $ifconfig->output,
+            "inet 127.0.0.105 netmask 0xffffffff broadcast 127.0.0.105 vhid 105"
+        );
+        $this->assert_str_contains(
+            $ifconfig->output,
+            "inet 127.0.0.106 netmask 0xffffffff broadcast 127.0.0.106 vhid 105"
+        );
+
+        # Clean up the VIPs we created
+        $child_vip->delete();
+        $carp_vip->delete(apply: true);
+    }
 }
