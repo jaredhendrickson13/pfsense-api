@@ -257,7 +257,7 @@ class OpenVPNClientExport extends Model {
         return openvpn_client_export_config(
             srvid: $this->server->value,
             usrid: $this->username->value ? $this->username->get_related_model()->id : null,
-            crtid: $this->__get_crtid_from_certref(),
+            crtid: $this->locate_crtid(),
             useaddr: $this->useaddr_hostname->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
@@ -291,7 +291,7 @@ class OpenVPNClientExport extends Model {
         return openvpn_client_export_installer(
             srvid: $this->server->value,
             usrid: $this->username->value ? $this->username->get_related_model()->id : null,
-            crtid: $this->__get_crtid_from_certref(),
+            crtid: $this->locate_crtid(),
             useaddr: $this->useaddr_hostnam->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
@@ -319,7 +319,7 @@ class OpenVPNClientExport extends Model {
         return viscosity_openvpn_client_config_exporter(
             srvid: $this->server->value,
             usrid: $this->username->value ? $this->username->get_related_model()->id : null,
-            crtid: $this->__get_crtid_from_certref(),
+            crtid: $this->locate_crtid(),
             useaddr: $this->useaddr_hostname->value ?? $this->useaddr->value,
             verifyservercn: $this->verifyservercn->value,
             blockoutsidedns: $this->blockoutsidedns->value,
@@ -343,7 +343,7 @@ class OpenVPNClientExport extends Model {
      * 'system/user/{$usrid}/cert' config path.
      * @returns int|null The crtid value pfSense expects for a given certref, or null if no certref is set.
      */
-    private function __get_crtid_from_certref(): int|null {
+    public function locate_crtid(): int|null {
         # If no certref is set, return null
         if (!$this->certref->value) {
             return null;
@@ -361,8 +361,8 @@ class OpenVPNClientExport extends Model {
             $ovpnsrv->mode->value === 'server_tls_user' and
             $ovpnsrv->authmode->value === ['Local Database']
         ) {
-            foreach ($user->cert->get_config() as $idx => $user_cert) {
-                if ($user_cert['refid'] === $cert->id) {
+            foreach ($user->cert->value as $idx => $user_cert) {
+                if ($user_cert === $cert->refid->value) {
                     return $idx;
                 }
             }

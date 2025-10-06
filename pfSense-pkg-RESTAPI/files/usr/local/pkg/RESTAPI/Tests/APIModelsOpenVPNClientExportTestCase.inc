@@ -441,4 +441,41 @@ class APIModelsOpenVPNClientExportTestCase extends TestCase {
         $this->assert_is_true(!ctype_print($export->binary_data->value));
         $this->assert_is_false(file_exists("/tmp/{$export->filename->value}"));
     }
+
+    /**
+     * Ensures we can exporta config for a server using the 'server_tls_user' mode, a user cert, and local database
+     * auth. This is a regression test for issue #756. This is a necessary test distinction as pfSense will change the
+     * meaning of the crtid passed into certain pfSense functions based on the server mode and authmode.
+     */
+    public function test_create_with_server_tls_user_and_local_database(): void {
+        # First, update the OpenVPNServer to use the 'server_tls_user' mode and local database auth
+        $this->ovpns->mode->value = 'server_tls_user';
+        $this->ovpns->authmode->value = ["Local Database"];
+        $this->ovpns->update();
+
+        # Setup the export
+        $export = new OpenVPNClientExport(
+            id: $this->ovpnce->id,
+            type: 'confinline',
+            username: $this->user->name->value,
+            certref: $this->user_cert->refid->value,
+        );
+
+        # Ensure the certref's object ID does NOT match the determined crtid. These should not match because
+        # pfSense now refers to the crtid as the index of the cert in the system/user config, NOT the cert config
+        # like usual.
+        $this->assert_not_equals(
+            $this->user_cert->refid->get_related_model()->id,
+            $export->locate_crtid()
+        );
+
+        # Ensure we can complete the export as intended and that the embedded cert is correct
+        $export->create();
+        $this->assert_is_not_empty($export->binary_data->value);
+        $this->assert_str_contains($export->binary_data->value, $this->user_cert->crt->value);
+
+        # Reset the server mode and authmode for other tests
+        $this->ovpns->mode->value = 'server_tls';
+        $this->ovpns->update();
+    }
 }
