@@ -85,12 +85,12 @@ class APIFieldsInterfaceFieldTestCase extends TestCase {
     public function test_get_interface_choices_with_allow_carp_interface(): void {
         # First, create a carp virtual IP to test with
         $vip = new VirtualIP(
-            interface: "lan",
-            mode: "carp",
-            subnet: "127.0.0.99",
+            interface: 'lan',
+            mode: 'carp',
+            subnet: '127.0.0.99',
             subnet_bits: 32,
             vhid: 99,
-            password: "test"
+            password: 'test',
         );
         $vip->create();
 

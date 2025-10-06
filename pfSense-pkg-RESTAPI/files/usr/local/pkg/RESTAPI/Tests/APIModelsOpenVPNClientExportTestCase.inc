@@ -450,7 +450,7 @@ class APIModelsOpenVPNClientExportTestCase extends TestCase {
     public function test_create_with_server_tls_user_and_local_database(): void {
         # First, update the OpenVPNServer to use the 'server_tls_user' mode and local database auth
         $this->ovpns->mode->value = 'server_tls_user';
-        $this->ovpns->authmode->value = ["Local Database"];
+        $this->ovpns->authmode->value = ['Local Database'];
         $this->ovpns->update();
 
         # Setup the export
@@ -464,10 +464,7 @@ class APIModelsOpenVPNClientExportTestCase extends TestCase {
         # Ensure the certref's object ID does NOT match the determined crtid. These should not match because
         # pfSense now refers to the crtid as the index of the cert in the system/user config, NOT the cert config
         # like usual.
-        $this->assert_not_equals(
-            $this->user_cert->refid->get_related_model()->id,
-            $export->locate_crtid()
-        );
+        $this->assert_not_equals($this->user_cert->refid->get_related_model()->id, $export->locate_crtid());
 
         # Ensure we can complete the export as intended and that the embedded cert is correct
         $export->create();
