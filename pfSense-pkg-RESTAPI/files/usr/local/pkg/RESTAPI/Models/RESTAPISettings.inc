@@ -235,7 +235,7 @@ class RESTAPISettings extends Model {
 
         # Format choices so they include the class's verbose name as the choice's verbose name
         foreach (get_classes_from_namespace(namespace: '\\RESTAPI\\Models\\') as $model_class) {
-            $model = new $model_class();
+            $model = new $model_class(skip_init: true);
             foreach ($model->get_fields() as $field) {
                 if ($model->$field->sensitive) {
                     $choices[$model->get_class_shortname() . ':' . $field] =

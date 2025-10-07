@@ -219,7 +219,8 @@ class InterfaceField extends StringField {
             foreach ($virtual_ips as $virtual_ip) {
                 # Only include CARP virtual iPs with unique IDs
                 if ($virtual_ip['mode'] === 'carp' and $virtual_ip['uniqid']) {
-                    $choices[$virtual_ip['uniqid']] = $virtual_ip['uniqid'];
+                    $uniqid = '_vip' . $virtual_ip['uniqid'];
+                    $choices[$uniqid] = $uniqid;
                 }
             }
         }

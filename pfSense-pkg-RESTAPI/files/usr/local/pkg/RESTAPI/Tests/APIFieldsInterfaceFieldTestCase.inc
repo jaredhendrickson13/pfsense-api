@@ -5,6 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Models\RESTAPISettings;
+use RESTAPI\Models\VirtualIP;
 
 class APIFieldsInterfaceFieldTestCase extends TestCase {
     # TODO: Needs Tests to ensure CARP interfaces and interface groups become available choices when the
@@ -76,6 +77,30 @@ class APIFieldsInterfaceFieldTestCase extends TestCase {
         $test_field = new InterfaceField(allow_openvpn_interface: true);
         $test_field->set_choices_from_callable();
         $this->assert_is_true(in_array('openvpn', $test_field->choices));
+    }
+
+    /**
+     * Checks that the InterfaceField's `allow_carp_interface` parameter allows CARP interfaces to become choices.
+     */
+    public function test_get_interface_choices_with_allow_carp_interface(): void {
+        # First, create a carp virtual IP to test with
+        $vip = new VirtualIP(
+            interface: 'lan',
+            mode: 'carp',
+            subnet: '127.0.0.99',
+            subnet_bits: 32,
+            vhid: 99,
+            password: 'test',
+        );
+        $vip->create();
+
+        # Ensure the virtual IP is now a valid choice when `allow_carp_interface` is enabled
+        $test_field = new InterfaceField(allow_carp_interface: true);
+        $test_field->set_choices_from_callable();
+        $this->assert_is_true(in_array("_vip{$vip->uniqid->value}", $test_field->choices));
+
+        # Cleanup
+        $vip->delete();
     }
 
     /**
