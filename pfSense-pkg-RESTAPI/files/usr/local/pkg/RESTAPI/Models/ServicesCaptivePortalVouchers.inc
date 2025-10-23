@@ -9,7 +9,7 @@ use RESTAPI\Core\Model;
 /**
  * Defines a Model that interacts with captive portal vouchers.
  */
-class CaptivePortalVoucher extends Model {
+class ServicesCaptivePortalVouchers extends Model {
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # TODO: Define Model attributes here
 
