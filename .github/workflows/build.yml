@@ -44,7 +44,7 @@ jobs:
           /usr/local/bin/VBoxManage controlvm ${{ matrix.FREEBSD_VERSION }} poweroff || true
           /usr/local/bin/VBoxManage snapshot ${{matrix.FREEBSD_VERSION}} restore initial
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
@@ -61,7 +61,7 @@ jobs:
             FREEBSD_ID: freebsd15
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
@@ -94,7 +94,7 @@ jobs:
           /usr/local/bin/VBoxManage controlvm ${{ matrix.PFSENSE_VERSION }} poweroff || true
           /usr/local/bin/VBoxManage snapshot ${{ matrix.PFSENSE_VERSION }} restore initial
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: openapi-${{ matrix.PFSENSE_VERSION }}.json
           path: openapi-${{ matrix.PFSENSE_VERSION }}.json
@@ -111,13 +111,13 @@ jobs:
             FREEBSD_ID: freebsd15
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: openapi-${{ matrix.PFSENSE_VERSION }}.json
           path: openapi-${{ matrix.PFSENSE_VERSION }}.json
 
       - name: Install Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
 
@@ -142,7 +142,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
           path: pfSense-pkg-RESTAPI-${{ env.BUILD_VERSION }}-${{ matrix.FREEBSD_ID }}.pkg
