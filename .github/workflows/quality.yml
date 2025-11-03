@@ -44,7 +44,7 @@ jobs:
     needs: ["check_black"]
     strategy:
       matrix:
-        PYTHON_VERSION: ["3.9", "3.10", "3.11"]
+        PYTHON_VERSION: ["3.10", "3.11"]
     steps:
       - uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.PYTHON_VERSION }}
