@@ -388,4 +388,17 @@ class APIModelsGraphQLTestCase extends TestCase {
             },
         );
     }
+
+    /**
+     * Ensure we can query for model fields that are conditionally required. Regression test for #778
+     */
+    public function test_query_conditionally_required_field(): void {
+        # Query for interfaces including conditionally required fields and ensure no errors are returned.
+        $graphql = new GraphQL(
+            query: 'query {queryInterfaces {id ipaddr subnet descr typev4 track6_interface}}',
+            client: $this->auth,
+        );
+        $graphql->create();
+        $this->assert_is_empty($graphql->result->value['errors'] ?? []);
+    }
 }

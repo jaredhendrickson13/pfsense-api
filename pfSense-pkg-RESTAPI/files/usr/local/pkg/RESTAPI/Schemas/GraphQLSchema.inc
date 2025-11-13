@@ -127,8 +127,8 @@ class GraphQLSchema extends Schema {
             $type = Type::listOf($type);
         }
 
-        # Make this field non-nullable if it is required
-        if ($field->required and !$ignore_required) {
+        # Make this field non-nullable if it is required and unconditional
+        if ($field->required and !$field->conditions and !$ignore_required) {
             $type = Type::nonNull($type);
         }
 
