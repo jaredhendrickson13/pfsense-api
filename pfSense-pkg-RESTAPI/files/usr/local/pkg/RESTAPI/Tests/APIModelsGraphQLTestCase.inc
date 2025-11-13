@@ -396,7 +396,7 @@ class APIModelsGraphQLTestCase extends TestCase {
         # Query for interfaces including conditionally required fields and ensure no errors are returned.
         $graphql = new GraphQL(
             query: 'query {queryInterfaces {id ipaddr subnet descr typev4 track6_interface}}',
-            client: $this->auth
+            client: $this->auth,
         );
         $graphql->create();
         $this->assert_is_empty($graphql->result->value['errors'] ?? []);
