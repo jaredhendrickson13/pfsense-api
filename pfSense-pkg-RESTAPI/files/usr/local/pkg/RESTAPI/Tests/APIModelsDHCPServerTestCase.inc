@@ -518,4 +518,18 @@ class APIModelsDHCPServerTestCase extends TestCase {
         $dhcp_server->update(apply: true);
         $this->assert_str_contains((new Command('cat /var/dhcpd/etc/dhcpd.conf'))->output, 'peer address 192.168.1.2;');
     }
+
+    /**
+     * Ensures non-static interfaces are exempt from DHCP server initialization. This is a regression test for #781
+     */
+    public function test_non_static_interfaces_exempt_from_dhcp_server_initialization(): void {
+        # Temporarily add a mock interface using pppoe for IPv4
+        Model::set_config('interfaces/opt1/ipaddr', 'pppoe');
+
+        # Init a DHCP server model. This should trigger initialization logic.
+        new DHCPServer();
+
+        # Ensure a config entry was not initialized for the non-static interface
+        $this->assert_is_false(array_key_exists('opt1', Model::get_config('dhcpd')));
+    }
 }
