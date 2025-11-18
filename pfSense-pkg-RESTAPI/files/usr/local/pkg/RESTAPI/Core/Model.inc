@@ -143,6 +143,13 @@ class Model {
     public Cache|null $cache = null;
 
     /**
+     * @var array $object_cache
+     * An array used internally to cache already loaded ModelSets for any Model class. This prevents redundant loading
+     * of ModelSet objects during operations that may require multiple references to the same ModelSet.
+     */
+    public static array $object_cache = [];
+
+    /**
      * @var ModelSet $related_objects
      * A ModelSet containing foreign Model objects related to this Model. These are primarily populated by
      * ForeignModelFields assigned to this Model object. If no related Models are found, this ModelSet will not contain
@@ -1882,6 +1889,7 @@ class Model {
         $model_objects = [];
         $is_parent_model_many = $model->is_parent_model_many();
         $requests_pagination = ($limit or $offset);
+        $cache_exempt = ($requests_pagination or $reverse);
 
         # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
         if ($is_parent_model_many and !isset($parent_id)) {
@@ -1898,6 +1906,11 @@ class Model {
                     '`offset`parameters and try again.',
                 response_id: 'MODEL_DOES_NOT_SUPPORT_PAGINATION',
             );
+        }
+
+        # Load from cache if it is not exempt and cached objects exist
+        if (!$cache_exempt and Model::$object_cache[$model_name]) {
+            return Model::$object_cache[$model_name];
         }
 
         # Obtain all of this Model's internally stored objects
@@ -1926,8 +1939,16 @@ class Model {
             $model_objects[] = $model_object;
         }
 
+        # Load the ModelSet with all obtained Model objects
+        $modelset = new ModelSet(model_objects: $model_objects);
+
+        # For many models, cache the ModelSet if not exempt
+        if ($model->many and !$cache_exempt) {
+            Model::$object_cache[$model_name] = new ModelSet(model_objects: $model_objects);
+        }
+
         # For many enabled Models return a ModelSet, otherwise return a single Model object
-        return $model->many ? new ModelSet(model_objects: $model_objects) : $model_objects[0];
+        return $model->many ? $modelset : $modelset->first();
     }
 
     /**
