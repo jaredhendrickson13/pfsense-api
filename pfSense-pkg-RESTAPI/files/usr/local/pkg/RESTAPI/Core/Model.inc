@@ -528,6 +528,16 @@ class Model {
     }
 
     /**
+     * Clears the object cache for this Model class.
+     */
+    public static function clear_object_cache(): void {
+        $class = get_called_class();
+        if (isset(self::$object_cache[$class])) {
+            unset(self::$object_cache[$class]);
+        }
+    }
+
+    /**
      * Provides this Model's Field object properties relevant information like its field name and provides this Model
      * object as this Field's $context Model object.
      */
@@ -2108,6 +2118,9 @@ class Model {
 
             # Refresh the initial object
             $this->initial_object = $this->copy();
+
+            # Clear the object cache for this Model class
+            $this->clear_object_cache();
         }
 
         # Return the current representation of this object
@@ -2198,6 +2211,9 @@ class Model {
 
             # Refresh the initial object
             $this->initial_object = $this->copy();
+
+            # Clear the object cache for this Model class
+            $this->clear_object_cache();
         }
 
         # Return the current representation of this object
@@ -2293,6 +2309,9 @@ class Model {
             clear_subsystem_dirty($this->subsystem);
         }
 
+        # Clear the object cache for this Model class
+        $this->clear_object_cache();
+
         return $new_objects;
     }
 
@@ -2376,6 +2395,9 @@ class Model {
 
             # Refresh the initial object
             $this->initial_object = $this->copy();
+
+            # Clear the object cache for this Model class
+            $this->clear_object_cache();
         }
 
         # Return the current representation of this object
@@ -2425,8 +2447,10 @@ class Model {
             offset: $offset,
         );
 
-        # Delete the Model objects that matched the query
-        return $model_objects->delete();
+        # Delete the Model objects that matched the query and clear the object cache
+        $deleted_model_objects = $model_objects->delete();
+        self::clear_object_cache();
+        return $deleted_model_objects;
     }
 
     /**
@@ -2436,8 +2460,10 @@ class Model {
         # Obtain all Model objects for this Model
         $model_objects = self::read_all();
 
-        # Delete all Model objects for this Model
-        return $model_objects->delete();
+        # Delete all Model objects for this Model and clear the object cache
+        $deleted_model_objects = $model_objects->delete();
+        self::clear_object_cache();
+        return $deleted_model_objects;
     }
 
     /**
