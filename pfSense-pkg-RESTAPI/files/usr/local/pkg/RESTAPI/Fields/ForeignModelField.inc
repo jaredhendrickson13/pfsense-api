@@ -16,8 +16,25 @@ use RESTAPI\Responses\ServerError;
  * For example, a ForeignModelField can be used to relate a static route to its parent Gateway model object.
  */
 class ForeignModelField extends Field {
+    /**
+     * @var string $MODELS_NAMESPACE The namespace prefix for all Model classes.
+     */
     const MODELS_NAMESPACE = 'RESTAPI\\Models\\';
+
+    /**
+     * @var array $models An array of instantiated Model objects for each assigned $model_name.
+     */
     public array $models = [];
+
+    /**
+     * @var array $model_index
+     * An associative array that maps objects of the assigned $model_name classes by their $model_field values
+     * for quick lookup. This ensures the most taxing reference operations are only performed once per request.
+     * Indices for each corresponding $model_name will be cleared automatically when any Model object of that class
+     * is created, updated, or deleted.
+     */
+    public static array $model_index = [];
+
     /**
      * Defines the ForeignModelField object and sets its options.
      * @param string|array $model_name The name(s) of the foreign Model class(es) this field relates to. This should be
@@ -324,6 +341,39 @@ class ForeignModelField extends Field {
     }
 
     /**
+     * Indexes all in scope Model objects by their $model_field values for quick lookup and returns
+     * an associative array of the indexed Model objects. This method will also cache the indices
+     * in the static $model_index property to prevent redundant indexing operations during the same request.
+     * @return array An associative array mapping $model_field values to their corresponding Model objects.
+     */
+    public function get_model_index(): array {
+        # Get the name of the Model this Field belongs to
+        $model_context_name = $this->context->get_class_shortname();
+
+        # Check if we have already indexed Model objects for this Field in this request
+        if (self::$model_index[$model_context_name][$this->name]) {
+            return self::$model_index[$model_context_name][$this->name];
+        }
+
+        # Loop through each in scope Model object and index them by their $model_field values
+        foreach($this->get_in_scope_models()->model_objects as $model_object) {
+            $foreign_model_field_value = $model_object->{$this->model_field_internal}->value;
+            self::$model_index[$model_context_name][$this->name][$foreign_model_field_value] = $model_object;
+        }
+
+        # Return the indexed Model objects for this Field
+        return self::$model_index[$model_context_name][$this->name];
+    }
+
+    /**
+     * Clears the cached model indices.
+     */
+    public static function clear_model_index(): void
+    {
+        self::$model_index = [];
+    }
+
+    /**
      * Obtains a ModelSet of the Model(s) that match this field's criteria.
      * @param string $field_name The name of the field used to check for matching values. This is typically set to the
      * same value as $this->field_name.
@@ -331,7 +381,16 @@ class ForeignModelField extends Field {
      * to the same value as $this->value.
      */
     private function __get_matches(string $field_name, mixed $field_value): ModelSet {
-        return $this->get_in_scope_models()->query(query_params: [$field_name => $field_value]);
+        # Create a ModelSet we can use to store matching objects
+        $modelset = new ModelSet();
+        $match = $this->get_model_index()[$field_value] ?? null;
+
+        # Only add the Model object if it exists
+        if ($match) {
+            $modelset->model_objects[] = $match;
+        }
+
+        return $modelset;
     }
 
     /**
