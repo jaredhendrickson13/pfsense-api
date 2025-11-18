@@ -10,6 +10,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Core\Schema;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\NestedModelField;
+use RESTAPI\Models\RESTAPIVersion;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
@@ -129,7 +130,8 @@ class NativeSchema extends Schema {
      * @return string The full schema string for this Schema class in JSON format
      */
     public function get_schema_str(): string {
-        $schema = ['endpoints' => [], 'models' => []];
+        $version = new RESTAPIVersion();
+        $schema = ['version' => $version->current_version->value, 'endpoints' => [], 'models' => []];
 
         # Get all endpoint metadata
         foreach (get_classes_from_namespace('RESTAPI\Endpoints') as $endpoint_class) {

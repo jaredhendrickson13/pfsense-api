@@ -523,6 +523,9 @@ class APIModelsDHCPServerTestCase extends TestCase {
      * Ensures non-static interfaces are exempt from DHCP server initialization. This is a regression test for #781
      */
     public function test_non_static_interfaces_exempt_from_dhcp_server_initialization(): void {
+        # Ensure no config entry exists for the `opt1` DHCP server
+        Model::del_config('dhcpd/opt1');
+
         # Temporarily add a mock interface using pppoe for IPv4
         Model::set_config('interfaces/opt1/ipaddr', 'pppoe');
 
