@@ -20,6 +20,7 @@ classes. Below is a basic outline of the schema's structure:
 
 ```json
 {
+  "version": "v0.0.0",
   "endpoints": {
     "/endpoint/url/path": {
       ...
