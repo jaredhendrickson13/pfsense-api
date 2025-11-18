@@ -261,7 +261,7 @@ class DHCPServer extends Model {
         # Loop through each defined interface
         foreach ($this->get_config('interfaces', []) as $if_id => $if) {
             # Skip this interface if it is not a static interface or the subnet value is greater than or equal to 31
-            if (empty($if['ipaddr']) or $if['ipaddr'] !== 'static' or $if->subnet->value >= 31) {
+            if (empty($if['ipaddr']) or !is_ipaddrv4($if['ipaddr']) or $if->subnet->value >= 31) {
                 continue;
             }
 
