@@ -39,7 +39,9 @@ class Model {
     use BaseTraits;
 
     /**
-     * @const string $READ_LOCK_FILE
+     * @var string $WRITE_LOCK_FILE
+     * The file path used to create a lock when writing to the pfSense configuration file. This prevents multiple
+     * simultaneous writes to the config file that could corrupt the config.
      */
     const WRITE_LOCK_FILE = '/tmp/.RESTAPI.write_config.lock';
 
@@ -535,6 +537,9 @@ class Model {
         if (isset(self::$object_cache[$class])) {
             unset(self::$object_cache[$class]);
         }
+
+        # Clear foreign model indices
+        RESTAPI\Fields\ForeignModelField::clear_model_index();
     }
 
     /**
