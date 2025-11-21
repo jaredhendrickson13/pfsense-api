@@ -120,7 +120,7 @@ class FreeRADIUSUser extends Model {
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
             help_text: 'Framed-IP-Address MUST be supported by NAS. ' .
                 'If the OpenVPN server uses a subnet style Topology the RADIUS server MUST ' .
-                'also send back an appropriate Framed-IP-Netmask value matching the VPN Tunnel Network.'
+                'also send back an appropriate Framed-IP-Netmask value matching the VPN Tunnel Network.',
         );
         $this->framed_ip_netmask = new StringField(
             required: false,
@@ -128,7 +128,7 @@ class FreeRADIUSUser extends Model {
             internal_name: 'varusersframedipnetmask',
             allow_empty: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
-            help_text: 'Framed-IP-Netmask MUST be supported by NAS'
+            help_text: 'Framed-IP-Netmask MUST be supported by NAS',
         );
 
         parent::__construct($id, $parent_id, $data, ...$options);
