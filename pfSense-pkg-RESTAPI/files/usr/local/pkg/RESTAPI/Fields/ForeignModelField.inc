@@ -341,10 +341,20 @@ class ForeignModelField extends Field {
     }
 
     /**
-     * Indexes all in scope Model objects by their $model_field values for quick lookup and returns
-     * an associative array of the indexed Model objects. This method will also cache the indices
+     * Indexes all in scope Model objects by their $model_field and $model_field_internal values for quick lookup and
+     * returns an associative array of the indexed Model objects. This method will also cache the indices
      * in the static $model_index property to prevent redundant indexing operations during the same request.
-     * @return array An associative array mapping $model_field values to their corresponding Model objects.
+     *
+     * Index is structured as:
+     * [
+     *   'ModelClassShortName' => [
+     *     'this_field_name' => [
+     *       'model_field_value' => ModelObject,
+     *       'model_field_internal_value' => ModelObject,
+     *    ],
+     *
+     * @return array An associative array mapping $model_field and $model_field_internal values to their corresponding
+     * Model objects.
      */
     public function get_model_index(): array {
         # Get the name of the Model this Field belongs to
@@ -356,34 +366,37 @@ class ForeignModelField extends Field {
         }
 
         # Loop through each in scope Model object and index them by their $model_field values
-        foreach($this->get_in_scope_models()->model_objects as $model_object) {
-            $foreign_model_field_value = $model_object->{$this->model_field_internal}->value;
-            self::$model_index[$model_context_name][$this->name][$foreign_model_field_value] = $model_object;
+        foreach ($this->get_in_scope_models()->model_objects as $model_object) {
+            $foreign_model_field_value = $model_object->{$this->model_field}->value;
+            $foreign_model_field_internal_value = $model_object->{$this->model_field_internal}->value;
+            self::$model_index[$model_context_name][$this->name][$this->model_field][
+                $foreign_model_field_value
+            ] = $model_object;
+            self::$model_index[$model_context_name][$this->name][$this->model_field_internal][
+                $foreign_model_field_internal_value
+            ] = $model_object;
         }
 
         # Return the indexed Model objects for this Field
-        return self::$model_index[$model_context_name][$this->name];
+        return self::$model_index[$model_context_name][$this->name] ?? [];
     }
 
     /**
      * Clears the cached model indices.
      */
-    public static function clear_model_index(): void
-    {
+    public static function clear_model_index(): void {
         self::$model_index = [];
     }
 
     /**
      * Obtains a ModelSet of the Model(s) that match this field's criteria.
-     * @param string $field_name The name of the field used to check for matching values. This is typically set to the
-     * same value as $this->field_name.
      * @param mixed $field_value The value of the $field_name that indicates there is a match. This is typically set
      * to the same value as $this->value.
      */
     private function __get_matches(string $field_name, mixed $field_value): ModelSet {
         # Create a ModelSet we can use to store matching objects
         $modelset = new ModelSet();
-        $match = $this->get_model_index()[$field_value] ?? null;
+        $match = $this->get_model_index()[$field_name][$field_value] ?? null;
 
         # Only add the Model object if it exists
         if ($match) {
@@ -399,6 +412,11 @@ class ForeignModelField extends Field {
      * @returns Model|null Returns the Model object associated with this Field's current value.
      */
     public function get_related_model(): Model|null {
+        # Skip for non-many fields
+        if ($this->many) {
+            return null;
+        }
+
         # Get the Model objects that match this field's criteria
         $query_modelset = $this->__get_matches($this->model_field, $this->value);
 
