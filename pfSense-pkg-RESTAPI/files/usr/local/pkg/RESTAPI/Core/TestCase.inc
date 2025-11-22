@@ -85,8 +85,7 @@ class TestCase {
                         break;
                     } catch (Error | Exception $e) {
                         # Tear down any resources created by this test before retrying or exiting
-                        $config = $original_config;
-                        write_config("Restored config after API test '$method'");
+                        $this->restore_config($original_config);
                         $this->teardown();
 
                         # If we have retries left, wait the configured delay and try again
@@ -101,13 +100,24 @@ class TestCase {
                 }
 
                 # Restore the config as it was when the test began.
-                $config = $original_config;
-                write_config("Restored config after API test '$method'");
+                $this->restore_config($original_config);
             }
         }
 
         # Teardown the test case now that all tests are completed
         $this->teardown();
+    }
+
+    /**
+     * Restores the configuration to its original state and clears the Model object cache.
+     *
+     * @param array $original_config The original configuration to restore.
+     */
+    protected function restore_config(array $original_config): void {
+        global $config;
+        $config = $original_config;
+        Model::clear_object_cache();
+        write_config("Restored config after API test '{$this->method}'");
     }
 
     /**
