@@ -533,10 +533,8 @@ class Model {
      * Clears the object cache for this Model class.
      */
     public static function clear_object_cache(): void {
-        $class = get_called_class();
-        if (isset(self::$object_cache[$class])) {
-            unset(self::$object_cache[$class]);
-        }
+        # Clear the object cache
+        self::$object_cache = [];
 
         # Clear foreign model indices
         RESTAPI\Fields\ForeignModelField::clear_model_index();
