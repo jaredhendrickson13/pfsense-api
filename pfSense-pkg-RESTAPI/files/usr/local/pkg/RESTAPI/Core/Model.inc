@@ -659,6 +659,8 @@ class Model {
      * @returns mixed $val or $default if the path prefix does not exist
      */
     public static function set_config(string $path, mixed $value, mixed $default = null): mixed {
+        # Clear the object cache for this Model class since config is being modified
+        self::clear_object_cache();
         return config_set_path(self::normalize_config_path($path), $value, $default);
     }
 
@@ -703,6 +705,8 @@ class Model {
      * @returns array copy of the removed value or null
      */
     public static function del_config(string $path): mixed {
+        # Clear the object cache for this Model class since config is being modified
+        self::clear_object_cache();
         return config_del_path(self::normalize_config_path($path));
     }
 
@@ -739,6 +743,9 @@ class Model {
                 write_config(sprintf(gettext(' ' . $change_note)));
                 session_destroy();
 
+                # Clear the object cache for this Model class since config has been modified
+                self::clear_object_cache();
+
                 # If a subsystem is specified for this Model, mark it as dirty
                 if ($this->subsystem) {
                     mark_subsystem_dirty($this->subsystem);
@@ -766,6 +773,10 @@ class Model {
      */
     public static function reload_config(bool $force_parse = false): void {
         global $config;
+
+        # Clear the object cache for all Model classes since config is being reloaded
+        self::clear_object_cache();
+
         $config = parse_config(parse: $force_parse);
     }
 
@@ -2123,9 +2134,6 @@ class Model {
 
             # Refresh the initial object
             $this->initial_object = $this->copy();
-
-            # Clear the object cache for this Model class
-            $this->clear_object_cache();
         }
 
         # Return the current representation of this object
@@ -2216,9 +2224,6 @@ class Model {
 
             # Refresh the initial object
             $this->initial_object = $this->copy();
-
-            # Clear the object cache for this Model class
-            $this->clear_object_cache();
         }
 
         # Return the current representation of this object
@@ -2314,9 +2319,6 @@ class Model {
             clear_subsystem_dirty($this->subsystem);
         }
 
-        # Clear the object cache for this Model class
-        $this->clear_object_cache();
-
         return $new_objects;
     }
 
@@ -2400,9 +2402,6 @@ class Model {
 
             # Refresh the initial object
             $this->initial_object = $this->copy();
-
-            # Clear the object cache for this Model class
-            $this->clear_object_cache();
         }
 
         # Return the current representation of this object
@@ -2452,10 +2451,8 @@ class Model {
             offset: $offset,
         );
 
-        # Delete the Model objects that matched the query and clear the object cache
-        $deleted_model_objects = $model_objects->delete();
-        self::clear_object_cache();
-        return $deleted_model_objects;
+        # Delete the Model objects that matched the query
+        return $model_objects->delete();
     }
 
     /**
@@ -2465,10 +2462,8 @@ class Model {
         # Obtain all Model objects for this Model
         $model_objects = self::read_all();
 
-        # Delete all Model objects for this Model and clear the object cache
-        $deleted_model_objects = $model_objects->delete();
-        self::clear_object_cache();
-        return $deleted_model_objects;
+        # Delete all Model objects for this Model
+        return $model_objects->delete();
     }
 
     /**
