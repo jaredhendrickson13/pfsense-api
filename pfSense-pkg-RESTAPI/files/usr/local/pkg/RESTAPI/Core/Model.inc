@@ -535,9 +535,6 @@ class Model {
     public static function clear_object_cache(): void {
         # Clear the object cache
         self::$object_cache = [];
-
-        # Clear foreign model indices
-        RESTAPI\Fields\ForeignModelField::clear_model_index();
     }
 
     /**
