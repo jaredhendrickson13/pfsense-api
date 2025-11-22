@@ -294,7 +294,7 @@ class RESTAPISettings extends Model {
             return API_SETTINGS_RESTORE_NO_CHANGE;
         }
 
-        config_set_path("installedpackages/package/$current_api_id/conf", $backup_api_conf);
+        Model::set_config("installedpackages/package/$current_api_id/conf", $backup_api_conf);
         write_config('Synchronized persistent API configuration');
         return API_SETTINGS_RESTORE_SUCCESS;
     }

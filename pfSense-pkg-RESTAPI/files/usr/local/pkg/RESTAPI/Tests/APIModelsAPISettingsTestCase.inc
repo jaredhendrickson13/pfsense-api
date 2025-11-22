@@ -87,7 +87,7 @@ class APIModelsAPISettingsTestCase extends TestCase {
         # Capture the current API config, delete the running API config, restore it from backup and ensure it matches
         $api_config_id = $api_settings->get_pkg_id();
         $original_api_config = $api_settings->get_pkg_config();
-        config_set_path("installedpackages/package/$api_config_id/conf", [
+        Model::set_config("installedpackages/package/$api_config_id/conf", [
             'keep_backup' => 'enabled',
             'bad-field' => true,
         ]);
