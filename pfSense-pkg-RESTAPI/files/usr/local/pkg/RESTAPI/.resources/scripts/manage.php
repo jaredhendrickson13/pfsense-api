@@ -426,7 +426,7 @@ function delete(): void {
  */
 function rotate_server_key(): void {
     $pkg_index = RESTAPISettings::get_pkg_id();
-    config_set_path("installedpackages/package/$pkg_index/conf/keys", []);
+    Model::set_config("installedpackages/package/$pkg_index/conf/keys", []);
     echo 'Rotating REST API server key... ';
     RESTAPIJWT::init_server_key(rotate: true);
     echo 'done.' . PHP_EOL;

@@ -33,7 +33,7 @@ class APIModelsAPIJWTTestCase extends TestCase {
         $this->assert_not_equals($first_server_key, $second_server_key);
 
         # Remove the JWT server key created by generate_jwt()
-        config_set_path("installedpackages/package/{$api_pkg_id}/conf/server_key", '');
+        Model::set_config("installedpackages/package/{$api_pkg_id}/conf/server_key", '');
         write_config('Unit test removed JWT server key used for testing');
     }
 
@@ -62,7 +62,7 @@ class APIModelsAPIJWTTestCase extends TestCase {
         $this->assert_equals($decoded_jwt['data'], 'admin');
 
         # Remove the JWT server key created by generate_jwt()
-        config_set_path("installedpackages/package/{$api_pkg_id}/conf/server_key", '');
+        Model::set_config("installedpackages/package/{$api_pkg_id}/conf/server_key", '');
         write_config('Unit test removed JWT server key used for testing');
     }
 }
