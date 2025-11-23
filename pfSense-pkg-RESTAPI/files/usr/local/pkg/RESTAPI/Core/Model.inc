@@ -2131,6 +2131,9 @@ class Model {
             $this->initial_object = $this->copy();
         }
 
+        # Reset the object cache as the config has changed
+        Model::$object_cache = [];
+
         # Return the current representation of this object
         return $this;
     }
@@ -2220,6 +2223,9 @@ class Model {
             # Refresh the initial object
             $this->initial_object = $this->copy();
         }
+
+        # Reset the object cache as the config has changed
+        Model::$object_cache = [];
 
         # Return the current representation of this object
         return $this;
@@ -2314,6 +2320,9 @@ class Model {
             clear_subsystem_dirty($this->subsystem);
         }
 
+        # Reset the object cache as the config has changed
+        Model::$object_cache = [];
+
         return $new_objects;
     }
 
@@ -2399,6 +2408,9 @@ class Model {
             $this->initial_object = $this->copy();
         }
 
+        # Reset the object cache as the config has changed
+        Model::$object_cache = [];
+
         # Return the current representation of this object
         return $this;
     }
@@ -2446,6 +2458,9 @@ class Model {
             offset: $offset,
         );
 
+        # Reset the object cache as the config has changed
+        Model::$object_cache = [];
+
         # Delete the Model objects that matched the query
         return $model_objects->delete();
     }
@@ -2456,6 +2471,9 @@ class Model {
     public static function delete_all(): ModelSet|Model {
         # Obtain all Model objects for this Model
         $model_objects = self::read_all();
+
+        # Reset the object cache as the config has changed
+        Model::$object_cache = [];
 
         # Delete all Model objects for this Model
         return $model_objects->delete();
