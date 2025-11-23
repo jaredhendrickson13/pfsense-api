@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
+use RESTAPI\Core\Model;
 use RESTAPI\Models\FirewallRule;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\User;
@@ -13,8 +14,6 @@ use const RESTAPI\Models\API_SETTINGS_RESTORE_NO_CHANGE;
 use const RESTAPI\Models\API_SETTINGS_RESTORE_SUCCESS;
 
 class APIModelsAPISettingsTestCase extends TestCase {
-    # TODO: Needs Tests for API HA sync feature
-
     /**
      * Checks that the static `get_pkg_config()` method returns the API package's internal configuration and
      * the static `get_pkg_id()` method returns the API package's ID
