@@ -177,7 +177,7 @@ class ForeignModelField extends Field {
         if (!class_exists($model_name)) {
             throw new ServerError(
                 message: "ForeignModelField's `model_name` property must be an existing Model class FQN, " .
-                "received `$model_name`.",
+                    "received `$model_name`.",
                 response_id: 'FOREIGN_MODEL_FIELD_WITH_UNKNOWN_MODEL_NAME',
             );
         }
@@ -278,7 +278,7 @@ class ForeignModelField extends Field {
         if (!$query_modelset->exists()) {
             throw new NotFoundError(
                 message: "Field `$this->name` could not locate `$model_names` object with " .
-                "`$this->model_field` set to `$value`",
+                    "`$this->model_field` set to `$value`",
                 response_id: 'FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND',
             );
         }
