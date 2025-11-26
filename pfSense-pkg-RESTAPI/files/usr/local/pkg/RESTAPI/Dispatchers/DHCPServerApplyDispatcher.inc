@@ -13,7 +13,7 @@ class DHCPServerApplyDispatcher extends Dispatcher {
      * Reloads the DHCP server and associated services.
      */
     protected function _process(mixed ...$arguments): void {
-        services_dhcpd_configure();
+        dhcp_apply_changes();
         clear_subsystem_dirty('dhcpd');
     }
 }
