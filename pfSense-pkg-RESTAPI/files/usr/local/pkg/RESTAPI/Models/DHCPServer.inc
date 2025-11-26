@@ -267,7 +267,7 @@ class DHCPServer extends Model {
 
             # Otherwise, make this interface eligible for a DHCP server
             if (!in_array($if_id, $ifs_using_dhcp_server)) {
-                $this->set_config(path: "$this->config_path/$if_id", value: []);
+                $this->set_config(path: "$this->config_path/$if_id", value: ['range' => ['from' => '', 'to' => '']]);
             }
         }
     }
