@@ -377,14 +377,16 @@ class OpenVPNClientExport extends Model {
      * @return array the proxy configuration array expected by pfSense functions
      */
     private function __get_proxy_config(): array {
-        return $this->useproxy->value ? [
-            'ip' => $this->proxyaddr->value,
-            'port' => $this->proxyport->value,
-            'user' => $this->proxyuser->value,
-            'password' => $this->proxypass->value,
-            'proxy_type' => $this->useproxytype->value,
-            'proxy_authtype' => $this->useproxypass->value,
-        ] : [];
+        return $this->useproxy->value
+            ? [
+                'ip' => $this->proxyaddr->value,
+                'port' => $this->proxyport->value,
+                'user' => $this->proxyuser->value,
+                'password' => $this->proxypass->value,
+                'proxy_type' => $this->useproxytype->value,
+                'proxy_authtype' => $this->useproxypass->value,
+            ]
+            : [];
     }
 
     private function __get_export_filename(): string {
