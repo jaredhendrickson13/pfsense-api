@@ -1910,7 +1910,7 @@ class Model {
         $model_objects = [];
         $is_parent_model_many = $model->is_parent_model_many();
         $requests_pagination = ($limit or $offset);
-        $cache_exempt = ($requests_pagination or $reverse);
+        $cache_exempt = ($requests_pagination or $reverse or isset($parent_id));
 
         # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
         if ($is_parent_model_many and !isset($parent_id)) {
