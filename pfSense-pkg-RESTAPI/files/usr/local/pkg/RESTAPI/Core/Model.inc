@@ -882,8 +882,8 @@ class Model {
             $child_configs = $this->get_config("$parent_model->config_path/$parent_id/$this->config_path", []);
 
             foreach ($child_configs as $child_id => $child_config) {
-                $child_config["parent_id"] = $parent_id;
-                $child_config["id"] = $child_id;
+                $child_config['parent_id'] = $parent_id;
+                $child_config['id'] = $child_id;
                 $internal_objects[] = $child_config;
             }
         }
@@ -1927,11 +1927,7 @@ class Model {
      * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
      * not enabled.
      */
-    public static function read_all(
-        int $limit = 0,
-        int $offset = 0,
-        bool $reverse = false,
-    ): ModelSet|Model {
+    public static function read_all(int $limit = 0, int $offset = 0, bool $reverse = false): ModelSet|Model {
         # Variables
         $model_name = get_called_class();
         $model = new $model_name();
@@ -2469,12 +2465,7 @@ class Model {
         }
 
         # Obtain all Model objects that match the query of objects to be deleted
-        $model_objects = self::query(
-            query_params: $query_params,
-            excluded: $excluded,
-            limit: $limit,
-            offset: $offset,
-        );
+        $model_objects = self::query(query_params: $query_params, excluded: $excluded, limit: $limit, offset: $offset);
 
         # Reset the object cache as the config has changed
         Model::$object_cache = [];
