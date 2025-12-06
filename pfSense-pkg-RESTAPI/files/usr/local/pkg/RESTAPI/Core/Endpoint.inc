@@ -412,14 +412,6 @@ class Endpoint {
                 );
             }
         }
-
-        # Do not allow `many` Endpoints that are assigned a Model with a parent Model
-        if ($this->many and $this->model->parent_model_class) {
-            throw new ServerError(
-                message: 'Endpoints cannot enable `many` when the assigned Model has a parent Model',
-                response_id: 'ENDPOINT_MANY_WHEN_MODEL_HAS_PARENT',
-            );
-        }
     }
 
     /**

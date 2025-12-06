@@ -461,7 +461,7 @@ class DHCPServer extends Model {
      */
     public function validate_staticarp(bool $staticarp): bool {
         # Do not allow `staticarp` to be enabled if there are any configured static mappings without IPs
-        $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->id);
+        $static_mappings = DHCPServerStaticMapping::query(parent_id: $this->id);
         foreach ($static_mappings->model_objects as $static_mapping) {
             if ($staticarp and !$static_mapping->ipaddr->value) {
                 throw new ValidationError(
@@ -484,7 +484,7 @@ class DHCPServer extends Model {
      */
     private function get_range_overlap(string $range_from, string $range_to): ?Model {
         # Ensure range does not overlap with existing static mappings
-        $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->id);
+        $static_mappings = DHCPServerStaticMapping::query(parent_id: $this->id);
         foreach ($static_mappings->model_objects as $static_mapping) {
             if (is_inrange_v4($static_mapping->ipaddr->value, $range_from, $range_to)) {
                 return $static_mapping;
@@ -492,7 +492,7 @@ class DHCPServer extends Model {
         }
 
         # Ensure range does not overlap with existing address pools `range_from` or `range_to` addresses
-        $pools = DHCPServerAddressPool::read_all(parent_id: $this->id);
+        $pools = DHCPServerAddressPool::query(parent_id: $this->id);
         foreach ($pools->model_objects as $pool) {
             if (is_inrange_v4($pool->range_from->value, $range_from, $range_to)) {
                 return $pool;

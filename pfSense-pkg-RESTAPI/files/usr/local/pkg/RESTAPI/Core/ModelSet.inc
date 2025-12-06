@@ -206,8 +206,9 @@ class ModelSet {
                     continue;
                 }
 
-                # Obtain the value for this field. If it is the ID, handle accordingly.
+                # Obtain the value for this field. If it is the ID or parent ID, handle accordingly.
                 $field_value = $field === 'id' ? $model_object->id : $model_object->$field->value;
+                $field_value = $field === 'parent_id' ? $model_object->parent_id : $field_value;
 
                 # Ensure the filter matches
                 $filter = QueryFilter::get_by_name($filter_name);

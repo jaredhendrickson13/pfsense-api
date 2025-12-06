@@ -865,6 +865,33 @@ class Model {
     }
 
     /**
+     * Recursively obtains all internal objects for this Model from all parent objects in config. This method is only
+     * applicable to Models with a `parent_model_class` assigned.
+     * @return array An array of all internal objects for this Model from all parent objects in
+     */
+    protected function get_internal_objects_from_all_parents(): array {
+        # Variables
+        $internal_objects = [];
+        $parent_model_class = "\\RESTAPI\\Models\\$this->parent_model_class";
+        $parent_model = new $parent_model_class(skip_init: true);
+        $parent_configs = $this->get_config($parent_model->config_path, []);
+
+        # Check for internal objects from all parents
+        foreach ($parent_configs as $parent_id => $parent_config) {
+            # Obtain the list of child objects from this parent config
+            $child_configs = $this->get_config("$parent_model->config_path/$parent_id/$this->config_path", []);
+
+            foreach ($child_configs as $child_id => $child_config) {
+                $child_config["parent_id"] = $parent_id;
+                $child_config["id"] = $child_id;
+                $internal_objects[] = $child_config;
+            }
+        }
+
+        return $internal_objects;
+    }
+
+    /**
      * Obtains all internal objects for this Model. When a `config_path` is specified, this method will obtain the
      * internal objects directly from config. When an `internal_callable` is assigned, this method will return
      * the output of the assigned callable.
@@ -885,6 +912,10 @@ class Model {
         # Use mock data if the $mock_internal_objects global is set
         elseif ($mock_internal_objects) {
             $internal_objects = $mock_internal_objects;
+        }
+        # Obtain all internal objects from all parents if a parent Model class is assigned
+        elseif ($this->parent_model_class) {
+            $internal_objects = $this->get_internal_objects_from_all_parents();
         }
         # Obtain the internal objects from the config path if specified
         elseif ($this->config_path) {
@@ -913,7 +944,7 @@ class Model {
      * @throws ServerError When this Model does not have a `config_path` set.
      * @throws NotFoundError When an object with the specified $id does not exist.
      */
-    public function from_internal() {
+    public function from_internal(): void {
         # Require a `parent_id` if a `many` parent Model is assigned
         if ($this->parent_model_class and $this->parent_model->many and !isset($this->parent_id)) {
             throw new ServerError(
@@ -1319,7 +1350,7 @@ class Model {
         }
 
         # Use the $modelset if provided, otherwise obtain a ModelSet of all existing objects for this Model
-        $modelset = $modelset ?: $this->read_all(parent_id: $this->parent_id);
+        $modelset = $modelset ?: $this->query(parent_id: $this->parent_id);
 
         # Use this variable to keep track of query parameters to use when checking uniqueness
         $query_params = [];
@@ -1415,7 +1446,7 @@ class Model {
 
         # For 'many' Models, capture all current Models in a ModelSet if one was not already given
         if ($this->many and !$modelset) {
-            $modelset = $this->read_all(parent_id: $this->parent_id);
+            $modelset = $this->query(parent_id: $this->parent_id);
         }
 
         # Loop through each of this object's assigned Fields and validate them.
@@ -1887,8 +1918,6 @@ class Model {
      * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
      * load Model objects for each object stored at the config path. If `internal_callable` is set, this will create
      * Model objects for each object returned by the specified callable.
-     * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
-     * $many Models with a $parent_model_class. This value has no affect otherwise.
      * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many
      * enabled Models.
      * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
@@ -1899,26 +1928,16 @@ class Model {
      * not enabled.
      */
     public static function read_all(
-        mixed $parent_id = null,
         int $limit = 0,
         int $offset = 0,
         bool $reverse = false,
     ): ModelSet|Model {
         # Variables
         $model_name = get_called_class();
-        $model = new $model_name(parent_id: $parent_id);
+        $model = new $model_name();
         $model_objects = [];
-        $is_parent_model_many = $model->is_parent_model_many();
         $requests_pagination = ($limit or $offset);
-        $cache_exempt = ($requests_pagination or $reverse or isset($parent_id));
-
-        # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
-        if ($is_parent_model_many and !isset($parent_id)) {
-            throw new ValidationError(
-                message: 'Field `parent_id` is required to read all.',
-                response_id: 'MODEL_PARENT_ID_REQUIRED',
-            );
-        }
+        $cache_exempt = ($requests_pagination or $reverse);
 
         # Throw an error if pagination was requested on a Model without $many enabled
         if (!$model->many and $requests_pagination) {
@@ -1946,8 +1965,11 @@ class Model {
 
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id => $internal_object) {
-            # Ensure numeric IDs are converted to integers
+            # Populate the ID and parent ID values where applicable
+            $internal_id = array_key_exists('id', $internal_object) ? $internal_object['id'] : $internal_id;
             $internal_id = is_numeric($internal_id) ? (int) $internal_id : $internal_id;
+            $parent_id = array_key_exists('parent_id', $internal_object) ? $internal_object['parent_id'] : null;
+            $parent_id = is_numeric($parent_id) ? (int) $parent_id : $parent_id;
 
             # Create a new Model object for this internal object and assign its ID
             $model_object = new $model(id: $internal_id, parent_id: $parent_id, skip_init: true);
@@ -1978,8 +2000,6 @@ class Model {
      * @param array $query_params An array of query parameters.
      * @param array $excluded An array of field names to exclude from the query. This is helpful when
      * query data may have extra values that you do not want to include in the query.
-     * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
-     * $many Models with a $parent_model_class. This value has no affect otherwise.
      * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many
      * enabled Models.
      * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
@@ -1993,7 +2013,6 @@ class Model {
     public static function query(
         array $query_params = [],
         array $excluded = [],
-        mixed $parent_id = null,
         int $limit = 0,
         int $offset = 0,
         bool $reverse = false,
@@ -2007,11 +2026,11 @@ class Model {
 
         # If no query or sort parameters were provided, just run read_all() with pagination for optimal performance
         if (!$query_params and $sort_by === null) {
-            return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset, reverse: $reverse);
+            return self::read_all(limit: $limit, offset: $offset, reverse: $reverse);
         }
 
         # Perform the query against all Model objects for this Model first
-        $modelset = self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
+        $modelset = self::read_all()->query(query_params: $query_params, excluded: $excluded);
 
         # Sort the set if a sort field was provided
         if ($sort_by) {
@@ -2277,7 +2296,7 @@ class Model {
         # Keep track of all existing objects for this Model before anything is changed. This will be passed back
         # into `apply_replace_all()` so that method can gracefully bring down these objects before replacing them
         # if needed.
-        $initial_objects = $this->read_all(parent_id: $this->parent_id);
+        $initial_objects = $this->query(parent_id: $this->parent_id);
 
         # Obtain any Models that are deemed protected to ensure they do not removed in the next step.
         $new_objects = new ModelSet();
@@ -2453,7 +2472,6 @@ class Model {
         $model_objects = self::query(
             query_params: $query_params,
             excluded: $excluded,
-            parent_id: $parent_id,
             limit: $limit,
             offset: $offset,
         );
