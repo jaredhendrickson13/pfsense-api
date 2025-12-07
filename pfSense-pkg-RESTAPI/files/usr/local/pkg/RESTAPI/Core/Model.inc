@@ -375,7 +375,7 @@ class Model {
      */
     public function __sleep() {
         # Variables
-        $excluded_properties = ['initial_object', 'client', 'parent_model', 'related_objects'];
+        $excluded_properties = ['initial_object', 'client', 'parent_model', 'related_objects', 'object_cache'];
         $properties = array_keys(get_object_vars($this));
 
         # Filter out excluded properties from the list of properties to serialize
@@ -880,8 +880,11 @@ class Model {
         foreach ($parent_configs as $parent_id => $parent_config) {
             # Obtain the list of child objects from this parent config
             $child_configs = $this->get_config("$parent_model->config_path/$parent_id/$this->config_path", []);
+            $parent_model = new $parent_model_class(id: $parent_id, skip_init: true);
+            $parent_model->from_internal_object($parent_config);
 
             foreach ($child_configs as $child_id => $child_config) {
+                $child_config['parent_model'] = $parent_model;
                 $child_config['parent_id'] = $parent_id;
                 $child_config['id'] = $child_id;
                 $internal_objects[] = $child_config;
@@ -1800,10 +1803,10 @@ class Model {
 
         # Obtain all Model objects for this Model and sort them by the requested criteria
         $modelset = $this->query(
-            parent_id: $this->parent_id,
             sort_by: $this->sort_by,
             sort_order: $this->sort_order,
             sort_flags: $this->sort_flags,
+            parent_id: $this->parent_id,
         );
 
         # Loop through the sorted object and assign it's internal value
@@ -1969,12 +1972,11 @@ class Model {
 
             # Create a new Model object for this internal object and assign its ID
             $model_object = new $model(id: $internal_id, parent_id: $parent_id, skip_init: true);
-
-            # Obtain the parent Model object if this Model has a parent Model class assigned
-            $model_object->parent_model = $model->parent_model;
+            $model_object->parent_model = $internal_object['parent_model'] ?? null;
 
             # Populate the Model object using its current internal values and add it to the array of all Model objects
             $model_object->from_internal_object($internal_object);
+
             $model_objects[] = $model_object;
         }
 
