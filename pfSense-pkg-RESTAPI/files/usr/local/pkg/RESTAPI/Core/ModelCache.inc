@@ -90,8 +90,7 @@ class ModelCache {
      * @param string $index_field The field name to index the Model objects by.
      * @return array An associative array of indexed Model objects.
      */
-    public static function index_modelset_by_field(string $model_class, string $index_field): array
-    {
+    public static function index_modelset_by_field(string $model_class, string $index_field): array {
         # First, check if this Model class has already been indexed by this field
         if (isset(self::$index[$model_class][$index_field])) {
             return self::$index[$model_class][$index_field];
@@ -122,11 +121,7 @@ class ModelCache {
      * @param mixed $index_value The index field value to look up the Model object by
      * @return bool True if a cached Model object exists for the specified Model class and index
      */
-    public static function has_model(
-        string $model_class,
-        string $index_field = 'id',
-        mixed $index_value = null,
-    ): bool {
+    public static function has_model(string $model_class, string $index_field = 'id', mixed $index_value = null): bool {
         # Cache is always a miss if the Model class is not indexed
         if (!self::$index[$model_class]) {
             return false;
@@ -145,7 +140,7 @@ class ModelCache {
      * Caches a Model object in the ModelCache by its index field/value.
      * @param Model $model The Model object to cache.
      * @param string $index_field The field to index the Model object by. Only used for many enabled Models.
- */
+     */
     public static function cache_model(Model $model, string $index_field = 'id'): void {
         # Determine the Model class of the Model object
         $model_class = $model->get_class_fqn();
@@ -183,12 +178,11 @@ class ModelCache {
         string $model_class,
         string $index_field = 'id',
         mixed $index_value = null,
-    ): Model
-    {
+    ): Model {
         if (!self::has_model($model_class, $index_field, $index_value)) {
             throw new NotFoundError(
                 message: "No cached Model found for Model class '$model_class' with " .
-                "index field '$index_field' and index value '$index_value'.",
+                    "index field '$index_field' and index value '$index_value'.",
                 response_id: 'MODEL_CACHE_MODEL_NOT_FOUND',
             );
         }
@@ -205,8 +199,7 @@ class ModelCache {
     /**
      * Clears the ModelCache of all cached ModelSets and indexed Model objects.
      */
-    public static function clear(): void
-    {
+    public static function clear(): void {
         self::$index = [];
         self::$cache = [];
     }

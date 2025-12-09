@@ -885,16 +885,14 @@ class Model {
         # Check for internal objects from all parents
         foreach ($parent_modelset->model_objects as $parent_model) {
             # Obtain the internal config for
-            $child_configs = $this->get_config(
-                "$parent_model->config_path/$parent_model->id/$this->config_path", []
-            );
+            $child_configs = $this->get_config("$parent_model->config_path/$parent_model->id/$this->config_path", []);
 
             foreach ($child_configs as $child_id => $child_config) {
                 # Retain internal object context information needed to reconstruct the Model object later
                 $internal_objects[] = [
-                    "_parent_model" => $parent_model,
-                    "_id" => $child_id,
-                    "_internal_object" => $child_config,
+                    '_parent_model' => $parent_model,
+                    '_id' => $child_id,
+                    '_internal_object' => $child_config,
                 ];
             }
         }
@@ -1978,10 +1976,10 @@ class Model {
         foreach ($internal_objects as $internal_id => $internal_object) {
             # For Models with parent Models, the internal object always contains extra context data about
             # the parent Model class. See the get_internal_objects_from_all_parents() method for more information.
-            $internal_id = $model->parent_model_class ? $internal_object["_id"] : $internal_id;
-            $parent_model = $model->parent_model_class ? $internal_object["_parent_model"] : null;
+            $internal_id = $model->parent_model_class ? $internal_object['_id'] : $internal_id;
+            $parent_model = $model->parent_model_class ? $internal_object['_parent_model'] : null;
             $parent_id = $parent_model ? $parent_model->id : null;
-            $internal_object = $parent_model ? $internal_object["_internal_object"] : $internal_object;
+            $internal_object = $parent_model ? $internal_object['_internal_object'] : $internal_object;
 
             # Normalize IDs
             $internal_id = is_numeric($internal_id) ? (int) $internal_id : $internal_id;
