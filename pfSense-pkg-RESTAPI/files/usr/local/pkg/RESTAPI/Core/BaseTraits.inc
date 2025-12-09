@@ -14,16 +14,16 @@ trait BaseTraits {
      * Obtains the shortname of the called class.
      * @return string The shortname for this object's class.
      */
-    public function get_class_shortname(): string {
-        return (new ReflectionClass($this))->getShortName();
+    public static function get_class_shortname(): string {
+        return (new ReflectionClass(static::class))->getShortName();
     }
 
     /**
      * Obtains the fully qualified name of the called class.
      * @return string The FQN for this object's class.
      */
-    public function get_class_fqn(): string {
-        return (new ReflectionClass($this))->getName();
+    public static function get_class_fqn(): string {
+        return (new ReflectionClass(static::class))->getName();
     }
 
     /**

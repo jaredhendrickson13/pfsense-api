@@ -145,13 +145,6 @@ class Model {
     public Cache|null $cache = null;
 
     /**
-     * @var array $object_cache
-     * An array used internally to cache already loaded ModelSets for any Model class. This prevents redundant loading
-     * of ModelSet objects during operations that may require multiple references to the same ModelSet.
-     */
-    public static array $object_cache = [];
-
-    /**
      * @var ModelSet $related_objects
      * A ModelSet containing foreign Model objects related to this Model. These are primarily populated by
      * ForeignModelFields assigned to this Model object. If no related Models are found, this ModelSet will not contain
@@ -375,7 +368,7 @@ class Model {
      */
     public function __sleep() {
         # Variables
-        $excluded_properties = ['initial_object', 'client', 'parent_model', 'related_objects', 'object_cache'];
+        $excluded_properties = ['initial_object', 'client', 'parent_model', 'related_objects'];
         $properties = array_keys(get_object_vars($this));
 
         # Filter out excluded properties from the list of properties to serialize
@@ -409,7 +402,7 @@ class Model {
      */
     private function set_construct_options(array $options): array {
         # Set the async flag if given. Ensure this defaults to true.
-        $this->async = isset($options['async']) ? $options['async'] : true;
+        $this->async = $options['async'] ?? true;
         unset($options['async']);
 
         # Set the placement index if given and is a positive integer
@@ -530,11 +523,19 @@ class Model {
     }
 
     /**
+     * Provides access to the ModelCache singleton instance.
+     * @return ModelCache The ModelCache singleton instance.
+     */
+    public static function get_model_cache(): ModelCache {
+        return ModelCache::get_instance();
+    }
+
+    /**
      * Clears the object cache for this Model class.
      */
-    public static function clear_object_cache(): void {
+    public static function clear_model_cache(): void {
         # Clear the object cache
-        self::$object_cache = [];
+        self::get_model_cache()::clear();
     }
 
     /**
@@ -655,7 +656,7 @@ class Model {
      */
     public static function set_config(string $path, mixed $value, mixed $default = null): mixed {
         # Clear the object cache for this Model class since config is being modified
-        self::clear_object_cache();
+        self::clear_model_cache();
         return config_set_path(self::normalize_config_path($path), $value, $default);
     }
 
@@ -701,7 +702,7 @@ class Model {
      */
     public static function del_config(string $path): mixed {
         # Clear the object cache for this Model class since config is being modified
-        self::clear_object_cache();
+        self::clear_model_cache();
         return config_del_path(self::normalize_config_path($path));
     }
 
@@ -739,7 +740,7 @@ class Model {
                 session_destroy();
 
                 # Clear the object cache for this Model class since config has been modified
-                self::clear_object_cache();
+                self::clear_model_cache();
 
                 # If a subsystem is specified for this Model, mark it as dirty
                 if ($this->subsystem) {
@@ -770,7 +771,7 @@ class Model {
         global $config;
 
         # Clear the object cache for all Model classes since config is being reloaded
-        self::clear_object_cache();
+        self::clear_model_cache();
 
         $config = parse_config(parse: $force_parse);
     }
@@ -867,27 +868,34 @@ class Model {
     /**
      * Recursively obtains all internal objects for this Model from all parent objects in config. This method is only
      * applicable to Models with a `parent_model_class` assigned.
-     * @return array An array of all internal objects for this Model from all parent objects in
+     * @return array An array containing the internal object and its context information needed to reconstruct the
+     * Model object later. This array will always be structured as the following:
+     * [
+     *   "_parent_model" => Model, // The parent Model object
+     *   "_id" => string|int,      // The ID of the internal object
+     *   "_internal_object" => array, // The internal object data
+     * ]
      */
     protected function get_internal_objects_from_all_parents(): array {
-        # Variables
-        $internal_objects = [];
+        /**@var Model $parent_model_class The parent Model class assigned to this Model. */
         $parent_model_class = "\\RESTAPI\\Models\\$this->parent_model_class";
-        $parent_model = new $parent_model_class(skip_init: true);
-        $parent_configs = $this->get_config($parent_model->config_path, []);
+        $parent_modelset = $parent_model_class::read_all();
+        $internal_objects = [];
 
         # Check for internal objects from all parents
-        foreach ($parent_configs as $parent_id => $parent_config) {
-            # Obtain the list of child objects from this parent config
-            $child_configs = $this->get_config("$parent_model->config_path/$parent_id/$this->config_path", []);
-            $parent_model = new $parent_model_class(id: $parent_id, skip_init: true);
-            $parent_model->from_internal_object($parent_config);
+        foreach ($parent_modelset->model_objects as $parent_model) {
+            # Obtain the internal config for
+            $child_configs = $this->get_config(
+                "$parent_model->config_path/$parent_model->id/$this->config_path", []
+            );
 
             foreach ($child_configs as $child_id => $child_config) {
-                $child_config['parent_model'] = $parent_model;
-                $child_config['parent_id'] = $parent_id;
-                $child_config['id'] = $child_id;
-                $internal_objects[] = $child_config;
+                # Retain internal object context information needed to reconstruct the Model object later
+                $internal_objects[] = [
+                    "_parent_model" => $parent_model,
+                    "_id" => $child_id,
+                    "_internal_object" => $child_config,
+                ];
             }
         }
 
@@ -898,11 +906,13 @@ class Model {
      * Obtains all internal objects for this Model. When a `config_path` is specified, this method will obtain the
      * internal objects directly from config. When an `internal_callable` is assigned, this method will return
      * the output of the assigned callable.
+     * @param bool $from_all_parents When set to `true`, this method will obtain internal objects from all parent
+     * objects in config. This is only applicable to Models with a `parent_model_class` assigned.
      * @throws ServerError When neither a `config_path` nor a `internal_callable` are assigned to this model, OR both a
      * `config_path` and a `internal_callable` are assigned to this model
      * @return array The array of internal objects without any additional processing performed.
      */
-    public function get_internal_objects(): array {
+    public function get_internal_objects(bool $from_all_parents = false): array {
         global $mock_internal_objects;
 
         # Throw an error if both `config_path` and `internal_callable` are set.
@@ -916,8 +926,8 @@ class Model {
         elseif ($mock_internal_objects) {
             $internal_objects = $mock_internal_objects;
         }
-        # Obtain all internal objects from all parents if a parent Model class is assigned
-        elseif ($this->parent_model_class) {
+        # Obtain all internal objects from all parents if a parent Model class is assigned and all parents is requested
+        elseif ($from_all_parents and $this->parent_model_class) {
             $internal_objects = $this->get_internal_objects_from_all_parents();
         }
         # Obtain the internal objects from the config path if specified
@@ -977,8 +987,10 @@ class Model {
 
         # When `many` is enabled, obtain the object with our ID. Otherwise, just assign the direct object
         $internal_object = $this->many ? $internal_objects[$this->id] : $internal_objects;
-
         $this->from_internal_object($internal_object);
+
+        # Re-index the ModelCache for this object since it has been refreshed from internal
+        self::get_model_cache()::cache_model($this);
     }
 
     /**
@@ -1932,7 +1944,7 @@ class Model {
      */
     public static function read_all(int $limit = 0, int $offset = 0, bool $reverse = false): ModelSet|Model {
         # Variables
-        $model_name = get_called_class();
+        $model_name = self::get_class_fqn();
         $model = new $model_name();
         $model_objects = [];
         $requests_pagination = ($limit or $offset);
@@ -1948,12 +1960,12 @@ class Model {
         }
 
         # Load from cache if it is not exempt and cached objects exist
-        if (!$cache_exempt and Model::$object_cache[$model_name]) {
-            return Model::$object_cache[$model_name];
+        if (!$cache_exempt and self::get_model_cache()::has_modelset($model_name)) {
+            return Model::get_model_cache()::fetch_modelset($model_name);
         }
 
-        # Obtain all of this Model's internally stored objects
-        $internal_objects = $model->get_internal_objects();
+        # Obtain all of this Model's internally stored objects, including those from parent Models if applicable
+        $internal_objects = $model->get_internal_objects(from_all_parents: true);
 
         # For non `many` Models, wrap the internal object in an array so we can loop
         $internal_objects = $model->many ? $internal_objects : [$internal_objects];
@@ -1964,15 +1976,19 @@ class Model {
 
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id => $internal_object) {
-            # Populate the ID and parent ID values where applicable
-            $internal_id = array_key_exists('id', $internal_object) ? $internal_object['id'] : $internal_id;
+            # For Models with parent Models, the internal object always contains extra context data about
+            # the parent Model class. See the get_internal_objects_from_all_parents() method for more information.
+            $internal_id = $model->parent_model_class ? $internal_object["_id"] : $internal_id;
+            $parent_model = $model->parent_model_class ? $internal_object["_parent_model"] : null;
+            $parent_id = $parent_model ? $parent_model->id : null;
+            $internal_object = $parent_model ? $internal_object["_internal_object"] : $internal_object;
+
+            # Normalize IDs
             $internal_id = is_numeric($internal_id) ? (int) $internal_id : $internal_id;
-            $parent_id = array_key_exists('parent_id', $internal_object) ? $internal_object['parent_id'] : null;
-            $parent_id = is_numeric($parent_id) ? (int) $parent_id : $parent_id;
 
             # Create a new Model object for this internal object and assign its ID
             $model_object = new $model(id: $internal_id, parent_id: $parent_id, skip_init: true);
-            $model_object->parent_model = $internal_object['parent_model'] ?? null;
+            $model_object->parent_model = $parent_model;
 
             # Populate the Model object using its current internal values and add it to the array of all Model objects
             $model_object->from_internal_object($internal_object);
@@ -1985,7 +2001,7 @@ class Model {
 
         # For many models, cache the ModelSet if not exempt
         if ($model->many and !$cache_exempt) {
-            Model::$object_cache[$model_name] = new ModelSet(model_objects: $model_objects);
+            self::get_model_cache()::cache_modelset($model_name, $modelset);
         }
 
         # For many enabled Models return a ModelSet, otherwise return a single Model object
@@ -2088,6 +2104,9 @@ class Model {
         # Obtain the requested Model object from config by ID
         $this->from_internal();
 
+        # Cache the newly read Model object
+        self::get_model_cache()::cache_model($this);
+
         return $this;
     }
 
@@ -2149,7 +2168,7 @@ class Model {
         }
 
         # Reset the object cache as the config has changed
-        Model::$object_cache = [];
+        self::clear_model_cache();
 
         # Return the current representation of this object
         return $this;
@@ -2242,7 +2261,7 @@ class Model {
         }
 
         # Reset the object cache as the config has changed
-        Model::$object_cache = [];
+        self::clear_model_cache();
 
         # Return the current representation of this object
         return $this;
@@ -2338,7 +2357,7 @@ class Model {
         }
 
         # Reset the object cache as the config has changed
-        Model::$object_cache = [];
+        self::clear_model_cache();
 
         return $new_objects;
     }
@@ -2426,7 +2445,7 @@ class Model {
         }
 
         # Reset the object cache as the config has changed
-        Model::$object_cache = [];
+        self::clear_model_cache();
 
         # Return the current representation of this object
         return $this;
@@ -2470,7 +2489,7 @@ class Model {
         $model_objects = self::query(query_params: $query_params, excluded: $excluded, limit: $limit, offset: $offset);
 
         # Reset the object cache as the config has changed
-        Model::$object_cache = [];
+        Model::clear_model_cache();
 
         # Delete the Model objects that matched the query
         return $model_objects->delete();
@@ -2484,7 +2503,7 @@ class Model {
         $model_objects = self::read_all();
 
         # Reset the object cache as the config has changed
-        Model::$object_cache = [];
+        Model::clear_model_cache();
 
         # Delete all Model objects for this Model
         return $model_objects->delete();

@@ -116,7 +116,7 @@ class TestCase {
     protected function restore_config(array $original_config): void {
         global $config;
         $config = $original_config;
-        Model::clear_object_cache();
+        Model::clear_model_cache();
         write_config("Restored config after API test '{$this->method}'");
     }
 

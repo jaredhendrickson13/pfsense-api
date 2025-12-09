@@ -90,7 +90,7 @@ class Package extends Model {
         pkg_install($this->name->value);
 
         # Clear the object cache to ensure we get fresh data
-        $this->clear_object_cache();
+        $this->clear_model_cache();
 
         # Locate this package's current ID and load info about the package installed
         $this->id = $this->query(name: $this->name->value)->first()->id;
