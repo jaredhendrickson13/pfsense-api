@@ -19,6 +19,7 @@ run pfSense. It's recommended to follow Netgate's [minimum hardware requirements
 - pfSense Plus 24.11
 - pfSense Plus 25.07
 - pfSense Plus 25.07.1
+- pfSense Plus 25.11
 
 !!! Warning
     Installation of the package on unsupported versions of pfSense may result in unexpected behavior and/or system instability.
@@ -35,13 +36,13 @@ The pfSense REST API package is built just like any other pfSense package and ca
 **Install on pfSense CE**
 
 ```bash
-pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.8.0-pkg-RESTAPI.pkg
+pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.8.1-pkg-RESTAPI.pkg
 ```
 
 **Install on pfSense Plus**
 
 ```bash
-pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-24.11-pkg-RESTAPI.pkg
+pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-25.11-pkg-RESTAPI.pkg
 ```
 
 !!! Important
