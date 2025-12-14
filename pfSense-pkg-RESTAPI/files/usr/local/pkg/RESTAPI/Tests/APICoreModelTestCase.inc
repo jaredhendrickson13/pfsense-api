@@ -1300,4 +1300,45 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals(Model::normalize_config_path('/test//path/'), 'test/path');
         $this->assert_equals(Model::normalize_config_path('test'), 'test');
     }
+
+    /**
+     * Checks that the read_all() method caches previously read Model objects to improve performance.
+     */
+    public function test_read_all_caching(): void {
+        # Ensure the model cache is empty
+        FirewallAlias::get_model_cache()::clear();
+
+        # Create FirewallAlias models to test this
+        $alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
+        $alias_0->create();
+        $alias_1 = new FirewallAlias(name: 'alias1', type: 'port');
+        $alias_1->create();
+        $aliias_2 = new FirewallAlias(name: 'alias2', type: 'network');
+        $aliias_2->create();
+
+        # Read all aliases and ensure the cache is populated
+        FirewallAlias::read_all();
+        $this->assert_is_true(
+            array_key_exists(FirewallAlias::get_class_fqn(), FirewallAlias::get_model_cache()::$cache),
+        );
+        $this->assert_equals(
+            count(FirewallAlias::get_model_cache()::fetch_modelset(FirewallAlias::get_class_fqn())->model_objects),
+            3,
+        );
+
+        # Add another alias and ensure the cache is updated
+        $alias_3 = new FirewallAlias(name: 'alias3', type: 'host');
+        $alias_3->create();
+        FirewallAlias::read_all();
+        $this->assert_equals(
+            count(FirewallAlias::get_model_cache()::fetch_modelset(FirewallAlias::get_class_fqn())->model_objects),
+            4,
+        );
+
+        # Delete all the aliases
+        FirewallAlias::delete_all();
+
+        # Ensure the cache was cleared after deletion
+        $this->assert_is_false(FirewallAlias::get_model_cache()::has_modelset(FirewallAlias::get_class_fqn()));
+    }
 }

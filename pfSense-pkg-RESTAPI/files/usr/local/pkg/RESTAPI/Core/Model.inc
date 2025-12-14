@@ -986,9 +986,6 @@ class Model {
         # When `many` is enabled, obtain the object with our ID. Otherwise, just assign the direct object
         $internal_object = $this->many ? $internal_objects[$this->id] : $internal_objects;
         $this->from_internal_object($internal_object);
-
-        # Re-index the ModelCache for this object since it has been refreshed from internal
-        self::get_model_cache()::cache_model($this);
     }
 
     /**
@@ -1946,7 +1943,7 @@ class Model {
         $model = new $model_name();
         $model_objects = [];
         $requests_pagination = ($limit or $offset);
-        $cache_exempt = ($requests_pagination or $reverse);
+        $cache_exempt = ($requests_pagination or $reverse or $model->internal_callable);
 
         # Throw an error if pagination was requested on a Model without $many enabled
         if (!$model->many and $requests_pagination) {
@@ -2101,9 +2098,6 @@ class Model {
 
         # Obtain the requested Model object from config by ID
         $this->from_internal();
-
-        # Cache the newly read Model object
-        self::get_model_cache()::cache_model($this);
 
         return $this;
     }
@@ -2467,7 +2461,6 @@ class Model {
     public static function delete_many(
         array $query_params = [],
         array $excluded = [],
-        mixed $parent_id = null,
         int $limit = 0,
         int $offset = 0,
         ...$vl_query_params,
@@ -2487,7 +2480,7 @@ class Model {
         $model_objects = self::query(query_params: $query_params, excluded: $excluded, limit: $limit, offset: $offset);
 
         # Reset the object cache as the config has changed
-        Model::clear_model_cache();
+        self::clear_model_cache();
 
         # Delete the Model objects that matched the query
         return $model_objects->delete();
@@ -2501,7 +2494,7 @@ class Model {
         $model_objects = self::read_all();
 
         # Reset the object cache as the config has changed
-        Model::clear_model_cache();
+        self::clear_model_cache();
 
         # Delete all Model objects for this Model
         return $model_objects->delete();

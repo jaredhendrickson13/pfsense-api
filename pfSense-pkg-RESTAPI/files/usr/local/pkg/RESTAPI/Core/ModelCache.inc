@@ -3,6 +3,7 @@
 namespace RESTAPI\Core;
 
 use RESTAPI\Responses\NotFoundError;
+use RESTAPI\Responses\ServerError;
 
 require_once 'RESTAPI/autoloader.inc';
 
@@ -83,6 +84,51 @@ class ModelCache {
     }
 
     /**
+     * Raises an error if the given Model object does not support being indexed by the specified field.
+     * @param Model $model The Model object to check for uniqueness.
+     * @param string $index_field The index field name to check for uniqueness.
+     * @throws ServerError If the Model is attempting to be indexed by a non-unique field.
+     * @throws ServerError If the Model is not many-enabled.
+     */
+    private static function ensure_model_supports_indexing(Model $model, string $index_field): void {
+        # Only many-enabled Models can be indexed
+        if (!$model->many) {
+            throw new ServerError(
+                message: "Cannot index Model class '" . $model->get_class_fqn() . 'because it is not many-enabled.',
+                response_id: 'MODEL_CACHE_INDEX_FIELD_ON_NON_MANY_MODEL',
+            );
+        }
+
+        # Models with parent model classes cannot be indexed
+        if ($model->parent_model_class) {
+            throw new ServerError(
+                message: "Cannot index Model class '" .
+                    $model->get_class_fqn() .
+                    "' because it has a parent model class '" .
+                    $model->parent_model_class .
+                    "'.",
+                response_id: 'MODEL_CACHE_INDEX_FIELD_ON_PARENTED_MODEL',
+            );
+        }
+
+        # If indexing by 'id', it's always unique
+        if ($index_field === 'id') {
+            return;
+        }
+
+        # Check if the index field is unique on the Model object
+        if (!$model->$index_field->unique) {
+            throw new ServerError(
+                message: "Cannot index Model class '" .
+                    $model->get_class_fqn() .
+                    "' by non-unique field " .
+                    "'$index_field'.",
+                response_id: 'MODEL_CACHE_INDEX_FIELD_NOT_UNIQUE',
+            );
+        }
+    }
+
+    /**
      * Indexes the ModelSet cache for a given Model class by a specified field. This method will populate
      * the $index array for the specified Model class and index field.
      * @param string $model_class The Model class name whose ModelSet is to be indexed. If no cached ModelSet exists,
@@ -96,8 +142,11 @@ class ModelCache {
             return self::$index[$model_class][$index_field];
         }
 
-        # Ensure a cached ModelSet exists for the specified Model class
+        # Ensure the Model can be indexed by the specified field
         $model = new $model_class();
+        self::ensure_model_supports_indexing($model, $index_field);
+
+        # Fetch or create the ModelSet for this Model class
         $model_set = $model->read_all();
 
         # Create an associative array to hold the indexed Model objects
@@ -134,36 +183,6 @@ class ModelCache {
 
         # Otherwise, cache is only a hit for many enabled models if the index field/value exists in the index
         return isset(self::$index[$model_class][$index_field][$index_value]);
-    }
-
-    /**
-     * Caches a Model object in the ModelCache by its index field/value.
-     * @param Model $model The Model object to cache.
-     * @param string $index_field The field to index the Model object by. Only used for many enabled Models.
-     */
-    public static function cache_model(Model $model, string $index_field = 'id'): void {
-        # Determine the Model class of the Model object
-        $model_class = $model->get_class_fqn();
-
-        # Ensure an index collection exists for this model's class
-        if (!isset(self::$index[$model_class])) {
-            self::$index[$model_class] = [];
-        }
-
-        # Ensure an index exists for this model's index field if many is enabled
-        if ($model->many and !isset(self::$index[$model_class][$index_field])) {
-            self::$index[$model_class][$index_field] = [];
-        }
-
-        # For many enabled models, index the model under the specified index field and value
-        if ($model->many) {
-            $index_value = $index_field === 'id' ? $model->id : $model->$index_field->value;
-            self::$index[$model_class][$index_field][$index_value] = $model;
-            return;
-        }
-
-        # Otherwise, index the model under the Model class only
-        self::$index[$model_class] = $model;
     }
 
     /**
