@@ -42,7 +42,7 @@ pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest
 Install on pfSense Plus:
 
 ```bash
-pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-25.07.1-pkg-RESTAPI.pkg
+pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-25.11-pkg-RESTAPI.pkg
 ```
 
 > [!WARNING]

@@ -36,6 +36,8 @@ jobs:
             PFSENSE_VERSION: "25.07"
           - FREEBSD_VERSION: FreeBSD-15.0-CURRENT
             PFSENSE_VERSION: "25.07.1"
+          - FREEBSD_VERSION: FreeBSD-16.0-CURRENT
+            PFSENSE_VERSION: "25.11"
 
     steps:
       - uses: actions/checkout@v6
@@ -49,8 +51,8 @@ jobs:
 
       - name: Build pfSense-pkg-RESTAPI on FreeBSD
         run: |
-          /usr/bin/ssh -o StrictHostKeyChecking=no ${{ matrix.FREEBSD_VERSION }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
-          /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.FREEBSD_VERSION }}.jaredhendrickson.com --branch ${{ github.sha }} --tag ${{ github.ref_name }} --filename pfSense-${{ matrix.PFSENSE_VERSION }}-pkg-RESTAPI.pkg --notests
+          /usr/bin/ssh -o StrictHostKeyChecking=no ${{ matrix.FREEBSD_VERSION }}.actions.pfrest.org 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
+          /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.FREEBSD_VERSION }}.actions.pfrest.org --branch ${{ github.sha }} --tag ${{ github.ref_name }} --filename pfSense-${{ matrix.PFSENSE_VERSION }}-pkg-RESTAPI.pkg --notests
 
       - name: Teardown FreeBSD build VM
         if: "${{ always() }}"
@@ -89,19 +91,19 @@ jobs:
       # This is only necessary until GitHub Actions allows an easier way to get a URL to download the artifact within pfSense
       - name: Copy pfSense-pkg-RESTAPI build to pfSense
         run: |
-          pfsense-vshell --host pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
-          pfsense-vshell --host pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
-          scp -o StrictHostKeyChecking=no pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg/pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg admin@pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.jaredhendrickson.com:/tmp/
+          pfsense-vshell --host pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.actions.pfrest.org -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
+          pfsense-vshell --host pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.actions.pfrest.org -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
+          scp -o StrictHostKeyChecking=no pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg/pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg admin@pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.actions.pfrest.org:/tmp/
 
       - name: Install pfSense-pkg-RESTAPI on pfSense
         run: |
-          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.jaredhendrickson.com "pkg -C /dev/null add /tmp/pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg"
+          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.actions.pfrest.org "pkg -C /dev/null add /tmp/pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-pkg-RESTAPI.pkg"
           sleep 5
 
       - name: Fetch schemas from pfSense
         run: |
-          curl -s -k -u admin:pfsense -X GET https://pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.jaredhendrickson.com/api/v2/schema/openapi > openapi.json
-          curl -s -k -u admin:pfsense -X GET https://pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.jaredhendrickson.com/api/v2/schema/graphql > schema.graphql
+          curl -s -k -u admin:pfsense -X GET https://pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.actions.pfrest.org/api/v2/schema/openapi > openapi.json
+          curl -s -k -u admin:pfsense -X GET https://pfSense-${{ env.DEFAULT_PFSENSE_VERSION }}-RELEASE.actions.pfrest.org/api/v2/schema/graphql > schema.graphql
 
       - name: Teardown pfSense VM
         if: "${{ always() }}"
