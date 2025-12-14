@@ -15,12 +15,14 @@ use RESTAPI\Models\SystemStatus;
 use RESTAPI\Models\Test;
 use function RESTAPI\Models\DHCPServerStaticMapping;
 
-class APICoreModelTestCase extends RESTAPI\Core\TestCase {
+class APICoreModelTestCase extends RESTAPI\Core\TestCase
+{
     /**
      * Checks that a Model object cannot be created when both an ID and representation data are provided. This
      * ensures there is no confusion about which object ID to use when obtaining the model from its internal value.
      */
-    public function test_no_model_with_id_and_representation_data() {
+    public function test_no_model_with_id_and_representation_data()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_WITH_ID_AND_REPRESENTATION',
             code: 500,
@@ -35,7 +37,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * and IP address. This is mostly commonly used by RESTAPI\Core\Endpoint to provide Models information about the client
      * that authenticated a REST API call.
      */
-    public function test_model_allows_provided_auth_obj() {
+    public function test_model_allows_provided_auth_obj()
+    {
         # Create an RESTAPI\Core\Auth object with custom values.
         $test_client = new RESTAPI\Core\Auth();
         $test_client->username = 'test_user';
@@ -52,7 +55,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a default RESTAPI\Core\Auth object is created when a Model object is created if none was provided.
      */
-    public function test_model_default_auth_obj() {
+    public function test_model_default_auth_obj()
+    {
         # Create a Model object and but do not provide an Auth object
         $test_model = new Test();
 
@@ -64,7 +68,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks the Model's default `verbose_name` and `verbose_name_plural` are properly derived from its class name.
      */
-    public function test_model_default_verbose_name() {
+    public function test_model_default_verbose_name()
+    {
         # Create a normal Model object and a FirewallAlias Model object for testing
         $test_model = new Test();
         $test_fw_alias = new FirewallAlias();
@@ -79,7 +84,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that we are able to read items from the internal pfSense configuration by path.
      */
-    public function test_model_get_config_valid_path() {
+    public function test_model_get_config_valid_path()
+    {
         # Try to read the WAN interface configuration since it is always present in the config
         $this->assert_type(Model::get_config('interfaces/wan'), 'array');
     }
@@ -87,7 +93,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that a specified default value is returned if the config path does not lead to an existing value.
      */
-    public function test_model_get_config_bad_path() {
+    public function test_model_get_config_bad_path()
+    {
         # Try to read the WAN interface configuration since it is always present in the config
         $this->assert_equals(Model::get_config('does/not/exists', []), []);
         $this->assert_equals(Model::get_config('does/not/exists', false), false);
@@ -97,7 +104,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that we cannot call the default get_next_id() method if the model object does not have a config path set.
      */
-    public function test_model_cant_get_next_id_without_config_path() {
+    public function test_model_cant_get_next_id_without_config_path()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_NEXT_ID_WITHOUT_CONFIG_PATH',
             code: 500,
@@ -112,7 +120,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that we cannot call the default get_next_id() method if the model object does not have `many` enabled.
      */
-    public function test_model_cant_get_next_id_without_many() {
+    public function test_model_cant_get_next_id_without_many()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_NEXT_ID_WITHOUT_MANY',
             code: 500,
@@ -129,7 +138,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * array value. This helps prevents dangerous write actions as it indicates the 'config_path' is wrong, or there
      * is a problem with the pfSense configuration.
      */
-    public function test_model_cant_get_next_id_with_dangerous_config_path() {
+    public function test_model_cant_get_next_id_with_dangerous_config_path()
+    {
         # Try to read the system hostname (which is a primitive string in the pfSense configuration). To get an ID, we
         # expect the value be to an indexed array or an empty value.
         $this->assert_throws_response(
@@ -148,7 +158,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that we can successfully obtain the next ID for a non-existing config path. Empty paths should always
      * return the first available ID, `0`.
      */
-    public function test_model_can_get_next_id_at_empty_path() {
+    public function test_model_can_get_next_id_at_empty_path()
+    {
         $test_model = new Test();
         $test_model->config_path = 'this/path/does/not/exist/yet';
         $test_model->many = true;
@@ -160,7 +171,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * checks that the ID returned for filter/rule is greater than 0 because it's generally safe to assume there
      * will always be at least one item in filter/rule.
      */
-    public function test_model_can_get_next_id_from_existing_array_path() {
+    public function test_model_can_get_next_id_from_existing_array_path()
+    {
         $test_model = new Test();
         $test_model->config_path = 'filter/rule';
         $test_model->many = true;
@@ -170,7 +182,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that Models can correctly convert to their internal values.
      */
-    public function test_model_to_internal() {
+    public function test_model_to_internal()
+    {
         # Since the default Model does not have any Fields, use a Test Model to test this.
         $test_model = new Test();
         $test_model->test_bool->value = true;
@@ -200,7 +213,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the Model's get_fields() method properly finds Field objects and their assigned names.
      */
-    public function test_model_get_fields() {
+    public function test_model_get_fields()
+    {
         # Use the Test model since the base Model has no Fields assigned.
         $this->assert_equals((new Test())->get_fields(), [
             'test_bool',
@@ -215,7 +229,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks to ensure Models cannot have Field objects with the same internal namespace and internal name.
      */
-    public function test_model_field_internal_name_unique_to_namespace() {
+    public function test_model_field_internal_name_unique_to_namespace()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES',
             code: 500,
@@ -234,7 +249,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks to ensure the validate() method properly throws an error if a required pfSense package for the Model
      * is missing.
      */
-    public function test_model_validate_packages_missing_package() {
+    public function test_model_validate_packages_missing_package()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_MISSING_REQUIRED_PACKAGE',
             code: 404,
@@ -249,7 +265,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks to ensure the validate() method is successful when we have the correct packages installed.
      */
-    public function test_model_validate_packages_installed_package() {
+    public function test_model_validate_packages_installed_package()
+    {
         $test_model = new Test();
         $test_model->packages = ['pfSense-pkg-RESTAPI']; # Use pfSense-pkg-RESTAPI since we know we have it.
         $test_model->validate();
@@ -259,7 +276,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks to ensure the validate() method properly throws an error if we cannot include a required package include
      * file because it is not found in the PHP path.
      */
-    public function test_model_validate_missing_package_includes() {
+    public function test_model_validate_missing_package_includes()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_WITH_FAILED_INCLUDE',
             code: 500,
@@ -276,7 +294,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * objects cannot be created unless the Model supports many objects OR the base Model class's `_create()` method
      * is overridden.
      */
-    public function test_model_create_without_many() {
+    public function test_model_create_without_many()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD',
             code: 500,
@@ -297,7 +316,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * objects cannot be created unless the Model has a valid config path OR the base Model class's `_create()` method
      * is overridden.
      */
-    public function test_model_create_without_config_path() {
+    public function test_model_create_without_config_path()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD',
             code: 500,
@@ -320,7 +340,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks the default `create()` method correctly validates and writes the Model object to config.
      */
-    public function test_model_create() {
+    public function test_model_create()
+    {
         # Create a new test model object in config
         $test_model = new Test();
         $test_model->test_bool->value = true;
@@ -344,7 +365,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * objects cannot be updated unless the Model has a valid config path OR the base Model class's `_update()` method
      * is overridden.
      */
-    public function test_model_update_without_config_path() {
+    public function test_model_update_without_config_path()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD',
             code: 500,
@@ -365,7 +387,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks the deafult Model object `update()` method to ensure it throws an error if `many` is set but no `id`
      * value has been assigned. We must have an ID to determine which object is being updated.
      */
-    public function test_model_update_without_id() {
+    public function test_model_update_without_id()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_REQUIRES_ID',
             code: 400,
@@ -381,7 +404,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks the default `update()` method correctly validates, updates and writes the Model object to config.
      */
-    public function test_model_update() {
+    public function test_model_update()
+    {
         # Create a new test model object in config
         $test_model = new Test();
         $test_model->test_bool->value = true;
@@ -415,7 +439,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * objects cannot be deleted unless the Model supports many objects OR the base Model class's `_delete()` method
      * is overridden.
      */
-    public function test_model_delete_without_many() {
+    public function test_model_delete_without_many()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD',
             code: 500,
@@ -436,7 +461,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * objects cannot be deleted unless the Model has a valid config path OR the base Model class's `_delete()` method
      * is overridden.
      */
-    public function test_model_delete_without_config_path() {
+    public function test_model_delete_without_config_path()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD',
             code: 500,
@@ -457,7 +483,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks the default Model object `delete()` method to ensure it throws an error if `many` is set but no `id`
      * value has been assigned. We must have an ID to determine which object is being deleted.
      */
-    public function test_model_delete_without_id() {
+    public function test_model_delete_without_id()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_REQUIRES_ID',
             code: 400,
@@ -473,7 +500,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the default `delete()` method actually deletes the object from configuration.
      */
-    public function test_model_delete() {
+    public function test_model_delete()
+    {
         # Ensure we cannot find the object from config after it's deleted.
         $this->assert_throws_response(
             response_id: 'MODEL_OBJECT_NOT_FOUND',
@@ -495,7 +523,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Test model's `apply()` method has been overridden to write a text file to /tmp/.api_model_test_apply.txt whenever
      * it is called. This test checks for that file after `create()`, `update()` or `delete()` is called.
      */
-    public function test_model_calls_apply_when_requested() {
+    public function test_model_calls_apply_when_requested()
+    {
         # In case a test file was leftover, try to remove the test file first
         unlink('/tmp/.api_models_test_apply.txt');
 
@@ -521,7 +550,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that all Fields specified in `unique_together_fields` must be existing Fields assigned to the Model.
      */
-    public function test_unique_together_fields() {
+    public function test_unique_together_fields()
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD',
             code: 500,
@@ -537,7 +567,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks the unique together validation correctly requires a group of Fields to be unique from all other Model
      * objects of its kind.
      */
-    public function test_unique_together_validation() {
+    public function test_unique_together_validation()
+    {
         # Create a Model object that uses the unique Fields
         $original_model_obj = new Test(
             data: [
@@ -572,7 +603,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that we are able to construct a Model object with an array of representation data.
      */
-    public function test_model_constructs_from_representation() {
+    public function test_model_constructs_from_representation()
+    {
         # Construct a new test model object using representation data
         $test_model = new Test(
             data: [
@@ -591,7 +623,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that `to_openapi_schema()` correctly converts the Model object to an OpenAPI schema.
      */
-    public function test_model_to_openapi_schema() {
+    public function test_model_to_openapi_schema()
+    {
         # Create a model to test with and generate it's OpenAPI schema
         $test_model = new Test();
         $test_model_schema = $test_model->to_openapi_schema();
@@ -608,7 +641,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the Models with a $cache_class assigned are construct with a specific Cache object.
      */
-    public function test_cache_class_creates_cache_object_during_construction(): void {
+    public function test_cache_class_creates_cache_object_during_construction(): void
+    {
         # Define a model with a cache class. Use the RESTAPIVersionReleasesCache for testing.
         $model = new Model();
         $model->cache_class = 'RESTAPIVersionReleasesCache';
@@ -627,7 +661,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that the Model's $placement property correctly sets the placement of the Model object in the pfSense
      * configuration during creation and updates.
      */
-    public function test_set_placement(): void {
+    public function test_set_placement(): void
+    {
         # Create three FirewallAlias models in order
         $alias_0 = new FirewallAlias(name: 'test0', type: 'host');
         $alias_0->create();
@@ -662,7 +697,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the get_all_model_classes() method correctly returns all Model classes that extend the Model class.
      */
-    public function test_get_all_model_classes(): void {
+    public function test_get_all_model_classes(): void
+    {
         # Variables
         $class_fqns = Model::get_all_model_classes();
         $class_shortnames = Model::get_all_model_classes(shortnames: true);
@@ -678,7 +714,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that each Model class in /usr/local/pkg/RESTAPI/Models/ has the correct constructor signature.
      */
-    public function test_model_constructor_signature(): void {
+    public function test_model_constructor_signature(): void
+    {
         # Variables
         $class_fqns = Model::get_all_model_classes();
 
@@ -704,7 +741,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that the skip_init property correctly skips loading a Model's values from internal in the Model's
      * __construct() method when set to true.
      */
-    public function test_skip_init(): void {
+    public function test_skip_init(): void
+    {
         # Create a new Test model object with skip_init set to true
         $test_model = new SystemStatus(skip_init: true);
 
@@ -722,7 +760,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that the Model::from_internal_object() correctly loads the Model object using the internal configuration
      * values.
      */
-    public function check_from_internal_object(): void {
+    public function check_from_internal_object(): void
+    {
         # Use a FirewallAlias model to test this
         $alias = new FirewallAlias();
 
@@ -752,7 +791,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures the authenticated username is properly retained whenever running Model::write_config() (#512)
      */
-    public function test_write_config_retains_authenticated_username(): void {
+    public function test_write_config_retains_authenticated_username(): void
+    {
         # Authenticate a user
         $client = new Auth();
         $client->username = 'test_user';
@@ -772,7 +812,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the 'delete_many()' method correctly deletes all Model objects that match the query.
      */
-    public function test_delete_many(): void {
+    public function test_delete_many(): void
+    {
         # Create FirewallAlias models
         $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
         $host_alias_0->create();
@@ -803,7 +844,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the 'delete_many()' method throws an error if no query parameters were given.
      */
-    public function test_delete_many_no_query(): void {
+    public function test_delete_many_no_query(): void
+    {
         $this->assert_throws_response(
             response_id: 'MODEL_DELETE_MANY_REQUIRES_QUERY_PARAMS',
             code: 400,
@@ -816,7 +858,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the 'paginate()' method works correctly.
      */
-    public function test_paginate(): void {
+    public function test_paginate(): void
+    {
         # Ensure the paginate method correctly returns the paginated subset of a given array
         $this->assert_equals(Model::paginate([1, 2, 3, 4, 5], limit: 2, offset: 1), [2, 3]);
         $this->assert_equals(Model::paginate([1, 2, 3, 4, 5], limit: 2, offset: 3), [4, 5]);
@@ -831,7 +874,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures that queries are performed before pagination is applied.
      */
-    public function test_paginate_with_query(): void {
+    public function test_paginate_with_query(): void
+    {
         # Create FirewallAlias models to test this
         $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
         $alias_alias_0->create();
@@ -859,7 +903,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures the read_all() method can be reversed to read the objects in reverse order.
      */
-    public function test_read_all_reverse(): void {
+    public function test_read_all_reverse(): void
+    {
         # Create FirewallAlias models to test this
         $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
         $alias_alias_0->create();
@@ -884,7 +929,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures the query() method can be reversed to read the objects in reverse order.
      */
-    public function test_query_reverse(): void {
+    public function test_query_reverse(): void
+    {
         # Create FirewallAlias models to test this
         $alias_alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
         $alias_alias_0->create();
@@ -910,7 +956,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that updates using the $append flag correctly append values to the existing values instead of replacing
      * them.
      */
-    public function test_update_append(): void {
+    public function test_update_append(): void
+    {
         # Use a FirewallAlias model to test this
         $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['127.0.0.1']);
         $alias->create();
@@ -938,7 +985,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks that updates using the $remove flag correctly remove array values from the existing array values instead of
      * replacing them.
      */
-    public function test_update_remove(): void {
+    public function test_update_remove(): void
+    {
         # Use a FirewallAlias model to test this
         $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['127.0.0.1', '127.0.0.2', '127.0.0.3']);
         $alias->create();
@@ -964,7 +1012,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the 'delete_all()' actually deletes all Model objects.
      */
-    public function test_delete_all(): void {
+    public function test_delete_all(): void
+    {
         # Create FirewallAlias models
         $host_alias_0 = new FirewallAlias(name: 'host0', type: 'host');
         $host_alias_0->create();
@@ -991,7 +1040,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Ensure the does_apply_immediately() method correctly determines if the Model object will apply changes
      * immediately or requires a manual apply.
      */
-    public function test_does_apply_immediately(): void {
+    public function test_does_apply_immediately(): void
+    {
         # The FirewallAlias Model requires a manual apply via FirewallApply, ensure it returns false
         $alias = new FirewallAlias();
         $this->assert_is_false($alias->does_apply_immediately());
@@ -1008,7 +1058,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures sorting via the Model's query() method works correctly.
      */
-    public function test_query_sort(): void {
+    public function test_query_sort(): void
+    {
         # Create FirewallAlias models to test this
         $a_alias = new FirewallAlias(name: 'a_alias', type: 'network');
         $a_alias->create();
@@ -1049,7 +1100,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures the sort() method works correctly when creating a new Model object.
      */
-    public function test_sort_create(): void {
+    public function test_sort_create(): void
+    {
         # Create a few FirewallAlias models to test this
         $alias_0 = new FirewallAlias(name: 'zzz', type: 'host');
         $alias_1 = new FirewallAlias(name: 'ccc', type: 'host');
@@ -1096,7 +1148,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensures the sort() method works correctly when updating an existing Model object.
      */
-    public function test_sort_update(): void {
+    public function test_sort_update(): void
+    {
         # Create a few FirewallAlias models to test this
         $alias_0 = new FirewallAlias(name: 'zzz', type: 'host');
         $alias_1 = new FirewallAlias(name: 'ccc', type: 'host');
@@ -1150,7 +1203,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensure the sort() method works correctly when replacing all Model objects.
      */
-    public function test_sort_replace_all(): void {
+    public function test_sort_replace_all(): void
+    {
         $alias = new FirewallAlias();
         $alias->sort_by = ['name'];
         $alias->sort_order = SORT_ASC;
@@ -1180,7 +1234,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensure an error is thrown if the write lock is not released after all write_config() attempts are exhausted.
      */
-    public function test_write_lock_not_released(): void {
+    public function test_write_lock_not_released(): void
+    {
         # Set the write lock
         touch(Model::WRITE_LOCK_FILE);
 
@@ -1204,7 +1259,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensure the copy() method creates an unlinked copy of the Model object.
      */
-    public function test_copy(): void {
+    public function test_copy(): void
+    {
         # Create a new FirewallAlias model to test with
         $alias = new FirewallAlias(name: 'test_alias', type: 'host', address: ['1.2.3.4']);
         $alias->id = 5;
@@ -1223,7 +1279,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Ensure the copy() method does not use excessive memory in larger datasets. This is a regression test for #617.
      */
-    public function test_copy_memory_usage(): void {
+    public function test_copy_memory_usage(): void
+    {
         # Generate lots of DHCP Server Static Mappings
         $static_mappings = [];
         $used_macs = [];
@@ -1252,7 +1309,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that all Model classes with an internal_callable assigned have an existing callable assigned.
      */
-    public function test_model_internal_callables_exist(): void {
+    public function test_model_internal_callables_exist(): void
+    {
         # Loop through all Model classes
         foreach (Model::get_all_model_classes() as $model_class) {
             # Create a new instance of the Model class
@@ -1271,7 +1329,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that all Model class fields with a 'choices_callable' assigned have an existing callable assigned.
      */
-    public function test_model_field_choices_callables_exist(): void {
+    public function test_model_field_choices_callables_exist(): void
+    {
         # Loop through all Model classes
         foreach (Model::get_all_model_classes() as $model_class) {
             # Create a new instance of the Model class
@@ -1293,7 +1352,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the normalize_config_path() method correctly removes extra slashes in the config path
      */
-    public function test_normalize_config_path(): void {
+    public function test_normalize_config_path(): void
+    {
         $this->assert_equals(Model::normalize_config_path('/test/path'), 'test/path');
         $this->assert_equals(Model::normalize_config_path('/test//path'), 'test/path');
         $this->assert_equals(Model::normalize_config_path('test/path/'), 'test/path');
@@ -1304,7 +1364,8 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
      * Checks that the read_all() method caches previously read Model objects to improve performance.
      */
-    public function test_read_all_caching(): void {
+    public function test_read_all_caching(): void
+    {
         # Ensure the model cache is empty
         FirewallAlias::get_model_cache()::clear();
 
@@ -1340,5 +1401,56 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
 
         # Ensure the cache was cleared after deletion
         $this->assert_is_false(FirewallAlias::get_model_cache()::has_modelset(FirewallAlias::get_class_fqn()));
+    }
+
+    /**
+     * Checks that read_all() on a Model with a parent Model class returns all child Model objects from all parents.
+     */
+    public function test_read_all_with_parent_model(): void
+    {
+        # Create DNSResolverHostOverrides with nested aliases to test this
+        $overrides = new RESTAPI\Models\DNSResolverHostOverride();
+        $overrides->replace_all([
+            [
+                'host' => 'host1',
+                'domain' => 'example.com',
+                'ip' => ['127.0.0.1'],
+                'aliases' => [
+                    ['host' => 'alias1', 'domain' => 'example.com'],
+                ]
+            ],
+            [
+                'host' => 'host2',
+                'domain' => 'example.com',
+                'ip' => ['127.0.0.2'],
+                'aliases' => [
+                    ['host' => 'alias2', 'domain' => 'example.com'],
+                ]
+            ],
+            [
+                'host' => 'host3',
+                'domain' => 'example.com',
+                'ip' => ['127.0.0.3'],
+                'aliases' => [
+                    ['host' => 'alias3', 'domain' => 'example.com']
+                ]
+            ]
+        ]);
+
+        # Read all DNSResolverHostOverrideAlias models and ensure all aliases from all overrides are returned
+        $all_aliases = RESTAPI\Models\DNSResolverHostOverrideAlias::read_all();
+        $this->assert_equals($all_aliases->count(), 3);
+        $this->assert_equals($all_aliases->model_objects[0]->host->value, 'alias1');
+        $this->assert_equals($all_aliases->model_objects[0]->parent_id, 0);
+        $this->assert_equals($all_aliases->model_objects[0]->id, 0);
+        $this->assert_equals($all_aliases->model_objects[1]->host->value, 'alias2');
+        $this->assert_equals($all_aliases->model_objects[1]->parent_id, 1);
+        $this->assert_equals($all_aliases->model_objects[1]->id, 0);
+        $this->assert_equals($all_aliases->model_objects[2]->host->value, 'alias3');
+        $this->assert_equals($all_aliases->model_objects[2]->parent_id, 2);
+        $this->assert_equals($all_aliases->model_objects[2]->id, 0);
+
+        # Cleanup DNSResolverHostOverrides
+        $overrides->delete_all();
     }
 }
