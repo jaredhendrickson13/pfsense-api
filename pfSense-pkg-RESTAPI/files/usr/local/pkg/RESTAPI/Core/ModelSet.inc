@@ -14,6 +14,14 @@ class ModelSet {
     use BaseTraits;
 
     /**
+     * @var string $signature A unique signature for this ModelSet used to index this ModelSet in the query cache
+     * while retaining all query chains. Signatures are compromised of a root signature (the Model class name) and
+     * a series of query signatures that represent each query that has been applied to this ModelSet to this point
+     * (separated by a colon). Example 'RESTAPI\Models\User:queryhash1:queryhash2'
+     */
+    public string $signature = '';
+
+    /**
      * @var array $model_objects An array of Model objects contained by this ModelSet.
      */
     public array $model_objects;
