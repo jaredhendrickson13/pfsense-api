@@ -110,6 +110,11 @@ class ModelCache {
             );
         }
 
+        # Always allow indexing by 'id'
+        if ($index_field === 'id') {
+            return;
+        }
+
         # Check if the index field is unique on the Model object
         if (!$model->$index_field->unique) {
             throw new ServerError(
