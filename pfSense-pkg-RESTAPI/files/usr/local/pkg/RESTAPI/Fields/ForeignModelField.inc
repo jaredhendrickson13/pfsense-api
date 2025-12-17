@@ -251,7 +251,13 @@ class ForeignModelField extends Field {
             $model_name = $model->get_class_fqn();
 
             # Check if a Model object is indexed by this internal value
-            if ($model_cache::has_model($model_name, index_field: $this->model_field_internal, index_value: $internal_value)) {
+            if (
+                $model_cache::has_model(
+                    $model_name,
+                    index_field: $this->model_field_internal,
+                    index_value: $internal_value,
+                )
+            ) {
                 return $model_cache::fetch_model(
                     model_class: $model_name,
                     index_field: $this->model_field_internal,

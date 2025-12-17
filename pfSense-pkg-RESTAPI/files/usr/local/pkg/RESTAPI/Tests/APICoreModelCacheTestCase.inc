@@ -87,8 +87,7 @@ class APICoreModelCacheTestCase extends TestCase {
     /**
      * Ensures a ModelSet without a signature cannot be cached in the ModelCache.
      */
-    public function test_model_cache_cache_modelset_without_signature_throws_error(): void
-    {
+    public function test_model_cache_cache_modelset_without_signature_throws_error(): void {
         # Obtain and clear the ModelCache
         $model_cache = ModelCache::get_instance();
         $model_cache::clear();

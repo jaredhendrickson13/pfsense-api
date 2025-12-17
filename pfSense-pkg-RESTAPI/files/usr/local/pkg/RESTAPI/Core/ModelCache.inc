@@ -114,10 +114,10 @@ class ModelCache {
         if ($model->parent_model_class) {
             throw new ServerError(
                 message: "Cannot index Model class '" .
-                $model->get_class_fqn() .
-                "' because it has a parent model class '" .
-                $model->parent_model_class .
-                "'.",
+                    $model->get_class_fqn() .
+                    "' because it has a parent model class '" .
+                    $model->parent_model_class .
+                    "'.",
                 response_id: 'MODEL_CACHE_INDEX_FIELD_ON_PARENTED_MODEL',
             );
         }
@@ -131,9 +131,9 @@ class ModelCache {
         if (!$model->$index_field->unique) {
             throw new ServerError(
                 message: "Cannot index Model class '" .
-                $model->get_class_fqn() .
-                "' by non-unique field " .
-                "'$index_field'.",
+                    $model->get_class_fqn() .
+                    "' by non-unique field " .
+                    "'$index_field'.",
                 response_id: 'MODEL_CACHE_INDEX_FIELD_NOT_UNIQUE',
             );
         }
@@ -212,7 +212,7 @@ class ModelCache {
         if (!self::has_model($model_class, $index_field, $index_value)) {
             throw new NotFoundError(
                 message: "No cached Model found for Model class '$model_class' with " .
-                "index field '$index_field' and index value '$index_value'.",
+                    "index field '$index_field' and index value '$index_value'.",
                 response_id: 'MODEL_CACHE_MODEL_NOT_FOUND',
             );
         }
@@ -225,7 +225,6 @@ class ModelCache {
         # Otherwise, return the Model object indexed under the Model class only
         return self::$index[$model_class];
     }
-
 
     /**
      * Clears the ModelCache of all cached ModelSets and indexed Model objects.

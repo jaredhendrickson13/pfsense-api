@@ -197,8 +197,7 @@ class ModelSet {
      * @param array $query_params An associative array of query parameters to use to generate the signature.
      * @return string The signature for the given query parameters.
      */
-    public function get_query_signature(array $query_params = []): string
-    {
+    public function get_query_signature(array $query_params = []): string {
         # ModelSet is cache exempt if there is no existing signature
         if (!$this->signature) {
             return '';
