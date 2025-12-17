@@ -110,23 +110,6 @@ class ModelCache {
             );
         }
 
-        # Models with parent model classes cannot be indexed
-        if ($model->parent_model_class) {
-            throw new ServerError(
-                message: "Cannot index Model class '" .
-                    $model->get_class_fqn() .
-                    "' because it has a parent model class '" .
-                    $model->parent_model_class .
-                    "'.",
-                response_id: 'MODEL_CACHE_INDEX_FIELD_ON_PARENTED_MODEL',
-            );
-        }
-
-        # If indexing by 'id', it's always unique
-        if ($index_field === 'id') {
-            return;
-        }
-
         # Check if the index field is unique on the Model object
         if (!$model->$index_field->unique) {
             throw new ServerError(
