@@ -19,7 +19,7 @@ class ModelSet {
      * a series of query signatures that represent each query that has been applied to this ModelSet to this point
      * (separated by a colon). Example 'RESTAPI\Models\User:queryhash1:queryhash2'
      */
-    public string $signature = '';
+    public string $signature;
 
     /**
      * @var array $model_objects An array of Model objects contained by this ModelSet.
@@ -30,7 +30,10 @@ class ModelSet {
      * Creates a ModelSet object that contains multiple Model objects.
      * @param array $model_objects An array of model objects to include in this model set
      */
-    public function __construct(array $model_objects = []) {
+    public function __construct(array $model_objects = [], string $signature = '') {
+        # Assign the signature if provided
+        $this->signature = $signature;
+
         # Throw an error if any Models are not a Model object
         foreach ($model_objects as $model_object) {
             if (!is_object($model_object) or !in_array('RESTAPI\Core\Model', class_parents($model_object))) {
@@ -181,6 +184,38 @@ class ModelSet {
     }
 
     /**
+     * Provides access to the ModelCache singleton instance.
+     * @return ModelCache The ModelCache singleton instance.
+     */
+    public static function get_model_cache(): ModelCache {
+        return ModelCache::get_instance();
+    }
+
+    /**
+     * Determines the signature for a given query. This signature is used to index queried ModelSets in the
+     * ModelCache while retaining all query chains.
+     * @param array $query_params An associative array of query parameters to use to generate the signature.
+     * @return string The signature for the given query parameters.
+     */
+    public function get_query_signature(array $query_params = []): string
+    {
+        # ModelSet is cache exempt if there is no existing signature
+        if (!$this->signature) {
+            return '';
+        }
+
+        # Sort the query parameters by key to ensure consistent signatures
+        ksort($query_params);
+
+        # Encode the query parameters as JSON and generate an xxh hash
+        $query_json = json_encode($query_params);
+        $query_hash = hash(algo: 'xxh64', data: $query_json);
+
+        # Append the query hash to the existing signature to retain query chains
+        return "$this->signature:$query_hash";
+    }
+
+    /**
      * Filters the ModelSet to only include Model objects that match a specific query.
      * @param array $query_params An associative array of query targets and values. The array key will be the query
      * target and the array value will be the query value.
@@ -193,9 +228,14 @@ class ModelSet {
     public function query(array $query_params = [], array $excluded = [], ...$vl_query_params): ModelSet {
         # Variables
         $queried_model_set = [];
-
-        # Merge the $query_params and any provided variable-length arguments into a single variable
         $query_params = array_merge($query_params, $vl_query_params);
+        $query_signature = $this->get_query_signature($query_params);
+        $cache_exempt = !$query_signature;
+
+        # Fetch the cached query if it exists and this ModelSet is not cache exempt
+        if (!$cache_exempt and self::get_model_cache()::has_modelset($query_signature)) {
+            return self::get_model_cache()::fetch_modelset($query_signature);
+        }
 
         # Loop through each model object in the provided model set and check it against the query parameters
         foreach ($this->model_objects as $model_object) {
@@ -230,7 +270,16 @@ class ModelSet {
                 $queried_model_set[] = $model_object;
             }
         }
-        return new ModelSet($queried_model_set);
+
+        # Create a new ModelSet with the queried model objects
+        $modelset = new ModelSet($queried_model_set, signature: $query_signature);
+
+        # Cache the queried ModelSet if this ModelSet is not cache exempt
+        if (!$cache_exempt) {
+            self::get_model_cache()::cache_modelset($modelset);
+        }
+
+        return $modelset;
     }
 
     /**

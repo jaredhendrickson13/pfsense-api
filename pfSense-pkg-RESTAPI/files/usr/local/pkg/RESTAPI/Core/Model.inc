@@ -1992,11 +1992,11 @@ class Model {
         }
 
         # Load the ModelSet with all obtained Model objects
-        $modelset = new ModelSet(model_objects: $model_objects);
+        $modelset = new ModelSet(model_objects: $model_objects, signature: $model_name);
 
         # For many models, cache the ModelSet if not exempt
         if ($model->many and !$cache_exempt) {
-            self::get_model_cache()::cache_modelset($model_name, $modelset);
+            self::get_model_cache()::cache_modelset($modelset);
         }
 
         # For many enabled Models return a ModelSet, otherwise return a single Model object
