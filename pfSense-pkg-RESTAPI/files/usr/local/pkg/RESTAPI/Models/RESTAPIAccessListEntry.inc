@@ -59,7 +59,8 @@ class RESTAPIAccessListEntry extends Model {
             allow_empty: true,
             many: true,
             many_minimum: 0,
-            help_text: 'The users that this entry applies to. Only users in this list will be affected by this entry.',
+            help_text: 'The users that this entry applies to. Only users in this list will be affected by this ' .
+            'entry. Leave empty if this entry should apply to all users.',
         );
         $this->sched = new ForeignModelField(
             model_name: 'FirewallSchedule',
