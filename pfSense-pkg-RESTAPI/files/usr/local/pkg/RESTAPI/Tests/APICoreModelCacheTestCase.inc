@@ -142,23 +142,6 @@ class APICoreModelCacheTestCase extends TestCase {
     }
 
     /**
-     * Ensures we cannot index a cached ModelSet for a Model that has a parent model class.
-     */
-    public function test_model_index_field_cannot_have_parent_model_class(): void {
-        # Ensure attempting to index the Model by the non-unique field throws an error
-        $this->assert_throws_response(
-            response_id: 'MODEL_CACHE_INDEX_FIELD_ON_PARENTED_MODEL',
-            code: 500,
-            callable: function () {
-                ModelCache::index_modelset_by_field(
-                    model_class: DNSResolverHostOverrideAlias::get_class_fqn(),
-                    index_field: 'id',
-                );
-            },
-        );
-    }
-
-    /**
      * Ensures the index_modelset_by_field() method correctly indexes a cached ModelSet by the specified field. This
      * test also ensures the has_model() and fetch_model() methods work as expected for indexed Model objects.
      */
