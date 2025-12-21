@@ -85,7 +85,7 @@ make API requests without human intervention.
 - Requires additional configuration to set up.
 - API keys need to be securely stored and managed.
 
-## Step 4: Use API-specific user accounts
+## Step 3: Use API-specific user accounts
 
 Regardless of the authentication method you choose, the REST API package uses pfSense's built-in privilege system to
 control access to API endpoints. This means that all credentials used for API access must belong to a pfSense user account
