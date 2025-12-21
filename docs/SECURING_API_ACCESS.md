@@ -41,6 +41,11 @@ over secure connections (e.g., HTTPS or VPN).
 - Credentials are sent with each request, increasing the risk of interception, especially if not using HTTPS.
 - Credentials may also allow web GUI and/or SSH access, which may not be desirable for API-only users.
 
+!!! Note
+    Basic authentication is not inherently insecure. In fact, with the proper user account management, strong passwords,
+    and secure transport (HTTPS), basic authentication can be just as secure as key-based authentication methods.
+    
+
 ### JWT Authentication
 
 [JWT authentication](AUTHENTICATION_AND_AUTHORIZATION.md#json-web-token-jwt-authentication) allows you to authenticate 
