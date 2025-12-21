@@ -535,4 +535,23 @@ class APIModelsDHCPServerTestCase extends TestCase {
         # Ensure a config entry was not initialized for the non-static interface
         $this->assert_is_false(array_key_exists('opt1', Model::get_config('dhcpd')));
     }
+
+    /**
+     * Ensures DHCP servers can be newly created and deleted for new interfaces.
+     */
+    public function test_dhcp_server_create_and_delete_for_new_interface(): void {
+        # Temporarily add a test interface using static IPv4
+        $interface = new NetworkInterface(descr: 'TESTIF', typev4: 'static', ipaddr: '192.168.2.1', subnet: 24);
+        $interface->create();
+
+        # Ensure we can create a DHCP server for the new interface
+        $dhcp_server = new DHCPServer(interface: $interface->id, range_from: '192.168.2.10', range_to: '192.168.2.15');
+        $dhcp_server->create();
+
+        # Ensure we can delete the DHCP server for the new interface
+        $dhcp_server->delete();
+
+        # Delete the test interface
+        $interface->delete();
+    }
 }
