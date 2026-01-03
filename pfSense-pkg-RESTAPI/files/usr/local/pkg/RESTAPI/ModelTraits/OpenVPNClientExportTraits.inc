@@ -193,6 +193,7 @@ trait OpenVPNClientExportTraits {
     public function validate_legacy(bool $legacy): bool {
         if ($legacy) {
             global $legacy_incompatible_ciphers;
+            $legacy_incompatible_ciphers = $legacy_incompatible_ciphers ?? [];
             $settings = get_openvpnserver_by_id($this->server->value);
             if (in_array($settings['data_ciphers_fallback'], $legacy_incompatible_ciphers)) {
                 throw new ConflictError(
