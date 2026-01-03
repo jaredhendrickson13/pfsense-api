@@ -9,6 +9,11 @@
         <version>%%PKGVERSION%%</version>
         <configurationfile>restapi.xml</configurationfile>
         <maintainer>github@jaredhendrickson.com</maintainer>
+        <logging>
+            <logtab>REST API</logtab>
+            <facilityname>restapi</facilityname>
+            <logfilename>restapi.log</logfilename>
+        </logging>
         <conf>
             <enabled>enabled</enabled>
             <read_only>disabled</read_only>
