@@ -1,7 +1,15 @@
 #!/bin/sh
+
 if [ "${2}" != "POST-INSTALL" ]; then
 	exit 0
 fi
+
+# Warn users installing on 32-bit systems
+ARCH_BITS=$(/usr/bin/getconf LONG_BIT)
+if [ "${ARCH_BITS}" = "32" ]; then
+  echo "!!! WARNING: This package is not supported on 32-bit systems. !!!"
+fi
+
 
 # Make this package known to pfSense
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}

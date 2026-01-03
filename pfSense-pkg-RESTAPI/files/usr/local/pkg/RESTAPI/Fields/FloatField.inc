@@ -82,7 +82,7 @@ class FloatField extends RESTAPI\Core\Field {
         int $many_minimum = 0,
         int $many_maximum = 128,
         public int $minimum = 0,
-        public int $maximum = 99999999999999,
+        public int $maximum = PHP_INT_MAX,
         string|null $delimiter = ',',
         string $verbose_name = '',
         string $verbose_name_plural = '',
