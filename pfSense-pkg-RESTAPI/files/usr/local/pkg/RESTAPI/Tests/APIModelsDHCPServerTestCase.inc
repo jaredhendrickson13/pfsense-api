@@ -541,7 +541,13 @@ class APIModelsDHCPServerTestCase extends TestCase {
      */
     public function test_dhcp_server_create_and_delete_for_new_interface(): void {
         # Temporarily add a test interface using static IPv4
-        $interface = new NetworkInterface(descr: 'TESTIF', typev4: 'static', ipaddr: '192.168.2.1', subnet: 24);
+        $interface = new NetworkInterface(
+            if: $this->env['PFREST_OPT1_IF'],
+            descr: 'TESTIF',
+            typev4: 'static',
+            ipaddr: '192.168.2.1',
+            subnet: 24,
+        );
         $interface->create();
 
         # Ensure we can create a DHCP server for the new interface
