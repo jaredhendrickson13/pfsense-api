@@ -3,6 +3,7 @@
 namespace RESTAPI\Core;
 
 use ReflectionClass;
+use RESTAPI\Models\RESTAPISettings;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
@@ -42,8 +43,11 @@ trait BaseTraits {
      * info.xml file.
      */
     public function log(int $level, string $message, string $logfile = 'restapi'): void {
-        # Only log debug messages when verbose logging is enabled
-        if ($level === LOG_DEBUG and !$this->config->debug_mode) {
+        # Get the log level limit from the RESTAPI settings
+        $log_limit = (int) RESTAPISettings::get_pkg_config()['log_level'] ?? 3;
+
+        # Do not log if the incoming level is higher than the configured log level
+        if ($level >= $log_limit) {
             return;
         }
 

@@ -31,6 +31,7 @@ class RESTAPISettings extends Model {
     public BooleanField $keep_backup;
     public BooleanField $login_protection;
     public BooleanField $log_successful_auth;
+    public IntegerField $log_level;
     public BooleanField $allow_pre_releases;
     public BooleanField $hateoas;
     public BooleanField $expose_sensitive_fields;
@@ -92,6 +93,22 @@ class RESTAPISettings extends Model {
             help_text: "Enables or disables logging of API authentication attempts that are successful. By default, only
             failed API authentication attempts are logged to prevent flooding the authentication logs. This field is
             only applicable when the API `login_protection` setting is enabled.",
+        );
+        $this->log_level = new IntegerField(
+            default: 3,
+            choices: [
+                0 => '0 - Emergency',
+                1 => '1 - Alert',
+                2 => '2 - Critical',
+                3 => '3 - Error',
+                4 => '4 - Warning',
+                5 => '5 - Notice',
+                6 => '6 - Info',
+                7 => '7 - Debug',
+            ],
+            verbose_name: 'log level',
+            help_text: 'Sets the log level for API logging. The log level determines the severity of messages that are
+            logged. Setting a higher log level will include all messages of that level and lower severity.',
         );
         $this->allow_pre_releases = new BooleanField(
             default: false,

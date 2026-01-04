@@ -20,6 +20,7 @@
             <keep_backup>enabled</keep_backup>
             <login_protection>enabled</login_protection>
             <log_successful_auth>disabled</log_successful_auth>
+            <log_level>3</log_level>
             <hateoas>disabled</hateoas>
             <expose_sensitive_fields>disabled</expose_sensitive_fields>
             <override_sensitive_fields></override_sensitive_fields>
