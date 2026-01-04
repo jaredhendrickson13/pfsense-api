@@ -145,6 +145,13 @@ class Model {
     public Cache|null $cache = null;
 
     /**
+     * @var bool $model_cache_exempt
+     * If set to `true`, this Model will be exempt from any global Model caching mechanisms. This is primarily
+     * used for Models that frequently change or are not suitable for caching.
+     */
+    public bool $model_cache_exempt = false;
+
+    /**
      * @var ModelSet $related_objects
      * A ModelSet containing foreign Model objects related to this Model. These are primarily populated by
      * ForeignModelFields assigned to this Model object. If no related Models are found, this ModelSet will not contain
@@ -1943,7 +1950,7 @@ class Model {
         $model = new $model_name();
         $model_objects = [];
         $requests_pagination = ($limit or $offset);
-        $cache_exempt = ($requests_pagination or $reverse or $model->internal_callable);
+        $cache_exempt = ($requests_pagination or $reverse or $model->model_cache_exempt);
 
         # Throw an error if pagination was requested on a Model without $many enabled
         if (!$model->many and $requests_pagination) {
