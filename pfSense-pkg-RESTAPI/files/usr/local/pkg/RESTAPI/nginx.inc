@@ -2,8 +2,8 @@
 
 /**
  * The pfSense-pkg-RESTAPI's 'plugin_nginx' package hook. This function is automatically called by the pfSense
- * package system to add custom NGINX configurations. For this packacge, this function ensures an nginx server block
- * is defined for API endpoints to allow the utiliziation of additional HTTP methods like PUT, PATCH and DELETE and
+ * package system to add custom NGINX configurations. For this package, this function ensures an nginx server block
+ * is defined for API endpoints to allow the utilization of additional HTTP methods like PUT, PATCH and DELETE and
  * URLs without a trailing slash.
  * @param mixed $pluginparams Plugin parameters passed in by the pfSense package system.
  * @return string The custom nginx block to be added to the webConfigurator's nginx.conf file
