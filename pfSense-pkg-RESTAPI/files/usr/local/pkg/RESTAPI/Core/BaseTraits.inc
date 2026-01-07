@@ -44,7 +44,7 @@ trait BaseTraits {
      */
     public function log(int $level, string $message, string $logfile = 'restapi'): void {
         # Get the log level limit from the RESTAPI settings
-        $log_limit = (int) RESTAPISettings::get_pkg_config()['log_level'] ?? 3;
+        $log_limit = constant(RESTAPISettings::get_pkg_config()['log_level']) ?? 4;
 
         # Do not log if the incoming level is higher than the configured log level
         if ($level >= $log_limit) {
