@@ -95,7 +95,7 @@ class RESTAPISettings extends Model {
             only applicable when the API `login_protection` setting is enabled.",
         );
         $this->log_level = new StringField(
-            default: "LOG_WARNING",
+            default: 'LOG_WARNING',
             choices: [
                 'LOG_DEBUG' => 'Debug',
                 'LOG_INFO' => 'Info',
