@@ -296,7 +296,7 @@ class Auth {
                 $matched_auth = $auth;
                 self::log(
                     level: LOG_DEBUG,
-                    message: "Client from $auth->ip_address is attempting to authenticate using $auth->verbose_name."
+                    message: "Client from $auth->ip_address is attempting to authenticate using $auth->verbose_name.",
                 );
                 break;
             }

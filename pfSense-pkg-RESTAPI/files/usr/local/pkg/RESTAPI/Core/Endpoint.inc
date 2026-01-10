@@ -635,8 +635,8 @@ class Endpoint {
         ) {
             $this->log(
                 level: LOG_WARNING,
-                message: "Denied {$this->client->username}@{$this->client->ip_address} access to $this->url for REST ".
-                    "API access list violation."
+                message: "Denied {$this->client->username}@{$this->client->ip_address} access to $this->url for REST " .
+                    'API access list violation.',
             );
             throw new ForbiddenError(
                 message: 'The requested action is not allowed by admin policy',
@@ -652,10 +652,7 @@ class Endpoint {
         $client_ip = $_SERVER['REMOTE_ADDR'];
 
         if (!$this->restapi_settings->enabled->value and !$this->ignore_enabled) {
-            $this->log(
-                level: LOG_WARNING,
-                message: "Denied $client_ip access to $this->url as REST API is disabled."
-            );
+            $this->log(level: LOG_WARNING, message: "Denied $client_ip access to $this->url as REST API is disabled.");
             throw new ServiceUnavailableError(
                 message: 'The REST API is currently not enabled.',
                 response_id: 'ENDPOINT_REST_API_IS_NOT_ENABLED',
@@ -683,10 +680,7 @@ class Endpoint {
         }
 
         # Loop through each allowed interface and check if the server IP is allowed to answer API calls
-        foreach (
-            $this->restapi_settings->allowed_interfaces->get_related_models()->model_objects
-            as $allowed_if
-        ) {
+        foreach ($this->restapi_settings->allowed_interfaces->get_related_models()->model_objects as $allowed_if) {
             # Allow the server IP if it matches the current interface's IPv4 or IPv6 address
             if ($server_ip === $allowed_if->get_current_ipv4()) {
                 return;
@@ -705,7 +699,7 @@ class Endpoint {
         # Throw a forbidden error if this API call was made to a non-API enabled interface
         $this->log(
             level: LOG_WARNING,
-            message:"Denied $client_ip access to $this->url as interface IP $server_ip is not allowed to respond."
+            message: "Denied $client_ip access to $this->url as interface IP $server_ip is not allowed to respond.",
         );
         throw new ForbiddenError(
             message: 'The requested action is not allowed by admin policy',

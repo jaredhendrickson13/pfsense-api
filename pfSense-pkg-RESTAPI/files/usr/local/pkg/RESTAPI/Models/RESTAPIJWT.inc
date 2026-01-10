@@ -109,7 +109,7 @@ class RESTAPIJWT extends Model {
         # Log the action
         $this->log(
             level: LOG_INFO,
-            message: "Client {$this->client->username}@{$this->client->ip_address} was issued a new JWT."
+            message: "Client {$this->client->username}@{$this->client->ip_address} was issued a new JWT.",
         );
     }
 }
