@@ -11,6 +11,8 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * automatically inherit all resources included.
  */
 trait BaseTraits {
+    private static int $__log_level;
+
     /**
      * Obtains the shortname of the called class.
      * @return string The shortname for this object's class.
@@ -42,12 +44,20 @@ trait BaseTraits {
      * @param string $logfile The log file to write to. This must be a valid logging facility defined in the package's
      * info.xml file.
      */
-    public function log(int $level, string $message, string $logfile = 'restapi'): void {
-        # Get the log level limit from the RESTAPI settings
-        $log_limit = constant(RESTAPISettings::get_pkg_config()['log_level']) ?? 4;
+    public static function log(int $level, string $message, string $logfile = 'restapi'): void {
+        # If this is a system log, use the pfSense 'log_error' function instead
+        if ($logfile === 'system') {
+            log_error($message);
+            return;
+        }
+
+        # If the log level has not been set yet, obtain it
+        if (!isset(self::$__log_level)) {
+            self::$__log_level = constant(RESTAPISettings::get_pkg_config()['log_level']) ?? 4;
+        }
 
         # Do not log if the incoming level is higher than the configured log level
-        if ($level >= $log_limit) {
+        if ($level > self::$__log_level) {
             return;
         }
 
