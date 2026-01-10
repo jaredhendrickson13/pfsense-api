@@ -105,5 +105,11 @@ class RESTAPIJWT extends Model {
 
         # Assign the JWT string to `token`
         $this->token->value = JWT::encode($payload, $server_key, 'HS256');
+
+        # Log the action
+        $this->log(
+            level: LOG_INFO,
+            message: "Client {$this->client->username}@{$this->client->ip_address} was issued a new JWT."
+        );
     }
 }
