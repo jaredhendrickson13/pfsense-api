@@ -137,7 +137,8 @@ class RESTAPIAccessListEntry extends Model {
 
         # If the assigned schedule no longer exists, log the event and deny access
         if (!$this->sched->get_related_model()) {
-            $this->log_error(
+            $this->log(
+                level: LOG_ERR,
                 message: "The schedule '{$this->sched->value}' assigned to REST API access list entry " .
                     "'$this->id' no longer exists.",
             );

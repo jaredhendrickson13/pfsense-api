@@ -236,8 +236,8 @@ class RESTAPIVersion extends Model {
 
             # If an error occurred either deleting or adding the package, return false
             if ($delete->result_code !== 0 or $add->result_code !== 0) {
-                $this->log_error($delete->output);
-                $this->log_error($add->output);
+                $this->log(level: LOG_ERR, message: $delete->output);
+                $this->log(level: LOG_ERR, message: $add->output);
                 return false;
             }
 
