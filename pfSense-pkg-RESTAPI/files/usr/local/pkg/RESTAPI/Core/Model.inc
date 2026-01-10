@@ -149,7 +149,7 @@ class Model {
      * If set to `true`, this Model will be exempt from any global Model caching mechanisms. This is primarily
      * used for Models that frequently change or are not suitable for caching.
      */
-    public bool $model_cache_exempt = false;
+    public bool $model_cache_exempt;
 
     /**
      * @var ModelSet $related_objects
@@ -339,6 +339,11 @@ class Model {
                 message: 'Representation data must be of type `array`.',
                 response_id: 'MODEL_NON_ARRAY_REPRESENTATION_DATA',
             );
+        }
+
+        # Set the model cache exemption if it was not explicitly defined
+        if (!isset($this->model_cache_exempt)) {
+            $this->model_cache_exempt = (bool) $this->internal_callable;
         }
 
         # Check for known $options and map them to their Model properties
