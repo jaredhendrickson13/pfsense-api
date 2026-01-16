@@ -123,4 +123,50 @@ class APIModelsUserGroupTestCase extends TestCase {
             },
         );
     }
+
+    /**
+     * Ensures that UserGroups cannot be created or updated with the 'system' scope unless the existing object also has
+     * the 'system' scope.
+     */
+    public function test_cannot_create_or_update_user_groups_with_system_scope(): void {
+        # Create a UserGroup to test with
+        $user_group = new UserGroup();
+
+        # Ensure attempts to create UserGroups with the system scope are rejected
+        $this->assert_throws_response(
+            response_id: 'USER_GROUP_SCOPE_CANNOT_BE_SET_TO_SYSTEM',
+            code: 422,
+            callable: function () use ($user_group) {
+                $user_group->scope->value = 'system';
+                $user_group->create();
+            },
+        );
+
+        # Ensure attempts to update existing UserGroups to have the system scope are rejected
+        $this->assert_throws_response(
+            response_id: 'USER_GROUP_SCOPE_CANNOT_BE_SET_TO_SYSTEM',
+            code: 422,
+            callable: function () use ($user_group) {
+                # Create a local UserGroup to test with
+                $user_group = new UserGroup(data: ['name' => 'testgroup', 'scope' => 'local']);
+                $user_group->create();
+
+                # Attempt to update the scope to `system`
+                $user_group->scope->value = 'system';
+                $user_group->update();
+            },
+        );
+
+        # Delete the test UserGroup
+        $user_group->delete();
+
+        # Ensure we CAN update an existing UserGroup with the system scope to still have the system scope
+        $this->assert_does_not_throw(
+            callable: function () {
+                # Create a UserGroup with the system scope to test with
+                $admin_group = UserGroup::query(name: 'Admins')->first();
+                $admin_group->validate_scope('system');
+            },
+        );
+    }
 }
