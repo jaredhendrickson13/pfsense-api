@@ -158,7 +158,7 @@ class APIModelsUserGroupTestCase extends TestCase {
         $this->assert_does_not_throw(
             callable: function () {
                 # Create a UserGroup with the system scope to test with
-                $admin_group = UserGroup::query(name: 'Admins')->first();
+                $admin_group = UserGroup::query(name: 'admins')->first();
                 $admin_group->validate_scope('system');
             },
         );
