@@ -61,6 +61,7 @@ class UserGroup extends Model {
             default: [],
             allow_empty: true,
             many: true,
+            many_maximum: 2048,
             delimiter: null,
             help_text: 'The local user names to assign to this user group.',
         );
