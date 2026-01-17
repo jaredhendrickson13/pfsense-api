@@ -359,7 +359,7 @@ class ForeignModelField extends Field {
 
             # Filter out Models that do not meet the assigned $model_query criteria
             $models = $models->query($this->model_query);
-            $in_scope_modelsets[] = $models;
+            $in_scope_modelsets[$model->get_class_fqn()] = $models;
         }
 
         # Query for the Model object this value relates to.
@@ -374,16 +374,25 @@ class ForeignModelField extends Field {
      * to the same value as $this->value.
      */
     private function __get_matches(string $field_name, mixed $field_value): ModelSet {
-        # Loop through all in cope modelsets to find matches
-        foreach ($this->get_in_scope_models() as $modelset) {
-            # Query for Model objects that match this field's criteria
-            $query_params = [$field_name => $field_value];
-            $query_modelset = $modelset->query($query_params);
+        self::_index_foreign_models();
 
-            # Return the matching ModelSet if it exists
-            if ($query_modelset->exists()) {
-                return $query_modelset;
+        # Loop through all in cope modelsets to find matches
+        foreach ($this->get_in_scope_models() as $model_class => $in_scope_modelset) {
+            # Move to the next model class if we found no matches in the index
+            if (!ModelCache::get_instance()::has_model($model_class, $field_name, $field_value)) {
+                continue;
             }
+
+            # Obtain the matched model
+            $matched_model = ModelCache::get_instance()::fetch_model($model_class, $field_name, $field_value);
+
+            # Move to the next model class if the matched model we found was not in scope
+            if ($this->model_query and !$in_scope_modelset->query(id: $matched_model->id)->exists()) {
+                continue;
+            }
+
+            # Otherwise, the matched model is valid. Return it within a ModelSet
+            return new ModelSet(model_objects: [$matched_model]);
         }
 
         # Return an empty ModelSet if no matches were found
