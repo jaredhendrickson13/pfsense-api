@@ -168,8 +168,7 @@ class APIModelsUserGroupTestCase extends TestCase {
      * Ensures UserGroups remain readable even when many users are assigned to a group. This tests for performance
      * issues identified in GitHub issue #779.
      */
-    public function test_read_performance_with_many_members(): void
-    {
+    public function test_read_performance_with_many_members(): void {
         # Mock creating many users by direct config assignment
         foreach (range(1, 1000) as $idx) {
             global $config;
@@ -180,11 +179,7 @@ class APIModelsUserGroupTestCase extends TestCase {
         }
 
         # Create a UserGroup with many members
-        $user_group = new UserGroup(
-            name: 'biggroup',
-            scope: 'local',
-            member: [],
-        );
+        $user_group = new UserGroup(name: 'biggroup', scope: 'local', member: []);
         $user_group->create();
 
         # Perform an update that maps all created users to our group and track its time
