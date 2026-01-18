@@ -294,6 +294,10 @@ class Auth {
             # If this Auth class is being requested by the remote client, set the matched auth and break the loop
             if ($auth->is_requested()) {
                 $matched_auth = $auth;
+                self::log(
+                    level: LOG_DEBUG,
+                    message: "Client from $auth->ip_address is attempting to authenticate using $auth->verbose_name.",
+                );
                 break;
             }
         }

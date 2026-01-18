@@ -20,7 +20,7 @@ class NumericRangeValidator extends RESTAPI\Core\Validator {
      * @param int $minimum The minimum value this value can be.
      * @param int $maximum The maximum value this value can be..
      */
-    public function __construct(int $minimum = 0, int $maximum = 99999999999) {
+    public function __construct(int $minimum = 0, int $maximum = PHP_INT_MAX) {
         $this->minimum = $minimum;
         $this->maximum = $maximum;
     }

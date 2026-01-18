@@ -21,7 +21,7 @@ class FirewallAdvancedSettings extends Model {
 
         # Set model fields
         $this->aliasesresolveinterval = new IntegerField(
-            default: 999999999,
+            default: PHP_INT_MAX,
             minimum: 0,
             help_text: 'The interval (in seconds) at which to resolve hostnames in aliases.',
         );

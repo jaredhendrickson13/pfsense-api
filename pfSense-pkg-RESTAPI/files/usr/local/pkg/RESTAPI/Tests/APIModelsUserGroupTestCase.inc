@@ -123,4 +123,83 @@ class APIModelsUserGroupTestCase extends TestCase {
             },
         );
     }
+
+    /**
+     * Ensures that UserGroups cannot be created or updated with the 'system' scope unless the existing object also has
+     * the 'system' scope.
+     */
+    public function test_cannot_create_or_update_user_groups_with_system_scope(): void {
+        # Ensure attempts to create UserGroups with the system scope are rejected
+        $this->assert_throws_response(
+            response_id: 'USER_GROUP_SCOPE_CANNOT_BE_SET_TO_SYSTEM',
+            code: 422,
+            callable: function () {
+                $user_group = new UserGroup(name: 'testgroup', scope: 'system');
+                $user_group->create();
+            },
+        );
+
+        # Ensure attempts to update existing UserGroups to have the system scope are rejected
+        $this->assert_throws_response(
+            response_id: 'USER_GROUP_SCOPE_CANNOT_BE_SET_TO_SYSTEM',
+            code: 422,
+            callable: function () {
+                # Create a local UserGroup to test with
+                $user_group = new UserGroup(data: ['name' => 'testgroup', 'scope' => 'local']);
+                $user_group->create();
+
+                # Attempt to update the scope to `system`
+                $user_group->scope->value = 'system';
+                $user_group->update();
+            },
+        );
+
+        # Ensure we CAN update an existing UserGroup with the system scope to still have the system scope
+        $this->assert_does_not_throw(
+            callable: function () {
+                # Create a UserGroup with the system scope to test with
+                $admin_group = new UserGroup(id: 0);
+                $admin_group->validate_scope('system');
+            },
+        );
+    }
+
+    /**
+     * Ensures UserGroups remain readable even when many users are assigned to a group. This tests for performance
+     * issues identified in GitHub issue #779.
+     */
+    public function test_read_performance_with_many_members(): void {
+        # Mock creating many users by direct config assignment
+        foreach (range(1, 1000) as $idx) {
+            global $config;
+            $config['system']['user'][] = [
+                'name' => "testuser$idx",
+                'uid' => 3000 + $idx,
+            ];
+        }
+
+        # Create a UserGroup with many members
+        $user_group = new UserGroup(name: 'biggroup', scope: 'local', member: []);
+        $user_group->create();
+
+        # Perform an update that maps all created users to our group and track its time
+        $start_time = time();
+        $user_group->member->value = array_map(fn($i) => "testuser$i", range(1, 1000));
+        $user_group->update();
+        $end_time = time();
+        $duration = $end_time - $start_time;
+
+        # Ensure the update took less than 10 seconds
+        $this->assert_is_less_than($duration, 5);
+
+        # Ensure we can read all user groups within 10 seconds
+        $start_time = time();
+        UserGroup::read_all();
+        $end_time = time();
+        $duration = $end_time - $start_time;
+        $this->assert_is_less_than($duration, 5);
+
+        # Clean up the user group
+        $user_group->delete();
+    }
 }
