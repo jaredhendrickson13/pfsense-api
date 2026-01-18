@@ -23,7 +23,6 @@ import subprocess
 import sys
 import jinja2
 
-
 # Constants
 REPO_OWNER = "jaredhendrickson13"
 REPO_NAME = "pfsense-api"
