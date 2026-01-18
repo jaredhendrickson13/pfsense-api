@@ -1,10 +1,10 @@
 # pfSense REST API Package
 
-[![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
-[![Quality](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/quality.yml)
-[![Release](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/release.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/release.yml)<br>
-![Downloads](https://img.shields.io/github/downloads/jaredhendrickson13/pfsense-api/total?label=Downloads)
-![License](https://img.shields.io/github/license/jaredhendrickson13/pfsense-api?label=License)
+[![Build](https://github.com/pfrest/pfSense-pkg-RESTAPI/actions/workflows/build.yml/badge.svg)](https://github.com/pfrest/pfSense-pkg-RESTAPI/actions/workflows/build.yml)
+[![Quality](https://github.com/pfrest/pfSense-pkg-RESTAPI/actions/workflows/quality.yml/badge.svg)](https://github.com/pfrest/pfSense-pkg-RESTAPI/actions/workflows/quality.yml)
+[![Release](https://github.com/pfrest/pfSense-pkg-RESTAPI/actions/workflows/release.yml/badge.svg)](https://github.com/pfrest/pfSense-pkg-RESTAPI/actions/workflows/release.yml)<br>
+![Downloads](https://img.shields.io/github/downloads/pfrest/pfSense-pkg-RESTAPI/total?label=Downloads)
+![License](https://img.shields.io/github/license/pfrest/pfSense-pkg-RESTAPI?label=License)
 ![Docs](https://img.shields.io/website?url=https%3A%2F%2Fpfrest.org&label=Documentation)
 
 The pfSense REST API package is an unofficial, open-source REST and GraphQL API for pfSense CE and pfSense Plus
@@ -36,13 +36,13 @@ commands are included below for quick reference.
 Install on pfSense CE:
 
 ```bash
-pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.8.1-pkg-RESTAPI.pkg
+pkg-static add https://github.com/pfrest/pfSense-pkg-RESTAPI/releases/latest/download/pfSense-2.8.1-pkg-RESTAPI.pkg
 ```
 
 Install on pfSense Plus:
 
 ```bash
-pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-25.11-pkg-RESTAPI.pkg
+pkg-static -C /dev/null add https://github.com/pfrest/pfSense-pkg-RESTAPI/releases/latest/download/pfSense-25.11-pkg-RESTAPI.pkg
 ```
 
 > [!WARNING]
@@ -51,7 +51,7 @@ pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/re
 
 > [!TIP]
 > You may need to customize the installation command to reference the package built for your pfSense version. Check
-> the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
+> the [releases page](https://github.com/pfrest/pfSense-pkg-RESTAPI/releases) to find the package built for
 > your version of pfSense.
 
 ## Disclaimers

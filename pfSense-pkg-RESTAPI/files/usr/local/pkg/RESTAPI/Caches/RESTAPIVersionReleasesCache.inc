@@ -12,7 +12,7 @@ use RESTAPI\Models\RESTAPIVersion;
  * runs on a schedule to periodically update the releases cache in the background.
  */
 class RESTAPIVersionReleasesCache extends Cache {
-    const RELEASES_URL = 'https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases';
+    const RELEASES_URL = 'https://api.github.com/repos/pfrest/pfSense-pkg-RESTAPI/releases';
 
     public int $timeout = 30;
     public string $schedule = '0 * * * *';
