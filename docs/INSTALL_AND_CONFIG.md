@@ -26,7 +26,7 @@ run pfSense. It's recommended to follow Netgate's [minimum hardware requirements
     
 !!! Tip
     Don't see your version of pfSense listed? Older versions of pfSense may be supported by older versions of this package.
-    Check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases).
+    Check the [releases page](https://github.com/pfrest/pfSense-pkg-RESTAPI/releases).
 
 ## Installing the package
 
@@ -36,18 +36,18 @@ The pfSense REST API package is built just like any other pfSense package and ca
 **Install on pfSense CE**
 
 ```bash
-pkg-static add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.8.1-pkg-RESTAPI.pkg
+pkg-static add https://github.com/pfrest/pfSense-pkg-RESTAPI/releases/latest/download/pfSense-2.8.1-pkg-RESTAPI.pkg
 ```
 
 **Install on pfSense Plus**
 
 ```bash
-pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-25.11-pkg-RESTAPI.pkg
+pkg-static -C /dev/null add https://github.com/pfrest/pfSense-pkg-RESTAPI/releases/latest/download/pfSense-25.11-pkg-RESTAPI.pkg
 ```
 
 !!! Important
     - You may need to customize the installation command to reference the package built for your pfSense version. Check
-      the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) to find the package built for
+      the [releases page](https://github.com/pfrest/pfSense-pkg-RESTAPI/releases) to find the package built for
       your version of pfSense.
     - When updating pfSense, **you must reinstall this package afterward** as pfSense removes unofficial packages during
       system updates and has no way to automatically reinstall them. 

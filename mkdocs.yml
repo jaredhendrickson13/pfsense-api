@@ -1,5 +1,5 @@
 site_name: pfSense REST API Guide
-repo_url: https://github.com/jaredhendrickson13/pfsense-api
+repo_url: https://github.com/pfrest/pfSense-pkg-RESTAPI
 nav:
   - General:
       - Home: index.md

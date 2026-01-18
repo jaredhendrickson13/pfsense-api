@@ -148,7 +148,7 @@ class FreeRADIUSUser extends Model {
         if (!empty($input_errors)) {
             throw new ValidationError(
                 message: "An unexpected validation error has occurred: $input_errors[0]. Please report this issue at " .
-                    'https://github.com/jaredhendrickson13/pfsense-api/issues/new',
+                    'https://github.com/pfrest/pfSense-pkg-RESTAPI/issues/new',
                 response_id: 'FREERADIUS_USER_UNEXPECTED_VALIDATION_ERROR',
             );
         }

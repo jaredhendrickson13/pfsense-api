@@ -13,15 +13,15 @@ SSH_CONFIG_FILE=$(mktemp)
 vagrant ssh-config > "$SSH_CONFIG_FILE"
 
 # Copy the source code to the vagrant box using SCP (vagrant upload skips hidden files)
-rsync -avz --progress -e "ssh -F $SSH_CONFIG_FILE" ../pfsense-api vagrant@default:/home/vagrant/build/ --exclude node_modules --exclude .git --exclude .phpdoc --exclude ./vendor --exclude .vagrant
+rsync -avz --progress -e "ssh -F $SSH_CONFIG_FILE" ../pfSense-pkg-RESTAPI vagrant@default:/home/vagrant/build/ --exclude node_modules --exclude .git --exclude .phpdoc --exclude ./vendor --exclude .vagrant
 
 # Run the build script on the vagrant box
 cat << END | vagrant ssh
-composer install --working-dir /home/vagrant/build/pfsense-api
-cp -r /home/vagrant/build/pfsense-api/vendor/* /home/vagrant/build/pfsense-api/pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/.resources/vendor/
-python3.11 /home/vagrant/build/pfsense-api/tools/make_package.py -t $BUILD_VERSION
+composer install --working-dir /home/vagrant/build/pfSense-pkg-RESTAPI
+cp -r /home/vagrant/build/pfSense-pkg-RESTAPI/vendor/* /home/vagrant/build/pfSense-pkg-RESTAPI/pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/.resources/vendor/
+python3.11 /home/vagrant/build/pfSense-pkg-RESTAPI/tools/make_package.py -t $BUILD_VERSION
 END
 
 # Copy the built package back to the host using SCP
-scp -F $SSH_CONFIG_FILE vagrant@default:/home/vagrant/build/pfsense-api/pfSense-pkg-RESTAPI/work/pkg/pfSense-pkg-RESTAPI-$BUILD_VERSION.pkg .
+scp -F $SSH_CONFIG_FILE vagrant@default:/home/vagrant/build/pfSense-pkg-RESTAPI/pfSense-pkg-RESTAPI/work/pkg/pfSense-pkg-RESTAPI-$BUILD_VERSION.pkg .
 rm $SSH_CONFIG_FILE
