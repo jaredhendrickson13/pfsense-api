@@ -412,14 +412,6 @@ class Endpoint {
                 );
             }
         }
-
-        # Do not allow `many` Endpoints that are assigned a Model with a parent Model
-        if ($this->many and $this->model->parent_model_class) {
-            throw new ServerError(
-                message: 'Endpoints cannot enable `many` when the assigned Model has a parent Model',
-                response_id: 'ENDPOINT_MANY_WHEN_MODEL_HAS_PARENT',
-            );
-        }
     }
 
     /**
@@ -633,6 +625,7 @@ class Endpoint {
     private function check_acl(): void {
         # Allow the API call if the ignore_acl flag is set
         if ($this->ignore_acl) {
+            $this->log(level: LOG_DEBUG, message: "Ignoring REST API ACL for $this->url as ignore_acl is set.");
             return;
         }
 
@@ -640,6 +633,11 @@ class Endpoint {
         if (
             !RESTAPIAccessListEntry::is_allowed_by_acl(ip: $this->client->ip_address, username: $this->client->username)
         ) {
+            $this->log(
+                level: LOG_WARNING,
+                message: "Denied {$this->client->username}@{$this->client->ip_address} access to $this->url for REST " .
+                    'API access list violation.',
+            );
             throw new ForbiddenError(
                 message: 'The requested action is not allowed by admin policy',
                 response_id: 'ENDPOINT_CLIENT_NOT_ALLOWED_BY_ACL',
@@ -651,7 +649,10 @@ class Endpoint {
      * Checks if the API is enabled before allowing the call.
      */
     private function check_enabled(): void {
+        $client_ip = $_SERVER['REMOTE_ADDR'];
+
         if (!$this->restapi_settings->enabled->value and !$this->ignore_enabled) {
+            $this->log(level: LOG_WARNING, message: "Denied $client_ip access to $this->url as REST API is disabled.");
             throw new ServiceUnavailableError(
                 message: 'The REST API is currently not enabled.',
                 response_id: 'ENDPOINT_REST_API_IS_NOT_ENABLED',
@@ -665,6 +666,7 @@ class Endpoint {
     private function check_interface_allowed(): void {
         # Variables
         $server_ip = $_SERVER['SERVER_ADDR'];
+        $client_ip = $_SERVER['REMOTE_ADDR'];
         $allowed_interfaces = $this->restapi_settings->allowed_interfaces->value;
 
         # Allow any interface if the allowed interfaces is empty or the ignore_interfaces flag is set
@@ -678,25 +680,27 @@ class Endpoint {
         }
 
         # Loop through each allowed interface and check if the server IP is allowed to answer API calls
-        foreach (
-            $this->restapi_settings->allowed_interfaces->get_related_models()->model_objects
-            as $allowed_interface
-        ) {
+        foreach ($this->restapi_settings->allowed_interfaces->get_related_models()->model_objects as $allowed_if) {
             # Allow the server IP if it matches the current interface's IPv4 or IPv6 address
-            if ($server_ip === $allowed_interface->get_current_ipv4()) {
+            if ($server_ip === $allowed_if->get_current_ipv4()) {
                 return;
             }
-            if ($server_ip === $allowed_interface->get_current_ipv6()) {
+            if ($server_ip === $allowed_if->get_current_ipv6()) {
                 return;
             }
 
             # Check if this interface has a virtual IP that matches the server IP that accepted the API call
-            $vip_q = VirtualIP::query(interface: $allowed_interface->represented_as(), subnet: $server_ip);
+            $vip_q = VirtualIP::query(interface: $allowed_if->represented_as(), subnet: $server_ip);
             if ($vip_q->exists()) {
                 return;
             }
         }
+
         # Throw a forbidden error if this API call was made to a non-API enabled interface
+        $this->log(
+            level: LOG_WARNING,
+            message: "Denied $client_ip access to $this->url as interface IP $server_ip is not allowed to respond.",
+        );
         throw new ForbiddenError(
             message: 'The requested action is not allowed by admin policy',
             response_id: 'ENDPOINT_INTERFACE_NOT_ALLOWED',

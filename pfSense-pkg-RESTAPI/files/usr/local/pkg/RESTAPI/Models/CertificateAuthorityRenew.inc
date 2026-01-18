@@ -120,7 +120,7 @@ class CertificateAuthorityRenew extends Model {
         # Otherwise, continue with the renewal
         $this->newserial->value = cert_get_serial($ca_config['item']['crt']);
         $msg = "Renewed CA {$ca_config['item']['descr']} ({$ca_config['item']['refid']}) - Serial {$this->oldserial->value} -> {$this->newserial->value}";
-        $this->log_error($msg);
+        $this->log(level: LOG_ERR, message: $msg, logfile: 'system');
         $this->write_config($msg);
     }
 

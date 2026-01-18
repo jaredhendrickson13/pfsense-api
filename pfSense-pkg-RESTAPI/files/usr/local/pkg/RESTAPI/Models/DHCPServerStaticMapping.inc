@@ -234,7 +234,7 @@ class DHCPServerStaticMapping extends Model {
         }
 
         # Ensure IP is not reserved by any existing DHCPServerAddressPools
-        $pools = DHCPServerAddressPool::read_all(parent_id: $this->parent_id);
+        $pools = DHCPServerAddressPool::query(parent_id: $this->parent_id);
         foreach ($pools->model_objects as $pool) {
             if (is_inrange_v4($ipaddr, $pool->range_from->value, $pool->range_to->value)) {
                 return $pool;

@@ -52,6 +52,15 @@ value array contains a given value for array fields.
 - Name: `contains`
 - Example: `https://pfsense.example.com/api/v2/examples?fieldname__contains=example`
 
+### In (in)
+
+Search for objects whose field value is within a given array of values (when the filter value is an array), or search
+for objects whose field value is a substring of a given string (when the filter value is a string).
+- Name: `in`
+- Examples: 
+  - `https://pfsense.example.com/api/v2/examples?fieldname__in=example`
+  - `https://pfsense.example.com/api/v2/examples?fieldname__in[]=example1&fieldname__in[]=example2`
+
 ### Less Than (lt)
 
 Search for objects whose field value is less than a given integer.

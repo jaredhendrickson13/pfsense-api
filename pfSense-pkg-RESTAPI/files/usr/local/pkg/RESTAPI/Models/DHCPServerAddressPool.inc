@@ -314,7 +314,7 @@ class DHCPServerAddressPool extends Model {
         }
 
         # Ensure range does not overlap with existing static mappings
-        $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->parent_id);
+        $static_mappings = DHCPServerStaticMapping::query(parent_id: $this->parent_id);
         foreach ($static_mappings->model_objects as $static_mapping) {
             if (is_inrange_v4($static_mapping->ipaddr->value, $range_from, $range_to)) {
                 return $static_mapping;

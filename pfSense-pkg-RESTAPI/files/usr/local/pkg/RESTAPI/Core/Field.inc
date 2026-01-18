@@ -731,7 +731,7 @@ class Field {
             }
 
             # Use $modelset if provided. Otherwise, use all existing $context model objects as the $modelset
-            $modelset = $modelset ?: $this->context->read_all(parent_id: $this->context->parent_id);
+            $modelset = $modelset ?: $this->context->query(parent_id: $this->context->parent_id);
 
             # If this is a $many field, query for any other object has this value in the array
             if ($this->many) {

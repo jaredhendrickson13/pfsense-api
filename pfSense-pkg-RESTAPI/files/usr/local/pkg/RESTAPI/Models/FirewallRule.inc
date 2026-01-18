@@ -272,6 +272,7 @@ class FirewallRule extends Model {
             help_text: 'The internal tracking ID for this firewall rule.',
         );
         $this->associated_rule_id = new StringField(
+            unique: true,
             default: null,
             allow_null: true,
             editable: false,

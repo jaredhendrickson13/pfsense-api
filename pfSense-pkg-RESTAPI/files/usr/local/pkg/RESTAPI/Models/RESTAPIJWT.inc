@@ -48,7 +48,7 @@ class RESTAPIJWT extends Model {
         if (empty($api_config['server_key']) or $rotate === true) {
             # Try to generate the server key, throw a ServerError if we cannot
             try {
-                config_set_path("installedpackages/package/$pkg_id/conf/server_key", bin2hex(random_bytes(32)));
+                Model::set_config("installedpackages/package/$pkg_id/conf/server_key", bin2hex(random_bytes(32)));
                 write_config('API server key created');
             } catch (Exception) {
                 throw new ServerError(
@@ -105,5 +105,11 @@ class RESTAPIJWT extends Model {
 
         # Assign the JWT string to `token`
         $this->token->value = JWT::encode($payload, $server_key, 'HS256');
+
+        # Log the action
+        $this->log(
+            level: LOG_INFO,
+            message: "Client {$this->client->username}@{$this->client->ip_address} was issued a new JWT.",
+        );
     }
 }

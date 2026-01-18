@@ -209,6 +209,7 @@ class PortForward extends Model {
         if ($this->associated_rule_id->value and $this->associated_rule_id->value !== 'pass') {
             $firewall_rule = new FirewallRule(
                 type: 'pass',
+                disabled: $this->disabled->value,
                 interface: [$this->interface->value],
                 ipprotocol: $this->ipprotocol->value,
                 protocol: $this->protocol->value,
@@ -250,6 +251,7 @@ class PortForward extends Model {
             $firewall_rule = $rule_q->first();
             $firewall_rule->from_representation(
                 type: 'pass',
+                disabled: $this->disabled->value,
                 interface: [$this->interface->value],
                 ipprotocol: $this->ipprotocol->value,
                 protocol: $this->protocol->value,

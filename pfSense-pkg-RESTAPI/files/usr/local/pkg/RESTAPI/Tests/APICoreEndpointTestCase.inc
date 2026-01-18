@@ -88,19 +88,6 @@ class APICoreEndpointTestCase extends TestCase {
                 $endpoint->check_construct();
             },
         );
-
-        # Ensure endpoints cannot be many if th model has a parent model
-        $this->assert_throws_response(
-            response_id: 'ENDPOINT_MANY_WHEN_MODEL_HAS_PARENT',
-            code: 500,
-            callable: function () {
-                # Mock a 'many' endpoint with a non many model
-                $endpoint = new ServicesDNSResolverHostOverrideAliasEndpoint();
-                $endpoint->many = true;
-                $endpoint->request_method_options = ['GET'];
-                $endpoint->check_construct();
-            },
-        );
     }
 
     public function test_get_pagination_resource_links(): void {

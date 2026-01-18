@@ -276,15 +276,6 @@ class Dispatcher {
     }
 
     /**
-     * Logs an error to the syslog.
-     * @param string $message The error message to write to the syslog
-     */
-    public static function log_error(string $message): void {
-        # Call the pfSense `log_error` function
-        log_error($message);
-    }
-
-    /**
      * Configures this Dispatcher to run on a schedule if the `schedule` property is set.
      * @return CronJob|null Returns the CronJob created for this Dispatcher if a `schedule` is defined. Returns `null`
      * if no schedule was defined.

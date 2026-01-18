@@ -52,7 +52,7 @@ class APIModelsRoutingGatewayGroupPriorityTestCase extends TestCase {
         $gateway_prio->create();
 
         # Ensure the gateway group object was created
-        $this->assert_equals(RoutingGatewayGroupPriority::read_all(parent_id: $gateway_group->id)->count(), 2);
+        $this->assert_equals(RoutingGatewayGroupPriority::query(parent_id: $gateway_group->id)->count(), 2);
 
         # Update the gateway group priority object with new values
         $gateway_prio->tier->value = 3;
@@ -67,7 +67,7 @@ class APIModelsRoutingGatewayGroupPriorityTestCase extends TestCase {
 
         # Delete the gateway group priority object and ensure it was deleted
         $gateway_prio->delete();
-        $this->assert_equals(RoutingGatewayGroupPriority::read_all(parent_id: $gateway_group->id)->count(), 1);
+        $this->assert_equals(RoutingGatewayGroupPriority::query(parent_id: $gateway_group->id)->count(), 1);
 
         # Cleanup
         $gateway_group->delete();
