@@ -53,7 +53,8 @@ trait BaseTraits {
 
         # If the log level has not been set yet, obtain it
         if (!isset(self::$__log_level)) {
-            self::$__log_level = constant(RESTAPISettings::get_pkg_config()['log_level']) ?? 4;
+            $log_lvl_cfg = RESTAPISettings::get_pkg_config()['log_level'] ?? 'LOG_WARNING';
+            self::$__log_level = constant($log_lvl_cfg);
         }
 
         # Do not log if the incoming level is higher than the configured log level
