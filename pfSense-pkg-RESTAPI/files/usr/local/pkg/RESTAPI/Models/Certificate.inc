@@ -28,8 +28,6 @@ class Certificate extends Model {
     public DateTimeField $valid_until;
     public IntegerField $valid_days_left;
 
-
-
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
         $this->config_path = 'cert';
@@ -110,7 +108,6 @@ class Certificate extends Model {
         $interval = (new \DateTime("now"))->diff($enddate);
         return ($startdate > $enddate) ? -1 * $interval->days : $interval->days;
     }
-
 
     /**
      * Adds extra validation to the `prv` field.
