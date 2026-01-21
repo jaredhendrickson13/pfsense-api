@@ -90,7 +90,6 @@ class Certificate extends Model {
             help_text: 'The number of days remaining until this certificate expires.',
         );
 
-
         parent::__construct($id, $parent_id, $data, ...$options);
     }
 
@@ -104,9 +103,11 @@ class Certificate extends Model {
 
     protected function from_internal_valid_days_left(): int {
         $enddate = cert_get_dates($this->crt->value, false, false)[1];
-        if ($enddate === false) return false;
-        $interval = (new \DateTime("now"))->diff($enddate);
-        return ($startdate > $enddate) ? -1 * $interval->days : $interval->days;
+        if ($enddate === false) {
+            return false;
+        }
+        $interval = (new \DateTime('now'))->diff($enddate);
+        return $startdate > $enddate ? -1 * $interval->days : $interval->days;
     }
 
     /**
