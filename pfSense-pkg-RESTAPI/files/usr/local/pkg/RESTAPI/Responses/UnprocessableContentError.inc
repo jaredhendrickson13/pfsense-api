@@ -15,7 +15,7 @@ use RESTAPI\Core\Response;
  */
 class UnprocessableContentError extends Response {
     public $code = 422;
-    public string $help_text = 'The client has requested a resource that requires a dependency which is not installed.';
+    public string $help_text = 'The client has requested a resource that requires a dependency or other requirement that was not met.';
 
     public function __construct(
         $message,

@@ -1300,4 +1300,89 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $this->assert_equals(Model::normalize_config_path('/test//path/'), 'test/path');
         $this->assert_equals(Model::normalize_config_path('test'), 'test');
     }
+
+    /**
+     * Checks that the read_all() method caches previously read Model objects to improve performance.
+     */
+    public function test_read_all_caching(): void {
+        # Ensure the model cache is empty
+        FirewallAlias::get_model_cache()::clear();
+
+        # Create FirewallAlias models to test this
+        $alias_0 = new FirewallAlias(name: 'alias0', type: 'host');
+        $alias_0->create();
+        $alias_1 = new FirewallAlias(name: 'alias1', type: 'port');
+        $alias_1->create();
+        $aliias_2 = new FirewallAlias(name: 'alias2', type: 'network');
+        $aliias_2->create();
+
+        # Read all aliases and ensure the cache is populated
+        FirewallAlias::read_all();
+        $this->assert_is_true(
+            array_key_exists(FirewallAlias::get_class_fqn(), FirewallAlias::get_model_cache()::$cache),
+        );
+        $this->assert_equals(
+            count(FirewallAlias::get_model_cache()::fetch_modelset(FirewallAlias::get_class_fqn())->model_objects),
+            3,
+        );
+
+        # Add another alias and ensure the cache is updated
+        $alias_3 = new FirewallAlias(name: 'alias3', type: 'host');
+        $alias_3->create();
+        FirewallAlias::read_all();
+        $this->assert_equals(
+            count(FirewallAlias::get_model_cache()::fetch_modelset(FirewallAlias::get_class_fqn())->model_objects),
+            4,
+        );
+
+        # Delete all the aliases
+        FirewallAlias::delete_all();
+
+        # Ensure the cache was cleared after deletion
+        $this->assert_is_false(FirewallAlias::get_model_cache()::has_modelset(FirewallAlias::get_class_fqn()));
+    }
+
+    /**
+     * Checks that read_all() on a Model with a parent Model class returns all child Model objects from all parents.
+     */
+    public function test_read_all_with_parent_model(): void {
+        # Create DNSResolverHostOverrides with nested aliases to test this
+        $overrides = new RESTAPI\Models\DNSResolverHostOverride();
+        $overrides->replace_all([
+            [
+                'host' => 'host1',
+                'domain' => 'example.com',
+                'ip' => ['127.0.0.1'],
+                'aliases' => [['host' => 'alias1', 'domain' => 'example.com']],
+            ],
+            [
+                'host' => 'host2',
+                'domain' => 'example.com',
+                'ip' => ['127.0.0.2'],
+                'aliases' => [['host' => 'alias2', 'domain' => 'example.com']],
+            ],
+            [
+                'host' => 'host3',
+                'domain' => 'example.com',
+                'ip' => ['127.0.0.3'],
+                'aliases' => [['host' => 'alias3', 'domain' => 'example.com']],
+            ],
+        ]);
+
+        # Read all DNSResolverHostOverrideAlias models and ensure all aliases from all overrides are returned
+        $all_aliases = RESTAPI\Models\DNSResolverHostOverrideAlias::read_all();
+        $this->assert_equals($all_aliases->count(), 3);
+        $this->assert_equals($all_aliases->model_objects[0]->host->value, 'alias1');
+        $this->assert_equals($all_aliases->model_objects[0]->parent_id, 0);
+        $this->assert_equals($all_aliases->model_objects[0]->id, 0);
+        $this->assert_equals($all_aliases->model_objects[1]->host->value, 'alias2');
+        $this->assert_equals($all_aliases->model_objects[1]->parent_id, 1);
+        $this->assert_equals($all_aliases->model_objects[1]->id, 0);
+        $this->assert_equals($all_aliases->model_objects[2]->host->value, 'alias3');
+        $this->assert_equals($all_aliases->model_objects[2]->parent_id, 2);
+        $this->assert_equals($all_aliases->model_objects[2]->id, 0);
+
+        # Cleanup DNSResolverHostOverrides
+        $overrides->delete_all();
+    }
 }

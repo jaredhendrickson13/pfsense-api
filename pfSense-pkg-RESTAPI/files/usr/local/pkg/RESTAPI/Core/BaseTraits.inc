@@ -3,6 +3,7 @@
 namespace RESTAPI\Core;
 
 use ReflectionClass;
+use RESTAPI\Models\RESTAPISettings;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
@@ -10,20 +11,22 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * automatically inherit all resources included.
  */
 trait BaseTraits {
+    private static int $__log_level;
+
     /**
      * Obtains the shortname of the called class.
      * @return string The shortname for this object's class.
      */
-    public function get_class_shortname(): string {
-        return (new ReflectionClass($this))->getShortName();
+    public static function get_class_shortname(): string {
+        return (new ReflectionClass(static::class))->getShortName();
     }
 
     /**
      * Obtains the fully qualified name of the called class.
      * @return string The FQN for this object's class.
      */
-    public function get_class_fqn(): string {
-        return (new ReflectionClass($this))->getName();
+    public static function get_class_fqn(): string {
+        return (new ReflectionClass(static::class))->getName();
     }
 
     /**
@@ -35,11 +38,33 @@ trait BaseTraits {
     }
 
     /**
-     * Logs an error to the syslog.
-     * @param string $message The error message to write to the syslog
+     * Writes a log entry to the applicable log file
+     * @param int $level The log level to write. This should be one of the LOG_* constants defined by syslog.
+     * @param string $message The message to write to the log file.
+     * @param string $logfile The log file to write to. This must be a valid logging facility defined in the package's
+     * info.xml file.
      */
-    public static function log_error(string $message): void {
-        # Call the pfSense `log_error` function
-        log_error($message);
+    public static function log(int $level, string $message, string $logfile = 'restapi'): void {
+        # If this is a system log, use the pfSense 'log_error' function instead
+        if ($logfile === 'system') {
+            log_error($message);
+            return;
+        }
+
+        # If the log level has not been set yet, obtain it
+        if (!isset(self::$__log_level)) {
+            $log_lvl_cfg = RESTAPISettings::get_pkg_config()['log_level'] ?? 'LOG_WARNING';
+            self::$__log_level = constant($log_lvl_cfg);
+        }
+
+        # Do not log if the incoming level is higher than the configured log level
+        if ($level > self::$__log_level) {
+            return;
+        }
+
+        # Otherwise, write to the applicable log file
+        openlog($logfile, flags: LOG_PID, facility: LOG_LOCAL0);
+        syslog(priority: $level, message: $message);
+        closelog();
     }
 }

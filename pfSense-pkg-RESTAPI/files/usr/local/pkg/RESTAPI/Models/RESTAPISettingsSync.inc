@@ -122,13 +122,22 @@ class RESTAPISettingsSync extends Model {
             # Log an error if the HTTP failed
             if (!$response) {
                 cprint(message: 'failed.' . PHP_EOL, condition: $print_status);
-                self::log_error("Failed to sync REST API settings to $ha_sync_host: no response received.");
+                self::log(
+                    level: LOG_ERR,
+                    message: "Failed to sync REST API settings to $ha_sync_host: no response received.",
+                );
             } elseif (!$response_json) {
                 cprint(message: 'failed.' . PHP_EOL, condition: $print_status);
-                self::log_error("Failed to sync REST API settings to $ha_sync_host: received unexpected response.");
+                self::log(
+                    level: LOG_ERR,
+                    message: "Failed to sync REST API settings to $ha_sync_host: received unexpected response.",
+                );
             } elseif ($response_json['code'] !== 200) {
                 cprint(message: 'failed.' . PHP_EOL, condition: $print_status);
-                self::log_error("Failed to sync REST API settings to $ha_sync_host: {$response_json['message']}");
+                self::log(
+                    level: LOG_ERR,
+                    message: "Failed to sync REST API settings to $ha_sync_host: {$response_json['message']}",
+                );
             } else {
                 cprint(message: 'done.' . PHP_EOL, condition: $print_status);
             }

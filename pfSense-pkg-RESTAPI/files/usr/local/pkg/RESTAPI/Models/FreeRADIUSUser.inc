@@ -10,6 +10,7 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
+use RESTAPI\Validators\IPAddressValidator;
 
 /**
  * Defines a Model that represents FreeRADIUS Users
@@ -58,7 +59,8 @@ class FreeRADIUSUser extends Model {
             help_text: 'The encryption method for the password.',
         );
         $this->motp_enable = new BooleanField(
-            required: true,
+            required: false,
+            default: false,
             indicates_true: 'on',
             indicates_false: '',
             internal_name: 'varusersmotpenable',
@@ -110,6 +112,24 @@ class FreeRADIUSUser extends Model {
             ],
             help_text: 'A description for this user.',
         );
+        $this->framed_ip_address = new StringField(
+            required: false,
+            default: '',
+            internal_name: 'varusersframedipaddress',
+            allow_empty: true,
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
+            help_text: 'Framed-IP-Address MUST be supported by NAS. ' .
+                'If the OpenVPN server uses a subnet style Topology the RADIUS server MUST ' .
+                'also send back an appropriate Framed-IP-Netmask value matching the VPN Tunnel Network.',
+        );
+        $this->framed_ip_netmask = new StringField(
+            required: false,
+            default: '',
+            internal_name: 'varusersframedipnetmask',
+            allow_empty: true,
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
+            help_text: 'Framed-IP-Netmask MUST be supported by NAS',
+        );
 
         parent::__construct($id, $parent_id, $data, ...$options);
     }
@@ -128,7 +148,7 @@ class FreeRADIUSUser extends Model {
         if (!empty($input_errors)) {
             throw new ValidationError(
                 message: "An unexpected validation error has occurred: $input_errors[0]. Please report this issue at " .
-                    'https://github.com/jaredhendrickson13/pfsense-api/issues/new',
+                    'https://github.com/pfrest/pfSense-pkg-RESTAPI/issues/new',
                 response_id: 'FREERADIUS_USER_UNEXPECTED_VALIDATION_ERROR',
             );
         }

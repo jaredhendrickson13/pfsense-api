@@ -12,12 +12,12 @@ including but not limited to:
 - Bug fixes
 - New features
 - Documentation improvements
-- Reporting and collaborating to open [issues](https://github.com/jaredhendrickson13/pfsense-api/issues)
-- Opening and contributing to [discussions](https://github.com/jaredhendrickson13/pfsense-api/discussions)
+- Reporting and collaborating to open [issues](https://github.com/pfrest/pfSense-pkg-RESTAPI/issues)
+- Opening and contributing to [discussions](https://github.com/pfrest/pfSense-pkg-RESTAPI/discussions)
 
 To make a code contribution, please follow these steps:
 
-1. Fork the repository on [GitHub](https://github.com/jaredhendrickson13/pfsense-api).
+1. Fork the repository on [GitHub](https://github.com/pfrest/pfSense-pkg-RESTAPI).
 2. Clone your fork locally and make your changes.
 3. Commit your changes and push them to your fork.
 4. Open a pull request on the main repository to merge your changes into the project.
@@ -174,7 +174,7 @@ These tools will allow you to create a FreeBSD virtual machine for building the 
 Clone the repository to your development machine:
 
 ```bash
-git clone git@github.com:jaredhendrickson13/pfsense-api.git
+git clone git@github.com:pfrest/pfSense-pkg-RESTAPI.git
 ```
 
 #### Step 3: Run the vagrant-build.sh script

@@ -12,7 +12,7 @@ use RESTAPI\Responses\ServerError;
  * Defines a Model that represents the REST API version installed on this system.
  */
 class RESTAPIVersion extends Model {
-    const REPO_URL = 'https://github.com/jaredhendrickson13/pfsense-api';
+    const REPO_URL = 'https://github.com/pfrest/pfSense-pkg-RESTAPI';
 
     public StringField $current_version;
     public StringField $latest_version;
@@ -236,8 +236,8 @@ class RESTAPIVersion extends Model {
 
             # If an error occurred either deleting or adding the package, return false
             if ($delete->result_code !== 0 or $add->result_code !== 0) {
-                $this->log_error($delete->output);
-                $this->log_error($add->output);
+                $this->log(level: LOG_ERR, message: $delete->output);
+                $this->log(level: LOG_ERR, message: $add->output);
                 return false;
             }
 

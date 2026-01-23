@@ -4,17 +4,23 @@
         <name>RESTAPI</name>
         <internal_name>restapi</internal_name>
         <descr><![CDATA[The missing REST API package for pfSense]]></descr>
-        <website>https://github.com/jaredhendrickson13/pfsense-api</website>
+        <website>https://github.com/pfrest/pfSense-pkg-RESTAPI</website>
         <category>System</category>
         <version>%%PKGVERSION%%</version>
         <configurationfile>restapi.xml</configurationfile>
         <maintainer>github@jaredhendrickson.com</maintainer>
+        <logging>
+            <logtab>REST API</logtab>
+            <facilityname>restapi</facilityname>
+            <logfilename>restapi.log</logfilename>
+        </logging>
         <conf>
             <enabled>enabled</enabled>
             <read_only>disabled</read_only>
             <keep_backup>enabled</keep_backup>
             <login_protection>enabled</login_protection>
             <log_successful_auth>disabled</log_successful_auth>
+            <log_level>LOG_WARNING</log_level>
             <hateoas>disabled</hateoas>
             <expose_sensitive_fields>disabled</expose_sensitive_fields>
             <override_sensitive_fields></override_sensitive_fields>

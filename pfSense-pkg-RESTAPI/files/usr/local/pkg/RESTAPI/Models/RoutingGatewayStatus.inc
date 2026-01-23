@@ -29,6 +29,7 @@ class RoutingGatewayStatus extends Model {
         $this->name = new ForeignModelField(
             model_name: 'RoutingGateway',
             model_field: 'name',
+            unique: true,
             allow_null: true,
             read_only: true,
             help_text: 'The name of the gateway this status corresponds to.',

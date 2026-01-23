@@ -12,7 +12,7 @@ API package and provide you with the information you need to configure and use t
 
 !!! Note
     These docs are only applicable to the REST API v2 package and later. If you are using the legacy v1 package, please
-    refer to the docs on the [legacy branch](https://github.com/jaredhendrickson13/pfsense-api/tree/legacy).
+    refer to the docs on the [legacy branch](https://github.com/pfrest/pfSense-pkg-RESTAPI/tree/legacy).
 
 ## Key Features
 
@@ -25,12 +25,12 @@ API package and provide you with the information you need to configure and use t
 - Built-in Swagger documentation
 
 New features are constantly being added. If you have a feature request, please open an issue on the project's [GitHub
-repository](https://github.com/jaredhendrickson13/pfsense-api/issues/new?labels=backlog%2C+feature+request&projects=&template=feature-request.md).
+repository](https://github.com/pfrest/pfSense-pkg-RESTAPI/issues/new?labels=backlog%2C+feature+request&projects=&template=feature-request.md).
 
 ## Source Code & Contributions
 
-The source code for this project is available in its entirety on [GitHub](https://github.com/jaredhendrickson13/pfsense-api)
-and is licensed under an [Apache 2.0 license](https://github.com/jaredhendrickson13/pfsense-api/blob/master/LICENSE).
+The source code for this project is available in its entirety on [GitHub](https://github.com/pfrest/pfSense-pkg-RESTAPI)
+and is licensed under an [Apache 2.0 license](https://github.com/pfrest/pfSense-pkg-RESTAPI/blob/master/LICENSE).
 Contributions are welcome and encouraged. If you would like to contribute to the project, please read through the
 [contribution guidelines](CONTRIBUTING.md) before
 opening a pull request.
@@ -41,8 +41,8 @@ opening a pull request.
 
 !!! Important
     Unless your inquiry is regarding a [security vulnerability](SECURITY.md) or other sensitive matter, please do not 
-    contact the maintainers directly. Instead, please [open an issue](https://github.com/jaredhendrickson13/pfsense-api/issues/new/choose) to report a bug or request a feature. For 
-    general questions or help requests, please [open a discussion](https://github.com/jaredhendrickson13/pfsense-api/discussions/new/choose).
+    contact the maintainers directly. Instead, please [open an issue](https://github.com/pfrest/pfSense-pkg-RESTAPI/issues/new/choose) to report a bug or request a feature. For 
+    general questions or help requests, please [open a discussion](https://github.com/pfrest/pfSense-pkg-RESTAPI/discussions/new/choose).
 
 ## Disclaimers
 

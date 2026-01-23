@@ -7,6 +7,7 @@ require_once 'RESTAPI/autoloader.inc';
 use RESTAPI;
 use RESTAPI\Core\Field;
 use RESTAPI\Core\Model;
+use RESTAPI\Core\ModelCache;
 use RESTAPI\Core\ModelSet;
 use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
@@ -212,27 +213,75 @@ class ForeignModelField extends Field {
     }
 
     /**
+     * Ensures that the foreign models this field relates to are indexed by their foreign model fields and
+     * internal fields for faster querying.
+     */
+    protected function _index_foreign_models(): void {
+        # Index all Models from the referenced Model classes
+        foreach ($this->models as $model) {
+            $model_name = $model->get_class_fqn();
+
+            # Index the Model objects by the `model_field`
+            ModelCache::get_instance()::index_modelset_by_field(
+                model_class: $model_name,
+                index_field: $this->model_field,
+            );
+
+            # Index the Model objects by the `model_field_internal` if different
+            if ($this->model_field_internal !== $this->model_field) {
+                ModelCache::get_instance()::index_modelset_by_field(
+                    model_class: $model_name,
+                    index_field: $this->model_field_internal,
+                );
+            }
+        }
+    }
+
+    /**
+     * Obtains the referenced Model object from the model cache index by its internal value.
+     */
+    public function get_referenced_model_by_internal_value(mixed $internal_value): Model|null {
+        # First, obtain the model cache and ensure foreign models are indexed
+        $model_cache = ModelCache::get_instance();
+        $this->_index_foreign_models();
+
+        # Then, attempt to obtain the Model object from the index
+        foreach ($this->models as $model) {
+            # Obtain the Model class FQN
+            $model_name = $model->get_class_fqn();
+
+            # Check if a Model object is indexed by this internal value
+            if (
+                $model_cache::has_model(
+                    $model_name,
+                    index_field: $this->model_field_internal,
+                    index_value: $internal_value,
+                )
+            ) {
+                return $model_cache::fetch_model(
+                    model_class: $model_name,
+                    index_field: $this->model_field_internal,
+                    index_value: $internal_value,
+                );
+            }
+        }
+
+        # Otherwise, return null
+        return null;
+    }
+
+    /**
      * Converts the field value to its representation form from it's internal pfSense configuration value.
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return mixed The field value in its representation form.
      */
     protected function _from_internal(mixed $internal_value): mixed {
-        # Ensure the internal field value is converted to its representation value before querying
-        if ($this->model_field_internal !== 'id') {
-            $internal_value = $this->models[0]->{$this->model_field_internal}->_from_internal($internal_value);
-        }
+        # Fetch the related Model object using the internal value
+        $related_model = $this->get_referenced_model_by_internal_value($internal_value);
 
-        # If the model_field_internal, and the model_field are the same, return the internal value as-is.
-        if ($this->model_field_internal === $this->model_field) {
-            return $internal_value;
-        }
-
-        # Query for the Model object this value relates to.
-        $query_modelset = $this->__get_matches($this->model_field_internal, $internal_value);
-
-        # If the model object exists, return the `model_field` value.
-        if ($query_modelset->exists()) {
-            return $query_modelset->first()->{$this->model_field}->value;
+        # If the related Model object exists, return the existing `model_field` value.
+        if ($related_model !== null) {
+            return $related_model->{$this->model_field}->value;
         }
 
         # As a failsafe, return the existing internal value if we could not find the related object
@@ -287,40 +336,34 @@ class ForeignModelField extends Field {
     /**
      * Obtains the ModelSet of Model objects that are in-scope for this field using the $model_query and
      * $parent_model_query properties.
-     * @return ModelSet A ModelSet of Model objects that are in-scope for this field
+     * @return array An array of ModelSet objects containing all in-scope Models for this ForeignModelField.
      */
-    public function get_in_scope_models(): ModelSet {
+    public function get_in_scope_models(): array {
         # Variables
-        $in_scope_models = new ModelSet();
+        $in_scope_modelsets = [];
 
         # Get in scope Models from all assigned $model_name classes
         foreach ($this->models as $model) {
-            # Create a new ModelSet to store the in-scope Models for this model class
-            $models = new ModelSet();
-
-            # Obtain the parent Models if the assigned $model has a $parent_model_class assigned to it.
+            # For Models with parent Mdoels assigned, ensure only child Models from in-scope parent Models are included
             if ($model->parent_model_class) {
                 $parent_model_class = $model->get_parent_model();
                 $parent_model = new $parent_model_class();
                 $parent_models = $parent_model->query($this->parent_model_query);
-
-                # Loop through each identified parent and add its children into the ModelSet
-                foreach ($parent_models->model_objects as $parent) {
-                    $parent_children = $model->query(parent_id: $parent->id);
-                    $models->model_objects = array_merge($models->model_objects, $parent_children->model_objects);
-                }
+                $in_scope_parent_model_ids = array_map(fn($parent) => $parent->id, $parent_models->model_objects);
+                $models = $model->query(parent_id__in: $in_scope_parent_model_ids);
             }
             # Otherwise, just use all of this $model's current objects
             else {
                 $models = $model->read_all();
             }
 
-            # Add the in-scope Models to the ModelSet
-            $in_scope_models->model_objects = array_merge($in_scope_models->model_objects, $models->model_objects);
+            # Filter out Models that do not meet the assigned $model_query criteria
+            $models = $models->query($this->model_query);
+            $in_scope_modelsets[$model->get_class_fqn()] = $models;
         }
 
         # Query for the Model object this value relates to.
-        return $in_scope_models->query($this->model_query);
+        return $in_scope_modelsets;
     }
 
     /**
@@ -331,7 +374,29 @@ class ForeignModelField extends Field {
      * to the same value as $this->value.
      */
     private function __get_matches(string $field_name, mixed $field_value): ModelSet {
-        return $this->get_in_scope_models()->query(query_params: [$field_name => $field_value]);
+        self::_index_foreign_models();
+
+        # Loop through all in cope modelsets to find matches
+        foreach ($this->get_in_scope_models() as $model_class => $in_scope_modelset) {
+            # Move to the next model class if we found no matches in the index
+            if (!ModelCache::get_instance()::has_model($model_class, $field_name, $field_value)) {
+                continue;
+            }
+
+            # Obtain the matched model
+            $matched_model = ModelCache::get_instance()::fetch_model($model_class, $field_name, $field_value);
+
+            # Move to the next model class if the matched model we found was not in scope
+            if ($this->model_query and !$in_scope_modelset->query(id: $matched_model->id)->exists()) {
+                continue;
+            }
+
+            # Otherwise, the matched model is valid. Return it within a ModelSet
+            return new ModelSet(model_objects: [$matched_model]);
+        }
+
+        # Return an empty ModelSet if no matches were found
+        return new ModelSet();
     }
 
     /**

@@ -33,6 +33,7 @@ class SystemRESTAPISettingsForm extends Form {
                 'jwt_exp',
                 'login_protection',
                 'log_successful_auth',
+                'log_level',
                 'expose_sensitive_fields',
                 'override_sensitive_fields',
             ],
@@ -60,7 +61,7 @@ class SystemRESTAPISettingsForm extends Form {
         'report_an_issue' => [
             'title' => 'Report an Issue',
             'icon' => 'fa-solid fa-question-circle',
-            'link' => 'https://github.com/jaredhendrickson13/pfsense-api/issues/new/choose',
+            'link' => 'https://github.com/pfrest/pfSense-pkg-RESTAPI/issues/new/choose',
             'classes' => ['btn-info'],
         ],
     ];
