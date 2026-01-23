@@ -86,6 +86,8 @@ class Certificate extends Model {
         );
         $this->valid_days_left = new IntegerField(
             read_only: true,
+            minimum: 1,
+            maximum: 12000,
             representation_only: true,
             help_text: 'The number of days remaining until this certificate expires.',
         );
@@ -93,21 +95,33 @@ class Certificate extends Model {
         parent::__construct($id, $parent_id, $data, ...$options);
     }
 
+    /**
+     * Gets the start date of this certificate.
+     * @returns string The start date in 'Y-m-d H:i:s' format.
+     */
     protected function from_internal_valid_from(): string {
         return cert_get_dates($this->crt->value, false, false)[0]->format('Y-m-d H:i:s');
     }
 
+    /**
+     * Gets the expiration date of this certificate.
+     * @returns string The expiration date in 'Y-m-d H:i:s' format.
+     */
     protected function from_internal_valid_until(): string {
         return cert_get_dates($this->crt->value, false, false)[1]->format('Y-m-d H:i:s');
     }
 
+    /**
+     * Calculates the number of days left until this certificate expires.
+     * @returns int The number of entire days left until expiration. -1 if already expired.
+     */
     protected function from_internal_valid_days_left(): int {
         $enddate = cert_get_dates($this->crt->value, false, false)[1];
-        if ($enddate === false) {
+        if (!$enddate) {
             return false;
         }
-        $interval = (new \DateTime('now'))->diff($enddate);
-        return $startdate > $enddate ? -1 * $interval->days : $interval->days;
+        $interval = (new \DateTime())->diff($enddate);
+        return $interval->invert ? -1 : $interval->days;
     }
 
     /**
