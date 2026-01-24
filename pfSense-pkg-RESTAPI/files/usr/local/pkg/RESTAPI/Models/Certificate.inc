@@ -5,6 +5,8 @@ namespace RESTAPI\Models;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Fields\DateTimeField;
+use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\UIDField;
 use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\ValidationError;
@@ -22,6 +24,9 @@ class Certificate extends Model {
     public Base64Field $csr;
     public Base64Field $crt;
     public Base64Field $prv;
+    public DateTimeField $valid_from;
+    public DateTimeField $valid_until;
+    public IntegerField $valid_days_left;
 
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options) {
         # Set model attributes
@@ -69,8 +74,54 @@ class Certificate extends Model {
             validators: [new X509Validator(allow_prv: true, allow_ecprv: true, allow_rsa: true)],
             help_text: 'The X509 private key string.',
         );
+        $this->valid_from = new DateTimeField(
+            read_only: true,
+            representation_only: true,
+            help_text: 'The start date from which this certificate is valid.',
+        );
+        $this->valid_until = new DateTimeField(
+            read_only: true,
+            representation_only: true,
+            help_text: 'The date until which this certificate is valid.',
+        );
+        $this->valid_days_left = new IntegerField(
+            read_only: true,
+            minimum: 1,
+            maximum: 12000,
+            representation_only: true,
+            help_text: 'The number of days remaining until this certificate expires.',
+        );
 
         parent::__construct($id, $parent_id, $data, ...$options);
+    }
+
+    /**
+     * Gets the start date of this certificate.
+     * @returns string The start date in 'Y-m-d H:i:s' format.
+     */
+    protected function from_internal_valid_from(): string {
+        return cert_get_dates($this->crt->value, false, false)[0]->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Gets the expiration date of this certificate.
+     * @returns string The expiration date in 'Y-m-d H:i:s' format.
+     */
+    protected function from_internal_valid_until(): string {
+        return cert_get_dates($this->crt->value, false, false)[1]->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Calculates the number of days left until this certificate expires.
+     * @returns int The number of entire days left until expiration. -1 if already expired.
+     */
+    protected function from_internal_valid_days_left(): int {
+        $enddate = cert_get_dates($this->crt->value, false, false)[1];
+        if (!$enddate) {
+            return false;
+        }
+        $interval = (new \DateTime())->diff($enddate);
+        return $interval->invert ? -1 : $interval->days;
     }
 
     /**
